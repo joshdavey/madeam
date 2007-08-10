@@ -1,0 +1,76 @@
+/* =prep
+------------------------------------------------------- */
+:link,:visited { text-decoration:none }
+ul,ol { list-style:none }
+ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,body,html,p,blockquote,fieldset,input { margin:0; padding:0 }
+a img,:link img,:visited img { border:none }
+address { font-style:normal }
+
+/* =main
+------------------------------------------------------- */
+html {  }
+body { color: #333; font-family: verdana, "Lucida Grande", arial, helvetica, sans-serif; background: #111; }
+
+/* =link
+------------------------------------------------------- */
+a:link, a:visited { color: #000; text-decoration: underline; }
+a:hover { color: #333; text-decoration: none; }
+
+/* =fieldset
+------------------------------------------------------- */
+fieldset { margin: 1em 0; padding: 1em; border: 1px solid #ccc; background: #f8f8f8; }
+
+/* =legend
+------------------------------------------------------- */
+legend { font-weight: bold; }
+
+/* =label
+------------------------------------------------------- */
+label { float: left; width: 8em; font-weight: bold; }
+
+/* =paragraph
+------------------------------------------------------- */
+form p { padding: 4px; }
+
+/* =input
+------------------------------------------------------- */
+input { background-image: url('../imgs/input_bg.gif'); border: solid 1px #ccc; }
+input { padding: 2px; font-size: 1em; font-weight: bold;  }
+
+/* =textarea
+------------------------------------------------------- */
+textarea { border: solid 1px #aaa; }
+textarea { padding: 2px; font-size: 1em; font-weight: bold;  }
+
+/* =error
+------------------------------------------------------- */
+.error { background: #c60e1b; color: #fff; padding: 3px; border: solid 3px #f31e2d; list-style-type: square; }
+.error li { margin-left: 20px; }
+
+/* =header
+------------------------------------------------------- */
+#header { background: #0c1531; border-bottom: solid 4px #555; border-top: solid 6px #000; padding: 4px; }
+#header h1 { color: #fffad4; font-weight: 100; }
+#header p { color: #fff; }
+#header img { float: left; margin-right: 10px; }
+
+/* =content
+------------------------------------------------------- */
+#content { background: #fff; border-bottom: solid 4px #ddd; padding: 20px; }
+
+/* =paragraph
+------------------------------------------------------- */
+p { padding: 10px; }
+
+/* =code
+------------------------------------------------------- */
+code { margin: 10px 0 10px 40px; font-weight: bold; font-size: 1.5em; background: #fffad4; border-left: solid 3px #ddd; border-bottom: solid 3px #ddd; padding: 8px; }
+
+/* =step
+------------------------------------------------------- */
+.step { margin: 0 0 20px 20px; border-left: solid 3px #ddd; padding-left: 8px; }
+
+
+/* =clear
+------------------------------------------------------- */
+.clr { clear: both; visibility: hidden; }

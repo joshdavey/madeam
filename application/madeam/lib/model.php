@@ -1,0 +1,559 @@
+<?php
+/**
+ * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
+ * Copyright (c)	2006, Joshua Davey
+ *								24 Ridley Gardens, Toronto, Ontario, Canada
+ *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright		Copyright (c) 2006, Joshua Davey
+ * @link				http://www.madeam.com
+ * @package			madeam
+ * @version			0.0.4
+ * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @author      Joshua Davey
+ */
+class model {
+
+  public $validators              = array();
+  public $models                  = array();
+  public $depth                   = 2;  // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
+  public $fields                  = array();
+  public $custom_fields           = array();
+  public $reflection_obj;
+  public $name                    = null;
+  public $skeleton                = array(); // array of fields that is the structure of this model
+  public $behaviours              = array(); // list of behaviours
+  
+  public $unbound                 = array();
+  
+  public $primary_key             = 'id';
+  
+  public $parent                  = false; // this is used when initiating a sub model within a model.
+
+  public $has_one                 = array();
+  public $has_many                = array();
+  public $belongs_to              = array();
+  public $has_and_belongs_to_many = array();
+  
+  public $has_models              = array(); // this is where we store all of it's relationships. It's just a copy of has_one, has_many and has_many_and_belongs_to_many for use by children of parents and other things when chaining query methods
+
+  public function __construct() {
+    // pre-load a reflection of this class for use in parseing the meta data and methods
+    $this->load_reflection();
+    
+    // get fields
+    // I would like to retire this function but I have a feeling it might make it's way back one day. -- I just hate typing out field information.
+    $this->load_fields();
+
+    // set name
+    $modelname = get_class($this);
+    $this->name = inflector::model_nameize(substr($modelname, 0, (strlen($modelname)-5))); // safely remove "Model" from the name
+
+    // the depth measures how deep you want the relationships to go.
+    if ($this->depth > 0) {
+      $this->depth--;
+
+      // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
+      $this->load_relations();
+      
+      // prepare models to make sure they have their foreign keys properly set
+      //$this->prep_models();
+    }
+  }
+  
+  /**
+   * Handle variable gets.
+   * This magic method exists to handle instances of models when they're called
+   * If the instance of a model doesn't exist we create it here.
+   * This is so we don't need to pre-load all of them.
+   *
+   * @param string $name
+   * @return object
+   */
+  public function __get($name) {
+    // catch set_ method call
+    $match = array();
+    if (preg_match("/^[A-Z]{1}/", $name, $match) && in_array($name, array_keys($this->has_models))) {
+      
+      $model = $this->has_models[$name]['model'];
+      
+      // set model class name
+      $model_class = inflector::model_classize($model);
+      
+      // create model instance
+      $inst = new $model_class($this->depth);
+      $this->$name = $inst;
+      
+      // here we pass a reference of this class to the child model
+      $this->$name->parent = $this;
+      
+      return $inst;
+    } else {
+      // set model class name
+      $comp_class = $name . 'Component';
+      
+      // create component instance
+      $inst = new $comp_class($this);
+      $this->$name = $inst;
+      return $inst;
+    }
+  }
+
+
+  /**
+   * The models all need to have foreign key values before they are processed by anything else.
+   * So here we run through each one and assign a foreign key if they don't already have one.
+   * 
+   * has_one Example Use 1: array('user')
+   * When there is only a key typed in then it takes that as the model name and the foreign key is assumed to be the singalized version of the model name
+   * 
+   * has_one Example Use 2: array('user' => 'author')
+   * When a key and a value are typed in the key is the model and the value is the foreign key
+   * 
+   * has_many Example Use 1: array('user')
+   * When there is only a key typed in then it takes that as the model name and the name of this model in singalized for is used as the foreign key
+   * 
+   * has_many Example Use 2: array('user' => 'author')
+   * When a key and a value are typed in the key is the model and the value is the foreign key
+   */
+  final protected function prep_models() {
+    // prep has_one models
+    $temp = $this->has_one;
+    $this->has_one = array();
+    foreach ($temp as $model => $opts) {
+      if (is_int($model)) {
+        $this->has_one[inflector::model_nameize($opts)] = inflector::model_foreign_key($opts);
+      } else {
+        $this->has_one[inflector::model_nameize($model)] = $opts;
+      }
+    }
+    
+    // prep has_many models
+    $temp = $this->has_many;
+    $this->has_many = array();
+    foreach ($temp as $model => $opts) {
+      if (is_int($model)) {
+        $this->has_many[inflector::model_nameize($opts)] = inflector::model_foreign_key($this->name);
+      } else {
+        $this->has_many[inflector::model_nameize($model)] = $opts;
+      }
+    }
+    
+    // prep has_and_belongs_to_many models
+    $temp = $this->has_and_belongs_to_many;
+    $this->has_and_belongs_to_many = array();
+    foreach ($temp as $model => $opts) {
+      if (is_int($model)) {
+        $this->has_and_belongs_to_many[inflector::model_nameize($opts)] = inflector::model_foreign_key($this->name);
+      } else {
+        $this->has_and_belongs_to_many[inflector::model_nameize($model)] = $opts;
+      }
+    }
+    
+    // merge models
+    // and add itself to the list of models
+    // let's get rid of this... I don't like it.
+    $this->has_models = array_merge($this->has_one, $this->has_many, $this->has_and_belongs_to_many, array($this->name => $this->primary_key));
+  }
+
+  /**
+   * This method scans the names of this object's variables and creates a list of validators that are used when saving data.
+   * For example the variable "var $validate_name_isnotempty = array('message' => 'Name cannot be empty')"
+   * Sets a validator that validates the name's value with the validator method "isnotempty". If it fails to validate then
+   * the error message "Name cannot be empty" is returned.
+   *
+   * You can also set arguments in the array. For example: "array('message' => 'Oops', 'max' => 255)".
+   */
+  final protected function load_validators() {
+    foreach ($this->reflection_obj->getProperties() as $prop) {     
+			
+			// filter out private variables. The less we need to parse the better
+			if ($prop->isPublic() || $prop->isProtected()) {
+				// get property name
+				$property_name = $prop->name;
+				
+				if (preg_match("/validate_(.+)/", $property_name, $found)) {
+					// get value of validator property
+					$args  = $prop->getValue($this);
+	
+					// seperate bits of validate call by _
+					$validate = explode('_', $found[1]);
+	
+					// get method name
+					$method = $validate[count($validate) - 1];
+	
+					// remove method name from the end of validate var
+					array_pop($validate);
+	
+					// implode remains of $validate to get field name
+					$field = implode('_', $validate);
+	
+					// add to validator list
+					$this->validator($field, $method, $args);
+				}
+			}
+    }
+  }
+  
+  /**
+   * Set a validator
+   *
+   * @param string $field
+   * @param string $method
+   * @param array $args
+   */
+  final protected function validator($field, $method, $args = array()) {
+    $args['field'] = $field;
+    $this->validators[] = array('method' => $method, 'args' => $args);
+  }
+  
+  /**
+   * Just an idea... How do you feel about setting up models all in the class?
+   * It'd be better if we didn't always have to load fields for every model that's related to this model. 
+   * Can we make it so it only does it for the root model or do we need the other fields when creating forms?
+   */
+  final protected function load_fields() {
+    $fields = array();
+    foreach ($this->reflection_obj->getProperties() as $prop) {
+      $property_name = $prop->name;
+      if (preg_match("/field_(.+)/", $property_name, $found)) {
+        $field_name = $found[1];
+        $fields[$field_name] = $this->{'field_' . $field_name};
+      }
+    }
+		
+   // it's called skeleton because $this->fields is already being used for something else and this data set
+   // represents the structure or skeleton of the model
+   $this->skeleton = $fields;
+  }
+
+  /**
+   * This method parses all the class properties to find relationships
+   */
+  final protected function load_relations() {
+    foreach ($this->reflection_obj->getProperties() as $prop) {
+			// ignore private properties so we don't need to parse every single variable
+			if ($prop->isPublic() || $prop->isProtected()) {
+				if (preg_match("/^(has_many|has_one|belongs_to|has_and_belongs_to_many)_(.+)/", $prop->name, $found)) {
+					$relationship = $found[1];
+					$model        = $found[2];
+					$params       = (array) $prop->getValue($this);
+	
+					$this->{'add_' . $relationship}($model, $params);
+				}
+			}
+    }
+    
+    // merge models
+    // and add itself to the list of models
+    $this->has_models = array_merge($this->has_one, $this->has_many, $this->has_and_belongs_to_many, $this->belongs_to, array($this->name => array('model' => $this->name)));
+  }
+  
+  final protected function add_has_and_belongs_to_many($model, $params) {
+    // set the model name
+    @$params['model'] == null ? $params['model'] = inflector::model_nameize($model) : $params['model'] = inflector::model_nameize($params['model']);
+    
+    // set name of field that identifies the foreign record
+    @$params['foreign_key'] == null ? $params['foreign_key'] = inflector::model_foreign_key($this->name) : false;
+    
+    // set associate's foreign key
+    @$params['associate_foreign_key'] == null ? $params['associate_foreign_key'] = inflector::model_foreign_key($model) : false;
+    
+    // set join model (table in the database that houses both foreign keys)
+    @$params['join_model'] == null ? $params['join_model'] = inflector::model_habtm($model, $this->name) : false;
+    
+    // set uniqueness
+    isset($params['unique']) ? true : $params['unique'] = true;
+              
+    $this->has_and_belongs_to_many[inflector::model_nameize($model)] = $params;
+  }
+  
+  final protected function add_has_one($model, $params) {
+    // set name of field that identifies the foreign record
+    @$params['foreign_key'] == null ? $params['foreign_key'] = inflector::model_foreign_key($model) : false;
+    
+    // set the model name
+    @$params['model'] == null ? $params['model'] = inflector::model_nameize($model) : $params['model'] = inflector::model_nameize($params['model']);
+    
+    // set dependency
+    isset($params['dependent']) ? true : $params['dependent'] = true;
+    
+    $this->has_one[inflector::model_nameize($model)] = $params;
+  }
+  
+  final protected function add_has_many($model, $params) {
+    // set name of field that identifies the foreign record
+    @$params['foreign_key'] == null ? $params['foreign_key'] = inflector::model_foreign_key($this->name) : false;
+    
+    // set the model name
+    @$params['model'] == null ? $params['model'] = inflector::model_nameize($model) : $params['model'] = inflector::model_nameize($params['model']);
+    
+    // set dependency
+    isset($params['dependent']) ? true : $params['dependent'] = true;
+    //t($params);
+    $this->has_many[inflector::model_nameize($model)] = $params;
+  }
+  
+  final protected function add_belongs_to($model, $params) {
+    // set name of field that identifies the foreign record
+    @$params['foreign_key'] == null ? $params['foreign_key'] = inflector::model_foreign_key($model) : false;
+    
+    // set the model name
+    @$params['model'] == null ? $params['model'] = inflector::model_nameize($model) : $params['model'] = inflector::model_nameize($params['model']);
+    
+    // set dependency
+    isset($params['dependent']) ? true : $params['dependent'] = true;
+    
+    $this->belongs_to[inflector::model_nameize($model)] = $params;
+  }
+  
+  /**
+   * Because we have so many methods that require the reflection instance of this class we have this method that
+   * pre-loads it when the object is constructed
+   */
+  final protected function load_reflection() {
+    $this->reflection_obj = new ReflectionClass(get_class($this));
+  }
+
+  /**
+   * This method calls all the validation methods listed in the $validators variable and validates the values of a single entry
+   */
+  final protected function validate_entry($check_non_existent_fields = false) {
+    foreach ($this->validators as $validator) {
+      $field    = $validator['args']['field'];
+      $method   = 'validate' . $validator['method'];
+
+      $error_key = $this->name . MODEL_JOINT . $field;
+      
+      // validate to make sure the validating method doesn't return false. If it does then save the error
+      if ($check_non_existent_fields === false || isset($this->entry[$field])) {
+        if ($this->$method($this->entry[$field], $validator['args']) === false) {
+					$this->session->error($error_key, $this->parse_validate_message($validator['args']));
+          //$_SESSION[USER_ERROR_NAME][$error_key][] = $this->parse_validate_message($validator['args']);
+        }
+      }
+    }
+  }
+
+  /**
+   * Searches for message variables that look like this "#varname" and replaces them with the values assigned
+   * in the message arguments.
+   *
+   * @param array $args
+   * @return string
+   */
+  final protected function parse_validate_message($args = array()) {
+    // set new message
+    $new_message = $args['message'];
+
+    // find message variables
+    preg_match_all('/\#([a-zA-Z_]+)/', $args['message'], $matchs);
+    $vars = $matchs[1];
+
+    // remove $message arg because if there is a string like #message it'll be replaced in an infinite loop!
+    unset($args['message']);
+
+    // replace each variable found in the message
+    foreach ($vars as $var) {
+      $new_message = str_replace("#$var", $args[$var], $new_message);
+    }
+
+    return $new_message;
+  }
+
+  /**
+   * New methods defined in models are actually custom fields. To add them to the entry being returned from a search
+   * we need to execute the methods for each entry.
+   *
+   * This is probably a very costly method when calling lots of data. Need to find a way of turning it off when not needed.
+   * Or atleast find a faster way of doing it.
+   */
+  final protected function prepare_result() {    
+    foreach ($this->custom_fields as $field) {
+      // include all fields if $this->fields is empty
+      if (empty($this->fields)) {
+        //$this->entry[$field] = $this->$field(@$this->entry[$field]);
+        $this->entry[$field] = $this->$field();
+      } else {
+        // include only fields that have been listed in the fields list if the list is not empty
+        if (in_array($field, $this->fields)) {
+          //$this->entry[$field] = $this->$field(@$this->entry[$field]); // cool idea to differentiate between custom fields and existing fields -- and handy
+          $this->entry[$field] = $this->$field();
+        }
+      }
+    }    
+  }
+
+  /**
+   * New methods defined in models are actually custom fields. This method derives them by comparing the new methods to the old
+   * methods to determine which ones are actually new
+   */
+  final protected function derive_custom_fields() {
+    // get the name of the model's instance.
+    //$reflection_obj = new ReflectionClass(get_class($this));
+
+    // get the name of it's parent (example parents: activeRecord. activeFile, etc...)
+    $parent = $this->reflection_obj->getParentClass()->getName();
+
+    // create instance of parent so we can compare the methods
+    $parent_relf  = new ReflectionClass($parent);
+
+    // check each method to find out whethere it's a new field or not
+    // I wish there was a faster way of doing this...
+    foreach ($this->reflection_obj->getMethods() as $model_method) {
+			// make sure this method is either not a final method or is public so we don't need to parse every single method
+			if (!$model_method->isFinal() && $model_method->isPublic()) {
+				// get method name
+				$model_method_name = $model_method->getName();
+				if (substr($model_method_name, 0, 1) != '_' && $parent_relf->hasMethod($model_method_name) == false) {
+					$this->custom_fields[] = $model_method_name;
+				}
+			}
+    }
+  }
+  
+  
+  /**
+   * Query Methods
+   * =======================================================================
+   */
+  final public function unbind() {
+    foreach (func_get_args() as $model) {
+      $this->unbound[] = inflector::model_nameize($model);
+    }
+    
+    return $this;
+  }
+  
+  final public function unbind_all() {
+		$exceptions = array();
+		$unbound 		= array_keys($this->has_models);
+	
+		if (func_num_args() > 0) {
+			foreach (func_get_args() as $model) {
+				$exceptions[] = inflector::model_nameize($model);
+			}			
+		}
+		
+		// exclude exceptions
+		$this->unbound = array_diff($unbound, $exceptions);
+		
+    return $this;
+  }
+  
+  final public function bind($model, $relation, $params) {
+    $this->{'add_' . $relation}($model, $params);    
+    
+    return $this;
+  }
+    
+
+  /**
+   * Validating Methods
+   * =======================================================================
+   */
+
+  final protected function validateLength($v, $args) {
+    $len = strlen($v);
+    $min = (int) $args['min'];
+    $max = (int) $args['max'];
+    if (($len >= $min && $len <= $max) || ($len >= $min && $max == 0)) {
+      return true;
+    }
+
+    return false;
+  }
+  
+  final protected function validateIsnotequal($v, $args) {
+    $not_values = $args['value'];
+    if (is_array($not_values)) {
+      if (!in_array($v, $not_values)) {
+        return true;
+      }
+      return false;
+    } else {
+      if ($not_values != $v) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  final protected function validateIsdatetime($v, $args) {
+    return true;
+  }
+
+  final protected function validateIsnotempty($v, $args) {
+    if ($v == null) {
+      return false;
+    }
+    return true;
+  }
+
+  final protected function validateIsemail($v, $args) {
+    if (!preg_match('/^(([A-Za-z0-9]+_+)|([A-Za-z0-9]+\-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6}$/', $v)) {
+      return false;
+    }
+    return true;
+  }
+
+  final protected function validateIsexpression($v, $args) {
+    if (!preg_match($args['regexp'], $v)) {
+      return false;
+    }
+    return true;
+  }
+  
+  final protected function validateIsisbn($v, $args) {
+    if (!preg_match('/^(97(8|9))?\d{9}(\d|X)$/', $v)) {
+      return false;
+    }
+    return true;
+  }
+  
+  final protected function validateIsUnique($v, $args) {
+    
+  }
+
+  /**
+   * Callback functions
+   * =======================================================================
+   */
+
+  public function before_save() {
+    return true;
+  }
+
+  public function after_save() {
+    return true;
+  }
+
+  public function before_delete() {
+    return true;
+  }
+
+  public function after_delete() {
+    return true;
+  }
+
+  public function before_validation() {
+    return true;
+  }
+
+  public function after_validation() {
+    return true;
+  }
+  
+  public function before_find() {
+    return true;
+  }
+  
+  public function after_find() {
+    return true;
+  }
+	
+}
+?>

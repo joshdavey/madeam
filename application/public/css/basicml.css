@@ -1,0 +1,5 @@
+.basicml h1,h2,h3,h4,h5,h6 { margin-top: 20px; }
+.basicml hr { background-color: #e6e6e6; border: 0; margin-top: 4px; }
+.basicml h1 { color: #0c1431; font-size: 1.3em; }
+.basicml h2 { font-size: 1.0em; }
+.basicml p { margin: 10px 0 10px; }
