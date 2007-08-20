@@ -1,0 +1,7 @@
+/* =flash
+------------------------------------------------------- */
+#flash { margin: 100px auto; width: 600px; background: #fff; padding: 20px; border: solid 5px #000; }
+
+/* =reload time
+------------------------------------------------------- */
+#reload_time { font-size: 0.6em; margin: 20px auto; }
