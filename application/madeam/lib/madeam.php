@@ -10,8 +10,7 @@
  * @copyright		Copyright (c) 2006, Joshua Davey
  * @link				http://www.madeam.com
  * @package			madeam
- * @revision		$Revision$
- * @version			0.0.6
+ * @version			0.0.5
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
@@ -22,11 +21,19 @@ class madeam {
    * @return boolean
    */
   public static function dispatch() {
-    $output = madeam::component('?layout=1');
+    // call user front controller?
+  	// include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
     
+    // call controller action
+    $output = madeam::call_action('?layout=1');
+    
+    /*
     // tidy up html output? -- this should be for html pages only
-    //$options = array('output-xhtml' => true, 'clean' => true, 'hide-comments' => true, 'indent' => true, 'indent-spaces' => 2, 'wrap' => 100);
-    //echo tidy_parse_string($output, $options);
+    if (function_exists('tidy_parse_string')) {
+	    $options = array('output-xhtml' => true, 'clean' => true, 'hide-comments' => true, 'indent' => true, 'indent-spaces' => 2, 'wrap' => 100);
+	    echo tidy_parse_string($output, $options);
+  	}
+  	*/
     
     // destroy user error notices
     if (isset($_SESSION[USER_ERROR_NAME])) {
@@ -46,6 +53,7 @@ class madeam {
     // return output
     return $output;
   }
+  
 
   /**
    * This is where all the magic starts.
@@ -66,9 +74,12 @@ class madeam {
    * @param string $url -- example: controller/action/32?foo=bar
    * @return string
    */
-  public static function component($url = null, $cfg = array()) {
+  public static function call_action($url = null, $cfg = array()) {
     // get params from uri
     $params = self::params($url);
+    
+    // cannot allow access to the app controller
+    if ($params['controller'] === 'app') { exit('sorry.'); }
    
     // if the controller is a directory then we need to append the default controller class name to the end (index)
     if (is_dir(CONTROLLER_PATH . $params['controller'])) { $params['controller'] .= '/index'; }
@@ -84,7 +95,7 @@ class madeam {
     if (class_exists($controllerClass)) {
       // create controller instance
       $inst = new $controllerClass($params);
-
+      
       // HACK make params available on view
       $inst->set('params', $params);
 
@@ -94,7 +105,6 @@ class madeam {
         $inst->{'_scaffold_' . $action}();
         $inst->after_action();
         $inst->before_render();
-        if ($params['layout'] == '0') { $inst->layout(false); } // render without layout
         $inst->render();
         $inst->after_render();
         return $inst->output;
@@ -105,11 +115,7 @@ class madeam {
         $inst->before_action();
         $inst->$action();
         $inst->after_action();
-        // return just data if requested
-        if (@$cfg['request'] == true) { return $inst->data; }
-        // otherwise render the template
         $inst->before_render();
-        if ($params['layout'] == '0') { $inst->layout(false); } // render without layout
         $inst->render();
         $inst->after_render();
         return $inst->output;
@@ -118,7 +124,6 @@ class madeam {
         $inst->before_action();
         $inst->after_action();
         $inst->before_render();
-        if ($params['layout'] == '0') { $inst->layout(false); } // render without layout
         $inst->render();
         $inst->after_render();
         return $inst->output;
@@ -195,12 +200,13 @@ class madeam {
 
     // automagically disable the layout when making an AJAX call
     if (!AJAX_LAYOUT && @$_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') { $params['layout'] = '0'; }
-
+    
     // set default values for controller and action
     @$params['controller'] == null ? $params['controller'] = DEFAULT_CONTROLLER : false ;
     @$params['action']     == null ? $params['action']     = DEFAULT_ACTION : false;
-    @$params['format']     == null ? $params['format']     = DEFAULT_FORMAT : false ;
+  	@$params['format']     == null ? $params['format']     = DEFAULT_FORMAT : false ;
     @$params['layout']     == null ? $params['layout']     = '0' : false ;
+    
 
     return $params;
   }

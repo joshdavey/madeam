@@ -10,18 +10,23 @@
  * @copyright		Copyright (c) 2006, Joshua Davey
  * @link				http://www.madeam.com
  * @package			madeam
- * @version			0.0.4
+ * @version			0.0.6
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
 class madeam_component {
-  var $controller;
+  static $controller;
   
-  function __construct(&$controller) {
-    $this->controller = $controller;
+  public static function init($controller_id) {
+    self::$controller = madeam_registry::get($controller_id);
     
     // what about using a class registry
     //$this->controller =& madeam_registry::get('controller_name');
   }
+  
+  // idea...
+  public function __call($name, $args) {
+  	$this->controller->$name($args);
+	}
 }
 ?>

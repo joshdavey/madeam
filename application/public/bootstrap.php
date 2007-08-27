@@ -14,7 +14,7 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-
+ 
 // directory splitter
 define('DS', DIRECTORY_SEPARATOR);
 
@@ -42,7 +42,7 @@ define('CFG_PATH', ROOT_APP_PATH . 'config' . DS);
 $cfg = array();
 
 // include base setup configuration
-require_once CFG_PATH . 'environment.php';
+require CFG_PATH . 'environment.php';
 
 // turn configs into constants for speed?
 define('DB_USER', $cfg[ENVIRONMENT]['db_user']);
@@ -50,12 +50,14 @@ define('DB_PASS', $cfg[ENVIRONMENT]['db_pass']);
 define('DB_NAME', $cfg[ENVIRONMENT]['db_name']);
 define('DB_HOST', $cfg[ENVIRONMENT]['db_host']);
 define('MOD_REWRITE', $cfg[ENVIRONMENT]['mod_rewrite']);
+define('DEBUG_MODE', $cfg[ENVIRONMENT]['debug_mode']);
+define('DISABLE_CACHE', $cfg[ENVIRONMENT]['disable_cache']);
 
 // set base url
 define('BASE_URL', $_SERVER['SERVER_NAME']);
 
 // set URI_PATH based on whether MOD_REWRITE is turned on or off. If it's off then we need to add the SCRIPT_FILENAME at the end
-if (MOD_REWRITE) {
+if (MOD_REWRITE === true) {
 	define('URI_PATH', '/' . substr(str_replace(DS, '/', substr(FOREIGN_PATH . '/', strlen(DOC_PATH), -strlen(PUB_DIR))), 1, -1));
 } else {
 	define('URI_PATH', str_replace(DS, '/', substr(FOREIGN_PATH . '/', strlen(DOC_PATH))) . SCRIPT_FILENAME . '/');
@@ -114,7 +116,7 @@ global $loaders;
 $loaders = array_merge($core_loaders, $cfg['loaders']);
 
 // include routes configuration
-require_once APP_PATH . 'routes.php';
+require APP_PATH . 'routes.php';
 
 
 // loaders
@@ -128,7 +130,7 @@ function __autoload($class) {
 		if (preg_match($regexp, $class, $matchs)) {
 			$function = 'loader_' . $loader;
 			$file = $function($class, $matchs);
-			if (is_string($file)) { require_once $file; }
+			if (is_string($file)) { require $file; }
 			break; // always break out! no second chances.
 		}
 	}
@@ -141,7 +143,7 @@ function loader_inflector($class, $matchs) {
 
 // madeam include handler
 function loader_madeam($class, $matchs) {
-	return MADEAM_LIB_PATH . madeam_inflector::underscorize($class) . '.php';
+	return MADEAM_LIB_PATH . $class . '.php';
 }
 
 // extensions include handler
@@ -308,7 +310,11 @@ function rotate() {
   return $returned;
 }
 
-// include vendor files
+/**
+ * Include vendor file
+ *
+ * @param string $file
+ */
 function vendor($file) {
   require_once VENDOR_LIB_PATH . $file;
 }
@@ -324,4 +330,7 @@ function rnd_string($length = 7) {
   
   return $string;
 }
+
+
+	
 ?>

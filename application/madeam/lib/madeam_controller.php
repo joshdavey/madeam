@@ -10,21 +10,23 @@
  * @copyright		Copyright (c) 2006, Joshua Davey
  * @link			http://www.madeam.com
  * @package			madeam
- * @version			0.0.4
+ * @version			0.0.6
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author      	Joshua Davey
+ * @author      Joshua Davey
  */
 
 class madeam_controller {
-  public $name;
-  public $layout      = 'standard';
-  public $view;
-  public $output      = null;
+	public $output      = null;
   public $data        = array();
   public $params      = array();
   public $scaffold    = false;
+
+  public $name;
+  public $layout      = 'standard';
+  public $view;  
   public $represent   = false;
   public $rendered    = false;
+  public $parser;
   
   public $scaffold_controller;
   public $scaffold_key;
@@ -35,12 +37,9 @@ class madeam_controller {
       $this->represent = madeam_inflector::model_nameize($this->represent);
     }
         
-    // assign params passed on from madeamRouter
+    // assign params passed on from madeam_router
     $this->params = $params;
     
-    // assign controller's name @see set()
-    $this->name = array_pop(preg_split('/[\/\.]/', $this->params['controller']));
-
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
       $this->scaffold_controller  = $this->params['controller'];
@@ -48,8 +47,7 @@ class madeam_controller {
     }
 
     // set view
-    $this->view ? true : $this->view = $params['action'];
-    $this->view($this->view);    
+    $this->view($params['action']);
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
@@ -63,21 +61,6 @@ class madeam_controller {
 		$this->set('header_for_layout', null);	
   }
   
-  /**
-   * Experimental
-   */
-  public function __set($name, $value) {
-		$this->data[$name] = $value;
-    
-    /*
-    $parser = $this->params['format'] . 'Parser';
-    if (class_exists($parser)) {
-    	if ($this->_parser == false) { $this->_parser = new $parser; }    	
-    	$this->_parser->set($name, $value);
-  	}
-  	*/  	
-	}
-	
 
   /**
    * Handle variable gets.
@@ -97,12 +80,11 @@ class madeam_controller {
       // create model instance
       $inst = new $model_class;
       $this->$name = $inst;
-      
       return $inst;
     } else {
       // set model class name
       $comp_class = 'component_' . $name;
-
+			
       // create component instance
       $inst = new $comp_class($this);
       $this->$name = $inst;
@@ -114,21 +96,13 @@ class madeam_controller {
    * Final methods. (Actions cannot have the same name as these methods)
    * =======================================================================
    */
-
-  // what about calling this "attach"?
-  final protected function component($uri, $cfg = array()) {
-    return madeam::component($uri, $cfg, $this->data);
+  
+  
+  final protected function call_action($uri, $cfg = array()) {
+    return madeam::call_action($uri, $cfg, $this->data);
   }
   
-  // re-named component method
-  final protected function render_action($uri, $cfg = array()) {
-    return madeam::component($uri, $cfg, $this->data);
-  }
-  
-  final protected function partial($partial_path, $data = array(), $start = 0, $limit = false) {
-    // Experimental!!!
-    $help = new madeamHelper;
-
+  final protected function call_partial($partial_path, $data = array(), $start = 0, $limit = false) {
     if (!empty($data)) {
       // internal counter can be accessed in the view
       $_num = $start;
@@ -234,21 +208,11 @@ class madeam_controller {
   
   var $_parser = false;
   
-  final public function set() {
-    if (func_num_args() > 1) {
-      $name = func_get_arg(0);
-      $value = func_get_arg(1);
-    } else {
-      // idea: base it on the root key instead?
-      $value = func_get_arg(0);
-      $name = $this->name;
-      if (isListFormat($value)) { $name = madeam_inflector::pluralize($name); }
-    }
-
+  final public function set($name, $value) {
     $this->data[$name] = $value;
     
     /*
-    $parser = $this->params['format'] . 'Parser';
+    $parser = "parser_' . $this->params['format'];
     if (class_exists($parser)) {
     	if ($this->_parser == false) { $this->_parser = new $parser; }    	
     	$this->_parser->set($name, $value);
@@ -262,9 +226,6 @@ class madeam_controller {
 
     // consider: checking if it's rendered based on if there is anything in the output buffer? does that make sense?
     if ($this->rendered === false) {
-      // Experimental!!!
-      //$help = new madeamHelper;
-
       // output buffering
       ob_start();
 

@@ -40,7 +40,6 @@ echo $time . '<br />';
 // log execution time
 //madeam_logger::log("Execution time: $time seconds" . $_SERVER['REQUEST_URI']);
 
-
 /*
 
 echo 'display_errors = ' . ini_get('display_errors') . "<br />";
@@ -53,7 +52,6 @@ $x=0;
 foreach(get_included_files() as $file) {
   echo ++$x . ' ' . $file . "<br />";
 }
-
 
 
 /*

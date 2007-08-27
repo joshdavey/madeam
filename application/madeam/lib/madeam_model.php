@@ -37,6 +37,40 @@ class madeam_model {
   public $belongs_to              = array();
   public $has_and_belongs_to_many = array();
   
+  /**
+   * This member variable is where all the model setup information is stored.
+   *
+   * behaviors
+   *	array of behaviors
+   *
+   * custom_fields
+   * 	array of custom fields
+   * 
+   * fields
+   *	array of fields and their properties
+   *
+   * has_one
+   *	array of has_one relationships
+   *
+   * has_many
+   *	array of has_many relationships
+   *
+   * belongs_to
+   *	array of belongs_to relationships
+   *
+   * has_and_belongs_to_many
+   *	array of has_and_belongs_to_many relationships
+   *
+   * has_models
+   *	array of all relationships
+   *
+   * primary_key
+   *	this model's primary key -- defaults to "id"
+   *
+   *
+   */
+  protected $setup								= array();
+  
   public $has_models              = array(); // this is where we store all of it's relationships. It's just a copy of has_one, has_many and has_many_and_belongs_to_many for use by children of parents and other things when chaining query methods
 
   public function __construct() {
@@ -57,9 +91,6 @@ class madeam_model {
 
       // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
       $this->load_relations();
-      
-      // prepare models to make sure they have their foreign keys properly set
-      //$this->prep_models();
     }
   }
   
@@ -99,63 +130,6 @@ class madeam_model {
       $this->$name = $inst;
       return $inst;
     }
-  }
-
-
-  /**
-   * The models all need to have foreign key values before they are processed by anything else.
-   * So here we run through each one and assign a foreign key if they don't already have one.
-   * 
-   * has_one Example Use 1: array('user')
-   * When there is only a key typed in then it takes that as the model name and the foreign key is assumed to be the singalized version of the model name
-   * 
-   * has_one Example Use 2: array('user' => 'author')
-   * When a key and a value are typed in the key is the model and the value is the foreign key
-   * 
-   * has_many Example Use 1: array('user')
-   * When there is only a key typed in then it takes that as the model name and the name of this model in singalized for is used as the foreign key
-   * 
-   * has_many Example Use 2: array('user' => 'author')
-   * When a key and a value are typed in the key is the model and the value is the foreign key
-   */
-  final protected function prep_models() {
-    // prep has_one models
-    $temp = $this->has_one;
-    $this->has_one = array();
-    foreach ($temp as $model => $opts) {
-      if (is_int($model)) {
-        $this->has_one[madeam_inflector::model_nameize($opts)] = madeam_inflector::model_foreign_key($opts);
-      } else {
-        $this->has_one[madeam_inflector::model_nameize($model)] = $opts;
-      }
-    }
-    
-    // prep has_many models
-    $temp = $this->has_many;
-    $this->has_many = array();
-    foreach ($temp as $model => $opts) {
-      if (is_int($model)) {
-        $this->has_many[madeam_inflector::model_nameize($opts)] = madeam_inflector::model_foreign_key($this->name);
-      } else {
-        $this->has_many[madeam_inflector::model_nameize($model)] = $opts;
-      }
-    }
-    
-    // prep has_and_belongs_to_many models
-    $temp = $this->has_and_belongs_to_many;
-    $this->has_and_belongs_to_many = array();
-    foreach ($temp as $model => $opts) {
-      if (is_int($model)) {
-        $this->has_and_belongs_to_many[madeam_inflector::model_nameize($opts)] = madeam_inflector::model_foreign_key($this->name);
-      } else {
-        $this->has_and_belongs_to_many[madeam_inflector::model_nameize($model)] = $opts;
-      }
-    }
-    
-    // merge models
-    // and add itself to the list of models
-    // let's get rid of this... I don't like it.
-    $this->has_models = array_merge($this->has_one, $this->has_many, $this->has_and_belongs_to_many, array($this->name => $this->primary_key));
   }
 
   /**

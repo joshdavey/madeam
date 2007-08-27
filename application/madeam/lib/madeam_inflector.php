@@ -236,8 +236,8 @@ class madeam_inflector {
 	  }
 	  return $word;
 	}
-
-
+	
+	
 	public static function urlsafe($string) {
 	  $special_chars = array('&', '?', '/', '\\', ' ');
 

@@ -26,7 +26,20 @@ class help_html {
     return self::wrappingTag('a', $label, $params);
   }
 
-  public static function img($src, $toWidth = false, $toHeight = false, $_params = array()) {
+  public static function img($src, $width = false, $height = false, $_params = array()) {
+    $params = array();
+    $params['alt'] = madeam_inflector::underscorize($src);
+    $params['src'] = self::url($src);
+	
+		if ($width !== false) { $params['width'] 	= $width; }
+		if ($height !== false) { $params['height'] = $height; }
+    
+    $params = array_merge($params, $_params);
+    
+    return self::tag('img', $params);
+  }
+  
+  public static function imgr($src, $toWidth = false, $toHeight = false, $_params = array()) {
     $params = array();
     $params['alt'] = madeam_inflector::underscorize($src);
     $params['src'] = self::url($src);

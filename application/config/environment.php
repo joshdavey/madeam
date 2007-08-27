@@ -19,9 +19,6 @@
 	 * db_host
 	 *	Database host -- normally "localhost"
 	 *
-	 * db_connect
-	 *	Database Connection String -- mysql://[username]:[password]@[host]/[database]
-	 *
 	 * mod_rewrite
 	 *	true: 	mod_rewrite is enabled  -- URLS look like: http://example.com/index
 	 *	false: 	mod_rewrite is disabled -- URLs look like: http://example.com/index.php/index
@@ -33,15 +30,14 @@
 // development configuration
 // ===================================================
 
-	$cfg['development']['db_host'] 			= 'localhost';
-	$cfg['development']['db_user'] 			= 'root';
-	$cfg['development']['db_pass'] 			= '';
-	$cfg['development']['db_name'] 			= 'application';	
-	$cfg['development']['db_connect']		= 'mysql://username:password@localhost/application';
-	$cfg['development']['madeam_dir'] 	= 'madeam';
-	$cfg['development']['mod_rewrite'] 	= true;	
-	$cfg['development']['show_errors']	= true;
-	$cfg['development']['system_check']	= true;
+	$cfg['development']['db_host'] 				= 'localhost';
+	$cfg['development']['db_user'] 				= 'root';
+	$cfg['development']['db_pass'] 				= '';
+	$cfg['development']['db_name'] 				= 'application';	
+	$cfg['development']['madeam_dir'] 		= 'madeam';
+	$cfg['development']['mod_rewrite'] 		= true;	
+	$cfg['development']['debug_mode']			= true;
+	$cfg['development']['disable_cache'] 	= true;
 
 
 
@@ -49,15 +45,14 @@
 // production configuration
 // ===================================================
 
-	$cfg['production']['db_host'] 			= 'localhost';
-	$cfg['production']['db_user'] 			= 'root';
-	$cfg['production']['db_pass'] 			= '';
-	$cfg['production']['db_name'] 			= 'application';
-	$cfg['production']['db_connect']		= 'mysql://username:password@localhost/application';
-	$cfg['production']['madeam_dir'] 		= 'madeam';
-	$cfg['production']['mod_rewrite'] 	= true;
-	$cfg['production']['show_errors']		= false;
-	$cfg['production']['system_check']	= true;
+	$cfg['production']['db_host'] 				= 'localhost';
+	$cfg['production']['db_user'] 				= 'root';
+	$cfg['production']['db_pass'] 				= '';
+	$cfg['production']['db_name'] 				= 'application';
+	$cfg['production']['madeam_dir'] 			= 'madeam';
+	$cfg['production']['mod_rewrite'] 		= true;
+	$cfg['production']['debug_mode']			= false;
+	$cfg['production']['disable_cache'] 	= false;
 	
 
 
@@ -96,6 +91,15 @@
 
 
 
+// format configuration
+// ===================================================	
+
+	// Map view file formats to parsers
+	$cfg['format_parsers'] = array();
+
+
+
+
 // loader configuration
 // ===================================================	
 	
@@ -106,7 +110,9 @@
 	);
 	
 	
-	// handlers
+	
+	
+	// loaders
 	function loader_example($class, $matchs) {
 		return VENDOR_LIB_PATH . 'Example' . DS . str_replace('Example_', null, ucfirst($class)) . '.php';
 	}

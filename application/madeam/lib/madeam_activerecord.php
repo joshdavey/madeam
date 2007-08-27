@@ -84,6 +84,13 @@ class madeam_activerecord extends madeam_model {
     if ($this->table_name == null) {
       $this->table_name = madeam_inflector::model_tableize($this->name);
     }
+    
+    // TESTING BEING
+    if (!$this->skeleton = madeam_cache::read($this->table_name . 'fields', -1)) {
+	    $this->skeleton = $this->describe();
+	    madeam_cache::save($this->table_name . 'fields', $this->skeleton);
+    }
+    // TESTING END
   }
   
   public function __call($name, $args) {
@@ -166,7 +173,6 @@ class madeam_activerecord extends madeam_model {
 	}
 	
 	final public function describe() {
-	t($this->table_name);
 	  return $this->query("DESCRIBE $this->table_name");
 	}
 	

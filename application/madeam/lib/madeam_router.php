@@ -47,7 +47,7 @@ class madeam_router {
    * @param string $name
    */
   public function resource($name) {
-    $plural = madeamInflector::pluralize($name);
+    $plural = madeam_inflector::pluralize($name);
     $this->{'connect_' . $plural}($plural . '.:format', array('controller' => $name, 'action' => 'index')); 
     $this->{'connect_' . $name . '_add'}($name . '/add.:format', array('controller' => $name, 'action' => 'add'));
     $this->{'connect_' . $name . '_edit'}($name . '/edit/:id.:format', array('controller' => $name, 'action' => 'edit'));
