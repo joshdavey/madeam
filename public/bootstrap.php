@@ -116,7 +116,7 @@ global $loaders;
 $loaders = array_merge($core_loaders, $cfg['loaders']);
 
 // include routes configuration
-require APP_PATH . 'routes.php';
+require CFG_PATH . 'routes.php';
 
 
 // loaders
