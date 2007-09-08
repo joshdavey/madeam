@@ -15,18 +15,10 @@
  * @author      Joshua Davey
  */
 class madeam_component {
-  static $controller;
+  private $controller;
   
-  public static function init($controller_id) {
-    self::$controller = madeam_registry::get($controller_id);
-    
-    // what about using a class registry
-    //$this->controller =& madeam_registry::get('controller_name');
+  public function __construct(&$controller) {
+    $this->controller =& $controller;
   }
-  
-  // idea...
-  public function __call($name, $args) {
-  	$this->controller->$name($args);
-	}
 }
 ?>
