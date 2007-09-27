@@ -17,14 +17,11 @@
 class madeam_model {
 
   public $validators              = array();
-  public $models                  = array();
   public $depth                   = 2;  // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
-  public $fields                  = array();
   public $custom_fields           = array();
   public $reflection_obj;
   public $name                    = null;
-  public $skeleton                = array(); // array of fields that is the structure of this model
-  public $behaviours              = array(); // list of behaviours
+  public $schema                  = array(); // array of fields that is the structure of this model
   
   public $unbound                 = array();
   
@@ -32,11 +29,6 @@ class madeam_model {
   
   public $parent                  = false; // this is used when initiating a sub model within a model.
 
-  public $has_one                 = array();
-  public $has_many                = array();
-  public $belongs_to              = array();
-  public $has_and_belongs_to_many = array();
-  
   /**
    * This member variable is where all the model setup information is stored.
    *
@@ -73,7 +65,10 @@ class madeam_model {
   
   public $has_models              = array(); // this is where we store all of it's relationships. It's just a copy of has_one, has_many and has_many_and_belongs_to_many for use by children of parents and other things when chaining query methods
 
-  public function __construct() {
+  public function __construct($depth = false) {
+    // set depth
+    if ($depth !== false) { $this->depth = $depth; }
+    
     // pre-load a reflection of this class for use in parseing the meta data and methods
     $this->load_reflection();
     
@@ -84,6 +79,11 @@ class madeam_model {
     // set name
     $modelname = get_class($this);
     $this->name = madeam_inflector::model_nameize(substr($modelname, 6)); // safely remove "Model" from the name
+    
+    // set resource_name
+    if ($this->resource_name == null) {
+      $this->resource_name = madeam_inflector::model_tableize($this->name);
+    }
 
     // the depth measures how deep you want the relationships to go.
     if ($this->depth > 0) {
@@ -91,6 +91,14 @@ class madeam_model {
 
       // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
       $this->load_relations();
+    }
+    
+    // check cache for schema
+    // if schema not cached get it from the database using describe()
+    // the cache should be infinite if cache is enabled
+    if (!$this->setup = madeam_cache::read($this->resource_name . 'fields', -1)) {
+	    $this->schema = $this->describe();
+	    madeam_cache::save($this->resource_name . 'fields', $this->schema);
     }
   }
   
@@ -180,7 +188,7 @@ class madeam_model {
    */
   final protected function validator($field, $method, $args = array()) {
     $args['field'] = $field;
-    $this->validators[] = array('method' => $method, 'args' => $args);
+    $this->setup['validators'][] = array('method' => $method, 'args' => $args);
   }
   
   /**
@@ -198,9 +206,9 @@ class madeam_model {
       }
     }
 		
-   // it's called skeleton because $this->fields is already being used for something else and this data set
+   // it's called skeleton because $this->setup['fields'] is already being used for something else and this data set
    // represents the structure or skeleton of the model
-   $this->skeleton = $fields;
+   $this->schema = $fields;
   }
 
   /**
@@ -222,7 +230,7 @@ class madeam_model {
     
     // merge models
     // and add itself to the list of models
-    $this->has_models = array_merge($this->has_one, $this->has_many, $this->has_and_belongs_to_many, $this->belongs_to, array($this->name => array('model' => $this->name)));
+    $this->has_models = array_merge($this->setup['has_one'], $this->setup['has_many'], $this->setup['has_and_belongs_to_many'], $this->setup['belongs_to'], array($this->name => array('model' => $this->name)));
   }
   
   final protected function add_has_and_belongs_to_many($model, $params) {
@@ -241,7 +249,7 @@ class madeam_model {
     // set uniqueness
     isset($params['unique']) ? true : $params['unique'] = true;
               
-    $this->has_and_belongs_to_many[madeam_inflector::model_nameize($model)] = $params;
+    $this->setup['has_and_belongs_to_many'][madeam_inflector::model_nameize($model)] = $params;
   }
   
   final protected function add_has_one($model, $params) {
@@ -254,7 +262,7 @@ class madeam_model {
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     
-    $this->has_one[madeam_inflector::model_nameize($model)] = $params;
+    $this->setup['has_one'][madeam_inflector::model_nameize($model)] = $params;
   }
   
   final protected function add_has_many($model, $params) {
@@ -267,7 +275,7 @@ class madeam_model {
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     //t($params);
-    $this->has_many[madeam_inflector::model_nameize($model)] = $params;
+    $this->setup['has_many'][madeam_inflector::model_nameize($model)] = $params;
   }
   
   final protected function add_belongs_to($model, $params) {
@@ -280,7 +288,7 @@ class madeam_model {
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     
-    $this->belongs_to[madeam_inflector::model_nameize($model)] = $params;
+    $this->setup['belongs_to'][madeam_inflector::model_nameize($model)] = $params;
   }
   
   /**
@@ -295,7 +303,7 @@ class madeam_model {
    * This method calls all the validation methods listed in the $validators variable and validates the values of a single entry
    */
   final protected function validate_entry($check_non_existent_fields = false) {
-    foreach ($this->validators as $validator) {
+    foreach ($this->setup['validators'] as $validator) {
       $field    = $validator['args']['field'];
       $method   = 'validate' . $validator['method'];
 
@@ -346,13 +354,13 @@ class madeam_model {
    */
   final protected function prepare_result() {    
     foreach ($this->custom_fields as $field) {
-      // include all fields if $this->fields is empty
-      if (empty($this->fields)) {
+      // include all fields if $this->setup['fields'] is empty
+      if (empty($this->setup['fields'])) {
         //$this->entry[$field] = $this->$field(@$this->entry[$field]);
         $this->entry[$field] = $this->$field();
       } else {
         // include only fields that have been listed in the fields list if the list is not empty
-        if (in_array($field, $this->fields)) {
+        if (in_array($field, $this->setup['fields'])) {
           //$this->entry[$field] = $this->$field(@$this->entry[$field]); // cool idea to differentiate between custom fields and existing fields -- and handy
           $this->entry[$field] = $this->$field();
         }
