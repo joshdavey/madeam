@@ -114,9 +114,9 @@ class madeam_model {
   public function __get($name) {
     // catch set_ method call
     $match = array();
-    if (preg_match("/^[A-Z]{1}/", $name, $match) && in_array($name, array_keys($this->has_models))) {
+    if (preg_match("/^[A-Z]{1}/", $name, $match) && in_array($name, array_keys($this->setup['has_models']))) {
       
-      $model = $this->has_models[$name]['model'];
+      $model = $this->setup['has_models'][$name]['model'];
       
       // set model class name
       $model_class = madeam_inflector::model_classize($model);
@@ -230,7 +230,7 @@ class madeam_model {
     
     // merge models
     // and add itself to the list of models
-    $this->has_models = array_merge($this->setup['has_one'], $this->setup['has_many'], $this->setup['has_and_belongs_to_many'], $this->setup['belongs_to'], array($this->name => array('model' => $this->name)));
+    $this->setup['has_models'] = array_merge($this->setup['has_one'], $this->setup['has_many'], $this->setup['has_and_belongs_to_many'], $this->setup['belongs_to'], array($this->name => array('model' => $this->name)));
   }
   
   final protected function add_has_and_belongs_to_many($model, $params) {
@@ -411,7 +411,7 @@ class madeam_model {
   
   final public function unbind_all() {
 		$exceptions = array();
-		$unbound 		= array_keys($this->has_models);
+		$unbound 		= array_keys($this->setup['has_models']);
 	
 		if (func_num_args() > 0) {
 			foreach (func_get_args() as $model) {
