@@ -23,23 +23,15 @@ class madeam {
   public static function dispatch() {
     // call user front controller?
   	// include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
-    
+
     // call controller action
     $output = madeam::call_action('?layout=1');
-    
-    /*
-    // tidy up html output? -- this should be for html pages only
-    if (function_exists('tidy_parse_string')) {
-	    $options = array('output-xhtml' => true, 'clean' => true, 'hide-comments' => true, 'indent' => true, 'indent-spaces' => 2, 'wrap' => 100);
-	    echo tidy_parse_string($output, $options);
-  	}
-  	*/
-    
+
     // destroy user error notices
     if (isset($_SESSION[USER_ERROR_NAME])) {
       unset($_SESSION[USER_ERROR_NAME]);
     }
-    
+
     // destroy flash data when it's life runs out
 		if (isset($_SESSION[FLASH_LIFE_NAME])) {
 			if (--$_SESSION[FLASH_LIFE_NAME] < 1) {
@@ -49,11 +41,11 @@ class madeam {
 				}
 			}
 		}
-    
+
     // return output
     return $output;
   }
-  
+
 
   /**
    * This is where all the magic starts.
@@ -77,25 +69,25 @@ class madeam {
   public static function call_action($url = null, $cfg = array()) {
     // get params from uri
     $params = self::params($url);
-    
+
     // cannot allow access to the app controller
     if ($params['controller'] === 'app') { exit('sorry.'); }
-   
+
     // if the controller is a directory then we need to append the default controller class name to the end (index)
     if (is_dir(CONTROLLER_PATH . $params['controller'])) { $params['controller'] .= '/index'; }
-    
+
      // set clean
     $controller = $params['controller'];
     $action     = str_replace('_', null, $params['action']); // protect callback methods by removing underscores
 
     // set controller class name
     $controllerClass = 'controller_' . madeam_inflector::underscorize($controller);
-    
+
     // check if controller's class exists
     if (class_exists($controllerClass)) {
       // create controller instance
       $inst = new $controllerClass($params);
-      
+
       // HACK make params available on view
       $inst->set('params', $params);
 
@@ -133,20 +125,20 @@ class madeam {
         return false;
       }
     } elseif (file_exists(VIEW_PATH . $controller . '/'. $action . '.' . $params['format'])) {
-    	
+
     	$nodes = explode('/', $controller);
     	array_pop($nodes);
     	$controllerGroup = implode('_', $nodes);
-    	
+
     	$controllerClass = 'controller_' . madeam_inflector::underscorize($controller);
-    		
+
       // set controller's class name
       if ($controllerGroup == null) {
       	$appControllerClass = 'controller_app';
     	} else {
     		$appControllerClass = 'controller_' . $controllerGroup . '_app';
   		}
-      
+
       if (class_exists($appControllerClass)) {
 	      $view = new $appControllerClass($params);
 	      if ($params['layout'] == '0') { $view->layout(false); } // render without layout
@@ -158,7 +150,7 @@ class madeam {
 	      $view->after_render();
 	      return $view->output;
       } else {
-      	include VIEW_PATH . $controller . '/'. $action . '.' . $params['format'];     
+      	include VIEW_PATH . $controller . '/'. $action . '.' . $params['format'];
   	  }
     } else {
       // darn! the controller you've selected is non-existent. Bah humbug.
@@ -200,13 +192,13 @@ class madeam {
 
     // automagically disable the layout when making an AJAX call
     if (!AJAX_LAYOUT && @$_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') { $params['layout'] = '0'; }
-    
+
     // set default values for controller and action
     @$params['controller'] == null ? $params['controller'] = DEFAULT_CONTROLLER : false ;
     @$params['action']     == null ? $params['action']     = DEFAULT_ACTION : false;
   	@$params['format']     == null ? $params['format']     = DEFAULT_FORMAT : false ;
     @$params['layout']     == null ? $params['layout']     = '0' : false ;
-    
+
 
     return $params;
   }
