@@ -64,7 +64,18 @@ class madeam_model {
   public function __construct($depth = false) {
     // set depth
     if ($depth !== false) { $this->depth = $depth; }
+
+    // get class name   
+    $modelname = get_class($this);
+        
+    // set name
+    $this->name = madeam_inflector::model_nameize(substr($modelname, 6)); // safely remove "Model" from the name
     
+    // set resource_name
+    if ($this->resource_name == null) {
+      $this->resource_name = madeam_inflector::model_tableize($this->name);
+    }
+      
     // check cache for schema
     // if schema not cached get it from the database using describe()
     // the cache should be infinite if cache is enabled
@@ -80,16 +91,7 @@ class madeam_model {
       
       // pre-load a reflection of this class for use in parseing the meta data and methods
       $this->load_reflection();
-      
-      // set name
-      $modelname = get_class($this);
-      $this->name = madeam_inflector::model_nameize(substr($modelname, 6)); // safely remove "Model" from the name
-      
-      // set resource_name
-      if ($this->resource_name == null) {
-        $this->resource_name = madeam_inflector::model_tableize($this->name);
-      }
-  
+            
       // the depth measures how deep you want the relationships to go.
       if ($this->depth > 0) {
         $this->depth--;
@@ -97,7 +99,7 @@ class madeam_model {
         // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
         $this->load_relations();
       }
-    
+      
       // get schema
       //test('we need to create a singleton pattern for models so that they dont call schemas multiple times like this...');
 	    $this->setup['schema'] = $this->describe();

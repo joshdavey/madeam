@@ -23,7 +23,7 @@ class madeam_logger {
 
     // append log to end of file
 		if (defined(LOG_PATH)) { define('LOG_PATH', '../log'); }
-		test($message);
+		//test($message);
     file_put_contents(LOG_PATH . date(LOG_FORMAT) . '.txt', $message . "\n", FILE_APPEND | LOCK_EX);
 
     if ($lvl < 25 && DEBUG_MODE === true) {
