@@ -16,12 +16,13 @@
  */
 class madeam_model {
 
-  public $depth                   = 2;  // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
-  public $reflection_obj;
-  public $name                    = null;
-  public $unbound                 = array();  
-  public $primary_key             = 'id';  
-  public $parent                  = false; // this is used when initiating a sub model within a model.
+  protected $depth                  = 2;  // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
+  protected $reflection_obj;
+  protected $name                   = null;
+  protected $unbound                = array();  
+  protected $primary_key            = 'id';  
+  protected $parent                 = false;    // this is used when initiating a sub model within a model.
+  protected $fields                 = array();  // list of arrays to be included when returning result
 
   /**
    * This member variable is where all the model setup information is stored.
@@ -366,13 +367,13 @@ class madeam_model {
    */
   final protected function prepare_result() {    
     foreach ($this->setup['custom_fields'] as $field) {
-      // include all fields if $this->setup['schema'] is empty
-      if (empty($this->setup['schema'])) {
+      // include all fields if $this->setup['standard_fields'] is empty
+      if (empty($this->fields)) {
         //$this->entry[$field] = $this->$field(@$this->entry[$field]);
         $this->entry[$field] = $this->$field();
       } else {
         // include only fields that have been listed in the fields list if the list is not empty
-        if (in_array($field, $this->setup['schema'])) {
+        if (in_array($field, $this->fields)) {
           //$this->entry[$field] = $this->$field(@$this->entry[$field]); // cool idea to differentiate between custom fields and existing fields -- and handy
           $this->entry[$field] = $this->$field();
         }

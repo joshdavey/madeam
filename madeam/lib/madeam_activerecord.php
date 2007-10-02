@@ -48,24 +48,20 @@ define('FIELD_TIME', 'TIME');
 define('FIELD_YEAR', 'YEAR');
 
 class madeam_activerecord extends madeam_model {
-  static $cache                   = array();
+  protected $resource_name        = null;     // name of the database table that holds the records for this model
+  protected $label                = null;     // name of field that acts as label for a row
 
-  protected $resource_name           = null;     // name of the database table that holds the records for this model
-  protected $label                   = null;     // name of field that acts as label for a row
+  protected $conn                 = false;    // connection resource
 
-  protected $conn                    = false;    // connection resource
-
-  protected $data                    = array();
-  protected $entry                   = array();  // represents a single row
-  protected $sql                     = null;  
-  protected $link                    = null;     // query resource link
-  protected $entry_id                = -1;       // row id
+  protected $data                 = array();
+  protected $entry                = array();  // represents a single row
+  protected $sql                  = null;  
+  protected $link                 = null;     // query resource link
+  protected $entry_id             = -1;       // row id
 	
 	protected $is_insert						= false;
 	protected $is_update						= false;
 	
-	private $fields                 = array();
-  
   private $sql_explain            = false;
   private $sql_start              = false;
   private $sql_fields							= array();
@@ -208,7 +204,7 @@ class madeam_activerecord extends madeam_model {
           // find has_ones
           foreach ($this->setup['has_one'] as $model => $params) {
             $fkey = $params['foreign_key'];
-            if ((empty($this->fields) || in_array($fkey,$this->fields)) && !in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->sql_joins))) {
+            if (!in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->sql_joins))) {
               // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
               // clone object so we don't interupt it's state with reset()
               
@@ -223,7 +219,7 @@ class madeam_activerecord extends madeam_model {
           // find belongs_tos
           foreach ($this->setup['belongs_to'] as $model => $params) {
             $fkey = $params['foreign_key'];
-            if ((empty($this->fields) || in_array($fkey,$this->fields)) && !in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->sql_joins))) {
+            if (!in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->sql_joins))) {
               // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
               // clone object so we don't interupt it's state with reset()
               
@@ -240,7 +236,7 @@ class madeam_activerecord extends madeam_model {
           // find has_manies
           foreach ($this->setup['has_many'] as $model => $params) {
             // do not call if the user has not specified to call this data
-            if ((in_array($params['model'],$this->fields) || empty($this->fields)) && !in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->sql_joins))) {
+            if (!in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->sql_joins))) {
               // clone object so we don't interupt it's state with reset()
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
