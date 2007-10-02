@@ -43,7 +43,7 @@ class madeam_cache {
 		
 		// set file name
 		$file = TMP_PATH . self::$dir . DS . md5($id);
-		echo 'saving';
+		
 		// save serialization to file
 		file_put_contents($file, serialize($value));
 	}
