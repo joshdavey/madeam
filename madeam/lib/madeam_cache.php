@@ -72,5 +72,22 @@ class madeam_cache {
 		ob_clean();
 		echo $cache;
 	}
+	
+	/**
+	 * Check to see if a cache exists
+	 *
+	 * @param string $id
+	 * @return boolean
+	 */
+	public static function check($id) {
+	  // set file name
+		$file = TMP_PATH . self::$dir . DS . md5($id);
+				
+		if (file_exists($file)) {
+		  return true;
+		} else {
+		  return false;
+		}
+	}
 }
 ?>

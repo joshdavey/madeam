@@ -16,17 +16,11 @@
  */
 class madeam_model {
 
-  public $validators              = array();
   public $depth                   = 2;  // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
-  public $custom_fields           = array();
   public $reflection_obj;
   public $name                    = null;
-  public $schema                  = array(); // array of fields that is the structure of this model
-  
-  public $unbound                 = array();
-  
-  public $primary_key             = 'id';
-  
+  public $unbound                 = array();  
+  public $primary_key             = 'id';  
   public $parent                  = false; // this is used when initiating a sub model within a model.
 
   /**
@@ -39,7 +33,10 @@ class madeam_model {
    * 	array of custom fields
    * 
    * fields
-   *	array of fields and their properties
+   *  array of fields
+   * 
+   * schema
+   *	array of fields and their properties that exist prior to the custom fields 
    *
    * has_one
    *	array of has_one relationships
@@ -63,42 +60,57 @@ class madeam_model {
    */
   protected $setup								= array();
   
-  public $has_models              = array(); // this is where we store all of it's relationships. It's just a copy of has_one, has_many and has_many_and_belongs_to_many for use by children of parents and other things when chaining query methods
-
   public function __construct($depth = false) {
     // set depth
     if ($depth !== false) { $this->depth = $depth; }
     
-    // pre-load a reflection of this class for use in parseing the meta data and methods
-    $this->load_reflection();
-    
-    // get fields
-    // I would like to retire this function but I have a feeling it might make it's way back one day. -- I just hate typing out field information.
-    $this->load_fields();
-
-    // set name
-    $modelname = get_class($this);
-    $this->name = madeam_inflector::model_nameize(substr($modelname, 6)); // safely remove "Model" from the name
-    
-    // set resource_name
-    if ($this->resource_name == null) {
-      $this->resource_name = madeam_inflector::model_tableize($this->name);
-    }
-
-    // the depth measures how deep you want the relationships to go.
-    if ($this->depth > 0) {
-      $this->depth--;
-
-      // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
-      $this->load_relations();
-    }
-    
     // check cache for schema
     // if schema not cached get it from the database using describe()
     // the cache should be infinite if cache is enabled
-    if (!$this->setup = madeam_cache::read($this->resource_name . 'fields', -1)) {
-	    $this->schema = $this->describe();
-	    madeam_cache::save($this->resource_name . 'fields', $this->schema);
+    $this->cache_name = $modelname . '_setup';
+    if (!$this->setup = madeam_cache::read($this->cache_name, -1)) {
+      $this->setup['has_many']                = array();
+      $this->setup['has_one']                 = array();
+      $this->setup['belongs_to']              = array();
+      $this->setup['has_and_belongs_to_many'] = array();
+      $this->setup['has_models']              = array(); // why is it called has_models? Change this please. Relationships maybe?
+      $this->setup['custom_fields']           = array(); // custom fields defined in model 
+	    $this->setup['standard_fields']         = array(); // default fields in the database or file system
+      
+      // pre-load a reflection of this class for use in parseing the meta data and methods
+      $this->load_reflection();
+      
+      // set name
+      $modelname = get_class($this);
+      $this->name = madeam_inflector::model_nameize(substr($modelname, 6)); // safely remove "Model" from the name
+      
+      // set resource_name
+      if ($this->resource_name == null) {
+        $this->resource_name = madeam_inflector::model_tableize($this->name);
+      }
+  
+      // the depth measures how deep you want the relationships to go.
+      if ($this->depth > 0) {
+        $this->depth--;
+  
+        // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
+        $this->load_relations();
+      }
+    
+      // get schema
+      //test('we need to create a singleton pattern for models so that they dont call schemas multiple times like this...');
+	    $this->setup['schema'] = $this->describe();
+	    
+	    // get fields
+	    foreach ($this->setup['schema'] as $field) {
+	      $this->setup['standard_fields'][] = $field['Field'];
+	    }
+    }
+  }
+  
+  public function __destruct() {
+    if (madeam_cache::check($this->cache_name) == false) {
+      madeam_cache::save($this->cache_name, $this->setup);
     }
   }
   
@@ -206,9 +218,9 @@ class madeam_model {
       }
     }
 		
-   // it's called skeleton because $this->setup['fields'] is already being used for something else and this data set
+   // it's called skeleton because $this->setup['schema'] is already being used for something else and this data set
    // represents the structure or skeleton of the model
-   $this->schema = $fields;
+   $this->setup['schema'] = $fields;
   }
 
   /**
@@ -353,14 +365,14 @@ class madeam_model {
    * Or atleast find a faster way of doing it.
    */
   final protected function prepare_result() {    
-    foreach ($this->custom_fields as $field) {
-      // include all fields if $this->setup['fields'] is empty
-      if (empty($this->setup['fields'])) {
+    foreach ($this->setup['custom_fields'] as $field) {
+      // include all fields if $this->setup['schema'] is empty
+      if (empty($this->setup['schema'])) {
         //$this->entry[$field] = $this->$field(@$this->entry[$field]);
         $this->entry[$field] = $this->$field();
       } else {
         // include only fields that have been listed in the fields list if the list is not empty
-        if (in_array($field, $this->setup['fields'])) {
+        if (in_array($field, $this->setup['schema'])) {
           //$this->entry[$field] = $this->$field(@$this->entry[$field]); // cool idea to differentiate between custom fields and existing fields -- and handy
           $this->entry[$field] = $this->$field();
         }
@@ -390,12 +402,15 @@ class madeam_model {
 				// get method name
 				$model_method_name = $model_method->getName();
 				if (substr($model_method_name, 0, 1) != '_' && $parent_relf->hasMethod($model_method_name) == false) {
-					$this->custom_fields[] = $model_method_name;
+					$this->setup['custom_fields'][] = $model_method_name;
 				}
 			}
     }
   }
   
+  protected function describe() {
+    return array();
+  }
   
   /**
    * Query Methods
