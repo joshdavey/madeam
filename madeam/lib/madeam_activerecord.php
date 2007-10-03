@@ -47,8 +47,7 @@ define('FIELD_TIMESTAMP', 'TIMESTAMP');
 define('FIELD_TIME', 'TIME');
 define('FIELD_YEAR', 'YEAR');
 
-class madeam_activerecord extends madeam_model {
-  protected $resource_name        = null;     // name of the database table that holds the records for this model
+class madeam_activerecord extends madeam_model {  
   protected $label                = null;     // name of field that acts as label for a row
 
   protected $conn                 = false;    // connection resource
@@ -84,7 +83,10 @@ class madeam_activerecord extends madeam_model {
       $this->where($match[2] . " = '$args[0]'");
       $function = 'find_' . $match[1];
       return $this->$function();
-    }
+    } /*elseif (preg_match("/^delete_by_(.*)/", $name, $match)) {
+      $this->where($match[2] . " = '$args[0]'");
+      $this->delete();
+    }*/
   }
 
   /**
@@ -158,7 +160,8 @@ class madeam_activerecord extends madeam_model {
 	}
 	
 	final public function describe() {
-	  return $this->query("DESCRIBE $this->resource_name");
+	  $table = $this->setup['resource_name'];
+	  return $this->query("DESCRIBE $table");
 	}
 	
   /**
@@ -176,17 +179,13 @@ class madeam_activerecord extends madeam_model {
     // find callback
     $this->before_find();
     
-    // derive and cache custom fields instead of doing it for each entry -- this code used to be inside of prepare_result
-    if (empty($this->setup['custom_fields'])) {
-      $this->derive_custom_fields();
-    }
-    
     // if this is a child model then filter the results to make sure they are related to this model's parent
     // this stuff is for when chaining models like: 
     // $this->article->find_one(32, true)->comment->find_all();
     // where article is the parent of comment
     if ($this->parent && $this->sql_where == '1') {
-      $this->where($this->parent->setup['has_models'][$this->name]['foreign_key'] . " = '" . $this->parent->entry[$this->parent->primary_key] . "'");
+      $this->where($this->parent->setup['has_models'][$this->name]['foreign_key'] . " = '" . $this->parent->entry[$this->parent->setup['has_models'][$this->name]['primary_key']] . "'");      
+      //$this->where($this->parent->setup['has_models'][$this->name]['foreign_key'] . " = '" . $this->parent->setup['has_models'][$this->name]['primary_key'] . "'");
     }
 
     // build select query and set resource link
@@ -355,7 +354,8 @@ class madeam_activerecord extends madeam_model {
 
     // set where
     if ($this->entry_id != -1 && $this->primary_key != false) {
-      $this->where("$this->resource_name.$this->primary_key = '$id'"); 
+      $table = $this->setup['resource_name'];
+      $this->where("$table.$this->primary_key = '$id'"); 
     }
 
     // set limit
@@ -438,7 +438,7 @@ class madeam_activerecord extends madeam_model {
     $this->before_validation();
 
     // validate data
-    $this->load_validators();
+    ////$this->load_validators();
     $this->validate_entry($update);
 
     // after validation callback
@@ -614,11 +614,11 @@ class madeam_activerecord extends madeam_model {
     
     // drop table -- this doesn't work yet
     if ($drop == true) {
-      $sql[] = 'DROP TABLE IF EXISTS `' . $this->resource_name . "`; \n";
+      $sql[] = 'DROP TABLE IF EXISTS `' . $this->setup['resource_name'] . "`; \n";
     }
     
     // initial query decleration
-    $sql[] = 'CREATE TABLE IF NOT EXISTS `' . $this->resource_name . '` (';
+    $sql[] = 'CREATE TABLE IF NOT EXISTS `' . $this->setup['resource_name'] . '` (';
 
     // add fields
     $fields = array();
@@ -702,13 +702,14 @@ class madeam_activerecord extends madeam_model {
    */
   final private function build_select_query() {
     $sql = array();
+    $table = $this->setup['resource_name'];
     
     if (empty($this->fields)) {
       if ($this->primary_key != false) {
-        // why should we have to re-state the id? This is a hack! (only for JOINS)
-        $sql[] = "SELECT *, $this->resource_name.$this->primary_key as $this->primary_key FROM $this->resource_name";
+        // why should we have to re-state the id? This is a hack! (only for JOINS)        
+        $sql[] = "SELECT *, $table.$this->primary_key as $this->primary_key FROM $table";
       } else {
-        $sql[] = "SELECT * FROM $this->resource_name";
+        $sql[] = "SELECT * FROM $table";
       }
     } else {
       // select only sepcified fields
@@ -718,7 +719,7 @@ class madeam_activerecord extends madeam_model {
       $fields =$this->sql_fields;
 
       $sql[] = implode(",", $fields);
-      $sql[] = "FROM $this->resource_name";
+      $sql[] = "FROM $table";
     }
     
     // joins
@@ -755,6 +756,7 @@ class madeam_activerecord extends madeam_model {
    */
   final private function build_insert_query() {
     $sql = array();
+    $table = $this->setup['resource_name'];
 
     // remove primary key insert if it is null
     if (!isset($this->data[$this->primary_key]) || $this->data[$this->primary_key] == null) {
@@ -762,7 +764,7 @@ class madeam_activerecord extends madeam_model {
     }
 
     // add table name
-    $sql[] = 'INSERT INTO ' . $this->resource_name;
+    $sql[] = 'INSERT INTO ' . $table;
 
      // add fields and values
     if (empty($this->fields)) {
@@ -798,9 +800,10 @@ class madeam_activerecord extends madeam_model {
    */
   final private function build_update_query() {
     $sql = array();
+    $table = $this->setup['resource_name'];
 
     // add table name
-    $sql[] = 'UPDATE ' . $this->resource_name . ' SET';
+    $sql[] = 'UPDATE ' . $table . ' SET';
 
     // fields
     if (empty($this->fields)) {
@@ -854,7 +857,7 @@ class madeam_activerecord extends madeam_model {
     $sql = array();
 
     // add table name
-    $sql[] = 'DELETE FROM ' . $this->resource_name;
+    $sql[] = 'DELETE FROM ' . $this->setup['resource_name'];
 
     // add where condition
     if ($this->sql_where != 1) {
@@ -948,10 +951,6 @@ class madeam_activerecord extends madeam_model {
    * @param list $fields
    */
   final public function fields() {
-    // get custom fields...?
-    if (empty($this->setup['custom_fields'])) {
-      $this->derive_custom_fields();
-    }
     
     foreach(func_get_args() as $field) {
       if (in_array($field, $this->setup['standard_fields'])) {
@@ -960,8 +959,6 @@ class madeam_activerecord extends madeam_model {
     
   		$this->fields[] = $field;
     }
-    
-    $this->fields = array_merge($this->setup['custom_fields'], $this->fields);
     
     // make sure there are no dupes
     $this->fields = array_unique($this->fields);
@@ -994,13 +991,14 @@ class madeam_activerecord extends madeam_model {
   final public function join($model, $on = false) {
     
     $model = madeam_inflector::model_nameize($model);
+    $table = $this->setup['resource_name'];
     
     if ($on == false) {
       if (in_array($model, array_keys($this->setup['has_and_belongs_to_many']))) {
         
         $relation = $this->setup['has_and_belongs_to_many'][$model];
         
-        $on = "$this->resource_name.$this->primary_key = $relation[join_model].$relation[foreign_key]";
+        $on = "$table.$this->primary_key = $relation[join_model].$relation[foreign_key]";
            
         $this->sql_joins[$model] = array('table' => $relation['join_model'], 'on' => $on);
         
@@ -1013,7 +1011,7 @@ class madeam_activerecord extends madeam_model {
         $foreign_table  = $this->$model->resource_name;
         $foreign_pk     = $this->$model->primary_key;
         
-        $on = "$this->resource_name.$fk = $foreign_table.$foreign_pk";
+        $on = "$table.$fk = $foreign_table.$foreign_pk";
         
         $this->sql_joins[$model] = array('table' => $this->$model->resource_name, 'on' => $on);
       } else {
@@ -1106,7 +1104,7 @@ class madeam_activerecord extends madeam_model {
   }
 
   final public function get_table_fields() {
-    $result = $this->query("SHOW COLUMNS FROM " . $this->resource_name);
+    $result = $this->query("SHOW COLUMNS FROM " . $table);
     
     $fields = array();
     while ($row = mysql_fetch_assoc($result)) {

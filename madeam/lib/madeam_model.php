@@ -16,9 +16,10 @@
  */
 class madeam_model {
 
+  protected $resource_name          = null;  // name of the database table or file resource that holds the records for this model
   protected $depth                  = 2;  // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
   protected $reflection_obj;
-  protected $name                   = null;
+  public $name                      = null; // -- this needs to be re-named to _name and made protected
   protected $unbound                = array();  
   protected $primary_key            = 'id';  
   protected $parent                 = false;    // this is used when initiating a sub model within a model.
@@ -64,53 +65,58 @@ class madeam_model {
   public function __construct($depth = false) {
     // set depth
     if ($depth !== false) { $this->depth = $depth; }
+    
+    // adjust depth
+    // the depth measures how deep you want the relationships to go.
+    if ($this->depth > 0) { $this->depth--; }
 
     // get class name   
     $modelname = get_class($this);
         
     // set name
     $this->name = madeam_inflector::model_nameize(substr($modelname, 6)); // safely remove "Model" from the name
-    
-    // set resource_name
-    if ($this->resource_name == null) {
-      $this->resource_name = madeam_inflector::model_tableize($this->name);
-    }
-      
+       
     // check cache for schema
     // if schema not cached get it from the database using describe()
     // the cache should be infinite if cache is enabled
     $this->cache_name = $modelname . '_setup';
     if (!$this->setup = madeam_cache::read($this->cache_name, -1)) {
-      $this->setup['has_many']                = array();
-      $this->setup['has_one']                 = array();
-      $this->setup['belongs_to']              = array();
-      $this->setup['has_and_belongs_to_many'] = array();
-      $this->setup['has_models']              = array(); // why is it called has_models? Change this please. Relationships maybe?
-      $this->setup['custom_fields']           = array(); // custom fields defined in model 
-	    $this->setup['standard_fields']         = array(); // default fields in the database or file system
+      $this->setup['has_many']                 = array();
+      $this->setup['has_one']                  = array();
+      $this->setup['belongs_to']               = array();
+      $this->setup['has_and_belongs_to_many']  = array();
+      $this->setup['has_models']               = array(); // why is it called has_models? Change this please. Relationships maybe?
+      $this->setup['custom_fields']            = array(); // custom fields defined in model 
+	    $this->setup['standard_fields']          = array(); // default fields in the database or file system
+	    $this->setup['validators']               = array();
+	    
+	    // set resource_name
+      if ($this->resource_name == null) {
+        $this->setup['resource_name'] = madeam_inflector::model_tableize($this->name);
+      } else {
+        $this->setup['resource_name'] = $this->resource_name;
+      }
       
       // pre-load a reflection of this class for use in parseing the meta data and methods
       $this->load_reflection();
             
-      // the depth measures how deep you want the relationships to go.
-      if ($this->depth > 0) {
-        $this->depth--;
-  
-        // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
-        $this->load_relations();
-      }
+      // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
+      $this->load_relations();
       
-      // get schema
-      //test('we need to create a singleton pattern for models so that they dont call schemas multiple times like this...');
-	    $this->setup['schema'] = $this->describe();
-	    
-	    // get fields
-	    foreach ($this->setup['schema'] as $field) {
-	      $this->setup['standard_fields'][] = $field['Field'];
-	    }
+      // pre-load custom fields
+      $this->load_custom_fields();
+      
+      // load schema
+      $this->load_schema();
+      
+      // load standard fields
+      $this->load_standard_fields();
+      
+      // load validators
+      $this->load_validators();
     }
   }
-  
+    
   public function __destruct() {
     if (madeam_cache::check($this->cache_name) == false) {
       madeam_cache::save($this->cache_name, $this->setup);
@@ -153,6 +159,24 @@ class madeam_model {
       $this->$name = $inst;
       return $inst;
     }
+  }
+  
+  /**
+   * load the standard fields from a schema
+   *
+   */
+  public function load_standard_fields() {
+    foreach ($this->setup['schema'] as $field) {
+      $this->setup['standard_fields'][] = $field['Field'];
+    }
+  }
+  
+  /**
+   * load a schema
+   *
+   */
+  public function load_schema() {
+    $this->setup['schema'] = $this->describe();
   }
 
   /**
@@ -261,6 +285,9 @@ class madeam_model {
     // set join model (table in the database that houses both foreign keys)
     @$params['join_model'] == null ? $params['join_model'] = madeam_inflector::model_habtm($model, $this->name) : false;
     
+    // set primary key
+    @$params['primary_key'] == null ? $params['primary_key'] = $this->primary_key : false;
+    
     // set uniqueness
     isset($params['unique']) ? true : $params['unique'] = true;
               
@@ -273,6 +300,9 @@ class madeam_model {
     
     // set the model name
     @$params['model'] == null ? $params['model'] = madeam_inflector::model_nameize($model) : $params['model'] = madeam_inflector::model_nameize($params['model']);
+    
+    // set primary key
+    @$params['primary_key'] == null ? $params['primary_key'] = $this->primary_key : false;
     
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
@@ -287,6 +317,9 @@ class madeam_model {
     // set the model name
     @$params['model'] == null ? $params['model'] = madeam_inflector::model_nameize($model) : $params['model'] = madeam_inflector::model_nameize($params['model']);
     
+    // set primary key
+    @$params['primary_key'] == null ? $params['primary_key'] = $this->primary_key : false;
+    
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     //t($params);
@@ -299,6 +332,9 @@ class madeam_model {
     
     // set the model name
     @$params['model'] == null ? $params['model'] = madeam_inflector::model_nameize($model) : $params['model'] = madeam_inflector::model_nameize($params['model']);
+    
+    // set primary key
+    @$params['primary_key'] == null ? $params['primary_key'] = $this->primary_key : false;
     
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
@@ -387,7 +423,7 @@ class madeam_model {
    * New methods defined in models are actually custom fields. This method derives them by comparing the new methods to the old
    * methods to determine which ones are actually new
    */
-  final protected function derive_custom_fields() {
+  final protected function load_custom_fields() {
     // get the name of the model's instance.
     //$reflection_obj = new ReflectionClass(get_class($this));
 

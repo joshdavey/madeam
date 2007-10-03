@@ -250,7 +250,9 @@ class madeam_inflector {
 
 
 	public static function slug($string) {
-  	return low(str_replace(' ', '-', $string));
+	  $string = low(str_replace(' ', '-', trim($string)));
+	  $string = preg_replace('/[\$,!\/\\\\&]/', '', $string);
+	  return $string;
 	}
 
 }

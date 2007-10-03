@@ -137,7 +137,7 @@ class help_html {
    * @param array $params
    * @return string
    */
-  protected static function paramsToHtml($params) {
+  protected static function paramsToHtml($params = array()) {
     $html = array();
     foreach ($params as $param => $value) {
       if ($value === true) {
