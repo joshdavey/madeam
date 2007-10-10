@@ -319,15 +319,16 @@ class help_form extends help_html {
     $output = null;
     
     // create model instance
-    $modelname = $model . 'Model';
+    $modelname = madeam_inflector::model_classize($model);
     $inst = new $modelname(1);
     
     // get fields
     // don't use this! use $Model->describe(); instead!
-    $fields = $inst->skeleton;
+    $model_setup = $inst->get_setup();
+    $fields = $model_setup['schema'];
     
     // open Form
-    $output = self::newForm($model, $action, 'post', array('enctype' => 'multipart/form-data')) . "\n";    
+    $output = self::open_file($model, $action, 'post', array('enctype' => 'multipart/form-data')) . "\n";    
     
     // create fields
     foreach ($fields as $field_name => $settings) {      
@@ -341,7 +342,7 @@ class help_form extends help_html {
       if ($settings['label']) {
         $field_label    = $settings['label']; 
       } else {
-        $field_label    = madeamInflector::sentencize($field_name); 
+        $field_label    = madeam_inflector::sentencize($field_name); 
       }
       
       // field parameters
@@ -381,7 +382,7 @@ class help_form extends help_html {
         }
         
         // add an error tag
-        $output .= self::error_tag($field_name);
+        $output .= help_error::single($field_name);
         $output .= '</p>' . "\n";
       }
     }
@@ -394,7 +395,7 @@ class help_form extends help_html {
     $output .= '</p>' . "\n";
     
     // close form
-    $output .= self::endForm();
+    $output .= self::close();
     
     // return magical form
     return $output;

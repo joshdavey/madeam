@@ -36,14 +36,14 @@ class madeam_controller {
     if ($this->represent == true) {
       $this->represent = madeam_inflector::model_nameize($this->represent);
     }
-        
+    
     // assign params passed on from madeam_router
     $this->params = $params;
     
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
       $this->scaffold_controller  = $this->params['controller'];
-      $this->scaffold_key         = $this->{$this->represent}->primary_key;
+      $this->scaffold_key         = $this->{$this->represent}->get_primary_key();
     }
 
     // set view
@@ -151,7 +151,7 @@ class madeam_controller {
       }
       if ($exit) { exit; }
     } else {
-      madeamLogger::log('Tried redirecting when headers already sent. (Check for echos before script redirects)');
+      madeam_logger::log('Tried redirecting when headers already sent. (Check for echos before script redirects)');
     }
   }
 
@@ -177,7 +177,7 @@ class madeam_controller {
     
     // if scaffolding is true and the view doesn't exist then use the scaffolding view
     if (!file_exists($this->view) && $this->scaffold == true) {
-      $this->view = MADEAM_SCAFFOLDS_PATH . $this->scaffold . '/views/' . $view . '.' . $this->params['format'];
+      $this->view = SCAFFOLD_PATH . $this->scaffold . '/views/' . $view . '.' . $this->params['format'];
     }
   }
 
@@ -300,23 +300,23 @@ class madeam_controller {
    */
 
   public function _scaffold_index() {
-    include(MADEAM_SCAFFOLDS_PATH . $this->scaffold . '/actions/index.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/actions/index.php');
   }
 
   public function _scaffold_show() {
-    include(MADEAM_SCAFFOLDS_PATH . $this->scaffold . '/actions/show.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/actions/show.php');
   }
 
   public function _scaffold_add() {
-    include(MADEAM_SCAFFOLDS_PATH . $this->scaffold . '/actions/add.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/actions/add.php');
   }
 
   public function _scaffold_edit() {
-    include(MADEAM_SCAFFOLDS_PATH . $this->scaffold . '/actions/edit.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/actions/edit.php');
   }
 
   public function _scaffold_delete() {
-    include(MADEAM_SCAFFOLDS_PATH . $this->scaffold . '/actions/delete.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/actions/delete.php');
   }
 
 

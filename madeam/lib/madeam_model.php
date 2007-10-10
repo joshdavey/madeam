@@ -34,8 +34,8 @@ class madeam_model {
    * custom_fields
    * 	array of custom fields
    * 
-   * fields
-   *  array of fields
+   * standard_fields
+   *  array of standard_fields
    * 
    * schema
    *	array of fields and their properties that exist prior to the custom fields 
@@ -589,6 +589,19 @@ class madeam_model {
   
   public function after_find() {
     return true;
+  }
+  
+  /**
+   * Getter functions
+   * =======================================================================
+   */
+  
+  public function get_primary_key() {
+   return $this->primary_key; 
+  }
+  
+  public function get_setup() {
+    return $this->setup;
   }
 	
 }

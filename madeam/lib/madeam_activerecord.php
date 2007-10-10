@@ -472,6 +472,9 @@ class madeam_activerecord extends madeam_model {
       
       // set data as row after callbacks have altered $this->entry
       $this->data = $this->entry;
+      
+      // filter out fields that don't exist in the model
+      $this->data = array_intersect_key($this->data, array_flip($this->setup['standard_fields']));
 
       // if the entry_id exists and the record exists then it is an update. Otherwise it's an insert
       if ($update === true) {
@@ -487,6 +490,9 @@ class madeam_activerecord extends madeam_model {
 			
 			// set this so it can be used in after_save
 			$this->entry[$this->primary_key] = $entry_id;
+			
+			// grab entry after it's been modified by callbacks
+			$entry = $this->entry;
       
       /*
       if ($entry_id) {
@@ -508,7 +514,7 @@ class madeam_activerecord extends madeam_model {
       // reset all sql values and data
       $this->reset();
 
-      return $entry_id;
+      return $entry;
     } else {
       // reset all sql values and data
       $this->reset();
@@ -764,29 +770,17 @@ class madeam_activerecord extends madeam_model {
     }
 
     // add table name
-    $sql[] = 'INSERT INTO ' . $table;
+    $sql[] = 'INSERT INTO ' . $table;    
+    
+    // add fields
+    $sql[] = '(' . implode(',', array_keys($this->data)) . ')';
 
-     // add fields and values
-    if (empty($this->fields)) {
-      // add fields
-      $sql[] = '(' . implode(',', array_keys($this->data)) . ')';
+    // close fields, open values
+    $sql[] = 'VALUES';
 
-      // close fields, open values
-      $sql[] = 'VALUES';
-
-      // add values
-      $sql[] = "('" . @implode("','", array_values($this->data)) . "')";
-    } else {
-      // add fields
-      $sql[] = implode("','",$this->fields);
-
-      // close fields, open values
-      $sql[] = 'VALUES';
-
-      // add values
-      foreach ($this->fields as $field) { $values[] = $this->data[$field]; }
-      $sql[] = "('" . implode(',', $values) . "')";
-    }
+    // add values
+    $sql[] = "('" . @implode("','", array_values($this->data)) . "')";
+    
 
     // build query
     //test(implode(' ', $sql));
@@ -1144,7 +1138,7 @@ class madeam_activerecord extends madeam_model {
     }
   }
 
-  final private function format_datetime_field($field, $default) {
+  final protected function format_datetime_field($field, $default) {
     if (isset($this->entry[$field])) {
       if (is_string($this->entry[$field]) && $this->entry[$field] == null) {
         $this->entry[$field] = date($default);

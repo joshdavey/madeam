@@ -24,7 +24,7 @@ class madeam_cache {
 		
 		// set file name
 		$file = TMP_PATH . self::$dir . DS . md5($id);
-				
+		
 		if (file_exists($file)) {
 			if ((time() - filemtime($file)) <= $life_time || $life_time == -1) {
 				// get cache from file and unserialize
@@ -48,13 +48,13 @@ class madeam_cache {
 		file_put_contents($file, serialize($value));
 	}
 	
-	public static function start($name, $life_time = 0) {
+	public static function start($id, $life_time = 0) {
 		// check to see if cache is disabled
 		if (DISABLE_CACHE === true) { return false; }
 		
-		if (!$cache = self::read($name, $life_time)) {
+		if (!$cache = self::read($id, $life_time)) {
 			ob_start();
-			self::$open_caches[] = $name;
+			self::$open_caches[] = $id;
 			return false;
 		} else {
 			echo $cache;
@@ -66,11 +66,19 @@ class madeam_cache {
 		// check to see if cache is disabled
 		if (DISABLE_CACHE === true) { return false; }
 		
-		$name = array_shift(self::$open_caches);
+		$id = array_shift(self::$open_caches);
 		$cache = ob_get_contents();
-		self::save($name, $cache);
+		self::save($id, $cache);
 		ob_clean();
 		echo $cache;
+	}
+	
+	public static function clear($id) {
+	  // set file name
+		$file = TMP_PATH . self::$dir . DS . md5($id);
+		
+		// save serialization to file
+		file_put_contents($file, null);
 	}
 	
 	/**

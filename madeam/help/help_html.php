@@ -84,11 +84,15 @@ class help_html {
 	 * If the url starts with none of the above we assume it's poitning to a resource like a controller
 	 */
 	public static function url($url) {
-    if (substr($url, 0, 1) == '/') {
-      $url = REL_PATH . substr($url, 1, strlen($url));
-    } elseif (!preg_match('/[a-z]+:/', $url, $matchs)) {
-			$url == "#" ? $url = "#" : $url = URI_PATH . $url;
-		}
+	  
+	  if (substr($url, 0, 1) != "#") { 
+      if (substr($url, 0, 1) == '/') {
+        $url = REL_PATH . substr($url, 1, strlen($url));
+      } elseif (!preg_match('/[a-z]+:/', $url, $matchs)) {
+  			$url == "#" ? $url = "#" : $url = URI_PATH . $url;
+  		}
+	  }
+		
     return $url;
   }
   
