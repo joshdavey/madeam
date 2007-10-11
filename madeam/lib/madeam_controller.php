@@ -23,11 +23,11 @@ class madeam_controller {
 
   public $name;
   public $layout      = 'standard';
-  public $view;  
+  public $view;
   public $represent   = false;
   public $rendered    = false;
   public $parser;
-  
+
   public $scaffold_controller;
   public $scaffold_key;
 
@@ -36,10 +36,10 @@ class madeam_controller {
     if ($this->represent == true) {
       $this->represent = madeam_inflector::model_nameize($this->represent);
     }
-    
+
     // assign params passed on from madeam_router
     $this->params = $params;
-    
+
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
       $this->scaffold_controller  = $this->params['controller'];
@@ -52,15 +52,15 @@ class madeam_controller {
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
     if ($params['layout'] == '0' || $params['layout'] == 'false') {
-      $this->layout(false); 
+      $this->layout(false);
     } else {
       $this->layout($this->layout);
     }
-		
+
 		// set header for layout variable
-		$this->set('header_for_layout', null);	
+		$this->set('header_for_layout', null);
   }
-  
+
 
   /**
    * Handle variable gets.
@@ -76,7 +76,7 @@ class madeam_controller {
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
       // set model class name
       $model_class = madeam_inflector::model_classize($name);
-      
+
       // create model instance
       $inst = new $model_class;
       $this->$name = $inst;
@@ -84,24 +84,24 @@ class madeam_controller {
     } else {
       // set model class name
       $comp_class = 'component_' . $name;
-			
+
       // create component instance
       $inst = new $comp_class($this);
       $this->$name = $inst;
       return $inst;
     }
   }
-  
+
   /**
    * Final methods. (Actions cannot have the same name as these methods)
    * =======================================================================
    */
-  
-  
+
+
   final protected function call_action($uri, $cfg = array()) {
     return madeam::call_action($uri, $cfg, $this->data);
   }
-  
+
   final protected function call_partial($partial_path, $data = array(), $start = 0, $limit = false) {
     if (!empty($data)) {
       // internal counter can be accessed in the view
@@ -143,7 +143,7 @@ class madeam_controller {
   }
 
   final protected function redirect($uri, $exit = true) {
-    if (!headers_sent()) {   
+    if (!headers_sent()) {
       if (substr_count($uri, 'http://') < 1) {
         header('Location:  ' . URI_PATH . $uri);
       } else {
@@ -174,7 +174,7 @@ class madeam_controller {
     } else {
       $this->view = VIEW_PATH . $this->params['controller'] . '/' . implode($path_nodes) . '.' . $this->params['format'];
     }
-    
+
     // if scaffolding is true and the view doesn't exist then use the scaffolding view
     if (!file_exists($this->view) && $this->scaffold == true) {
       $this->view = SCAFFOLD_PATH . $this->scaffold . '/views/' . $view . '.' . $this->params['format'];
@@ -188,7 +188,7 @@ class madeam_controller {
    */
   final public function layout($layouts) {
     $this->layout = array();
-    
+
     if (func_num_args() < 2) {
       if (is_string($layouts)) {
         $this->layout[] = LAYOUT_PATH . $layouts . '.' . $this->params['format'];
@@ -205,21 +205,21 @@ class madeam_controller {
       }
     }
   }
-  
+
   var $_parser = false;
-  
+
   final public function set($name, $value) {
     $this->data[$name] = $value;
-    
+
     /*
     $parser = "parser_' . $this->params['format'];
     if (class_exists($parser)) {
-    	if ($this->_parser == false) { $this->_parser = new $parser; }    	
+    	if ($this->_parser == false) { $this->_parser = new $parser; }
     	$this->_parser->set($name, $value);
   	}
   	*/
   }
-  
+
   final public function render($data = true, $rendered = true) {
     // sometimes the developer may want to tell the view not to render from the controller's action
     if ($data === false) { $this->rendered = true; }
@@ -259,7 +259,7 @@ class madeam_controller {
 				}
 				*/
       }
-            
+
       // loop through layouts
       // the layouts are rendered in order they are in the array
       if (is_array($this->layout)) {
@@ -271,10 +271,10 @@ class madeam_controller {
             // otherwise just output the content
             echo $content_for_layout;
           }
-    
+
           // get contents of output buffering
           $content_for_layout = ob_get_contents();
-          
+
           // clean ob
           ob_clean();
         }
@@ -285,7 +285,7 @@ class madeam_controller {
 
       // mark view as rendered
       $this->rendered = $rendered;
-      
+
       $this->output = $content_for_layout;
 
       return $this->output;

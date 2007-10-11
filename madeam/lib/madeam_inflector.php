@@ -178,33 +178,33 @@ class madeam_inflector {
     return self::specialize('\\', $word);
 	}
 
-	
+
 	public static function sentencize($string) {
 	  return ucfirst(self::specialize(' ', $string));
 	}
-	
-	
+
+
 	public static function model_classize($string) {
 	  $string[0] = low($string[0]);
 	  return 'model_' . self::underscorize(self::singalize($string));
 	}
-	
+
 	public static function model_tableize($string) {
 	  $string[0] = low($string[0]);
 	  return self::underscorize((self::pluralize($string)));
 	}
-	
+
 	public static function model_nameize($string) {
 	  $string[0] = low($string[0]);
 	  return ucfirst(self::camelize((self::singalize($string))));
 	}
-	
+
 	public static function model_fileize($string) {
 	  $string[0] = low($string[0]);
 	  return self::underscorize((self::singalize($string))) . '_model.php';
 	}
-	
-	
+
+
 	/**
 	 * Takes 2 tables and determine's their has and belongs to many table name
 	 *
@@ -236,8 +236,8 @@ class madeam_inflector {
 	  }
 	  return $word;
 	}
-	
-	
+
+
 	public static function urlsafe($string) {
 	  $special_chars = array('&', '?', '/', '\\', ' ');
 
@@ -251,7 +251,7 @@ class madeam_inflector {
 
 	public static function slug($string) {
 	  $string = low(str_replace(' ', '-', trim($string)));
-	  $string = preg_replace('/[\$,!\/\\\\&]/', '', $string);
+	  $string = preg_replace('/[\$,!\/\\\\&\.]/', '', $string);
 	  return $string;
 	}
 

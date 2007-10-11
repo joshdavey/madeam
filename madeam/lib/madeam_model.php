@@ -20,8 +20,8 @@ class madeam_model {
   protected $depth                  = 2;  // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
   protected $reflection_obj;
   public $name                      = null; // -- this needs to be re-named to _name and made protected
-  protected $unbound                = array();  
-  protected $primary_key            = 'id';  
+  protected $unbound                = array();
+  protected $primary_key            = 'id';
   protected $parent                 = false;    // this is used when initiating a sub model within a model.
   protected $fields                 = array();  // list of arrays to be included when returning result
 
@@ -33,12 +33,12 @@ class madeam_model {
    *
    * custom_fields
    * 	array of custom fields
-   * 
+   *
    * standard_fields
    *  array of standard_fields
-   * 
+   *
    * schema
-   *	array of fields and their properties that exist prior to the custom fields 
+   *	array of fields and their properties that exist prior to the custom fields
    *
    * has_one
    *	array of has_one relationships
@@ -61,21 +61,21 @@ class madeam_model {
    *
    */
   protected $setup								= array();
-  
+
   public function __construct($depth = false) {
     // set depth
     if ($depth !== false) { $this->depth = $depth; }
-    
+
     // adjust depth
     // the depth measures how deep you want the relationships to go.
     if ($this->depth > 0) { $this->depth--; }
 
-    // get class name   
+    // get class name
     $modelname = get_class($this);
-        
+
     // set name
     $this->name = madeam_inflector::model_nameize(substr($modelname, 6)); // safely remove "Model" from the name
-       
+
     // check cache for schema
     // if schema not cached get it from the database using describe()
     // the cache should be infinite if cache is enabled
@@ -86,43 +86,43 @@ class madeam_model {
       $this->setup['belongs_to']               = array();
       $this->setup['has_and_belongs_to_many']  = array();
       $this->setup['has_models']               = array(); // why is it called has_models? Change this please. Relationships maybe?
-      $this->setup['custom_fields']            = array(); // custom fields defined in model 
+      $this->setup['custom_fields']            = array(); // custom fields defined in model
 	    $this->setup['standard_fields']          = array(); // default fields in the database or file system
 	    $this->setup['validators']               = array();
-	    
+
 	    // set resource_name
       if ($this->resource_name == null) {
         $this->setup['resource_name'] = madeam_inflector::model_tableize($this->name);
       } else {
         $this->setup['resource_name'] = $this->resource_name;
       }
-      
+
       // pre-load a reflection of this class for use in parseing the meta data and methods
       $this->load_reflection();
-            
+
       // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
       $this->load_relations();
-      
+
       // pre-load custom fields
       $this->load_custom_fields();
-      
+
       // load schema
       $this->load_schema();
-      
+
       // load standard fields
       $this->load_standard_fields();
-      
+
       // load validators
       $this->load_validators();
     }
   }
-    
+
   public function __destruct() {
     if (madeam_cache::check($this->cache_name) == false) {
       madeam_cache::save($this->cache_name, $this->setup);
     }
   }
-  
+
   /**
    * Handle variable gets.
    * This magic method exists to handle instances of models when they're called
@@ -136,31 +136,31 @@ class madeam_model {
     // catch set_ method call
     $match = array();
     if (preg_match("/^[A-Z]{1}/", $name, $match) && in_array($name, array_keys($this->setup['has_models']))) {
-      
+
       $model = $this->setup['has_models'][$name]['model'];
-      
+
       // set model class name
       $model_class = madeam_inflector::model_classize($model);
-      
+
       // create model instance
       $inst = new $model_class($this->depth);
       $this->$name = $inst;
-      
+
       // here we pass a reference of this class to the child model
       $this->$name->parent = $this;
-      
+
       return $inst;
     } else {
       // set model class name
       $comp_class = 'component_' . $name;
-      
+
       // create component instance
       $inst = new $comp_class($this);
       $this->$name = $inst;
       return $inst;
     }
   }
-  
+
   /**
    * load the standard fields from a schema
    *
@@ -170,7 +170,7 @@ class madeam_model {
       $this->setup['standard_fields'][] = $field['Field'];
     }
   }
-  
+
   /**
    * load a schema
    *
@@ -188,36 +188,36 @@ class madeam_model {
    * You can also set arguments in the array. For example: "array('message' => 'Oops', 'max' => 255)".
    */
   final protected function load_validators() {
-    foreach ($this->reflection_obj->getProperties() as $prop) {     
-			
+    foreach ($this->reflection_obj->getProperties() as $prop) {
+
 			// filter out private variables. The less we need to parse the better
 			if ($prop->isPublic() || $prop->isProtected()) {
 				// get property name
 				$property_name = $prop->name;
-				
+
 				if (preg_match("/validate_(.+)/", $property_name, $found)) {
 					// get value of validator property
 					$args  = $prop->getValue($this);
-	
+
 					// seperate bits of validate call by _
 					$validate = explode('_', $found[1]);
-	
+
 					// get method name
 					$method = $validate[count($validate) - 1];
-	
+
 					// remove method name from the end of validate var
 					array_pop($validate);
-	
+
 					// implode remains of $validate to get field name
 					$field = implode('_', $validate);
-	
+
 					// add to validator list
 					$this->validator($field, $method, $args);
 				}
 			}
     }
   }
-  
+
   /**
    * Set a validator
    *
@@ -229,10 +229,10 @@ class madeam_model {
     $args['field'] = $field;
     $this->setup['validators'][] = array('method' => $method, 'args' => $args);
   }
-  
+
   /**
    * Just an idea... How do you feel about setting up models all in the class?
-   * It'd be better if we didn't always have to load fields for every model that's related to this model. 
+   * It'd be better if we didn't always have to load fields for every model that's related to this model.
    * Can we make it so it only does it for the root model or do we need the other fields when creating forms?
    */
   final protected function load_fields() {
@@ -244,7 +244,7 @@ class madeam_model {
         $fields[$field_name] = $this->{'field_' . $field_name};
       }
     }
-		
+
    // it's called skeleton because $this->setup['schema'] is already being used for something else and this data set
    // represents the structure or skeleton of the model
    $this->setup['schema'] = $fields;
@@ -261,87 +261,87 @@ class madeam_model {
 					$relationship = $found[1];
 					$model        = $found[2];
 					$params       = (array) $prop->getValue($this);
-	
+
 					$this->{'add_' . $relationship}($model, $params);
 				}
 			}
     }
-    
+
     // merge models
     // and add itself to the list of models
     $this->setup['has_models'] = array_merge($this->setup['has_one'], $this->setup['has_many'], $this->setup['has_and_belongs_to_many'], $this->setup['belongs_to'], array($this->name => array('model' => $this->name)));
   }
-  
+
   final protected function add_has_and_belongs_to_many($model, $params) {
     // set the model name
     @$params['model'] == null ? $params['model'] = madeam_inflector::model_nameize($model) : $params['model'] = madeam_inflector::model_nameize($params['model']);
-    
+
     // set name of field that identifies the foreign record
     @$params['foreign_key'] == null ? $params['foreign_key'] = madeam_inflector::model_foreign_key($this->name) : false;
-    
+
     // set associate's foreign key
     @$params['associate_foreign_key'] == null ? $params['associate_foreign_key'] = madeam_inflector::model_foreign_key($model) : false;
-    
+
     // set join model (table in the database that houses both foreign keys)
     @$params['join_model'] == null ? $params['join_model'] = madeam_inflector::model_habtm($model, $this->name) : false;
-    
+
     // set primary key
     @$params['primary_key'] == null ? $params['primary_key'] = $this->primary_key : false;
-    
+
     // set uniqueness
     isset($params['unique']) ? true : $params['unique'] = true;
-              
+
     $this->setup['has_and_belongs_to_many'][madeam_inflector::model_nameize($model)] = $params;
   }
-  
+
   final protected function add_has_one($model, $params) {
     // set name of field that identifies the foreign record
     @$params['foreign_key'] == null ? $params['foreign_key'] = madeam_inflector::model_foreign_key($model) : false;
-    
+
     // set the model name
     @$params['model'] == null ? $params['model'] = madeam_inflector::model_nameize($model) : $params['model'] = madeam_inflector::model_nameize($params['model']);
-    
+
     // set primary key
     @$params['primary_key'] == null ? $params['primary_key'] = $this->primary_key : false;
-    
+
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
-    
+
     $this->setup['has_one'][madeam_inflector::model_nameize($model)] = $params;
   }
-  
+
   final protected function add_has_many($model, $params) {
     // set name of field that identifies the foreign record
     @$params['foreign_key'] == null ? $params['foreign_key'] = madeam_inflector::model_foreign_key($this->name) : false;
-    
+
     // set the model name
     @$params['model'] == null ? $params['model'] = madeam_inflector::model_nameize($model) : $params['model'] = madeam_inflector::model_nameize($params['model']);
-    
+
     // set primary key
     @$params['primary_key'] == null ? $params['primary_key'] = $this->primary_key : false;
-    
+
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     //t($params);
     $this->setup['has_many'][madeam_inflector::model_nameize($model)] = $params;
   }
-  
+
   final protected function add_belongs_to($model, $params) {
     // set name of field that identifies the foreign record
     @$params['foreign_key'] == null ? $params['foreign_key'] = madeam_inflector::model_foreign_key($model) : false;
-    
+
     // set the model name
     @$params['model'] == null ? $params['model'] = madeam_inflector::model_nameize($model) : $params['model'] = madeam_inflector::model_nameize($params['model']);
-    
+
     // set primary key
     @$params['primary_key'] == null ? $params['primary_key'] = $this->primary_key : false;
-    
+
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
-    
+
     $this->setup['belongs_to'][madeam_inflector::model_nameize($model)] = $params;
   }
-  
+
   /**
    * Because we have so many methods that require the reflection instance of this class we have this method that
    * pre-loads it when the object is constructed
@@ -359,7 +359,7 @@ class madeam_model {
       $method   = 'validate' . $validator['method'];
 
       $error_key = $this->name . MODEL_JOINT . $field;
-      
+
       // validate to make sure the validating method doesn't return false. If it does then save the error
       if ($check_non_existent_fields === false || isset($this->entry[$field])) {
         if ($this->$method($this->entry[$field], $validator['args']) === false) {
@@ -403,9 +403,9 @@ class madeam_model {
    * This is probably a very costly method when calling lots of data. Need to find a way of turning it off when not needed.
    * Or atleast find a faster way of doing it.
    */
-  final protected function prepare_result() {    
+  final protected function prepare_result() {
     foreach ($this->setup['custom_fields'] as $field) {
-      // include all fields if $this->setup['standard_fields'] is empty
+      // include all fields if $this->fields is empty
       if (empty($this->fields)) {
         //$this->entry[$field] = $this->$field(@$this->entry[$field]);
         $this->entry[$field] = $this->$field();
@@ -416,7 +416,7 @@ class madeam_model {
           $this->entry[$field] = $this->$field();
         }
       }
-    }    
+    }
   }
 
   /**
@@ -446,11 +446,11 @@ class madeam_model {
 			}
     }
   }
-  
+
   protected function describe() {
     return array();
   }
-  
+
   /**
    * Query Methods
    * =======================================================================
@@ -459,32 +459,32 @@ class madeam_model {
     foreach (func_get_args() as $model) {
       $this->unbound[] = madeam_inflector::model_nameize($model);
     }
-    
+
     return $this;
   }
-  
+
   final public function unbind_all() {
 		$exceptions = array();
 		$unbound 		= array_keys($this->setup['has_models']);
-	
+
 		if (func_num_args() > 0) {
 			foreach (func_get_args() as $model) {
 				$exceptions[] = madeam_inflector::model_nameize($model);
-			}			
+			}
 		}
-		
+
 		// exclude exceptions
 		$this->unbound = array_diff($unbound, $exceptions);
-		
+
     return $this;
   }
-  
+
   final public function bind($model, $relation, $params) {
-    $this->{'add_' . $relation}($model, $params);    
-    
+    $this->{'add_' . $relation}($model, $params);
+
     return $this;
   }
-    
+
 
   /**
    * Validating Methods
@@ -501,7 +501,7 @@ class madeam_model {
 
     return false;
   }
-  
+
   final protected function validateIsnotequal($v, $args) {
     $not_values = $args['value'];
     if (is_array($not_values)) {
@@ -542,16 +542,16 @@ class madeam_model {
     }
     return true;
   }
-  
+
   final protected function validateIsisbn($v, $args) {
     if (!preg_match('/^(97(8|9))?\d{9}(\d|X)$/', $v)) {
       return false;
     }
     return true;
   }
-  
+
   final protected function validateIsUnique($v, $args) {
-    
+
   }
 
   /**
@@ -582,27 +582,27 @@ class madeam_model {
   public function after_validation() {
     return true;
   }
-  
+
   public function before_find() {
     return true;
   }
-  
+
   public function after_find() {
     return true;
   }
-  
+
   /**
    * Getter functions
    * =======================================================================
    */
-  
+
   public function get_primary_key() {
-   return $this->primary_key; 
+   return $this->primary_key;
   }
-  
+
   public function get_setup() {
     return $this->setup;
   }
-	
+
 }
 ?>
