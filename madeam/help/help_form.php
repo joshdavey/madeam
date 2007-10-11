@@ -15,41 +15,41 @@
  * @author      Joshua Davey
  */
 class help_form extends help_html {
-	
+
 	public static function open_post($name, $action = null, $_params = array()) {
 		$params = array();
-		
+
     $params['id']     = $name . 'Form';
     $params['action'] = self::url($action);
     $params['method'] = 'post';
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::openTag('form', $params);
 	}
-	
+
 	public static function open_get($name, $action = null, $_params = array()) {
 		$params = array();
-		
+
     $params['id']     = $name . 'Form';
     $params['action'] = self::url($action);
     $params['method'] = 'get';
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::openTag('form', $params);
 	}
-	
+
 	public static function open_file($name, $action = null, $_params = array()) {
 		$params = array();
-		
+
     $params['id']     	= $name . 'Form';
     $params['action'] 	= self::url($action);
     $params['method'] 	= 'post';
 		$params['enctype']	= 'multipart/form-data';
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::openTag('form', $params);
 	}
 
@@ -63,22 +63,22 @@ class help_form extends help_html {
     $params['type']   = 'hidden';
     $params['value']  = self::fieldValue($name, $value);
     $params['id']     = self::nameToId($name);
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('input', $params);
   }
 
   public static function checkbox($name, $checked_value = null, $source_value = null, $_params = array()) {
 		static $nameid = array();
-		
+
 		if (isset($nameid[$name])) {
 			$name .= '.' . $nameid[$name]++;
 		} else {
 			$nameid[$name] = 0;
 			$name .= '.' . $nameid[$name]++;
 		}
-		
+
     $params = array();
     $params['name']   = self::fieldName($name);
     $params['type']   = 'checkbox';
@@ -86,26 +86,26 @@ class help_form extends help_html {
 		$source_value  = self::fieldValue($name, $source_value);
     if ($checked_value == $source_value) { $params['checked'] = true; } else { $params['checked'] = false; }
     $params['value']  = self::fieldValue($name, $checked_value);
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('input', $params);
   }
-	
+
 	public static function radio($name, $checked_value = null, $source_value = null, $_params = array()) {
 	  $params = array();
     $params['name']   = self::fieldName($name);
     $params['type']   = 'radio';
     $params['id']     = self::nameToId($name);
-		
+
 		$source_value  = self::fieldValue($name, $source_value);
-		
+
     if ($checked_value == $source_value) { $params['checked'] = true; } else { $params['checked'] = false; }
-		
+
     $params['value']  = $checked_value;
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('input', $params);
 	}
 
@@ -115,9 +115,9 @@ class help_form extends help_html {
     $params['type']   = 'text';
     $params['id']     = self::nameToId($name);
     $params['value']  = self::fieldValue($name, $value);
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('input', $params);
   }
 
@@ -127,14 +127,14 @@ class help_form extends help_html {
 
   public static function password($name, $value = null, $_params = array()) {
     $params = array();
-     
+
     $params['name']   = self::fieldName($name);
     $params['type']   = 'password';
     $params['id']     = self::nameToId($name);
     $params['value']  = self::fieldValue($name, $value);
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('input', $params);
   }
 
@@ -143,9 +143,9 @@ class help_form extends help_html {
     $params['name']   = $name; // don't need to give it a form name
     $params['type']   = 'file';
     $params['id']     = self::nameToId($name);
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('input', $params);
   }
 
@@ -155,9 +155,9 @@ class help_form extends help_html {
     $params['id']   = self::nameToId($name);
     $params['rows'] = 6;
     $params['cols'] = 30;
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::wrappingTag('textarea', self::fieldValue($name, $value), $params);
   }
 
@@ -167,9 +167,9 @@ class help_form extends help_html {
     $params['type']   = 'button';
     $params['id']     = self::nameToId($name);
     $params['value']  = self::fieldValue($name, $value);
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('input', $params);
   }
 
@@ -179,12 +179,12 @@ class help_form extends help_html {
 		if ($value == 'Submit') { $params['value'] = $name; } else { $params['value']  = $value; }
     $params['id']     = self::nameToId($name);
     $params['type']   = 'submit';
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('input', $params);
   }
-  
+
   //re-named submit
   public static function send($name = 'Submit', $value = 'Submit', $_params = array()) {
     return self::submit($name, $value, $_params);
@@ -195,9 +195,9 @@ class help_form extends help_html {
     $params['name']   = $name;
     $params['id']     = self::nameToId($name);
     $params['type']   = 'reset';
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('input', $params);
   }
 
@@ -245,7 +245,10 @@ class help_form extends help_html {
 
   public static function datetime($name, $value, $_params = array()) {
     $returned = array();
-    $returned[] = self::date($name, $value, $params);
+    $returned[] = self::date($name, $value, $_params);
+
+    // set name of IDs
+    $idname = self::nameToId($name);
 
     if (is_string($value)) {
       preg_match_all('/(\d{2})\:(\d{2})\:(\d{2})/', $value, $matchs);
@@ -261,7 +264,7 @@ class help_form extends help_html {
     $hour_params = array();
     $hour_params['class']  = 'datetime_hour';
     $hour_params['id']     = $idname . '_datetime_hour';
-    if ($value[$name . MODEL_JOINT . 'hour'] == null) { $value[$name . MODEL_JOINT . 'hour'] = date('H'); }
+    if (@$value[$name . MODEL_JOINT . 'hour'] == null) { $value[$name . MODEL_JOINT . 'hour'] = date('H'); }
     //if ($value[$name . MODEL_JOINT . 'hour'] == null) { $value[$name . MODEL_JOINT . 'hour'] = '12'; }
     $returned[] = self::dropdown($name . MODEL_JOINT . 'hour', $value[$name . MODEL_JOINT . 'hour'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'), $hour_params) . ' : ';
 
@@ -269,7 +272,7 @@ class help_form extends help_html {
     $min_params = array();
     $min_params['class']  = 'datetime_minute';
     $min_params['id']     = $idname . '_datetime_minute';
-    if ($value[$name . MODEL_JOINT . 'minute'] == null) { $value[$name . MODEL_JOINT . 'minute'] = date('i'); }
+    if (@$value[$name . MODEL_JOINT . 'minute'] == null) { $value[$name . MODEL_JOINT . 'minute'] = date('i'); }
     //if ($value[$name . MODEL_JOINT . 'minute'] == null) { $value[$name . MODEL_JOINT . 'minute'] = '00'; }
     $returned[] = self::dropdown($name . MODEL_JOINT . 'minute', $value[$name . MODEL_JOINT . 'minute'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'), $min_params) . ' : ';
 
@@ -277,7 +280,7 @@ class help_form extends help_html {
     $sec_params = array();
     $sec_params['class']  = 'datetime_second';
     $sec_params['id']     = $idname . '_datetime_second';
-    if ($value[$name . MODEL_JOINT . 'second'] == null) { $value[$name . MODEL_JOINT . 'second'] = date('s'); }
+    if (@$value[$name . MODEL_JOINT . 'second'] == null) { $value[$name . MODEL_JOINT . 'second'] = date('s'); }
     //if ($value[$name . MODEL_JOINT . 'second'] == null) { $value[$name . MODEL_JOINT . 'second'] = '00'; }
     $returned[] = self::dropdown($name . MODEL_JOINT . 'second', $value[$name . MODEL_JOINT . 'second'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'), $sec_params);
 
@@ -297,7 +300,7 @@ class help_form extends help_html {
         if (is_array($value)) {
           if ($selected == @$value[1]) { $o_params['selected']  = true; }
           $o_params['value'] = @$value[1];
-  
+
           $contents[]       = self::wrappingTag('option', $value[0], $o_params);
         } else {
           if ($selected == $value) $o_params['selected']  = true;
@@ -305,50 +308,50 @@ class help_form extends help_html {
         }
       }
     }
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::wrappingTag('select', implode($contents), $params);
   }
-	
-	
-	
-  
+
+
+
+
   public static function magic($model, $action, $data = array(), $select_fields = array()) {
     // output definition
     $output = null;
-    
+
     // create model instance
     $modelname = madeam_inflector::model_classize($model);
     $inst = new $modelname(1);
-    
+
     // get fields
     // don't use this! use $Model->describe(); instead!
     $model_setup = $inst->get_setup();
     $fields = $model_setup['schema'];
-    
+
     // open Form
-    $output = self::open_file($model, $action, 'post', array('enctype' => 'multipart/form-data')) . "\n";    
-    
+    $output = self::open_file($model, $action, 'post', array('enctype' => 'multipart/form-data')) . "\n";
+
     // create fields
-    foreach ($fields as $field_name => $settings) {      
+    foreach ($fields as $field_name => $settings) {
       // filter out fields if the developer has chosen only specific fields
       if (!empty($select_fields) && !in_array($field_name, $select_fields)) { continue; }
-      
+
       // field type
       $field_type     = $settings['type'];
-      
+
       // field label
       if ($settings['label']) {
-        $field_label    = $settings['label']; 
+        $field_label    = $settings['label'];
       } else {
-        $field_label    = madeam_inflector::sentencize($field_name); 
+        $field_label    = madeam_inflector::sentencize($field_name);
       }
-      
+
       // field parameters
       $params = array();
       if ($settings['class']) { $params['class'] = $settings['class']; }
-      
+
       if (in_array('auto_increment', $settings) || in_array('hidden', $settings)) {
         // hidden field
         $output .= self::hidden($field_name, $data[$field_name], $params) . "\n";
@@ -356,7 +359,7 @@ class help_form extends help_html {
         $output .= '<p>' . "\n";
         // add label
         $output .= '  <label for="' . $model . '_' . $field_name . '">' . $field_label . '</label>' . "\n  ";
-        
+
         if (in_array('password', $settings)) {
           // password fields
           $output .= self::password($field_name, null, $params) . "\n";
@@ -364,7 +367,7 @@ class help_form extends help_html {
           // file fields
           $output .= self::file($field_name, $params) . "\n";
         } else {
-          
+
           if ($field_type == FIELD_VARCHAR || $field_type == FIELD_CHAR || $field_type == FIELD_TINYINT || $field_type == FIELD_INT || $field_type == FIELD_MEDIUMINT || $field_type == FIELD_BIGINT) {
             if ($settings['size']) { $params['maxlength'] = $settings['size']; }
             $output .= self::text($field_name, $data[$field_name], $params) . "\n";
@@ -380,37 +383,37 @@ class help_form extends help_html {
             // need to create group of checkboxes
           }
         }
-        
+
         // add an error tag
         $output .= help_error::single($field_name);
         $output .= '</p>' . "\n";
       }
     }
-    
+
     // save & cancel button
     $output .= '<p>' . "\n";
     $output .= '  <label for="Save">Save</label>' . "\n  ";
     $output .= self::send('Save');
     $output .= self::button('Cancel', 'Cancel', array('onclick' => "window.location.href = '" . $_SERVER['HTTP_REFERER'] . "'"));
     $output .= '</p>' . "\n";
-    
+
     // close form
     $output .= self::close();
-    
+
     // return magical form
     return $output;
   }
-	
-	
+
+
 	/**
    * Protected functions.
    * =======================================================================
    */
-	
+
 	protected static function fieldName($fieldName) {
-	
+
 		$nodes = explode(MODEL_JOINT, $fieldName);
-		
+
     $name = $nodes[0];
     array_shift($nodes);
     if (!empty($nodes)) {
@@ -420,18 +423,18 @@ class help_form extends help_html {
   }
 
   protected static function fieldValue($fieldName, $setValue) {
-	
+
 		// get nodes of field name to identify it's value
     $nodes = explode(MODEL_JOINT, $fieldName);
-		
+
 		// get root of value
     $value = $_POST;
-    
+
     foreach($nodes as $node) { $value = @$value[$node]; }
-    
+
 		// if the value is empty then set it to the $setValue
     if (empty($value)) { $value = $setValue; }
-    
+
     return stripslashes($value);
   }
 
