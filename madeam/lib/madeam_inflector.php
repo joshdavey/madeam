@@ -56,22 +56,6 @@ class madeam_inflector {
 		'turf'        => 'turfs',
   );
 
-
-
-  /* //still need to add more of these...
-  $coreUninflectedPlural = array('.*[nrlm]ese', '.*deer', '.*fish', '.*measles', '.*ois', '.*pox', '.*rice', '.*sheep', 'Amoyese',
-											'bison', 'Borghese', 'bream', 'breeches', 'britches', 'buffalo', 'cantus', 'carp', 'chassis', 'clippers',
-											'cod', 'coitus', 'Congoese', 'contretemps', 'corps', 'debris', 'diabetes', 'djinn', 'eland', 'elk',
-											'equipment', 'Faroese', 'flounder', 'Foochowese', 'gallows', 'Genevese', 'Genoese', 'Gilbertese', 'graffiti',
-											'headquarters', 'herpes', 'hijinks', 'Hottentotese', 'information', 'innings', 'jackanapes', 'Kiplingese',
-											'Kongoese', 'Lucchese', 'mackerel', 'Maltese', 'mews', 'moose', 'mumps', 'Nankingese', 'news',
-											'nexus', 'Niasese', 'Pekingese', 'Piedmontese', 'pincers', 'Pistoiese', 'pliers', 'Portuguese', 'proceedings',
-											'rabies', 'rhinoceros', 'salmon', 'Sarawakese', 'scissors', 'sea[- ]bass', 'series', 'Shavese', 'shears',
-											'siemens', 'species', 'swine', 'testes', 'trousers', 'trout', 'tuna', 'Vermontese', 'Wenchowese',
-											'whiting', 'wildebeest', 'Yengeese',);
-	*/
-
-
   /**
    * Pluralizes a word
    *
@@ -239,12 +223,7 @@ class madeam_inflector {
 
 
 	public static function urlsafe($string) {
-	  $special_chars = array('&', '?', '/', '\\', ' ');
-
-	  foreach ($special_chars as $char) {
-	    $string = str_replace($char, '', $string);
-	  }
-
+	  $string = preg_replace('/[\$,!\/\\\\&\.]/', '', $string);
 	  return $string;
 	}
 

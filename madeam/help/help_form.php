@@ -19,7 +19,7 @@ class help_form extends help_html {
 	public static function open_post($name, $action = null, $_params = array()) {
 		$params = array();
 
-    $params['id']     = $name . 'Form';
+    $params['id']     = 'form_' . low($name);
     $params['action'] = self::url($action);
     $params['method'] = 'post';
 
@@ -31,7 +31,7 @@ class help_form extends help_html {
 	public static function open_get($name, $action = null, $_params = array()) {
 		$params = array();
 
-    $params['id']     = $name . 'Form';
+    $params['id']     = 'form_' . low($name);
     $params['action'] = self::url($action);
     $params['method'] = 'get';
 
@@ -43,7 +43,7 @@ class help_form extends help_html {
 	public static function open_file($name, $action = null, $_params = array()) {
 		$params = array();
 
-    $params['id']     	= $name . 'Form';
+    $params['id']     	= 'form_' . low($name);
     $params['action'] 	= self::url($action);
     $params['method'] 	= 'post';
 		$params['enctype']	= 'multipart/form-data';

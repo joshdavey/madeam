@@ -16,8 +16,8 @@
  */
 
 class madeam_router {
-  static $routes  = array(); // regex, names, params, http_request_method -- damn these really need to be cached! (Store them in a text file?)
-  static $links   = array(); // a place to store the magic smart links
+  public static $routes  = array(); // regex, names, params, http_request_method -- damn these really need to be cached! (Store them in a text file?)
+  public static $links   = array(); // a place to store the magic smart links
 
   /**
    * When intercepting "connect" method calls we are check to see if they are special in anyway.
@@ -35,11 +35,11 @@ class madeam_router {
       $params = $args[1];
       // get var name
       self::$links[$link] = $route;
-      
+
       $this->connect($route, $params);
     }
   }
-  
+
   /**
    * Early stages of defining a resource. This is a good start.
    * It adds all the necessary routes for a controller
@@ -48,13 +48,13 @@ class madeam_router {
    */
   public function resource($name) {
     $plural = madeam_inflector::pluralize($name);
-    $this->{'connect_' . $plural}($plural . '.:format', array('controller' => $name, 'action' => 'index')); 
+    $this->{'connect_' . $plural}($plural . '.:format', array('controller' => $name, 'action' => 'index'));
     $this->{'connect_' . $name . '_add'}($name . '/add.:format', array('controller' => $name, 'action' => 'add'));
     $this->{'connect_' . $name . '_edit'}($name . '/edit/:id.:format', array('controller' => $name, 'action' => 'edit'));
     $this->{'connect_' . $name . '_show'}($name . '/:id.:format', array('controller' => $name, 'action' => 'show'));
     $this->{'connect_' . $name . '_delete'}($name . '/delete/:id.:format', array('controller' => $name, 'action' => 'delete'));
   }
-  
+
   /**
    * This cool method adds paths by formatting the string the user has entered and turning it into a regular expression
    * which can be used to be compared against URIs.
@@ -104,7 +104,7 @@ class madeam_router {
 
       // build route's regexp
       $regexp = '/^' . implode('', $mini_exp) . '[\/\.]?([.]*)$/';
-      
+
       // add to routes list
 		  self::$routes[] = array($regexp, $names, $params, $http_request_method);
     }
@@ -155,7 +155,7 @@ class madeam_router {
 			t($uri);
       exit();
     }
-    
+
     return $params;
   }
 
@@ -167,12 +167,12 @@ class madeam_router {
       return '/' . @$_GET['uri'];
     } else {
       $url = explode(SCRIPT_FILENAME, $_SERVER['REQUEST_URI']);
-			// check if it split it into 2 peices. 
+			// check if it split it into 2 peices.
 			// If it didn't then there is ending "index.php" so we assume there is no URI on the end either
-			if (isset($url[1])) { 
-				return $url[1]; 
+			if (isset($url[1])) {
+				return $url[1];
 			} else {
-			 return null; 
+			 return null;
 			}
     }
   }

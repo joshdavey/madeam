@@ -29,36 +29,36 @@ class madeam_logger {
     if ($lvl < 25 && DEBUG_MODE === true) {
       self::show();
     }
-  }  
+  }
 
-  public static function query($query) {
-    
+  public static function db_query($query) {
+
 
   }
 
-  
+
   public static function system_error($msg) {
-    
+
 
   }
 
-  
+
   public static function fatal_error($msg) {
-    
+
 
   }
 
-  
+
 
   public static function user_error($msg) {
-    
+
 
   }
 
 
 
   public static function show() {
-  	
+
   	$helpful_reminders = array(
   		"Don't worry, be happy. It could be a lot worse.",
   		"Oops. Did someone make a boo boo?",
@@ -67,9 +67,9 @@ class madeam_logger {
   		"It wasn't me.",
   		"This is the last time I trust open source software."
   	);
-  		
+
   	$reminder = rand(0, count($helpful_reminders)-1);
-  
+
     echo
     '<style>
     h1 { margin: 0; padding: 0; font-size: 12pt; }
@@ -92,7 +92,7 @@ class madeam_logger {
 	      echo '<div class="info">';
 		      echo '<h1>Backtrace</h1>';
 		      echo '<hr />';
-					echo '<pre id="backtrace">';        
+					echo '<pre id="backtrace">';
 	        debug_print_backtrace();
 	      	echo '</pre>';
 	      echo '</div>';

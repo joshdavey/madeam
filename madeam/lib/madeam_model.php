@@ -19,7 +19,7 @@ class madeam_model {
   protected $resource_name          = null;  // name of the database table or file resource that holds the records for this model
   protected $depth                  = 2;  // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
   protected $reflection_obj;
-  public $name                      = null; // -- this needs to be re-named to _name and made protected
+  protected $name                      = null; // -- this needs to be re-named to _name and made protected
   protected $unbound                = array();
   protected $primary_key            = 'id';
   protected $parent                 = false;    // this is used when initiating a sub model within a model.
@@ -114,14 +114,11 @@ class madeam_model {
 
       // load validators
       $this->load_validators();
+
+      madeam_cache::save($this->cache_name, $this->setup, true);
     }
   }
 
-  public function __destruct() {
-    if (madeam_cache::check($this->cache_name) == false) {
-      madeam_cache::save($this->cache_name, $this->setup);
-    }
-  }
 
   /**
    * Handle variable gets.
@@ -362,7 +359,7 @@ class madeam_model {
 
       // validate to make sure the validating method doesn't return false. If it does then save the error
       if ($check_non_existent_fields === false || isset($this->entry[$field])) {
-        if ($this->$method($this->entry[$field], $validator['args']) === false) {
+        if ($this->$method(@$this->entry[$field], $validator['args']) === false) {
 					$this->session->error($error_key, $this->parse_validate_message($validator['args']));
           //$_SESSION[USER_ERROR_NAME][$error_key][] = $this->parse_validate_message($validator['args']);
         }
