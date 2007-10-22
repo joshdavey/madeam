@@ -5,7 +5,7 @@
 
 	/**
 	 * Environment configuration variables:
-	 * ------------------------------------------------ 
+	 * ------------------------------------------------
 	 *
 	 * db_user
 	 *	Database username
@@ -26,18 +26,14 @@
 	 * madeam_dir
 	 *	Path to madeam directory relative to applications directory
 	 */
-	 
+
 // development configuration
 // ===================================================
 
-	$cfg['development']['db_host'] 				= 'localhost';
-	$cfg['development']['db_user'] 				= 'root';
-	$cfg['development']['db_pass'] 				= '';
-	$cfg['development']['db_name'] 				= 'application';	
-	$cfg['development']['madeam_dir'] 		= 'madeam';
-	$cfg['development']['mod_rewrite'] 		= true;	
+	$cfg['development']['db_servers'][]   = 'mysql://root:password@localhost?name=application';
+	$cfg['development']['mod_rewrite'] 		= true;
 	$cfg['development']['debug_mode']			= true;
-	$cfg['development']['disable_cache'] 	= true;
+	$cfg['development']['disable_cache'] 	= false;
 
 
 
@@ -45,15 +41,12 @@
 // production configuration
 // ===================================================
 
-	$cfg['production']['db_host'] 				= 'localhost';
-	$cfg['production']['db_user'] 				= 'root';
-	$cfg['production']['db_pass'] 				= '';
-	$cfg['production']['db_name'] 				= 'application';
+	$cfg['development']['db_servers'][]   = 'mysql://root:password@localhost?name=application';
 	$cfg['production']['madeam_dir'] 			= 'madeam';
 	$cfg['production']['mod_rewrite'] 		= true;
 	$cfg['production']['debug_mode']			= false;
 	$cfg['production']['disable_cache'] 	= false;
-	
+
 
 
 
@@ -74,7 +67,7 @@
 
 
 // logs configuration
-// ===================================================	
+// ===================================================
 
 	// Edit this to change the naming format of the log files
 	define('LOG_FORMAT', 'Y-m');
@@ -83,16 +76,16 @@
 
 
 // ajax configuration
-// ===================================================	
+// ===================================================
 
 	// When this is set to "false" and you are making an AJAX call no layout will be displayed
-	define('AJAX_LAYOUT', false);	
+	define('AJAX_LAYOUT', false);
 
 
 
 
 // format configuration
-// ===================================================	
+// ===================================================
 
 	// Map view file formats to parsers
 	$cfg['format_parsers'] = array();
@@ -101,17 +94,17 @@
 
 
 // loader configuration
-// ===================================================	
-	
+// ===================================================
+
 	// this array of loaders allows you to dynamically include objects when they're instantiated
 	// exmple: array('loader_name' => 'regular_expression')
 	$cfg['loaders'] = array(
 		//'example'	=> '/^Example_/'
 	);
-	
-	
-	
-	
+
+
+
+
 	// loaders
 	function loader_example($class, $matchs) {
 		return VENDOR_LIB_PATH . 'Example' . DS . str_replace('Example_', null, ucfirst($class)) . '.php';
