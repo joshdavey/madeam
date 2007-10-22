@@ -14,7 +14,7 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
- 
+
 // directory splitter
 define('DS', DIRECTORY_SEPARATOR);
 
@@ -45,12 +45,8 @@ $cfg = array();
 require CFG_PATH . 'environment.php';
 
 // turn configs into constants for speed?
-define('DB_USER', $cfg[ENVIRONMENT]['db_user']);
-define('DB_PASS', $cfg[ENVIRONMENT]['db_pass']);
-define('DB_NAME', $cfg[ENVIRONMENT]['db_name']);
-define('DB_HOST', $cfg[ENVIRONMENT]['db_host']);
-define('MOD_REWRITE', $cfg[ENVIRONMENT]['mod_rewrite']);
-define('DEBUG_MODE', $cfg[ENVIRONMENT]['debug_mode']);
+define('MOD_REWRITE',   $cfg[ENVIRONMENT]['mod_rewrite']);
+define('DEBUG_MODE',    $cfg[ENVIRONMENT]['debug_mode']);
 define('DISABLE_CACHE', $cfg[ENVIRONMENT]['disable_cache']);
 
 // set base url
@@ -71,6 +67,9 @@ define('MADEAM_PATH',       realpath($cfg[ENVIRONMENT]['madeam_dir']) . DS);
 define('MADEAM_LIB_PATH',		MADEAM_PATH . 'lib' . DS);
 define('VENDOR_PATH',       APP_PATH . 'vendor' . DS);
 define('VENDOR_LIB_PATH',   VENDOR_PATH . 'lib' . DS);
+
+// scaffold path
+define('SCAFFOLD_PATH',     'scaffold' . DS);
 
 // application files
 define('VIEW_PATH',         APP_PATH . 'view' . DS);
@@ -104,19 +103,23 @@ define('MODEL_JOINT', '.');
 
 // define core file include handlers
 $core_loaders = array(
-	'inflector' 		=> '/madeam_inflector/', 
-	'madeam' 				=> '/^madeam/', 
+	'inflector' 		=> '/madeam_inflector/',
+	'madeam' 				=> '/^madeam/',
 	'extensions' 		=> '/^component|behavior|parser|help|console/',
 	'model'					=> '/^model/',
 	'controller'		=> '/^controller/'
 	);
 
 // merge core include handlers with handlers from configuration
-global $loaders; 
+global $loaders;
 $loaders = array_merge($core_loaders, $cfg['loaders']);
 
 // include routes configuration
 require CFG_PATH . 'routes.php';
+
+// save database server configurations to registry
+$registry = madeam_registry::instance();
+$registry->set('db_servers', $cfg[ENVIRONMENT]['db_servers']);
 
 
 // loaders
@@ -157,7 +160,7 @@ function loader_extensions($class, $matchs) {
 function loader_model($class, $matchs) {
 	$nodes = explode('_', $class);
 	array_pop($nodes);
-	return APP_PATH . implode(DS, $nodes) . DS . $class . '.php'; 
+	return APP_PATH . implode(DS, $nodes) . DS . $class . '.php';
 }
 
 // controller include handler
@@ -323,14 +326,33 @@ function vendor($file) {
 function rnd_string($length = 7) {
   $string = null;
   $chars = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-    
+
   for ($i = 0; $i <= $length; $i++) {
     $string .= $chars[rand(0, 35)];
   }
-  
+
   return $string;
 }
 
 
-	
+function parse_db_connection($string) {
+  $details = array();
+
+  // parse connection string as url
+  $parsed_string = parse_url($string);
+
+  isset($parsed_string['scheme']) ? $details['driver']  = $parsed_string['scheme']  : $details['driver'] = null;
+  isset($parsed_string['host'])   ? $details['host']    = $parsed_string['host']    : $details['host']   = null;
+  isset($parsed_string['user'])   ? $details['user']    = $parsed_string['user']    : $details['user']   = null;
+  isset($parsed_string['pass'])   ? $details['pass']    = $parsed_string['pass']    : $details['pass']   = null;
+
+  parse_str($parsed_string['query'], $options);
+
+  isset($options['name']) ? $details['name'] = $options['name'] : $details['name'] = null;
+  isset($options['port']) ? $details['port'] = $options['port'] : $details['port'] = false;
+
+  return $details;
+}
+
+
 ?>
