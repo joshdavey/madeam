@@ -25,7 +25,7 @@ class madeam {
   	// include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
 
     // call controller action
-    $output = madeam::call_action('?layout=1');
+    $output = madeam::call_action(madeam_router::getCurrentURI() . '?layout=1');
 
     // destroy user error notices
     if (isset($_SESSION[USER_ERROR_NAME])) {
@@ -68,7 +68,7 @@ class madeam {
    */
   public static function call_action($url = null, $cfg = array()) {
     // get params from uri
-    $params = madeam_router::params($url);
+    $params = madeam_router::parseURI($url);
 
     // cannot allow access to the app controller
     if ($params['controller'] === 'app') { exit('sorry.'); }

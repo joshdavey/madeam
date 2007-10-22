@@ -111,30 +111,52 @@ class madeam_router {
   }
 
   /**
-   * Parses the URI and returns the params within.
+   * This method takes a URL and parses it for parameters
+   *
+   * Parameters (params) can be passed to the framework by adding a get query to the end of a url like so: ?foo=bar
+   * Or by defining params in the routes configuration file @see config/routes.php
+   *
+   * If no values have been assigned to madeam's special params then default values are assigned
+   * which can be defined in the configuration @see config/setup.php
+   *
+   * This method excepts URIs in anyformat.
+   * Examples:
+   *  http://localhost/website/index?foo=bar
+   *  index/test?blah=nah
    *
    * @param string $uri
-   * @return array $params
+   * @return array
    */
   public static function parseURI($uri = false) {
-    // set uri if not set by user
-    // it's not set if the $uri is false or null
-    if ($uri == null) {
-      $uri = self::getCurrentURI();
-    } else {
-      $path = parse_url($uri, PHP_URL_PATH);
-      $extracted_path = explode(URI_PATH, $path, 2);
+    // parse uri
+    $parsed_uri = parse_url($uri);
+
+    // set uri
+    if (isset($parsed_uri['path'])) {
+      $extracted_path = explode(URI_PATH, $parsed_uri['path'], 2);
       $uri = array_pop($extracted_path);
     }
 
-    // matchs count
-    $matchs = 0;
+    // set get
+    $get = array();
+    if (isset($parsed_uri['query'])) {
+      $query = $parsed_uri['query'];
+
+      // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
+      parse_str($query, $get); // assigns $get array of query params
+    }
+
+    // merge manual $_GETs with http $_GETs
+    $gets = array_merge($get, $_GET); // http $_GETs overide manual $_GETs
 
     // makes sure the first character is "/"
     if (substr($uri, 0, 1) != '/') { $uri = '/' . $uri; }
 
     // define params as array
     $params = array();
+
+    // matchs count
+    $matchs = 0;
 
     // match uri to route map
     foreach(self::$routes as $route) {
@@ -162,6 +184,18 @@ class madeam_router {
       exit();
     }
 
+    // get params from uri
+    $params = array_merge($params, $gets);
+
+    // automagically disable the layout when making an AJAX call
+    if (!AJAX_LAYOUT && @$_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') { $params['layout'] = '0'; }
+
+    // set default values for controller and action
+    @$params['controller'] == null ? $params['controller'] = DEFAULT_CONTROLLER : false ;
+    @$params['action']     == null ? $params['action']     = DEFAULT_ACTION : false;
+  	@$params['format']     == null ? $params['format']     = DEFAULT_FORMAT : false ;
+    @$params['layout']     == null ? $params['layout']     = '0' : false ;
+
     return $params;
   }
 
@@ -181,49 +215,6 @@ class madeam_router {
 			 return null;
 			}
     }
-  }
-
-  /**
-   * This method takes a URL and parses it for parameters
-   *
-   * Parameters (params) can be passed to the framework by adding a get query to the end of a url like so: ?foo=bar
-   * Or by defining params in the routes configuration file @see config/routes.php
-   *
-   * If no values have been assigned to madeam's special params then default values are assigned
-   * which can be defined in the configuration @see config/setup.php
-   *
-   * @param string $url
-   * @return array
-   */
-  public static function params($url = false) {
-    // split url into uri ($uri[0]) and GET query ($uri[1])
-    $url = explode('?', $url, 2);
-
-    // set uri
-    $uri = array_shift($url);
-
-    // set query
-    $query = array_shift($url);
-
-    // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
-    parse_str($query, $get); // assigns $get array of query params
-
-    // merge manual $_GETs with http $_GETs
-    $gets = array_merge($get, $_GET); // http $_GETs overide manual $_GETs
-
-    // get params from uri
-    $params = array_merge(self::parseURI($uri), $gets);
-
-    // automagically disable the layout when making an AJAX call
-    if (!AJAX_LAYOUT && @$_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') { $params['layout'] = '0'; }
-
-    // set default values for controller and action
-    @$params['controller'] == null ? $params['controller'] = DEFAULT_CONTROLLER : false ;
-    @$params['action']     == null ? $params['action']     = DEFAULT_ACTION : false;
-  	@$params['format']     == null ? $params['format']     = DEFAULT_FORMAT : false ;
-    @$params['layout']     == null ? $params['layout']     = '0' : false ;
-
-    return $params;
   }
 }
 ?>
