@@ -100,7 +100,7 @@ class madeam_logger {
 	        echo '<h1>Params</h1>';
 	        echo '<hr />';
 	        echo '<table>';
-	          foreach(madeam::params() as $name => $value) {
+	          foreach(madeam_router::parseURI(madeam_router::getCurrentURI()) as $name => $value) {
 	            echo "<tr>";
 	            echo "<td>$name</td>";
 	            echo "<td> = $value </td>";

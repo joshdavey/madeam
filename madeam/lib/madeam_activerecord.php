@@ -61,6 +61,8 @@ class madeam_activerecord extends madeam_model {
 	protected $is_insert						= false;
 	protected $is_update						= false;
 
+	protected $server               = 0; // the name of the server configuration we want to use.
+
   private $sql_explain            = false;
   private $sql_start              = false;
   private $sql_fields							= array();
@@ -106,14 +108,22 @@ class madeam_activerecord extends madeam_model {
     // if we connect here we don't need to connect to the database until we execute a query
     // therefore if all we're doing is loading a cached page we won't need a database connection
     if (!is_resource($db_connection)) {
-      if (@DB_PORT) {
-        $db_connection = @mysql_connect(DB_HOST . ':' . DB_PORT, DB_USER, DB_PASS);
+
+      // parse DB information
+      $registry = madeam_registry::instance();
+      $servers = $registry->get('db_servers');
+      $server_connection_string = $servers[$this->server];
+
+      $server = parse_db_connection($server_connection_string);
+
+      if (isset($server['port']) && $server['port'] != false) {
+        $db_connection = @mysql_connect($server['host'] . ':' . $server['port'], $server['user'], $server['pass']);
       } else {
-        $db_connection = @mysql_connect(DB_HOST, DB_USER, DB_PASS);
+        $db_connection = @mysql_connect($server['host'], $server['user'], $server['pass']);
       }
 
       if (is_resource($db_connection)) {
-        if (!@mysql_select_db(DB_NAME, $db_connection)) {
+        if (!@mysql_select_db($server['name'], $db_connection)) {
           // failed to find selected database
           madeam_logger::log(mysql_error(), 0);
         }
