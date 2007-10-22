@@ -68,7 +68,7 @@ class madeam {
    */
   public static function call_action($url = null, $cfg = array()) {
     // get params from uri
-    $params = self::params($url);
+    $params = madeam_router::params($url);
 
     // cannot allow access to the app controller
     if ($params['controller'] === 'app') { exit('sorry.'); }
@@ -157,50 +157,6 @@ class madeam {
       madeam_logger::log("the controller <b>$controller</b> does not exist", 10);
       return false;
     }
-  }
-
-  /**
-   * This method takes a URL and parses it for parameters
-   *
-   * Parameters (params) can be passed to the framework by adding a get query to the end of a url like so: ?foo=bar
-   * Or by defining params in the routes configuration file @see config/routes.php
-   *
-   * If no values have been assigned to madeam's special params then default values are assigned
-   * which can be defined in the configuration @see config/setup.php
-   *
-   * @param string $url
-   * @return array
-   */
-  public static function params($url = false) {
-    // split url into uri ($uri[0]) and GET query ($uri[1])
-    $url = explode('?', $url, 2);
-
-    // set uri
-    $uri = array_shift($url);
-
-    // set query
-    $query = array_shift($url);
-
-    // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
-    parse_str($query, $get); // assigns $get array of query params
-
-    // merge manual $_GETs with http $_GETs
-    $gets = array_merge($get, $_GET); // http $_GETs overide manual $_GETs
-
-    // get params from uri
-    $params = array_merge(madeam_router::parseURI($uri), $gets);
-
-    // automagically disable the layout when making an AJAX call
-    if (!AJAX_LAYOUT && @$_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') { $params['layout'] = '0'; }
-
-    // set default values for controller and action
-    @$params['controller'] == null ? $params['controller'] = DEFAULT_CONTROLLER : false ;
-    @$params['action']     == null ? $params['action']     = DEFAULT_ACTION : false;
-  	@$params['format']     == null ? $params['format']     = DEFAULT_FORMAT : false ;
-    @$params['layout']     == null ? $params['layout']     = '0' : false ;
-
-
-    return $params;
   }
 }
 ?>
