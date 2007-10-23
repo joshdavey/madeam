@@ -1,9 +1,9 @@
-<?php
-class madeam_console {
-
-	public function __construct() {
-		
-	}
-	
-}
+<?php
+class madeam_console {
+
+  public function __construct() {
+
+  }
+
+}
 ?>

@@ -177,7 +177,7 @@ class madeam_controller {
 
     // if scaffolding is true and the view doesn't exist then use the scaffolding view
     if (!file_exists($this->view) && $this->scaffold == true) {
-      $this->view = SCAFFOLD_PATH . $this->scaffold . '/views/' . $view . '.' . $this->params['format'];
+      $this->view = SCAFFOLD_PATH . $this->scaffold . '/view/' . $view . '.' . $this->params['format'];
     }
   }
 
@@ -300,23 +300,23 @@ class madeam_controller {
    */
 
   public function _scaffold_index() {
-    include(SCAFFOLD_PATH . $this->scaffold . '/actions/index.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/action/index.php');
   }
 
   public function _scaffold_show() {
-    include(SCAFFOLD_PATH . $this->scaffold . '/actions/show.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/action/show.php');
   }
 
   public function _scaffold_add() {
-    include(SCAFFOLD_PATH . $this->scaffold . '/actions/add.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/action/add.php');
   }
 
   public function _scaffold_edit() {
-    include(SCAFFOLD_PATH . $this->scaffold . '/actions/edit.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/action/edit.php');
   }
 
   public function _scaffold_delete() {
-    include(SCAFFOLD_PATH . $this->scaffold . '/actions/delete.php');
+    include(SCAFFOLD_PATH . $this->scaffold . '/action/delete.php');
   }
 
 
