@@ -62,7 +62,7 @@ echo '<div id="madeam_dev_bar">The Developer Bar - Loadtime: ' . $time . ' secon
 </style>
 */
 
-//ini_set('include_path', 
+//ini_set('include_path',
 // session.save_path
 // split sessions into multiple directories
 /*

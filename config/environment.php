@@ -31,6 +31,7 @@
 // ===================================================
 
 	$cfg['development']['db_servers'][]   = 'mysql://root:password@localhost?name=application';
+	$cfg['development']['madeam_dir'] 			= 'madeam';
 	$cfg['development']['mod_rewrite'] 		= true;
 	$cfg['development']['debug_mode']			= true;
 	$cfg['development']['disable_cache'] 	= false;

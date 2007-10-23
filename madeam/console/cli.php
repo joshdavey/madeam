@@ -1,9 +1,10 @@
 <?php
+$current_dir = getcwd();
 // The script file name is the name of the script that includes the bootstrap and runs the framework
 if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__)); }
 
 // set forein path
-if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
+if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', $current_dir); }
 
 // get our bearings
 $current_dir = getcwd();
@@ -14,7 +15,7 @@ chdir(FOREIGN_PATH);
 
 
 // include boostrap and include all of the madeam core files and configurations
-require_once '../../public/bootstrap.php';
+require_once $current_dir . '/public/bootstrap.php';
 
 
 define('CURRENT_DIR', $current_dir . DS);
