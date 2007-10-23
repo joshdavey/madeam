@@ -3,8 +3,8 @@ class console_generate extends madeam_console {
 
 	public $description = 'The generate console allows you to generate models, views and controllers';
 
-	public $root_app_path	= array('controller', 'model', 'view');
-
+	public $command_requires_root	= array('controller', 'model', 'view');
+	
 	public $require = array(
 		'controller' => array(
 			'name' => 'Please choose a name for this controller'

@@ -1,10 +1,9 @@
 <?php
-$current_dir = getcwd();
 // The script file name is the name of the script that includes the bootstrap and runs the framework
 if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__)); }
 
 // set forein path
-if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', $current_dir); }
+if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
 
 // get our bearings
 $current_dir = getcwd();
@@ -15,7 +14,7 @@ chdir(FOREIGN_PATH);
 
 
 // include boostrap and include all of the madeam core files and configurations
-require_once $current_dir . '/public/bootstrap.php';
+require '../../public/bootstrap.php';
 
 
 define('CURRENT_DIR', $current_dir . DS);
@@ -33,7 +32,7 @@ if (count($commands) > 1) {
 
 	// if the command requires to be in the application's root path then check it.
 	// If we aren't in the applicatin's root path then tell the user and exit
-	if (in_array($command, $console->root_app_path)) {
+	if (in_array($command, $console->command_requires_root)) {
 		if (!file_exists(CURRENT_DIR . DS . 'public' . DS . 'bootstrap.php')) {
 			out('Please point Madeam to the root directory of your application.');
 			exit();
