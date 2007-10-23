@@ -23,26 +23,29 @@ array_shift($_SERVER['argv']);
 $commands = $_SERVER['argv'];
 
 if (count($commands) > 1) {
-	$console_name = 'console_' . array_shift($commands);			
+	$console_name = 'console_' . array_shift($commands);
 	$command = array_shift($commands);
-	
+
 	$console 	= new $console_name;
 	$requires = $console->{'require_' . $command};
 	$params 	= cli_parse_arguments($commands);
-	
-	// if the command requires to be in the application's root path then check it. 
+
+	// if the command requires to be in the application's root path then check it.
 	// If we aren't in the applicatin's root path then tell the user and exit
 	if (in_array($command, $console->root_app_path)) {
 		if (!file_exists(CURRENT_DIR . DS . 'public' . DS . 'bootstrap.php')) {
 			out('Please point Madeam to the root directory of your application.');
 			exit();
-		}		
+		}
 	}
-	
-	$console->$command($params);
-	out('success');
+
+	if ($console->$command($params) === true) {
+    out('Success');
+	} else {
+	  out('Failed');
+	}
 } elseif (count($commands) > 0) {
-	$console_name = 'console_' . array_shift($commands);		
+	$console_name = 'console_' . array_shift($commands);
 	$console 	= new $console_name;
 	out($console->description);
 	out();
@@ -68,7 +71,7 @@ function out($string = null, $newline = 1) {
 	if ($newline == 1) {
 		fwrite(STDOUT, $string . "\n");
 	} else {
-		fwrite(STDOUT, $string);	
+		fwrite(STDOUT, $string);
 	}
 }
 
