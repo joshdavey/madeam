@@ -5,6 +5,8 @@ if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__))
 // set forein path
 if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
 
+define('MADEAM_PATH', realpath('madeam/madeam') . '/'); 
+
 // get our bearings
 $current_dir = getcwd();
 

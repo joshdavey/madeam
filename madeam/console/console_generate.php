@@ -174,6 +174,8 @@ class console_generate extends madeam_console {
 
     // save file
     file_put_contents(APP_PATH . 'model' . DS . $model_class_name . '.php', $model_contents);
+    
+    echo APP_PATH;
 
     out('Generating ' . $model_name . ' model');
 

@@ -27,7 +27,7 @@ define('PUB_PATH', dirname(__FILE__) . DS);
 define('PUB_DIR', basename(PUB_PATH));
 
 // Application Directory
-define('ROOT_APP_PATH', dirname(PUB_PATH) . DS);
+if (!defined('ROOT_APP_PATH')) { define('ROOT_APP_PATH', dirname(PUB_PATH) . DS); }
 
 // set current directory to application directory
 chdir(ROOT_APP_PATH);
@@ -63,7 +63,9 @@ if (MOD_REWRITE === true) {
 define('REL_PATH', str_replace(DS, '/', substr(PUB_PATH, strlen(DOC_PATH))));
 
 // major madeam directories
-define('MADEAM_PATH',       realpath($cfg[ENVIRONMENT]['madeam_dir']) . DS);
+if (!defined('MADEAM_DIR')) { 
+  define('MADEAM_PATH',     realpath($cfg[ENVIRONMENT]['madeam_dir']) . DS); 
+}
 define('MADEAM_LIB_PATH',		MADEAM_PATH . 'lib' . DS);
 define('VENDOR_PATH',       APP_PATH . 'vendor' . DS);
 define('VENDOR_LIB_PATH',   VENDOR_PATH . 'lib' . DS);
