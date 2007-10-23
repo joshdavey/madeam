@@ -43,7 +43,7 @@ class console_generate extends madeam_console {
 
 
 		// define controller class in controller file contents
-		$controller_contents = "<?php\nclass $controller_class_name extends app_controller {";
+		$controller_contents = "<?php\nclass $controller_class_name extends controller_app {";
 
     // read scaffold directory for actions
 		if ($dh = opendir($actions_dir)) {
@@ -191,6 +191,12 @@ class console_generate extends madeam_console {
 
 	  // set file contents
 	  $view_contents = $view_name . ' view';
+	  
+	  // this needs a re-write because it should allow depth greater than 1 directory	  
+	  // make controller directory if it does not already exist
+    if (!file_exists(APP_PATH . 'view' . DS . dirname($view_name))) {
+      mkdir(APP_PATH . 'view' . DS . dirname($view_name));
+    }
 
 	  // save contents
     file_put_contents(APP_PATH . 'view' . DS . $view_name . '.' . $view_format, $view_contents);

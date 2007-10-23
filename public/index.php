@@ -35,30 +35,30 @@ echo madeam::dispatch();
 $time_end = microtime(true);
 $time = $time_end - $time_start;
 
+/*
 echo $time . '<br />';
 
 // log execution time
 //madeam_logger::log("Execution time: $time seconds" . $_SERVER['REQUEST_URI']);
 
-/*
 
 echo 'display_errors = ' . ini_get('display_errors') . "<br />";
 echo 'register_globals = ' . ini_get('register_globals') . "<br />";
 echo 'post_max_size = ' . ini_get('post_max_size') . "<br />";
 echo 'post_max_size+1 = ' . (ini_get('post_max_size')+1) . "<br />";
 echo 'short_open_tag = ' . ini_get('short_open_tag') . "<br />";
-*/
+
 $x=0;
 foreach(get_included_files() as $file) {
   echo ++$x . ' ' . $file . "<br />";
 }
 
 
-/*
+
 // developer mode
 echo '<div id="madeam_dev_bar">The Developer Bar - Loadtime: ' . $time . ' seconds </div>';
 <style>
-#madeam_dev_bar { position: absolute; left: 0; bottom: 0; right: 0; padding: 4px; height: 100px; border: solid 1px #000; background: darkblue; color: #fff; }
+#madeam_dev_bar { position: absolute; left: 0; bottom: 0; right: 0; padding: 4px; height: 100px; border: solid 1px #000; background: #335599; color: #fff; }
 </style>
 */
 
