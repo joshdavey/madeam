@@ -5,6 +5,7 @@ if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__))
 // set forein path
 if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
 
+
 // get our bearings
 $current_dir = getcwd();
 
@@ -32,14 +33,14 @@ $args = $_SERVER['argv'];
 
 out("Welcome to the Madeam Console");
 
-while (1) {
+//while (1) {
   $console  = false;
   $command  = false;
 
   outhr();
 
   // get list of available consoles
-  $consoles = array('new', 'generate');
+  $consoles = array('new', 'create');
 
   do {
     // by entering a console name at this point it means they've tried entering one that doesn't exist.
@@ -56,7 +57,7 @@ while (1) {
 
     if ($console == null) {
       // ask them for the name of the console they'd like to use
-      outp("Console");
+      outp("console");
       $console = getc();
     }
 
@@ -64,7 +65,7 @@ while (1) {
 
 
   // get list of available commands
-  $commands = array('controller', 'view', 'model', 'application');
+  $commands = array('controller', 'view', 'model', 'app');
 
   do {
     // by entering a console name at this point it means they've tried entering one that doesn't exist.
@@ -81,7 +82,7 @@ while (1) {
 
     if ($command == null) {
       // ask them for the name of the console they'd like to use
-      outp("Command");
+      outp("command");
       $command  = getc();
     }
   } while (!in_array($command, $commands));
@@ -98,7 +99,7 @@ while (1) {
 
   // unset arguments -- they are only for first time use
   $args = array();
-}
+//}
 
 // error
 function oute($string) {
@@ -109,14 +110,14 @@ function oute($string) {
 // create
 function outc($string, $display = true) {
   if ($display === true) {
-    out('+ ' . $string);
+    out('create ' . $string);
   }
 }
 
 // delete
 function outd($string, $display = true) {
   if ($display === true) {
-    out('- ' . $string);
+    out('delete ' . $string);
   }
 }
 
@@ -141,10 +142,14 @@ function outhr() {
 // get command
 function getc() {
   $command = get();
-  if ($command != 'exit') {
-    return $command;
-  } else {
+  if ($command == 'cls') {
+    //system("command /C cls");
+    exec('clear');
+    return false;
+  } elseif ($command == 'exit') {
     exit();
+  } else {
+    return $command;
   }
 }
 

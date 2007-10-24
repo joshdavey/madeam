@@ -1,7 +1,7 @@
 <?php
 class console_new extends madeam_console {
 
-  public function application($params) {
+  public function app($params) {
 
 
     //--------------------
@@ -32,7 +32,7 @@ class console_new extends madeam_console {
 
     if ($app_name != null) {
       // notify user of progress
-      outc("Generating new $app_name application in " . CURRENT_DIR);
+      outc("application $app_name in " . CURRENT_DIR);
 
       // make controller directory if it does not already exist
       if (!file_exists(CURRENT_DIR . DS . $app_name)) {
@@ -65,11 +65,11 @@ function full_copy($source, $target) {
       $Entry = $source . '/' . $entry;
       if (is_dir($Entry)) {
         full_copy($Entry, $target . '/' . $entry);
-        outc("Generating " . basename($Entry) . " directory");
+        outc('directory ' . basename($Entry));
         continue;
       }
 
-      outc("Generating " . basename($Entry) . " file");
+      outc('file ' . basename($Entry));
       if (!copy($Entry, $target . '/' . $entry)) {
         return false;
       }
@@ -77,7 +77,7 @@ function full_copy($source, $target) {
 
     $d->close();
   } else {
-    outc("Generating " . basename($source) . " file");
+    outc('file ' . basename($source));
     if (!copy($source, $target)) {
       return false;
     }
