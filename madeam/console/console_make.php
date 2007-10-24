@@ -1,8 +1,7 @@
 <?php
-class console_new extends madeam_console {
+class console_make extends madeam_console {
 
   public function app($params) {
-
 
     //--------------------
     // this code is key and needs to be extracted for use in all commands
@@ -31,12 +30,23 @@ class console_new extends madeam_console {
     $app_name = $params['name'];
 
     if ($app_name != null) {
-      // notify user of progress
-      outc("application $app_name in " . CURRENT_DIR);
-
       // make controller directory if it does not already exist
       if (!file_exists(CURRENT_DIR . DS . $app_name)) {
+        // notify user of progress
+        outc("application $app_name in " . CURRENT_DIR);
+        outc('directory ' . $app_name);
+        
         mkdir(CURRENT_DIR . $app_name);
+      } else {
+        outp("Overwrite $app_name application? [y/n]");
+        $continue = getc();
+        if ($continue == 'n') {
+          return false;
+        } 
+        
+        // notify user of progress
+        out();
+        outc("application $app_name in " . CURRENT_DIR);
       }
 
       if (full_copy(dirname(MADEAM_PATH), CURRENT_DIR . $app_name)) {

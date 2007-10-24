@@ -31,16 +31,13 @@ require '../../public/bootstrap.php';
 array_shift($_SERVER['argv']);
 $args = $_SERVER['argv'];
 
-out("Welcome to the Madeam Console");
 
 //while (1) {
   $console  = false;
   $command  = false;
 
-  outhr();
-
   // get list of available consoles
-  $consoles = array('new', 'create');
+  $consoles = array('make', 'create');
 
   do {
     // by entering a console name at this point it means they've tried entering one that doesn't exist.
@@ -54,7 +51,7 @@ out("Welcome to the Madeam Console");
 
     // check to see if the console exists in the args
     if (isset($args[0])) { $console = array_shift($args); }
-
+    
     if ($console == null) {
       // ask them for the name of the console they'd like to use
       outp("console");
@@ -79,7 +76,7 @@ out("Welcome to the Madeam Console");
 
     // check to see if the command exists in the args
     if (isset($args[0])) { $command = array_shift($args); }
-
+    
     if ($command == null) {
       // ask them for the name of the console they'd like to use
       outp("command");
