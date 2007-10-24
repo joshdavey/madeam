@@ -89,8 +89,10 @@ while (1) {
 
   // execute commands
   if (execute_console_command($console, $command, $args) === true) {
+    out();
     out("Success!");
   } else {
+    out();
     out("Failure");
   }
 

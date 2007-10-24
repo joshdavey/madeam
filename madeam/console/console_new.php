@@ -2,33 +2,35 @@
 class console_new extends madeam_console {
 
   public function application($params) {
-    // set app name
-    $app_name = $params['name'];
 
-    $required = array('name');
-    asort($required);
 
-    $param_names = array_values($params);
+    //--------------------
+    // this code is key and needs to be extracted for use in all commands
+    $required_params = array('name');
+    asort($required_params);
+
+    $param_names = array_keys($params);
     asort($param_names);
 
     do {
-      if ($required != $param_names) { continue; }
-
-      $still_required = array_diff_assoc($required, $param_names);
+      $still_required = array_diff_assoc($required_params, $param_names);
 
       foreach ($still_required as $param) {
         outp($param);
         $params[$param] = getc();
 
-        $param_names = array_values($params);
+        $param_names = array_keys($params);
         asort($param_names);
       }
+    } while ($required_params != $param_names);
+    //--------------------
 
-    } while ($required != $param_names);
 
+
+    // set app name
+    $app_name = $params['name'];
 
     if ($app_name != null) {
-
       // notify user of progress
       outc("Generating new $app_name application in " . CURRENT_DIR);
 
