@@ -5,22 +5,28 @@ if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__))
 // set forein path
 if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
 
-define('MADEAM_PATH', realpath('madeam/madeam') . '/'); 
-
 // get our bearings
 $current_dir = getcwd();
 
+define('CURRENT_DIR', $current_dir . DIRECTORY_SEPARATOR);
+
+// define root application path
+if (file_exists('madeam/console/cli.php')) {
+  define('ROOT_APP_PATH', CURRENT_DIR);
+  // www
+} else {
+  // location of cli.php (www/madeam)
+}
+
 // change the current working directory to our foreign path
 // foreign path is anything that executes outside of the public directory
-chdir(FOREIGN_PATH);
-
+chdir(FOREIGN_PATH);    // www/madeam
 
 // include boostrap and include all of the madeam core files and configurations
 require '../../public/bootstrap.php';
 
 
-define('CURRENT_DIR', $current_dir . DS);
-
+// get args from original input
 array_shift($_SERVER['argv']);
 $args = $_SERVER['argv'];
 
@@ -57,7 +63,7 @@ while (1) {
   } while (!in_array($console, $consoles));
   
   // get list of available commands
-  $commands = array('controller', 'view', 'model');
+  $commands = array('controller', 'view', 'model', 'application');
   
   do {
     // by entering a console name at this point it means they've tried entering one that doesn't exist. 
@@ -129,7 +135,7 @@ function execute_console_command($console_name, $command_name, $args) {
 	// if the command requires to be in the application's root path then check it.
 	// If we aren't in the applicatin's root path then tell the user and exit
 	if (in_array($command_name, $console->command_requires_root)) {
-		if (!file_exists(CURRENT_DIR . DS . 'public' . DS . 'bootstrap.php')) {
+		if (!file_exists(PUB_PATH . DS . 'bootstrap.php')) {
 			out('Please point Madeam to the root directory of your application.');
 			exit();
 		}

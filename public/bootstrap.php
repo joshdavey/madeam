@@ -63,7 +63,7 @@ if (MOD_REWRITE === true) {
 define('REL_PATH', str_replace(DS, '/', substr(PUB_PATH, strlen(DOC_PATH))));
 
 // major madeam directories
-if (!defined('MADEAM_DIR')) { 
+if (!defined('MADEAM_PATH')) { 
   define('MADEAM_PATH',     realpath($cfg[ENVIRONMENT]['madeam_dir']) . DS); 
 }
 define('MADEAM_LIB_PATH',		MADEAM_PATH . 'lib' . DS);
