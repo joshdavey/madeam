@@ -4,7 +4,7 @@ class console_generate extends madeam_console {
 	public $description = 'The generate console allows you to generate models, views and controllers';
 
 	public $command_requires_root	= array('controller', 'model', 'view');
-	
+
 	public $require = array(
 		'controller' => array(
 			'name' => 'Please choose a name for this controller'
@@ -34,13 +34,12 @@ class console_generate extends madeam_console {
 		$controller_class_name = 'controller_' . $controller_name;
 
 		// Send message to user that we are creating the controller
-		out('Generating controller ' . $controller_name);
+		outc('Generating controller ' . $controller_name);
 
 		// determine scaffold directory
 		$dir = VENDOR_PATH . SCAFFOLD_PATH . $scaffold . DS;
 		$actions_dir = $dir . 'action' . DS;
 		$views_dir = $dir . 'view' . DS;
-
 
 		// define controller class in controller file contents
 		$controller_contents = "<?php\nclass $controller_class_name extends controller_app {";
@@ -90,7 +89,7 @@ class console_generate extends madeam_console {
           $controller_contents .= "\n    $function_code";
           $controller_contents .= "\n  }";
 
-          out('Generating function ' . $function_name);
+          outc('Generating function ' . $function_name);
         }
       }
       closedir($dh);
@@ -131,7 +130,7 @@ class console_generate extends madeam_console {
               $view_code = str_replace('{$this->represent}', $model_name, $view_code);
               $view_code = str_replace('$this->represent', "'$model_name'", $view_code);
             } else {
-              out('Oops. This scaffold requires that it represents a model');
+              oute('Oops. This scaffold requires that it represents a model');
               return false;
             }
           }
@@ -140,7 +139,7 @@ class console_generate extends madeam_console {
           $ext = '.' . substr($file, strrpos($file, '.') + 1);
           $view_name = substr($file, 0, -strlen($ext));
 
-          out('Generating view ' . $view_name);
+          outc('Generating view ' . $view_name);
 
           // make controller directory if it does not already exist
           if (!file_exists(APP_PATH . 'view' . DS . $controller_name)) {
@@ -174,10 +173,10 @@ class console_generate extends madeam_console {
 
     // save file
     file_put_contents(APP_PATH . 'model' . DS . $model_class_name . '.php', $model_contents);
-    
+
     echo APP_PATH;
 
-    out('Generating ' . $model_name . ' model');
+    outc('Generating ' . $model_name . ' model');
 
     return true;
 	}
@@ -193,8 +192,8 @@ class console_generate extends madeam_console {
 
 	  // set file contents
 	  $view_contents = $view_name . ' view';
-	  
-	  // this needs a re-write because it should allow depth greater than 1 directory	  
+
+	  // this needs a re-write because it should allow depth greater than 1 directory
 	  // make controller directory if it does not already exist
     if (!file_exists(APP_PATH . 'view' . DS . dirname($view_name))) {
       mkdir(APP_PATH . 'view' . DS . dirname($view_name));
@@ -204,7 +203,7 @@ class console_generate extends madeam_console {
     file_put_contents(APP_PATH . 'view' . DS . $view_name . '.' . $view_format, $view_contents);
 
     // save file
-    out('Generating ' . $view_name . ' view');
+    outc('Generating ' . $view_name . ' view');
 
     return true;
 	}

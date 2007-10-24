@@ -34,82 +34,109 @@ out("Welcome to the Madeam Console");
 
 while (1) {
   $console  = false;
-  $command  = false;    
-  
+  $command  = false;
+
   outhr();
-  
+
   // get list of available consoles
   $consoles = array('new', 'generate');
-  
+
   do {
-    // by entering a console name at this point it means they've tried entering one that doesn't exist. 
+    // by entering a console name at this point it means they've tried entering one that doesn't exist.
     // prompt them with an saying please try again.
     if ($console !== false) {
       oute("Sorry the console you've entered does not exist.");
     }
-    
+
     // reset console
     $console = false;
-    
+
     // check to see if the console exists in the args
     if (isset($args[0])) { $console = array_shift($args); }
-    
+
     if ($console == null) {
       // ask them for the name of the console they'd like to use
-      outr("Console");
+      outp("Console");
       $console = getc();
     }
-    
+
   } while (!in_array($console, $consoles));
-  
+
+
   // get list of available commands
   $commands = array('controller', 'view', 'model', 'application');
-  
+
   do {
-    // by entering a console name at this point it means they've tried entering one that doesn't exist. 
+    // by entering a console name at this point it means they've tried entering one that doesn't exist.
     // prompt them with an saying please try again.
     if ($command !== false) {
       oute("Sorry the command you've entered does not exist.");
     }
-    
+
     // reset command
     $command = false;
-    
+
     // check to see if the command exists in the args
     if (isset($args[0])) { $command = array_shift($args); }
-    
+
     if ($command == null) {
       // ask them for the name of the console they'd like to use
-      outr("Command");
+      outp("Command");
       $command  = getc();
-    }    
+    }
   } while (!in_array($command, $commands));
-  
+
+
   // execute commands
   if (execute_console_command($console, $command, $args) === true) {
     out("Success!");
   } else {
     out("Failure");
   }
-  
+
   // unset arguments -- they are only for first time use
   $args = array();
 }
 
+// error
 function oute($string) {
   out();
   out('* ' . $string);
 }
 
-function outr($string) {
+// create
+function outc($string, $display = true) {
+  if ($display === true) {
+    out('+ ' . $string);
+  }
+}
+
+// delete
+function outd($string, $display = true) {
+  if ($display === true) {
+    out('- ' . $string);
+  }
+}
+
+// info
+function outi($string, $display = true) {
+  if ($display === true) {
+    out('= ' . $string);
+  }
+}
+
+// param
+function outp($string) {
   out('  ' . $string . '> ', 0);
 }
 
+// horizontal rule
 function outhr() {
   out();
   out('--------------------------');
 }
 
+// get command
 function getc() {
   $command = get();
   if ($command != 'exit') {
@@ -119,13 +146,11 @@ function getc() {
   }
 }
 
-exit();
-
 function execute_console_command($console_name, $command_name, $args) {
   $console_name = 'console_' . $console_name;
   $console 	= new $console_name;
 	$requires = $console->{'require_' . $command_name};
-	
+
   if (!empty($args)) {
     $params = cli_parse_arguments($args);
   } else {
@@ -136,7 +161,7 @@ function execute_console_command($console_name, $command_name, $args) {
 	// If we aren't in the applicatin's root path then tell the user and exit
 	if (in_array($command_name, $console->command_requires_root)) {
 		if (!file_exists(PUB_PATH . DS . 'bootstrap.php')) {
-			out('Please point Madeam to the root directory of your application.');
+			oute('Please point Madeam to the root directory of your application.');
 			exit();
 		}
 	}
@@ -144,43 +169,6 @@ function execute_console_command($console_name, $command_name, $args) {
 	return $console->$command_name($params);
 }
 
-while ($command != 'exit') {
-  $command = get();
-  
-  if (count($commands) > 1) {
-  	$console_name = 'console_' . array_shift($commands);
-  	$command = array_shift($commands);
-  
-  	$console 	= new $console_name;
-  	$requires = $console->{'require_' . $command};
-  	$params 	= cli_parse_arguments($commands);
-  
-  	// if the command requires to be in the application's root path then check it.
-  	// If we aren't in the applicatin's root path then tell the user and exit
-  	if (in_array($command, $console->command_requires_root)) {
-  		if (!file_exists(CURRENT_DIR . DS . 'public' . DS . 'bootstrap.php')) {
-  			out('Please point Madeam to the root directory of your application.');
-  			exit();
-  		}
-  	}
-  
-  	if ($console->$command($params) === true) {
-      out('Success');
-  	} else {
-  	  out('Failed');
-  	}
-  } elseif (count($commands) > 0) {
-  	$console_name = 'console_' . array_shift($commands);
-  	$console 	= new $console_name;
-  	out($console->description);
-  	out();
-  	out('Commands: ..list..of..commands..');
-  	$command = get();
-  } else {
-  	out("Sorry the command you entered did not register. Please try again");
-  }
-} 
-  
 function cli_parse_arguments($commands) {
 	$params = array();
 	foreach ($commands as $command) {
