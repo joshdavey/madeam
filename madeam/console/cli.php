@@ -51,10 +51,18 @@ $args = $_SERVER['argv'];
 
     // check to see if the console exists in the args
     if (isset($args[0])) { $console = array_shift($args); }
-    
+
     if ($console == null) {
       // ask them for the name of the console they'd like to use
+
+      out('  cache');
+      out('  destroy');
+      out('  generate');
+      out('  help');
+      out('  new');
+      out();
       outp("console");
+
       $console = getc();
     }
 
@@ -76,10 +84,18 @@ $args = $_SERVER['argv'];
 
     // check to see if the command exists in the args
     if (isset($args[0])) { $command = array_shift($args); }
-    
+
     if ($command == null) {
       // ask them for the name of the console they'd like to use
+
+      out();
+      out('  application');
+      out('  controller');
+      out('  model');
+      out('  view');
+      out();
       outp("command");
+
       $command  = getc();
     }
   } while (!in_array($command, $commands));
@@ -91,7 +107,7 @@ $args = $_SERVER['argv'];
     out("Success!");
   } else {
     out();
-    out("Failure");
+    out("Aborted");
   }
 
   // unset arguments -- they are only for first time use
@@ -176,7 +192,7 @@ function execute_console_command($console_name, $command_name, $args) {
 function cli_parse_arguments($commands) {
 	$params = array();
 	foreach ($commands as $command) {
-		$nodes = explode(':', $command);
+		$nodes = explode('=', $command);
 		$name = $nodes[0];
 		$value = $nodes[1];
 		$params[$name] = $value;
