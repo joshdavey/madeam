@@ -26,6 +26,11 @@ chdir(FOREIGN_PATH);    // www/madeam
 // include boostrap and include all of the madeam core files and configurations
 require '../../public/bootstrap.php';
 
+echo 'test';
+$cli = new madeam_cli;
+$cli->initialize();
+
+exit();
 
 // get args from original input
 array_shift($_SERVER['argv']);
@@ -56,10 +61,9 @@ $args = $_SERVER['argv'];
       // ask them for the name of the console they'd like to use
 
       out('  cache');
-      out('  destroy');
-      out('  generate');
-      out('  help');
-      out('  new');
+      out('  create');
+      out('  delete');
+      out('  make');
       out();
       outp("console");
 
@@ -155,11 +159,7 @@ function outhr() {
 // get command
 function getc() {
   $command = get();
-  if ($command == 'cls') {
-    //system("command /C cls");
-    exec('clear');
-    return false;
-  } elseif ($command == 'exit') {
+  if ($command == 'exit') {
     exit();
   } else {
     return $command;
@@ -185,7 +185,7 @@ function execute_console_command($console_name, $command_name, $args) {
 			exit();
 		}
 	}
-
+  // 360R58
 	return $console->$command_name($params);
 }
 

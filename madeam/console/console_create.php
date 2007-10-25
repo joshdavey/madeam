@@ -20,7 +20,6 @@ class console_create extends madeam_console {
 	);
 
 
-
 	function controller($params) {
 	  // set scaffold setting
 		if (isset($params['scaffold'])) {
@@ -34,7 +33,7 @@ class console_create extends madeam_console {
 		$controller_class_name = 'controller_' . $controller_name;
 
 		// Send message to user that we are creating the controller
-		outc('controller ' . $controller_name);
+		$this->out_create('controller ' . $controller_name);
 
 		// determine scaffold directory
 		$dir = VENDOR_PATH . SCAFFOLD_PATH . $scaffold . DS;
@@ -89,7 +88,7 @@ class console_create extends madeam_console {
           $controller_contents .= "\n    $function_code";
           $controller_contents .= "\n  }";
 
-          outc('function ' . $function_name);
+          $this->out_create('function ' . $function_name);
         }
       }
       closedir($dh);
@@ -139,7 +138,7 @@ class console_create extends madeam_console {
           $ext = '.' . substr($file, strrpos($file, '.') + 1);
           $view_name = substr($file, 0, -strlen($ext));
 
-          outc('view ' . $view_name);
+          $this->out_create('view ' . $view_name);
 
           // make controller directory if it does not already exist
           if (!file_exists(APP_PATH . 'view' . DS . $controller_name)) {
@@ -174,7 +173,7 @@ class console_create extends madeam_console {
     // save file
     file_put_contents(APP_PATH . 'model' . DS . $model_class_name . '.php', $model_contents);
 
-    outc('model ' . $model_name);
+    $this->out_create('model ' . $model_name);
 
     return true;
 	}
@@ -201,7 +200,7 @@ class console_create extends madeam_console {
     file_put_contents(APP_PATH . 'view' . DS . $view_name . '.' . $view_format, $view_contents);
 
     // save file
-    outc('view' . $view_name);
+    $this->out_create('view' . $view_name);
 
     return true;
 	}

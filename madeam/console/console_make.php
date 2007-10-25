@@ -33,23 +33,23 @@ class console_make extends madeam_console {
       // make controller directory if it does not already exist
       if (!file_exists(CURRENT_DIR . DS . $app_name)) {
         // notify user of progress
-        outc("application $app_name in " . CURRENT_DIR);
-        outc('directory ' . $app_name);
-        
+        $this->out_create("application $app_name in " . CURRENT_DIR);
+        $this->out_create($app_name);
+
         mkdir(CURRENT_DIR . $app_name);
       } else {
         outp("Overwrite $app_name application? [y/n]");
         $continue = getc();
         if ($continue == 'n') {
           return false;
-        } 
-        
+        }
+
         // notify user of progress
         out();
-        outc("application $app_name in " . CURRENT_DIR);
+        $this->out_create("application $app_name in " . CURRENT_DIR);
       }
 
-      if (full_copy(dirname(MADEAM_PATH), CURRENT_DIR . $app_name)) {
+      if ($this->full_copy(dirname(MADEAM_PATH), CURRENT_DIR . $app_name)) {
         return true;
       } else {
         return false;
@@ -60,10 +60,7 @@ class console_make extends madeam_console {
     }
   }
 
-}
-
-
-function full_copy($source, $target) {
+  private function full_copy($source, $target) {
   if (is_dir($source)) {
     @mkdir($target);
 
@@ -74,12 +71,12 @@ function full_copy($source, $target) {
 
       $Entry = $source . '/' . $entry;
       if (is_dir($Entry)) {
-        full_copy($Entry, $target . '/' . $entry);
-        outc('directory ' . basename($Entry));
+        $this->full_copy($Entry, $target . '/' . $entry);
+        $this->out_create(basename($Entry));
         continue;
       }
 
-      outc('file ' . basename($Entry));
+      $this->out_create(basename($Entry));
       if (!copy($Entry, $target . '/' . $entry)) {
         return false;
       }
@@ -87,12 +84,14 @@ function full_copy($source, $target) {
 
     $d->close();
   } else {
-    outc('file ' . basename($source));
+    $this->out_create(basename($source));
     if (!copy($source, $target)) {
       return false;
     }
   }
 
   return true;
+}
+
 }
 ?>
