@@ -81,7 +81,7 @@ class madeam_logger {
     	echo '<h1 style="color: #fff;">' . $helpful_reminders[$reminder] . '</h1>';
 	    echo '<div style=" text-align: left;">';
 	      echo '<div id="errors" class="info">';
-	        echo '<h1>Errors/Logs - ' . apache_get_version() . '</h1>';
+	        echo '<h1>Errors/Logs - ' . /*apache_get_version() . */ '</h1>';
 	        echo '<hr />';
 	        echo '<ul>';
 	          foreach(self::$logs as $log) {
