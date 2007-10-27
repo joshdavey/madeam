@@ -107,7 +107,7 @@ define('MODEL_JOINT', '.');
 $core_loaders = array(
 	'inflector' 		=> '/madeam_inflector/',
 	'madeam' 				=> '/^madeam/',
-	'extensions' 		=> '/^component|behavior|parser|help|console/',
+	'extensions' 		=> '/^component|behavior|parser|help|script/',
 	'model'					=> '/^model/',
 	'controller'		=> '/^controller/'
 	);
