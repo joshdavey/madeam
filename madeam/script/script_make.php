@@ -1,5 +1,5 @@
 <?php
-class console_make extends madeam_console {
+class script_make extends madeam_script {
 
   public function app($params) {
 
@@ -15,8 +15,7 @@ class console_make extends madeam_console {
       $still_required = array_diff_assoc($required_params, $param_names);
 
       foreach ($still_required as $param) {
-        outp($param);
-        $params[$param] = getc();
+        $params[$param] = $this->get_command($param);
 
         $param_names = array_keys($params);
         asort($param_names);
@@ -38,8 +37,7 @@ class console_make extends madeam_console {
 
         mkdir(CURRENT_DIR . $app_name);
       } else {
-        outp("Overwrite $app_name application? [y/n]");
-        $continue = getc();
+        $continue = $this->get_yesno("Overwrite $app_name application?");
         if ($continue == 'n') {
           return false;
         }

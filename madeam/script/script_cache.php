@@ -1,5 +1,5 @@
 <?php
-class console_cache extends madeam_console {
+class script_cache extends madeam_script {
 
 }
 ?>

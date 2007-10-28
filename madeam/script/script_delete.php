@@ -1,5 +1,5 @@
 <?php
-class console_delete extends madeam_console {
-  
+class script_delete extends madeam_script {
+
 }
 ?>

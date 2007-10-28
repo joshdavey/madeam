@@ -1,5 +1,5 @@
 <?php
-class console_create extends madeam_console {
+class script_create extends madeam_script {
 
 	public $description = 'The generate console allows you to generate models, views and controllers';
 
