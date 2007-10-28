@@ -5,34 +5,33 @@ class madeam_console extends madeam_cli {
     array_shift($_SERVER['argv']);
     $args = $_SERVER['argv'];
 
-    $console  = false;
-    $command  = false;
+    $script  = false;
+    $command = false;
 
     // get list of available consoles
-    $consoles = array('make', 'create', 'delete', 'cache', 'test');
+    $scripts = array('make', 'create', 'delete', 'cache', 'test');
 
     do {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
-      if ($console !== false) {
-        oute("Sorry the console you've entered does not exist.");
+      if ($script !== false) {
+        $this->out_error("Sorry the console you've entered does not exist.");
       }
 
       // reset console
-      $console = false;
+      $script = false;
 
       // check to see if the console exists in the args
-      if (isset($args[0])) { $console = array_shift($args); }
+      if (isset($args[0])) { $script = array_shift($args); }
 
-      if ($console == null) {
-        // ask them for the name of the console they'd like to use
+      if ($script == null) {
+        // ask them for the script of the console they'd like to use
+        $this->out_menu('Scripts', $scripts);
 
-        $this->out_menu($consles);
-
-        $console = $this->get_command('script');
+        $script = $this->get_command('script');
       }
 
-    } while (!in_array($console, $consoles));
+    } while (!in_array($script, $scripts));
 
 
     // get list of available commands
@@ -42,7 +41,7 @@ class madeam_console extends madeam_cli {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
       if ($command !== false) {
-        oute("Sorry the command you've entered does not exist.");
+        $this->out_error("Sorry the command you've entered does not exist.");
       }
 
       // reset command
@@ -52,9 +51,7 @@ class madeam_console extends madeam_cli {
       if (isset($args[0])) { $command = array_shift($args); }
 
       if ($command == null) {
-        // ask them for the name of the console they'd like to use
-
-        $this->out_menu($commands);
+        $this->out_menu('Commands', $commands);
 
         $command = $this->get_command('command');
       }
@@ -62,7 +59,7 @@ class madeam_console extends madeam_cli {
 
 
     // execute commands
-    if (execute_script_command($console, $command, $args) === true) {
+    if ($this->script_command($script, $command, $args) === true) {
       out();
       out("Success!");
     } else {
@@ -74,6 +71,38 @@ class madeam_console extends madeam_cli {
     $args = array();
   }
 
+  protected function script_command($script_name, $command_name, $args) {
+    $script_name = 'script_' . $script_name;
+    $script 	= new $script_name;
+  	$requires = $script->{'require_' . $command_name};
 
+    if (!empty($args)) {
+      $params = parse_arguments($args);
+    } else {
+      $params = array();
+    }
+
+  	// if the command requires to be in the application's root path then check it.
+  	// If we aren't in the applicatin's root path then tell the user and exit
+  	if (!in_array($command_name, (array) $script->execute_outside_root)) {
+  		if (!file_exists(PUB_PATH . DS . 'bootstrap.php')) {
+  			oute('Please point Madeam to the root directory of your application.');
+  			exit();
+  		}
+  	}
+
+  	return $script->$command_name($params);
+  }
+
+  protected function parse_arguments($commands) {
+  	$params = array();
+  	foreach ($commands as $command) {
+  		$nodes = explode('=', $command);
+  		$name = $nodes[0];
+  		$value = $nodes[1];
+  		$params[$name] = $value;
+  	}
+  	return $params;
+  }
 }
 ?>

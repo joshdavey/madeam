@@ -1,10 +1,14 @@
 <?php
 class madeam_cli {
 
-  protected function out_menu($name, $options = array()) {
+  protected function out_menu($label, $options = array()) {
+    out();
+    out($label);
+    out('---------------');
     foreach ($options as $opt) {
-      out('|' . $opt);
+      out('| ' . $opt);
     }
+    out('---------------');
   }
 
   protected function out_error($msg) {
@@ -19,19 +23,23 @@ class madeam_cli {
     out('delete ' . $msg);
   }
 
-  protected function out_get($msg) {
+  protected function out_get($name, $msg = null) {
     out();
-    out($msg);
-    out('>', 0);
+    if ($msg != null) { out($msg); }
+    out($name . '>', 0);
   }
 
   protected function get_yesno($msg) {
-    $this->out_get($msg . ' [y/n]');
-    return get();
+    $this->out_get('[y/n]', $msg);
+    return $this->get();
   }
 
   protected function get_command($msg) {
     $this->out_get($msg);
+    return $this->get();
+  }
+
+  protected function get() {
     $command = get();
     if ($command == 'exit') {
       exit();
