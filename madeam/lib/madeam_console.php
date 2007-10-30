@@ -77,7 +77,7 @@ class madeam_console extends madeam_cli {
   	$requires = $script->{'require_' . $command_name};
 
     if (!empty($args)) {
-      $params = parse_arguments($args);
+      $params = $this->parse_arguments($args);
     } else {
       $params = array();
     }

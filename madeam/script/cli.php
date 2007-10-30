@@ -12,7 +12,7 @@ $current_dir = getcwd();
 define('CURRENT_DIR', $current_dir . DIRECTORY_SEPARATOR);
 
 // define root application path
-if (file_exists('madeam/console/cli.php')) {
+if (file_exists('madeam/script/cli.php')) {
   define('ROOT_APP_PATH', CURRENT_DIR);
   // www
 } else {

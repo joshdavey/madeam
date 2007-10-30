@@ -63,8 +63,8 @@ if (MOD_REWRITE === true) {
 define('REL_PATH', str_replace(DS, '/', substr(PUB_PATH, strlen(DOC_PATH))));
 
 // major madeam directories
-if (!defined('MADEAM_PATH')) { 
-  define('MADEAM_PATH',     realpath($cfg[ENVIRONMENT]['madeam_dir']) . DS); 
+if (!defined('MADEAM_PATH')) {
+  define('MADEAM_PATH',     realpath($cfg[ENVIRONMENT]['madeam_dir']) . DS);
 }
 define('MADEAM_LIB_PATH',		MADEAM_PATH . 'lib' . DS);
 define('VENDOR_PATH',       APP_PATH . 'vendor' . DS);
@@ -107,7 +107,7 @@ define('MODEL_JOINT', '.');
 $core_loaders = array(
 	'inflector' 		=> '/madeam_inflector/',
 	'madeam' 				=> '/^madeam/',
-	'extensions' 		=> '/^component|behavior|parser|help|script/',
+	'extensions' 		=> '/^(?=component|behavior|parser|help|script)/',
 	'model'					=> '/^model/',
 	'controller'		=> '/^controller/'
 	);
