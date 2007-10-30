@@ -117,7 +117,7 @@ class madeam_inflector {
 	    $replacement = up(substr($match, 1, 1));
 	    $word = str_replace($match, $replacement, $word);
 	  }
-	  return $word;
+  	return $word;
 	}
 
 

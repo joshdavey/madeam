@@ -104,5 +104,6 @@ class madeam_console extends madeam_cli {
   	}
   	return $params;
   }
+
 }
 ?>

@@ -171,11 +171,12 @@ class script_create extends madeam_script {
     $model_contents .= "\n\n}\n?>";
 
     // save file
-    file_put_contents(APP_PATH . 'model' . DS . $model_class_name . '.php', $model_contents);
+    if ($this->create_file($model_class_name . '.php', APP_PATH . 'model' . DS, $model_contents) === true) {
+      $this->out_create('model ' . $model_name);
+      return true;
+    }
 
-    $this->out_create('model ' . $model_name);
-
-    return true;
+    return false;
 	}
 
 
