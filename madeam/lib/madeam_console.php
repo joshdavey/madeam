@@ -8,6 +8,7 @@ class madeam_console extends madeam_cli {
     $script  = false;
     $command = false;
 
+
     // get list of available consoles
     $scripts = array('make', 'create', 'delete', 'cache', 'test');
 
