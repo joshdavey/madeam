@@ -88,7 +88,7 @@ class script_create extends madeam_script {
           $controller_contents .= "\n    $function_code";
           $controller_contents .= "\n  }";
 
-          $this->out_create('function ' . $function_name);
+          $this->out_create('action ' . $function_name);
         }
       }
       closedir($dh);
@@ -99,7 +99,6 @@ class script_create extends madeam_script {
 
     // save file contents to file
     file_put_contents(CONTROLLER_PATH . $controller_class_name . '.php', $controller_contents);
-
 
     // read scaffold directory for views
 		if ($dh = opendir($views_dir)) {

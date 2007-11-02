@@ -31,7 +31,13 @@ class madeam_cli {
 
   protected function get_yesno($msg) {
     $this->out_get('[y/n]', $msg);
-    return $this->get();
+    $command = $this->get();
+
+    if ($command == 'y') {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   protected function get_command($msg) {

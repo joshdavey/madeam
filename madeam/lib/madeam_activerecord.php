@@ -1109,19 +1109,13 @@ class madeam_activerecord extends madeam_model {
     }
   }
 
-  final public function get_table_fields() {
-    $result = $this->query("SHOW COLUMNS FROM " . $table);
 
-    $fields = array();
-    while ($row = mysql_fetch_assoc($result)) {
-      $fields[] = $row;
-    }
-
-    return $fields;
-  }
-
-  final public function create_form() {
-
+  /**
+   * Getters
+   * =======================================================================
+   */
+  final public function get_label() {
+    return $this->label;
   }
 
   /**
@@ -1173,5 +1167,7 @@ class madeam_activerecord extends madeam_model {
     // updated_at
     $this->format_datetime_field('updated_at', 'Y-m-d H:i:s');
   }
+
+
 }
 ?>
