@@ -8,13 +8,10 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright		Copyright (c) 2006, Joshua Davey
- * @link			http://www.madeam.com
+ * @link				http://www.madeam.com
  * @package			madeam
- * @version			0.0.6
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author      Joshua Davey
  */
-
 class madeam_controller {
 	public $output      = null;
   public $data        = array();

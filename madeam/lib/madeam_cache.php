@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -11,9 +10,7 @@
  * @copyright		Copyright (c) 2006, Joshua Davey
  * @link				http://www.madeam.com
  * @package			madeam
- * @version			0.0.6
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author      Joshua Davey
  */
 class madeam_cache {
 
