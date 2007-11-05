@@ -7,17 +7,8 @@
 	 * Environment configuration variables:
 	 * ------------------------------------------------
 	 *
-	 * db_user
-	 *	Database username
-	 *
-	 * db_pass
-	 *	Database password
-	 *
-	 * db_name
-	 *	Database name
-	 *
-	 * db_host
-	 *	Database host -- normally "localhost"
+	 * db_servers
+	 *	driver://username:password@host?name=application&port=0000
 	 *
 	 * mod_rewrite
 	 *	true: 	mod_rewrite is enabled  -- URLS look like: http://example.com/index
@@ -25,6 +16,14 @@
 	 *
 	 * madeam_dir
 	 *	Path to madeam directory relative to applications directory
+	 *
+	 * disable_cache
+	 *   true:   cache is disabled
+	 *   false:  cache is enabled
+	 *
+	 * debug_mode
+	 *   true:
+	 *   false:
 	 */
 
 // development configuration

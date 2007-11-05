@@ -98,7 +98,7 @@ class script_create extends madeam_script {
     $controller_contents .= "\n\n}\n?>";
 
     // save file contents to file
-    file_put_contents(CONTROLLER_PATH . $controller_class_name . '.php', $controller_contents);
+    $this->create_file($controller_class_name . '.php', CONTROLLER_PATH, $controller_contents);
 
     // read scaffold directory for views
 		if ($dh = opendir($views_dir)) {
@@ -144,7 +144,7 @@ class script_create extends madeam_script {
             mkdir(APP_PATH . 'view' . DS . $controller_name);
           }
 
-          file_put_contents(APP_PATH . 'view' . DS . $controller_name . DS . $view_name . $ext, $view_code);
+          $this->create_file($view_name . $ext, APP_PATH . 'view' . DS . $controller_name . DS, $view_code);
         }
       }
       closedir($dh);
@@ -171,7 +171,6 @@ class script_create extends madeam_script {
 
     // save file
     if ($this->create_file($model_class_name . '.php', APP_PATH . 'model' . DS, $model_contents) === true) {
-      $this->out_create('model ' . $model_name);
       return true;
     }
 
@@ -197,12 +196,11 @@ class script_create extends madeam_script {
     }
 
 	  // save contents
-    file_put_contents(APP_PATH . 'view' . DS . $view_name . '.' . $view_format, $view_contents);
+    if ($this->create_file($view_name . '.' . $view_format, APP_PATH . 'view' . DS, $view_contents) === true) {
+      return true;
+    }
 
-    // save file
-    $this->out_create('view' . $view_name);
-
-    return true;
+    return false;
 	}
 
 }

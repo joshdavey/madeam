@@ -5,6 +5,9 @@ if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__))
 // set forein path
 if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
 
+// really weird bug when I installed zend core made SERVER_NAME inaccessible and thew a notice error
+// this is a simple hack to fix that
+if (!isset($_SERVER['SERVER_NAME'])) { $_SERVER['SERVER_NAME'] = 'localhost'; }
 
 // get our bearings
 $current_dir = getcwd();

@@ -10,9 +10,7 @@
  * @copyright		Copyright (c) 2006, Joshua Davey
  * @link				http://www.madeam.com
  * @package			madeam
- * @version			0.0.6
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author      Joshua Davey
  */
 
 // directory splitter
@@ -51,6 +49,7 @@ define('DISABLE_CACHE', $cfg[ENVIRONMENT]['disable_cache']);
 
 // set base url
 define('BASE_URL', $_SERVER['SERVER_NAME']);
+
 
 // set URI_PATH based on whether MOD_REWRITE is turned on or off. If it's off then we need to add the SCRIPT_FILENAME at the end
 if (MOD_REWRITE === true) {

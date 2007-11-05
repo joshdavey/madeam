@@ -37,8 +37,7 @@ class script_make extends madeam_script {
 
         mkdir(CURRENT_DIR . $app_name);
       } else {
-        $continue = $this->get_yesno("Overwrite $app_name application?");
-        if ($continue == 'n') {
+        if (!$this->get_yesno("Overwrite $app_name application?")) {
           return false;
         }
 
@@ -54,7 +53,7 @@ class script_make extends madeam_script {
       }
 
     } else {
-      oute("Requires name");
+      $this->out_error("Requires name");
     }
   }
 
