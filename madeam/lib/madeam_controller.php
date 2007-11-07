@@ -116,7 +116,7 @@ class madeam_controller {
       }
 
       // set variables
-      if (isListFormat($data)) {
+      if (is_list($data)) {
         foreach ($data as $key => $$partial_name) {
           $_num++;
           if (count($partial) > 0) {

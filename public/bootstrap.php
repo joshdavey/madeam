@@ -218,7 +218,7 @@ function test($var = null) {
  * @param array $data
  * @return boolean
  */
-function isListFormat($data) {
+function is_list($data) {
   $matching_entries = 1;
   $entries_checked  = 0;
   $keys_string      = null;
