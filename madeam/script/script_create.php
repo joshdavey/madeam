@@ -1,13 +1,22 @@
 <?php
 class script_create extends madeam_script {
 
-	public $description = 'The generate console allows you to generate models, views and controllers';
+	public $description = 'The create console allows you to generate models, views and controllers';
 
-	public $command_requires_root	= array('controller', 'model', 'view');
-
-	public $require = array(
+	public $required = array(
 		'controller' => array(
-			'name' => 'Please choose a name for this controller'
+			'name' => 'Please enter a name for this controller'
+		),
+		'model' => array(
+		  'name' => 'Please enter a name for this model'
+		),
+		'view' => array(
+		  'name' => 'Please enter a name for this view'
+		),
+		'scaffold' => array(
+		  'controller'  => 'Please enter the name of the controller',
+		  'represent'   => 'Please enter a name of the model this controller will represent',
+		  'from'        => 'Please enter from which scaffold pattern you would like to build from'
 		)
 	);
 
@@ -19,9 +28,110 @@ class script_create extends madeam_script {
 		)
 	);
 
-
+  /**
+   * Creates a controller
+   *
+   * @param array $params
+   * @return boolean
+   */
 	function controller($params) {
 	  // set scaffold setting
+		if (isset($params['scaffold'])) {
+		  $scaffold = $params['scaffold'];
+		} else {
+		  $scaffold = 'standard';
+		}
+
+		// set controller name and class name
+		$controller_name = madeam_inflector::underscorize(low($params['name']));
+		$controller_class_name = 'controller_' . $controller_name;
+
+		// Send message to user that we are creating the controller
+		$this->out_create('controller ' . $controller_name);
+
+		// define controller class in controller file contents
+		$controller_contents = "<?php\nclass $controller_class_name extends controller_app {";
+
+    // close class definition
+    $controller_contents .= "\n\n}\n?>";
+
+    // save file contents to file
+    $this->create_file($controller_class_name . '.php', CONTROLLER_PATH, $controller_contents);
+
+    // completed with no errors
+	  return true;
+	}
+
+
+  /**
+   * Creates a model
+   *
+   * @param array $params
+   * @return boolean
+   */
+	function model($params) {
+    // set model type
+	  if (!isset($params['type'])) { $type = 'activerecord'; } else { $type = $params['type']; }
+
+    // set model name and class name
+    $model_name = madeam_inflector::model_nameize($params['name']);
+    $model_class_name = madeam_inflector::model_classize($model_name);
+
+    // define model class
+	  $model_contents = "<?php\nclass $model_class_name extends madeam_$type {";
+
+	  // close class definition
+    $model_contents .= "\n\n}\n?>";
+
+    // save file
+    if ($this->create_file($model_class_name . '.php', APP_PATH . 'model' . DS, $model_contents) === true) {
+      return true;
+    }
+
+    return false;
+	}
+
+
+  /**
+   * Creates a view
+   *
+   * @param array $params
+   * @return boolean
+   */
+	function view($params) {
+	  // set view name
+	  $view_name = $params['name'];
+
+	  // set file contents
+	  $view_contents = $view_name . ' view';
+
+	  // set view format
+	  if (!isset($params['format'])) { $view_format = 'html'; } else { $view_format = $params['format']; }
+
+
+	  // this needs a re-write because it should allow depth greater than 1 directory
+	  // make controller directory if it does not already exist
+    if (!file_exists(APP_PATH . 'view' . DS . dirname($view_name))) {
+      mkdir(APP_PATH . 'view' . DS . dirname($view_name));
+    }
+
+	  // save contents to new view file
+    if ($this->create_file($view_name . '.' . $view_format, APP_PATH . 'view' . DS, $view_contents) === true) {
+      return true;
+    }
+
+    return false;
+	}
+
+
+	/**
+	 * Scaffold a new controller and views that represent a model
+	 *
+	 * @param array $params
+	 * @return boolean
+	 */
+	function scaffold($params) {
+    // set scaffold setting
 		if (isset($params['scaffold'])) {
 		  $scaffold = $params['scaffold'];
 		} else {
@@ -75,7 +185,7 @@ class script_create extends madeam_script {
               $function_code = str_replace('{$this->represent}', $model_name, $function_code);
               $function_code = str_replace('$this->represent', "'$model_name'", $function_code);
             } else {
-              out('Oops. This scaffold requires that it represents a model');
+              $this->out_error('This scaffold requires that it represents a model');
               return false;
             }
           }
@@ -128,7 +238,7 @@ class script_create extends madeam_script {
               $view_code = str_replace('{$this->represent}', $model_name, $view_code);
               $view_code = str_replace('$this->represent', "'$model_name'", $view_code);
             } else {
-              oute('Oops. This scaffold requires that it represents a model');
+              $this->out_error('This scaffold requires that it represents a model');
               return false;
             }
           }
@@ -152,55 +262,6 @@ class script_create extends madeam_script {
 
     // completed with no errors
 	  return true;
-	}
-
-
-
-	function model($params) {
-    if (!isset($params['type'])) { $type = 'activerecord'; } else { $type = $params['type']; }
-
-    // set model name and class name
-    $model_name = madeam_inflector::model_nameize($params['name']);
-    $model_class_name = madeam_inflector::model_classize($model_name);
-
-    // define model class
-	  $model_contents = "<?php\nclass $model_class_name extends madeam_$type {";
-
-	  // close class definition
-    $model_contents .= "\n\n}\n?>";
-
-    // save file
-    if ($this->create_file($model_class_name . '.php', APP_PATH . 'model' . DS, $model_contents) === true) {
-      return true;
-    }
-
-    return false;
-	}
-
-
-
-	function view($params) {
-	  // set view name
-	  $view_name = $params['name'];
-
-	  // set view format
-	  if (!isset($params['format'])) { $view_format = 'html'; } else { $view_format = $params['format']; }
-
-	  // set file contents
-	  $view_contents = $view_name . ' view';
-
-	  // this needs a re-write because it should allow depth greater than 1 directory
-	  // make controller directory if it does not already exist
-    if (!file_exists(APP_PATH . 'view' . DS . dirname($view_name))) {
-      mkdir(APP_PATH . 'view' . DS . dirname($view_name));
-    }
-
-	  // save contents
-    if ($this->create_file($view_name . '.' . $view_format, APP_PATH . 'view' . DS, $view_contents) === true) {
-      return true;
-    }
-
-    return false;
 	}
 
 }

@@ -29,7 +29,7 @@ class madeam_console extends madeam_cli {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
       if ($script !== false) {
-        $this->out_error("Sorry the console you've entered does not exist.");
+        $this->out_error("Sorry the script you entered does not exist.");
       }
 
       // reset console
@@ -55,7 +55,7 @@ class madeam_console extends madeam_cli {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
       if ($command !== false) {
-        $this->out_error("Sorry the command you've entered does not exist.");
+        $this->out_error("Sorry the command you entered does not exist.");
       }
 
       // reset command

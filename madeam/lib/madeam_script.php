@@ -15,6 +15,7 @@
 class madeam_script extends madeam_cli {
 
   public $execute_outside_root = array();
+  public $command_requirements = array();
 
   protected function create_file($file_name, $file_path, $file_content) {
     if (substr($file_path, -1) !== DS) { $file_path = $file_path . DS; }

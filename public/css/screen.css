@@ -1,44 +1,51 @@
-/* =prep
+/* =universal
 ------------------------------------------------------- */
 :link,:visited { text-decoration:none }
 ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,body,html,p,blockquote,fieldset,input { margin:0; padding:0 }
 a img,:link img,:visited img { border:none }
 
+
+
+
+/* =madeam defaults
+------------------------------------------------------- */
+h1.madeam { border-bottom: solid 8px #555; padding-top: 90px; }
+p.madeam { padding: 6px; }
+code.madeam { margin-left: 10px; font-family: "Trebuchet MS", Helvetica; font-weight: bold; font-size: 1.1em; background: #fffad4; padding: 6px; display: block; border-bottom: solid 4px #555; }
+
+
+
+
 /* =body
 ------------------------------------------------------- */
-body { line-height: 1.6em; font-family: "Lucida Grande", arial, helvetica, sans-serif; font-size: 12px; }
+body { line-height: 1.6em; font-family: Georgia, "Lucida Grande", arial, helvetica, sans-serif; font-size: 16px; background: #eee; }
 
-/* =link
+
+/* =prep
 ------------------------------------------------------- */
 a:link, a:visited { color: #000; text-decoration: underline; }
 a:hover { color: #333; text-decoration: none; }
+hr { border: none; height: 2px; background: #555; }
 
 
+/* =container
+	------------------------------------------------------- */
+.container { margin: 0 auto; padding: 10px 0 10px; width: 70%; max-width: 1000px; min-width: 760px; }
 
 
-/* =madeam default setup styles
+/* =header
 ------------------------------------------------------- */
-  .container { margin: 0 auto; width: 760px; padding: 10px; }
-	/* =header
-	------------------------------------------------------- */
-	#header { background: #0c1531; color: #fffad4; }
-	#header h1 { border-bottom: solid 4px #555; border-top: none; }
-	
-	
-	/* =madeam_paragraph
-	------------------------------------------------------- */
-	.madeam_step p { padding: 5px; }
-	
-	/* =madeam_code
-	------------------------------------------------------- */
-	code.madeam_file { margin-left: 20px; font-size: 1.3em; background: #fffad4; padding: 6px; display: block; }
+#header { background: #0c1531; color: #fffad4; }
 
 
+/* =content
+------------------------------------------------------- */
+#content { background: #fff; }
 
 
 /* =error
 ------------------------------------------------------- */
-.error { background: #c60e1b; color: #fff; padding: 3px; border: solid 3px #f31e2d; list-style-type: square; }
+.error { background: #c60e1b; color: #fff; padding: 3px; border: solid 3px #f31e2d; }
 .error li { margin-left: 20px; }
 
 

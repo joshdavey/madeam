@@ -1,6 +1,10 @@
 <?php
 class script_make extends madeam_script {
 
+  public $command_requirements = array(
+    'app' => array('name')
+  );
+
   public function app($params) {
 
     //--------------------
