@@ -1,8 +1,6 @@
 /* =universal
 ------------------------------------------------------- */
-:link,:visited { text-decoration:none }
-ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,body,html,p,blockquote,fieldset,input { margin:0; padding:0 }
-a img,:link img,:visited img { border:none }
+:link,:visited {text-decoration:none} ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,body,html,p,blockquote,fieldset,input {margin:0;padding:0} a img,:link img,:visited img {border:none}
 
 
 
