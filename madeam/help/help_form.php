@@ -177,7 +177,7 @@ class help_form extends help_html {
     $params = array();
 		if ($name != 'Submit') { $params['name'] = $name; }
 		if ($value == 'Submit') { $params['value'] = $name; } else { $params['value']  = $value; }
-    $params['id']     = self::nameToId($name);
+    $params['id']     = self::nameToId($name . '_btn');
     $params['type']   = 'submit';
 
     $params = array_merge($params, $_params);
