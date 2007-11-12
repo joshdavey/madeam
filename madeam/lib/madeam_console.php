@@ -49,7 +49,7 @@ class madeam_console extends madeam_cli {
 
 
     // get list of available commands
-    $commands = array('controller', 'view', 'model', 'app');
+    $commands = array('controller', 'scaffold', 'view', 'model', 'app');
 
     do {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
