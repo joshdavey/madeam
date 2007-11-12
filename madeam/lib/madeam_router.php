@@ -135,6 +135,11 @@ class madeam_router {
       $uri = array_pop($extracted_path);
     }
 
+    // set format
+    $uri_anatomy = explode('.', $uri, 2);
+    $uri = $uri_anatomy[0];
+    $format = $uri_anatomy[1];
+
     // set get
     $get = array();
     if (isset($parsed_uri['query'])) {
@@ -191,7 +196,7 @@ class madeam_router {
     // set default values for controller and action
     @$params['controller'] == null ? $params['controller'] = DEFAULT_CONTROLLER : false ;
     @$params['action']     == null ? $params['action']     = DEFAULT_ACTION : false;
-  	@$params['format']     == null ? $params['format']     = DEFAULT_FORMAT : false ;
+  	@$format               == null ? $params['format']     = DEFAULT_FORMAT : $params['format'] = $format  ;
     @$params['layout']     == null ? $params['layout']     = '0' : false ;
 
     return $params;
