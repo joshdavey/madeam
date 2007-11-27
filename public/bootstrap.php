@@ -34,7 +34,7 @@ chdir(ROOT_APP_PATH);
 define('APP_PATH', ROOT_APP_PATH . 'app' . DS);
 
 // Config directory
-define('CFG_PATH', ROOT_APP_PATH . 'config' . DS);
+define('CFG_PATH', APP_PATH . 'config' . DS);
 
 // define config variable
 $cfg = array();

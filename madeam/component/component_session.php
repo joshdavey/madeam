@@ -16,40 +16,40 @@
  */
 class component_session extends madeam_component {
 
-  function start($sess_id = false) {	
+  public static function start($sess_id = false) {
 		// load session by ID
     if ($sess_id) { session_id($sess_id); }
-    
+
 		// start session
     if (!isset($_SESSION)) {
 			session_start();
 		}
-		
+
 		// merge post data with flash post data
 		if (isset($_SESSION[FLASH_DATA_NAME][FLASH_POST_NAME])) {
       $_POST = array_merge($_SESSION[FLASH_DATA_NAME][FLASH_POST_NAME], $_POST);
     }
   }
-  
-  function destroy() {
+
+  public static function destroy() {
     session_destroy();
   }
-  
-  function flash($name, $data) {
+
+  public function flash($name, $data) {
     $_SESSION[FLASH_DATA_NAME][$name] = $data;
   }
-	
-	function flash_post() {
+
+	public static function flash_post() {
 	  if (isset($_POST)) {
 			$_SESSION[FLASH_DATA_NAME][FLASH_POST_NAME] = $_POST;
 		}
 	}
-	
-	function flash_life($pages_to_live = 1) {
+
+	public static function flash_life($pages_to_live = 1) {
 	  $_SESSION[FLASH_LIFE_NAME] = $pages_to_live;
 	}
-  
-  function error($name, $msg) {
+
+  public static function error($name, $msg) {
     $_SESSION[USER_ERROR_NAME][$name][] = $msg;
   }
 }
