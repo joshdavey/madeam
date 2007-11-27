@@ -19,9 +19,10 @@ define('DS', DIRECTORY_SEPARATOR);
 // define root document path
 define('DOC_PATH', $_SERVER['DOCUMENT_ROOT']);
 
-// instance directory
-define('PUB_PATH', dirname(__FILE__) . DS);
+// set path to public directory
+if (!defined('PUB_PATH')) { define('PUB_PATH', dirname(dirname(__FILE__)) . DS . 'public' . DS); }
 
+// set name of public dir
 define('PUB_DIR', basename(PUB_PATH));
 
 // Application Directory

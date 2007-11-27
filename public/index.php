@@ -18,22 +18,27 @@
 // start benchmark
 $time_start = microtime(true);
 
-// The script file name is the name of the script that includes the bootstrap and runs the framework
-if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__)); }
+chdir(dirname(__FILE__));
 
-// set forein path
-if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
+// The script file name is the name of the script that includes the bootstrap and runs the framework
+  if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__)); }
+
+// set forein path (does not include ending slash)
+  if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
+
+// set public path
+  if (!defined('PUB_PATH')) { define('PUB_PATH', FOREIGN_PATH . DIRECTORY_SEPARATOR); }
 
 // include boostrap and include all of the madeam core files and configurations
-require_once 'bootstrap.php';
+  require_once '../madeam/bootstrap.php';
 
 // dispatch calls the framework and returns the resulting output
-echo madeam::dispatch();
+  echo madeam::dispatch();
 
 
 // end benchmark
-$time_end = microtime(true);
-$time = $time_end - $time_start;
+  $time_end = microtime(true);
+  $time = $time_end - $time_start;
 
 /*
 echo $time . '<br />';

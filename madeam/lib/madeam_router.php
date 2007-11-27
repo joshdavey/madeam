@@ -136,9 +136,12 @@ class madeam_router {
     }
 
     // set format
+    $format = false;
     $uri_anatomy = explode('.', $uri, 2);
     $uri = $uri_anatomy[0];
-    $format = $uri_anatomy[1];
+    if (isset($uri_anatomy[1])) {
+      $format = $uri_anatomy[1];
+    }
 
     // set get
     $get = array();
