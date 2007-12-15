@@ -30,7 +30,7 @@ chdir(dirname(__FILE__));
   if (!defined('PUB_PATH')) { define('PUB_PATH', FOREIGN_PATH . DIRECTORY_SEPARATOR); }
 
 // include boostrap and include all of the madeam core files and configurations
-  require_once '../madeam/bootstrap.php';
+  require_once '../system/bootstrap.php';
 
 // dispatch calls the framework and returns the resulting output
   echo madeam::dispatch();
