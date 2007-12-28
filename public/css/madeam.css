@@ -1,21 +1,18 @@
+/* =madeam defaults
+------------------------------------------------------- */
+h1.madeam { border-bottom: solid 8px #555; padding-top: 90px; }
+p.madeam { padding: 6px; }
+code.madeam { margin-left: 10px; letter-spacing: 0.03em; font-family: "Trebuchet MS", Helvetica; font-weight: bold; font-size: 1.1em; background: #fffad4; padding: 6px; display: block; border-bottom: solid 4px #555; }
+
+
 /* =universal
 ------------------------------------------------------- */
 :link,:visited {text-decoration:none} ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,body,html,p,blockquote,fieldset,input {margin:0;padding:0} a img,:link img,:visited img {border:none}
 
 
-
-/* =madeam defaults
-------------------------------------------------------- */
-h1.madeam { border-bottom: solid 8px #555; padding-top: 90px; }
-p.madeam { padding: 6px; }
-code.madeam { margin-left: 10px; font-family: "Trebuchet MS", Helvetica; font-weight: bold; font-size: 1.1em; background: #fffad4; padding: 6px; display: block; border-bottom: solid 4px #555; }
-
-
-
 /* =body
 ------------------------------------------------------- */
 body { line-height: 1.6em; font-family: Georgia, "Lucida Grande", arial, helvetica, sans-serif; font-size: 16px; background: #eee; }
-
 
 
 /* =prep
@@ -37,7 +34,7 @@ hr { border: none; height: 2px; background: #555; }
 
 /* =content
 ------------------------------------------------------- */
-#content { background: #fff; }
+#content { background: #fff; border-bottom: solid 8px #ddd; }
 
 
 /* =error
