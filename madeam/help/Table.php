@@ -1,5 +1,5 @@
 <?php
-class help_table extends help_html {
+class Help_Table extends Help_Html {
 	 /**
    * Create a table from a model's plural data
    *
@@ -20,7 +20,7 @@ class help_table extends help_html {
       $table .= '<table class="mad_table">';
 
       // create model instance
-      $modelname = 'model_' . low($model);
+      $modelname = 'Model_' . ucfirst($model);
       $inst = new $modelname(1);
 
       $setup = $inst->get_setup();

@@ -14,13 +14,13 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class help_form extends help_html {
+class Help_Form extends Help_Html {
 
 	public static function open_post($name, $action = null, $_params = array()) {
 		$params = array();
 
     $params['id']     = 'form_' . low($name);
-    $params['action'] = self::url($action);
+    $params['action'] = Madeam::url($action);
     $params['method'] = 'post';
 
     $params = array_merge($params, $_params);
@@ -32,7 +32,7 @@ class help_form extends help_html {
 		$params = array();
 
     $params['id']     = 'form_' . low($name);
-    $params['action'] = self::url($action);
+    $params['action'] = Madeam::url($action);
     $params['method'] = 'get';
 
     $params = array_merge($params, $_params);
@@ -44,7 +44,7 @@ class help_form extends help_html {
 		$params = array();
 
     $params['id']     	= 'form_' . low($name);
-    $params['action'] 	= self::url($action);
+    $params['action'] 	= Madeam::url($action);
     $params['method'] 	= 'post';
 		$params['enctype']	= 'multipart/form-data';
 
