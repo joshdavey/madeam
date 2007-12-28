@@ -1,5 +1,5 @@
 <?php
-class script_make extends madeam_script {
+class Script_Make extends Madeam_Script {
 
   public $command_requirements = array(
     'app' => array('name')

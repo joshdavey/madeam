@@ -1,5 +1,5 @@
 <?php
-class script_create extends madeam_script {
+class Script_Create extends Madeam_Script {
 
 	public $description = 'The create console allows you to generate models, views and controllers';
 
@@ -56,7 +56,7 @@ class script_create extends madeam_script {
     $controller_contents .= "\n\n}\n?>";
 
     // save file contents to file
-    $this->create_file($controller_class_name . '.php', CONTROLLER_PATH, $controller_contents);
+    $this->create_file($controller_class_name . '.php', APP_PATH . 'controller' . DS, $controller_contents);
 
     // completed with no errors
 	  return true;
@@ -208,7 +208,7 @@ class script_create extends madeam_script {
     $controller_contents .= "\n\n}\n?>";
 
     // save file contents to file
-    $this->create_file($controller_class_name . '.php', CONTROLLER_PATH, $controller_contents);
+    $this->create_file($controller_class_name . '.php', APP_PATH . 'controller' . DS, $controller_contents);
 
     // read scaffold directory for views
 		if ($dh = opendir($views_dir)) {
