@@ -1,11 +1,10 @@
 <html>
 <head>
   <title><?php echo $page_title; ?></title>
-  <meta http-equiv="refresh" content="<?php echo $pause; ?>;url=<?php echo help_html::url($uri); ?>">
+  <meta http-equiv="refresh" content="<?php echo $pause; ?>;url=<?php echo madeam_url($uri); ?>">
 
-  <?php echo help_html::css('css/site'); ?>
-  <?php echo help_html::css('css/flash'); ?>
-
+  <?php echo Help_Html::css('/css/madeam'); ?>
+  <?php echo Help_Html::css('css/flash'); ?>
 
   <script type="text/javascript">
     function reload_timer(time, id) {
@@ -24,7 +23,7 @@
   <div id="flash">
     <!-- content for layout placeholder -->
     <?php echo $content_for_layout; ?>
-    <div id="reload_time"></div><?php echo help_html::link('Click here to continue.', $uri); ?>
+    <div id="reload_time"></div><?php echo Help_Html::link('Click here to continue.', $uri); ?>
   </div>
 
 </body>
