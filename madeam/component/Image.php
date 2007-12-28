@@ -14,7 +14,7 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class component_image extends madeam_component {
+class Component_Image extends Madeam_Component {
   
   var $mime_map = array(
   'image/gif'   => array('createfrom' => 'imagecreatefromgif',  'image' => 'imagegif'),
@@ -24,7 +24,7 @@ class component_image extends madeam_component {
   
   function newsize($image, $toWidth, $toHeight, $favor = 'width') {  
       
-    list($width, $height) = getimagesize(PUB_PATH . $image);
+    list($width, $height) = getimagesize(PATH_TO_PUBLIC . $image);
     
     $xscale = $width/$toWidth;
     $yscale = $height/$toHeight;
@@ -74,7 +74,7 @@ class component_image extends madeam_component {
       imagecopyresized($tmp_img, $img, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], $width, $height );
       
       // create jpeg
-      $func_image($tmp_img, PUB_PATH . $image);
+      $func_image($tmp_img, PUBLIC_PATH . $image);
       
       return true;
     } else {

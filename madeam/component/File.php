@@ -14,7 +14,7 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class component_file extends madeam_component {
+class Component_File extends Madeam_Component {
   public $path          = 'files/';
   public $allowed_mimes = array(); // leave empty to allow all mimes
   
@@ -91,7 +91,7 @@ class component_file extends madeam_component {
 	      $target_path = $this->path . $name;
 	      
 	      // copy uploaded file to target path
-	      if(move_uploaded_file($tmp_path, PUB_PATH . $target_path)) {
+	      if(move_uploaded_file($tmp_path, PUBLIC_PATH . $target_path)) {
 	        return $target_path;
 	      }
 	    } else {
