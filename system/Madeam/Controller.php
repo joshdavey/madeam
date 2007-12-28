@@ -47,14 +47,14 @@ class Madeam_Controller {
     }
 
     // set view
-    $this->view($params['controller'] . '/' . $params['action']);
+    $this->setView($params['controller'] . '/' . $params['action']);
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
     if ($params['layout'] == '0' || $params['layout'] == 'false') {
-      $this->layout(false);
+      $this->setLayout(false);
     } else {
-      $this->layout($this->layout);
+      $this->setLayout($this->layout);
     }
 
 		// set header for layout variable
@@ -99,6 +99,9 @@ class Madeam_Controller {
    * =======================================================================
    */
 
+  final public function callback($callback) {
+    return $this->$callback();
+  }
 
   final protected function callAction($uri, $cfg = array()) {
     return madeam::callAction($uri, $cfg, $this->data);
@@ -145,7 +148,7 @@ class Madeam_Controller {
   }
 
   final protected function flash($msg, $uri, $pause = 5) {
-    $this->layout('flash');
+    $this->setLayout('flash');
 
     $this->set('pause', $pause);
     $this->set('uri', $uri);
@@ -161,7 +164,7 @@ class Madeam_Controller {
    *
    * @param string $view
    */
-  final public function view($view) {
+  final protected function setView($view) {
     $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->params['format'];
   }
 
@@ -170,7 +173,7 @@ class Madeam_Controller {
    *
    * @param string/boolean/array $layouts
    */
-  final public function layout($layouts) {
+  final protected function setLayout($layouts) {
     $this->layout = array();
 
     if (func_num_args() < 2) {
@@ -192,7 +195,7 @@ class Madeam_Controller {
 
   public $_parser = false;
 
-  final public function set($name, $value) {
+  final protected function set($name, $value) {
     $this->data[$name] = $value;
 
     /*
@@ -204,7 +207,7 @@ class Madeam_Controller {
   	*/
   }
 
-  final public function render($data = true, $rendered = true) {
+  final protected function render($data = true, $rendered = true) {
     // sometimes the developer may want to tell the view not to render from the controller's action
     if ($data === false) { $this->rendered = true; }
 
@@ -317,13 +320,13 @@ class Madeam_Controller {
 
   /* what about re-naming these like this: _beforeAction() or before_action()? */
   /* come up with a better naming convention for these methods */
-  public function beforeAction() {
+  protected function beforeAction() {
   }
   
-  public function beforeRender() {
+  protected function beforeRender() {
   }
 
-  public function afterRender() {
+  protected function afterRender() {
   }
 }
 ?>
