@@ -13,76 +13,57 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
+
 // directory splitter
-define('DS', DIRECTORY_SEPARATOR);
+if (!defined('DS')) { define('DS', DIRECTORY_SEPARATOR); }
 
-// define root document path
-define('DOC_PATH', $_SERVER['DOCUMENT_ROOT']);
+if (!defined('PATH_TO_PUBLIC'))  { define('PATH_TO_PUBLIC', dirname(dirname(__FILE__)) . DS . 'public' . DS); }
+if (!defined('PATH_TO_PROJECT')) { define('PATH_TO_PROJECT', dirname(PATH_TO_PUBLIC) . DS); }
 
-// set path to public directory
-if (!defined('PUB_PATH')) { define('PUB_PATH', dirname(dirname(__FILE__)) . DS . 'public' . DS); }
+// add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
+if (substr($_SERVER['DOCUMENT_ROOT'], -1) != '/') { $_SERVER['DOCUMENT_ROOT'] .= '/'; }
 
-// set name of public dir
-define('PUB_DIR', basename(PUB_PATH));
-
-// Application Directory
-if (!defined('ROOT_APP_PATH')) { define('ROOT_APP_PATH', dirname(PUB_PATH) . DS); }
-
-// set current directory to application directory
-chdir(ROOT_APP_PATH);
-
-// set app path (contains controllers, models, views and vendors)
-define('APP_PATH', ROOT_APP_PATH . 'app' . DS);
-
-// Config directory
-define('CFG_PATH', APP_PATH . 'config' . DS);
-
-// define config variable
-$cfg = array();
+// set key paths
+define('PATH_TO_APP',         PATH_TO_PROJECT . 'app' . DS);
+define('PATH_TO_ANTHOLOGY',   PATH_TO_APP . 'Anthology' . DS);
 
 // include base setup configuration
-require CFG_PATH . 'environment.php';
+require PATH_TO_APP . 'Config' . DS . 'setup.php';
+
+// set configuration
+$config = array_merge($env[$cfg['environment']], $cfg);
 
 // turn configs into constants for speed?
-define('MOD_REWRITE',   $cfg[ENVIRONMENT]['mod_rewrite']);
-define('DEBUG_MODE',    $cfg[ENVIRONMENT]['debug_mode']);
-define('DISABLE_CACHE', $cfg[ENVIRONMENT]['disable_cache']);
+define('MADEAM_ENABLE_DEBUG', $config['enable_debug']);
+define('MADEAM_ENABLE_CACHE', $config['enable_cache']);
 
-// set base url
-define('BASE_URL', $_SERVER['SERVER_NAME']);
-
-
-// set URI_PATH based on whether MOD_REWRITE is turned on or off. If it's off then we need to add the SCRIPT_FILENAME at the end
-if (MOD_REWRITE === true) {
-	define('URI_PATH', '/' . substr(str_replace(DS, '/', substr(FOREIGN_PATH . '/', strlen(DOC_PATH), -strlen(PUB_DIR))), 1, -1));
+// set PATH_TO_URI based on whether mod_rewrite is turned on or off. 
+// If it's off then we need to add the SCRIPT_FILENAME at the end.
+if (isset($_GET['uri'])) {
+  $public_dir = basename(PATH_TO_PUBLIC);
+	define('PATH_TO_URI', '/' . substr(str_replace(DS, '/', substr(PATH_TO_SCRIPT, strlen($_SERVER['DOCUMENT_ROOT']), -strlen($public_dir))), 0, -1));
 } else {
-	define('URI_PATH', str_replace(DS, '/', substr(FOREIGN_PATH . '/', strlen(DOC_PATH))) . SCRIPT_FILENAME . '/');
+	define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_SCRIPT, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
 }
 
 // determine the relative path to the public directory
-define('REL_PATH', str_replace(DS, '/', substr(PUB_PATH, strlen(DOC_PATH))));
+define('PATH_TO_REL', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))));
 
 // major madeam directories
-if (!defined('MADEAM_PATH')) {
-  define('MADEAM_PATH',     realpath($cfg[ENVIRONMENT]['madeam_dir']) . DS);
-}
-define('MADEAM_LIB_PATH',		MADEAM_PATH . 'lib' . DS);
-define('VENDOR_PATH',       APP_PATH . 'vendor' . DS);
-define('VENDOR_LIB_PATH',   VENDOR_PATH . 'lib' . DS);
-
-// scaffold path
-define('SCAFFOLD_PATH',     'scaffold' . DS);
+if (!defined('PATH_TO_SYSTEM')) { define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS); }
 
 // application files
-define('VIEW_PATH',         APP_PATH . 'view' . DS);
-define('CONTROLLER_PATH',		APP_PATH . 'controller' . DS); // necessary for routing in madeam dispatcher
-define('LAYOUT_PATH',       VIEW_PATH . '_layouts' . DS);
-define('ERROR_PATH',        VIEW_PATH . '_errors' . DS);
-define('LOG_PATH', 					ROOT_APP_PATH . 'etc' . DS . 'log' . DS);
-define('TMP_PATH', 					ROOT_APP_PATH . 'etc' . DS . 'tmp' . DS);
+define('PATH_TO_VIEW',        PATH_TO_APP . 'View' . DS);
+define('PATH_TO_CONTROLLER',  PATH_TO_APP . 'Controller' . DS);
+define('PATH_TO_MODEL',       PATH_TO_APP . 'Model' . DS);
 
-// set include paths although I'm not really sure this is necessary...
-$include_paths = array(MADEAM_PATH, VENDOR_PATH, VENDOR_LIB_PATH, ini_get('include_path'));
+define('PATH_TO_LAYOUT',      PATH_TO_VIEW);
+
+define('PATH_TO_LOG', 		    PATH_TO_PROJECT . 'etc' . DS . 'log' . DS);
+define('PATH_TO_TMP', 		    PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
+
+// set include paths
+$include_paths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_ANTHOLOGY, ini_get('include_path'));
 ini_set('include_path', implode(PATH_SEPARATOR, $include_paths));
 
 // define user errors variable name for $_SESSION
@@ -103,79 +84,129 @@ define('FLASH_POST_NAME', 'mfpost');
 // example use: "user.name"
 define('MODEL_JOINT', '.');
 
-// define core file include handlers
-$core_loaders = array(
-	'inflector' 		=> '/madeam_inflector/',
-	'madeam' 				=> '/^madeam/',
-	'extensions' 		=> '/^(?=component|behavior|parser|help|script)/',
-	'model'					=> '/^model/',
-	'controller'		=> '/^controller/'
-	);
+function Madeam_App_Autoload($class) {
+  $file = str_replace('_', DS, $class) . '.php';
+  if (file_exists(PATH_TO_APP . $file)) {
+    include $file;
+  }
+}
 
-// merge core include handlers with handlers from configuration
-global $loaders;
-$loaders = array_merge($core_loaders, $cfg['loaders']);
+function Madeam_System_Autoload($class) {
+  $file = str_replace('_', DS, $class) . '.php';
+  if (file_exists(PATH_TO_SYSTEM . $file)) {
+    include $file;
+  }
+}
 
-// include routes configuration
-require CFG_PATH . 'routes.php';
+// autoload function
+function Madeam_Autoload_Exception($class) {
 
-// save database server configurations to registry
-$registry = madeam_registry::instance();
-$registry->set('db_servers', $cfg[ENVIRONMENT]['db_servers']);
+  // set class file name
+  $file = str_replace('_', DS, $class) . '.php';
+  
+  // include class file
+  if (file_lives($file)) {
+    include $file;
+  }
+  
+  if (!class_exists($class, false) && !interface_exists($class, false)) {
+    eval("class $class {}");
+	  throw new Madeam_Exception('Missing Class ' . $class, Madeam_Exception::ERR_CLASS_MISSING);
+  }
+}
+
+// register autoload function
+
+// benchmark this against the regular way
+spl_autoload_register('Madeam_System_Autoload');
+spl_autoload_register('Madeam_App_Autoload');
+
+// include application bootstrap
+require PATH_TO_APP . 'Config' . DS . 'bootstrap.php';
+
+// idea... use this as a last resort when all autoloads fail.
+// have this one throw an exception or make a last resort to check every path for the file.
+spl_autoload_register('Madeam_Autoload_Exception');
 
 
-// loaders
+/**
+ * Checks to see if a relative file exists by checking each include path.
+ * Special thanks to Ahmad Nassri from PHP-Infinity for the proof of concept.
+ *
+ * @param string $file
+ * @return boolean
+ */
+function file_lives($file) {
+  $paths = explode(PATH_SEPARATOR, get_include_path());
+  
+  foreach ($paths as $path) {
+    if (is_file($path . $file)) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+
+
+// save config to registry
 // ========================================================
 
-// autoload class
-// automatically includes classes upon instantiation
-function __autoload($class) {
-	global $loaders;
-	foreach ($loaders as $loader => $regexp) {
-		if (preg_match($regexp, $class, $matchs)) {
-			$function = 'loader_' . $loader;
-			$file = $function($class, $matchs);
-			if (is_string($file)) { require $file; }
-			break; // always break out! no second chances.
-		}
-	}
+// save configuration to registry
+Madeam_Registry::set('config', $config);
+
+
+// include routes
+// ========================================================
+
+// check cache for routes
+if (!Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', -1)) {
+  // include routes configuration
+  require PATH_TO_APP . 'Config' . DS . 'routes.php';
+  
+  // save routes to cache
+  Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
 }
 
-// inflector include handler
-function loader_inflector($class, $matchs) {
-	return MADEAM_LIB_PATH . 'madeam_inflector.php';
+
+/**
+ * Enter description here...
+ *
+ * @param unknown_type $e
+ */
+function madeam_uncaught_exception($e) {
+  echo 'Uncaught Exception: ' . $e->getMessage() . $e->getCode();
 }
 
-// madeam include handler
-function loader_madeam($class, $matchs) {
-	return MADEAM_LIB_PATH . $class . '.php';
-}
+/**
+ * Set exception handler
+ */
+set_exception_handler('madeam_uncaught_exception');
 
-// extensions include handler
-function loader_extensions($class, $matchs) {
-	$nodes = explode('_', $class);
-	array_pop($nodes);
-	return implode(DS, $nodes) . DS . $class . '.php';
-}
+/**
+ * Enter description here...
+ *
+ * @param unknown_type $code
+ * @param unknown_type $string
+ * @param unknown_type $file
+ * @param unknown_type $line
+ */
+function madeam_error_handler($code, $string, $file, $line) {
+  if (!in_array($code, array(E_NOTICE))) {
+    $exception = new Madeam_Exception($string, $code);
+    echo $line;
+    echo $file;
+    //$exception->setLine($line);
+    //$exception->setFile($file);
+    throw $exception;
+  }
+} 
 
-// model include handler
-function loader_model($class, $matchs) {
-	$nodes = explode('_', $class);
-	array_pop($nodes);
-	return APP_PATH . implode(DS, $nodes) . DS . $class . '.php';
-}
-
-// controller include handler
-function loader_controller($class, $matchs) {
-	$nodes = explode('_', $class);
-	array_pop($nodes);
-	$file = APP_PATH . implode(DS, $nodes) . DS . $class . '.php';
-	if (file_exists($file)) {
-		return $file;
-	} else {
-		return false;
-	}
-}
+/**
+ * Set error handler
+ */
+set_error_handler('madeam_error_handler', E_ALL);
 
 
 // function library
@@ -187,27 +218,16 @@ function loader_controller($class, $matchs) {
  */
 function test($var = null) {
 	static $tests;
-
 	$tests++;
+	
+	for($i = 0; $i < (6 - strlen($tests)); $i++) { $tests = '0' . $tests; }
 
-	$length = 3;
-	$digits = preg_split('//', $tests, -1, PREG_SPLIT_NO_EMPTY);
-	$digits = count($digits);
-	$differ = $length - $digits;
-	$pad    = null;
-
-	if ($differ > 0) {
-		for($i = 0; $i <= $differ; $i++) {
-			$pad .= '0';
-		}
-	}
-
-	if (is_array($var)) {
-		echo '<pre> <br /> TESTING 123 (' . $pad . $tests . ') &nbsp;&nbsp;' . "\n";
+	if (is_array($var) || is_object($var)) {
+		echo '<br /><pre>[TEST::' . $tests . '] &nbsp;&nbsp;' . "\n";
 		print_r($var);
 		echo ' &nbsp;&nbsp;</pre>' . "\n";
 	} else {
-		echo "<br /> TESTING 123 (" . $pad . $tests . ") &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
+		echo "<br /> [TEST::" . $tests . "] &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
 	}
 }
 
@@ -314,47 +334,4 @@ function rotate() {
 
   return $returned;
 }
-
-/**
- * Include vendor file
- *
- * @param string $file
- */
-function vendor($file) {
-  require_once VENDOR_LIB_PATH . $file;
-}
-
-// generate a random string
-function rnd_string($length = 7) {
-  $string = null;
-  $chars = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-
-  for ($i = 0; $i <= $length; $i++) {
-    $string .= $chars[rand(0, 35)];
-  }
-
-  return $string;
-}
-
-
-function parse_db_connection($string) {
-  $details = array();
-
-  // parse connection string as url
-  $parsed_string = parse_url($string);
-
-  isset($parsed_string['scheme']) ? $details['driver']  = $parsed_string['scheme']  : $details['driver'] = null;
-  isset($parsed_string['host'])   ? $details['host']    = $parsed_string['host']    : $details['host']   = null;
-  isset($parsed_string['user'])   ? $details['user']    = $parsed_string['user']    : $details['user']   = null;
-  isset($parsed_string['pass'])   ? $details['pass']    = $parsed_string['pass']    : $details['pass']   = null;
-
-  parse_str($parsed_string['query'], $options);
-
-  isset($options['name']) ? $details['name'] = $options['name'] : $details['name'] = null;
-  isset($options['port']) ? $details['port'] = $options['port'] : $details['port'] = false;
-
-  return $details;
-}
-
-
 ?>
