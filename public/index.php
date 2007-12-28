@@ -18,22 +18,27 @@
 // start benchmark
 $time_start = microtime(true);
 
-chdir(dirname(__FILE__));
+// directory splitter
+  if (!defined('DS')) { define('DS', DIRECTORY_SEPARATOR); }
 
 // The script file name is the name of the script that includes the bootstrap and runs the framework
   if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__)); }
 
-// set forein path (does not include ending slash)
-  if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
+// set forein path
+  if (!defined('PATH_TO_SCRIPT')) { define('PATH_TO_SCRIPT', dirname(__FILE__) . DS); }
 
 // set public path
-  if (!defined('PUB_PATH')) { define('PUB_PATH', FOREIGN_PATH . DIRECTORY_SEPARATOR); }
+  if (!defined('PATH_TO_PUBLIC')) { define('PATH_TO_PUBLIC', PATH_TO_SCRIPT); }
 
+// set path to project
+  if (!defined('PATH_TO_PROJECT')) { define('PATH_TO_PROJECT', dirname(PATH_TO_PUBLIC) . DS); }  
+  
 // include boostrap and include all of the madeam core files and configurations
-  require_once '../system/bootstrap.php';
+  require PATH_TO_PROJECT . DS . 'system' . DS . 'bootstrap.php';
+  
 
 // dispatch calls the framework and returns the resulting output
-  echo madeam::dispatch();
+  echo Madeam::dispatch();
 
 
 // end benchmark
@@ -53,12 +58,14 @@ echo 'post_max_size = ' . ini_get('post_max_size') . "<br />";
 echo 'post_max_size+1 = ' . (ini_get('post_max_size')+1) . "<br />";
 echo 'short_open_tag = ' . ini_get('short_open_tag') . "<br />";
 
+
+//note: for some reason the get_included_files() causes failed requests when doing benchmarks
 $x=0;
 foreach(get_included_files() as $file) {
   echo ++$x . ' ' . $file . "<br />";
 }
-
-
+*/
+/*
 
 // developer mode
 echo '<div id="madeam_dev_bar">The Developer Bar - Loadtime: ' . $time . ' seconds </div>';
