@@ -98,19 +98,19 @@ class Madeam {
      
     try {   
       // before action callback
-      $controller->beforeAction();
+      $controller->callback('beforeAction');
       
       // call action
       $controller->{Madeam_Inflector::camelize($params['action'])}();
       
       // after action callback
-      $controller->beforeRender();
+      $controller->callback('beforeRender');
       
       // render
-      $controller->render();
+      $controller->callback('render');
       
       // after render callback
-      $controller->afterRender();    
+      $controller->callback('afterRender');
       
       // return output
       return $controller->output;
