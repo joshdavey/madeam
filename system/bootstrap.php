@@ -46,9 +46,6 @@ if (isset($_GET['uri'])) {
 	define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_SCRIPT, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
 }
 
-test(PATH_TO_URI);
-test($_SERVER['REQUEST_URI']);
-
 // determine the relative path to the public directory
 define('PATH_TO_REL', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))));
 
