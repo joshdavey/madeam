@@ -93,11 +93,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
       if (is_resource($db_connection)) {
         if (!@mysql_select_db($server['name'], $db_connection)) {
           // failed to find selected database
-          madeam_logger::log(mysql_error(), 0);
+          Madeam_Logger::log(mysql_error(), 0);
         }
       } else {
         // failed to connect to the database
-        madeam_logger::log(mysql_error(), 0);
+        Madeam_Logger::log(mysql_error(), 0);
       }
     }
 
@@ -105,11 +105,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->link = mysql_query($sql);
 
     // log query
-    madeam_logger::log($sql, 100);
+    Madeam_Logger::log($sql, 100);
 
     // log sql error if any
     if (mysql_error()) {
-      madeam_logger::log(mysql_error());
+      Madeam_Logger::log(mysql_error());
     }
 
     return $this->link;
@@ -125,7 +125,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
 		if (count($matchs) > 0) {
 		  if ($this->numRows() > 0) {
-  			while ($this->entry = mysql_fetch_assoc($this->link)) {
+  			while ($this->entry = mysql_fetch_object($this->link)) {
   			  // don't prepare results of describe queries
   			  if ($matchs[0] != "DESCRIBE" && $matchs[0] != 'describe') {
   		      $this->prepareResult(); // should this be done?
@@ -175,7 +175,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     if (is_resource($this->link)) {
       // get data
-      while ($this->entry = mysql_fetch_assoc($this->link)) {
+      while ($this->entry = mysql_fetch_object($this->link)) {
         // adds custom fields
         $this->prepareResult();
 

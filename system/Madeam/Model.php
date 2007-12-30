@@ -22,6 +22,7 @@ class Madeam_Model {
   protected $primaryKey            = 'id';
   protected $parent                = false;    // this is used when initiating a sub model within a model.
   protected $fields                = array();  // list of arrays to be included when returning result
+  protected $cacheName             = 'madeam.model.';
 
   /**
    * This member variable is where all the model setup information is stored.
@@ -77,8 +78,8 @@ class Madeam_Model {
     // check cache for schema
     // if schema not cached get it from the database using describe()
     // the cache should be infinite if cache is enabled
-    $this->cache_name = $modelname . '.setup';
-    if (!$this->setup = Madeam_Cache::read($this->cache_name, -1)) {
+    $this->cacheName .= $modelname . '.setup';
+    if (!$this->setup = Madeam_Cache::read($this->cacheName, -1)) {
       $this->setup['has_many']                 = array();
       $this->setup['has_one']                  = array();
       $this->setup['belongs_to']               = array();
@@ -113,7 +114,7 @@ class Madeam_Model {
       // load validators
       $this->loadValidators();
 
-      Madeam_Cache::save($this->cache_name, $this->setup, true);
+      Madeam_Cache::save($this->cacheName, $this->setup, true);
     }
   }
 
@@ -346,6 +347,10 @@ class Madeam_Model {
       $method   = 'validate' . $validator['method'];
 
       $error_key = $this->name . MODEL_JOINT . $field;
+      
+      // testing new Validation class
+      test('Valid? ' . Madeam_Validate::$method($this->entry[$field], $args));
+        
 
       // validate to make sure the validating method doesn't return false. If it does then save the error
       if ($check_non_existent_fields === false || isset($this->entry[$field])) {

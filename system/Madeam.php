@@ -82,7 +82,7 @@ class Madeam {
     if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['controller']))) { $params['controller'] .= '/' . $config['default_controller']; }
     
     // set controller's class
-    $controllerClass = 'Controller_' . str_replace(' ', '_', ucwords(str_replace('/', ' ', $params['controller'])));
+    $controllerClass = 'Controller_' . str_replace(' ', '_', ucwords(str_replace('/', ' ', Madeam_Inflector::camelize($params['controller']))));
     
     try {
       // create controller instance

@@ -46,6 +46,9 @@ if (isset($_GET['uri'])) {
 	define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_SCRIPT, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
 }
 
+test(PATH_TO_URI);
+test($_SERVER['REQUEST_URI']);
+
 // determine the relative path to the public directory
 define('PATH_TO_REL', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))));
 
@@ -84,30 +87,14 @@ define('FLASH_POST_NAME', 'mfpost');
 // example use: "user.name"
 define('MODEL_JOINT', '.');
 
-function Madeam_App_Autoload($class) {
-  $file = str_replace('_', DS, $class) . '.php';
-  if (file_exists(PATH_TO_APP . $file)) {
-    include $file;
-  }
-}
-
-function Madeam_System_Autoload($class) {
-  $file = str_replace('_', DS, $class) . '.php';
-  if (file_exists(PATH_TO_SYSTEM . $file)) {
-    include $file;
-  }
-}
-
 // autoload function
-function Madeam_Autoload_Exception($class) {
+function Madeam_Autoload($class) {
 
   // set class file name
   $file = str_replace('_', DS, $class) . '.php';
   
   // include class file
-  if (file_lives($file)) {
-    include $file;
-  }
+  if (file_lives($file)) { require $file; }
   
   if (!class_exists($class, false) && !interface_exists($class, false)) {
     eval("class $class {}");
@@ -115,18 +102,12 @@ function Madeam_Autoload_Exception($class) {
   }
 }
 
-// register autoload function
-
-// benchmark this against the regular way
-spl_autoload_register('Madeam_System_Autoload');
-spl_autoload_register('Madeam_App_Autoload');
-
 // include application bootstrap
 require PATH_TO_APP . 'Config' . DS . 'bootstrap.php';
 
 // idea... use this as a last resort when all autoloads fail.
 // have this one throw an exception or make a last resort to check every path for the file.
-spl_autoload_register('Madeam_Autoload_Exception');
+spl_autoload_register('Madeam_Autoload');
 
 
 /**
@@ -175,14 +156,14 @@ if (!Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', -1)) {
  *
  * @param unknown_type $e
  */
-function madeam_uncaught_exception($e) {
+function Madeam_uncaughtException($e) {
   echo 'Uncaught Exception: ' . $e->getMessage() . $e->getCode();
 }
 
 /**
  * Set exception handler
  */
-set_exception_handler('madeam_uncaught_exception');
+set_exception_handler('Madeam_uncaughtException');
 
 /**
  * Enter description here...
@@ -192,7 +173,7 @@ set_exception_handler('madeam_uncaught_exception');
  * @param unknown_type $file
  * @param unknown_type $line
  */
-function madeam_error_handler($code, $string, $file, $line) {
+function Madeam_errorHandler($code, $string, $file, $line) {
   if (!in_array($code, array(E_NOTICE))) {
     $exception = new Madeam_Exception($string, $code);
     echo $line;
@@ -206,7 +187,7 @@ function madeam_error_handler($code, $string, $file, $line) {
 /**
  * Set error handler
  */
-set_error_handler('madeam_error_handler', E_ALL);
+set_error_handler('Madeam_errorHandler', E_ALL);
 
 
 // function library
