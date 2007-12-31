@@ -32,10 +32,13 @@ require PATH_TO_APP . 'Config' . DS . 'setup.php';
 
 // set configuration
 $config = array_merge($env[$cfg['environment']], $cfg);
+unset($cfg, $env);
 
 // turn configs into constants for speed?
-define('MADEAM_ENABLE_DEBUG', $config['enable_debug']);
-define('MADEAM_ENABLE_CACHE', $config['enable_cache']);
+define('MADAEM_ENVIRONMENT',        $config['environment']);
+define('MADEAM_ENABLE_DEBUG',       $config['enable_debug']);
+define('MADEAM_ENABLE_CACHE',       $config['enable_cache']);
+define('MADAEM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off. 
 // If it's off then we need to add the SCRIPT_FILENAME at the end.
@@ -155,6 +158,8 @@ if (!Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', -1)) {
  */
 function Madeam_uncaughtException($e) {
   echo 'Uncaught Exception: ' . $e->getMessage() . $e->getCode();
+  
+  return true;
 }
 
 /**
@@ -171,20 +176,19 @@ set_exception_handler('Madeam_uncaughtException');
  * @param unknown_type $line
  */
 function Madeam_errorHandler($code, $string, $file, $line) {
-  if (!in_array($code, array(E_NOTICE))) {
-    $exception = new Madeam_Exception($string, $code);
-    echo $line;
-    echo $file;
-    //$exception->setLine($line);
-    //$exception->setFile($file);
-    throw $exception;
-  }
+  echo 'Handled';
+  $exception = new Madeam_Exception($string, $code);  
+  //$exception->setLine($line);
+  //$exception->setFile($file);
+  throw $exception;
+  
+  return true;
 } 
 
 /**
  * Set error handler
  */
-set_error_handler('Madeam_errorHandler', E_ALL);
+set_error_handler('Madeam_errorHandler');
 
 
 // function library

@@ -74,7 +74,7 @@ $cfg['log_file_name']      = 'Y-m';
  * things for you. To avoid including a layout with the content being called set the ajax_layout to "false".
  * By default this is already done for you. To include layouts when making ajax calls set it to "true".
  */
-$cfg['ajax_layout']        = false;
+$cfg['enable_ajax_layout']  = false;
 
 
 /**

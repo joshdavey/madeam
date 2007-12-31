@@ -7,4 +7,7 @@
  */
 
 // spl_autoload_register('PEAR2_Autoload');
+
+// set error handling
+error_reporting(E_ALL);
 ?>

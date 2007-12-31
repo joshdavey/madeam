@@ -61,7 +61,7 @@ class Madeam_Registry extends ArrayIterator {
    * @param string $id
    * @param mixed $value
    */
-	public function set($id, $value) {
+	public static function set($id, $value) {
 	  $registry = self::getInstance();
 		$registry->registry[$id] = $value;
 	}
@@ -72,7 +72,7 @@ class Madeam_Registry extends ArrayIterator {
 	 * @param string $id
 	 * @return mixed/boolean
 	 */
-	public function get($id) {
+	public static function get($id) {
 	  $registry = self::getInstance();
 		if (isset($registry->registry[$id])) {
 		  return $registry->registry[$id];
@@ -87,7 +87,7 @@ class Madeam_Registry extends ArrayIterator {
 	 * @param string $id
 	 * @return boolean
 	 */
-	public function exists($id) {
+	public static function exists($id) {
 	  $registry = self::getInstance();
     if (isset($registry->registry[$id])) {
 		  return true;
@@ -101,7 +101,7 @@ class Madeam_Registry extends ArrayIterator {
 	 *
 	 * @param string $id
 	 */
-	public function delete($id) {
+	public static function delete($id) {
 	  $registry = self::getInstance();
 	  if (isset($registry->registry[$id])) {
 		  unset($registry->registry[$id]);

@@ -157,7 +157,7 @@ class Madeam_Router {
     $params = array_merge($params, $gets);
     
     // automagically disable the layout when making an AJAX call
-    if (!AJAX_LAYOUT && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') { $params['layout'] = '0'; }
+    if (!MADAEM_ENABLE_AJAX_LAYOUT && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') { $params['layout'] = '0'; }
 
     $config = Madeam_Registry::get('config');
     

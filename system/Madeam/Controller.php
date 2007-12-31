@@ -31,7 +31,7 @@ class Madeam_Controller {
   public function __construct($params) {
     // load represented model
     if ($this->represent == true) {
-      $this->represent = madeam_inflector::model_nameize($this->represent);
+      $this->represent = Madeam_Inflector::model_nameize($this->represent);
     }
 
     // assign params passed on from madeam_router
@@ -90,7 +90,7 @@ class Madeam_Controller {
   
   public function __call($name, $args) {
     if (!file_exists($this->view)) {
-      throw new Madeam_Exception('Missing Action ' . $name . ' in ' . get_class($this) . ' controller', Madeam_Exception::ERR_ACTION_MISSING);
+      throw new Madeam_Exception('Missing Action <b>' . $name . '</b> in <b>' . get_class($this) . '</b> controller', Madeam_Exception::ERR_ACTION_MISSING);
     }
   }
 
@@ -224,7 +224,7 @@ class Madeam_Controller {
         if (file_exists($this->view)) {      
             include($this->view);
         } else {
-          throw new Madeam_Exception('Missing View ' . substr($this->view, strlen(PATH_TO_VIEW)), Madeam_Exception::ERR_VIEW_MISSING);
+          throw new Madeam_Exception('Missing View <b>' . substr($this->view, strlen(PATH_TO_VIEW)) . '</b>', Madeam_Exception::ERR_VIEW_MISSING);
         }
         
 				/*

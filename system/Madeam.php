@@ -91,7 +91,7 @@ class Madeam {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
         $controller = new Controller_App($params);
       } else {
-        $e->setMessage('Missing Controller ' . $controllerClass);
+        $e->setMessage('Missing Controller <b>' . $controllerClass . '</b>');
         Madeam_Error::catchException($e, Madeam_Error::ERR_NOT_FOUND);
       }
     }
