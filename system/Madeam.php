@@ -23,7 +23,7 @@ class Madeam {
   	// include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
 
     // call controller action
-    $output = Madeam::makeRequest(Madeam_Router::currentUri() . '?layout=1');
+    $output = Madeam::makeRequest(Madeam_Router::currentUri() . '?showLayout=1');
 
     // destroy user error notices
     if (isset($_SESSION[USER_ERROR_NAME])) {
@@ -101,7 +101,11 @@ class Madeam {
       $controller->callback('beforeAction');
       
       // call action
-      $controller->{Madeam_Inflector::camelize($params['action'])}();
+      if ($params['action'] != 'callback') {
+        $controller->{Madeam_Inflector::camelize($params['action'])}();
+      } else {
+        throw new Madeam_Exception('You cannot call an action "callback".');
+      }
       
       // after action callback
       $controller->callback('beforeRender');

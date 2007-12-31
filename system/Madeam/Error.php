@@ -23,7 +23,7 @@ class Madeam_Error {
       $reminder = rand(0, count(self::$helpfulReminders)-1);
       exit(
       '<p>' . self::$helpfulReminders[$reminder] . '<hr />' . 
-      '<b>Error:</b> <p>' . $exception->getMessage() . '</p>' . 
+      '<b>Error:</b> <p>' . $exception->getMessage() . '  <br /><br /> ' . $exception->getFile() . ' (' . $exception->getLine() . ')</p>' . 
       '<b>Backtrace:</b>' . 
       '<pre>' . $exception->getTraceAsString() . '</pre>');
     } else {

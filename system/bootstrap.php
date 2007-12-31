@@ -157,7 +157,7 @@ if (!Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', -1)) {
  * @param unknown_type $e
  */
 function Madeam_uncaughtException($e) {
-  echo 'Uncaught Exception: ' . $e->getMessage() . $e->getCode();
+  echo 'Uncaught Exception: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile();
   
   return true;
 }
@@ -176,10 +176,9 @@ set_exception_handler('Madeam_uncaughtException');
  * @param unknown_type $line
  */
 function Madeam_errorHandler($code, $string, $file, $line) {
-  echo 'Handled';
   $exception = new Madeam_Exception($string, $code);  
-  //$exception->setLine($line);
-  //$exception->setFile($file);
+  $exception->setLine($line);
+  $exception->setFile($file);
   throw $exception;
   
   return true;

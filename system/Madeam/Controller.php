@@ -13,52 +13,48 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Controller {
-	public $output      = null;
-  public $data        = array();
-  public $params      = array();
-  public $scaffold    = false;
+	public    $output      = null;
+  
+  protected $scaffold     = false;
+  protected $layout       = 'master';  
+  protected $represent    = false;
+  
+  protected $view;
+  protected $isRendered   = false;
+  protected $viewParser;
 
-  public $name;
-  public $layout      = 'master';
-  public $view;
-  public $represent   = false;
-  public $rendered    = false;
-  public $parser;
-
-  public $scaffoldController;
-  public $scaffoldKey;
+  protected $scaffoldController;
+  protected $scaffoldKey;
 
   public function __construct($params) {
     // load represented model
-    if ($this->represent == true) {
+    if (is_string($this->represent)) {
       $this->represent = Madeam_Inflector::model_nameize($this->represent);
     }
 
-    // assign params passed on from madeam_router
-    $this->params = $params;
-    
-    // send params to view
-    $this->data['params'] = $params;
+    // assign params
+    foreach ($params as $name => $value) {
+      if (!isset($this->$name)) {
+        $this->$name = $value;
+      }
+    }
 
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
-      $this->scaffoldController  = $this->params['controller'];
+      $this->scaffoldController  = $this->controller;
       $this->scaffoldKey         = $this->{$this->represent}->get_primary_key();
     }
 
     // set view
-    $this->setView($params['controller'] . '/' . $params['action']);
+    $this->setView($this->controller . '/' . $this->action);
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
-    if ($params['layout'] == '0' || $params['layout'] == 'false') {
+    if ($this->showLayout == '0' || $this->showLayout == 'false') {
       $this->setLayout(false);
     } else {
       $this->setLayout($this->layout);
     }
-
-		// set header for layout variable
-		$this->set('header_for_layout', null);
   }
 
 
@@ -83,11 +79,7 @@ class Madeam_Controller {
       return $inst;
     }
   }
-  
-  public function __set($name, $value) {
-    $this->$name = $this->data[$name] = $value;
-  }
-  
+
   public function __call($name, $args) {
     if (!file_exists($this->view)) {
       throw new Madeam_Exception('Missing Action <b>' . $name . '</b> in <b>' . get_class($this) . '</b> controller', Madeam_Exception::ERR_ACTION_MISSING);
@@ -103,8 +95,8 @@ class Madeam_Controller {
     return $this->$callback();
   }
 
-  final protected function callAction($uri, $cfg = array()) {
-    return madeam::callAction($uri, $cfg, $this->data);
+  final protected function callAction($uri) {
+    return Madeam::callAction($uri);
   }
 
   final protected function callPartial($partial_path, $data = array(), $start = 0, $limit = false) {
@@ -128,33 +120,23 @@ class Madeam_Controller {
         foreach ($data as $key => $$partial_name) {
           $_num++;
           if (count($partial) > 0) {
-            include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->params['format']);
+            include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->format);
           } else {
-            include(PATH_TO_VIEW . str_replace('/', DS, $this->params['controller']) . DS . '_' . implode($partial) . '.' . $this->params['format']);
+            include(PATH_TO_VIEW . str_replace('/', DS, $this->controller) . DS . '_' . implode($partial) . '.' . $this->format);
           }
         }
       } else {
         $$partial_name = $data;
         $_num++;
         if (count($partial) > 0) {
-          include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->params['format']);
+          include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->format);
         } else {
-          include(PATH_TO_VIEW . str_replace('/', DS, $this->params['controller']) . DS . '_' . implode($partial) . '.' . $this->params['format']);
+          include(PATH_TO_VIEW . str_replace('/', DS, $this->controller) . DS . '_' . implode($partial) . '.' . $this->format);
         }
       }
     }
 
     return false;
-  }
-
-  final protected function flash($msg, $uri, $pause = 5) {
-    $this->setLayout('flash');
-
-    $this->set('pause', $pause);
-    $this->set('uri', $uri);
-    $this->set('page_title', $msg);
-
-    $this->render($msg);
   }
 
   /**
@@ -165,7 +147,7 @@ class Madeam_Controller {
    * @param string $view
    */
   final protected function setView($view) {
-    $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->params['format'];
+    $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->format;
   }
 
   /**
@@ -178,28 +160,26 @@ class Madeam_Controller {
 
     if (func_num_args() < 2) {
       if (is_string($layouts)) {
-        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->params['format'];
+        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->format;
       } elseif (is_array($layouts)) {
         foreach ($layouts as $layout) {
-          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['format'];
+          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->format;
         }
       } else {
         $this->layout = false;
       }
     } else {
       foreach (func_get_args() as $layout) {
-        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['format'];
+        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->format;
       }
     }
   }
-
-  public $_parser = false;
 
   final protected function set($name, $value) {
     $this->data[$name] = $value;
 
     /*
-    $parser = "parser_' . $this->params['format'];
+    $parser = "parser_' . $this->format;
     if (class_exists($parser)) {
     	if ($this->_parser == false) { $this->_parser = new $parser; }
     	$this->_parser->set($name, $value);
@@ -209,26 +189,27 @@ class Madeam_Controller {
 
   final protected function render($data = true, $rendered = true) {
     // sometimes the developer may want to tell the view not to render from the controller's action
-    if ($data === false) { $this->rendered = true; }
-
+    if ($data === false) { $this->isRendered = true; }
+    
     // consider: checking if it's rendered based on if there is anything in the output buffer? does that make sense?
-    if ($this->rendered === false) {
+    if ($this->isRendered === false) {
       // output buffering
       ob_start();
 
-      foreach($this->data as $key => $value) { $$key = $value; }
+      foreach($this as $key => $value) { $$key = $value; }
       //extract($this->data, EXTR_OVERWRITE); // which one is faster?
+      
 
       if ($data === true) {
         // include view's template file
-        if (file_exists($this->view)) {      
-            include($this->view);
+        if (file_exists($this->view)) {
+          include($this->view);
         } else {
           throw new Madeam_Exception('Missing View <b>' . substr($this->view, strlen(PATH_TO_VIEW)) . '</b>', Madeam_Exception::ERR_VIEW_MISSING);
         }
         
 				/*
-				$parser = $this->params['format'];
+				$parser = $this->format;
 				if (method_exists('madeamParser', $parser)) {
 					unset($this->data['header_for_layout']);
 					unset($this->data['params']);
@@ -244,7 +225,7 @@ class Madeam_Controller {
         // set $content_for_layout to $data which is just a string
 				$content_for_layout = $data;
 				/*
-				$parser = $this->params['format'];
+				$parser = $this->format;
         if (method_exists('madeamParser', $parser)) {
 					$content_for_layout = madeamParser::$parser($this->view, $data);
 				} else {
@@ -277,7 +258,7 @@ class Madeam_Controller {
       ob_end_clean();
 
       // mark view as rendered
-      $this->rendered = $rendered;
+      $this->isRendered = $rendered;
 
       $this->output = $content_for_layout;
       
