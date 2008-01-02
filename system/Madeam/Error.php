@@ -4,7 +4,7 @@ class Madeam_Error {
   const ERR_CRITICAL  = 0;
   const ERR_NOT_FOUND = 50;
   
-  private static $helpfulReminders = array(
+  private static $funSnippets = array(
 		"Don't worry, be happy. It could be worse.",
 		"Oops. Did someone make a boo boo?",
 		"You should really fix this.",
@@ -17,17 +17,33 @@ class Madeam_Error {
 		"The tech bubble burst! Run, save yourself!",
 		"Is this your idea of web 3.0?"
 	);
+	
   
   public static function catchException(Exception $exception, $code = 100) {
+    
+    $config = Madeam_Registry::get('config');
+    
     if (MADEAM_ENABLE_DEBUG === true) {
-      $reminder = rand(0, count(self::$helpfulReminders)-1);
-      exit(
-      '<p>' . self::$helpfulReminders[$reminder] . '<hr />' . 
-      '<b>Error:</b> <p>' . $exception->getMessage() . '  <br /><br /> ' . $exception->getFile() . ' (' . $exception->getLine() . ')</p>' . 
-      '<b>Backtrace:</b>' . 
-      '<pre>' . $exception->getTraceAsString() . '</pre>');
+      
+      // get random snippet
+      $snippet = self::$funSnippets[rand(0, count(self::$funSnippets)-1)];
+      
+      // call error controller and pass information
+      echo Madeam::makeRequest(
+        $config['error_controller'] . '/debug?error=' . urlencode($exception->getMessage()) . 
+        '&backtrace=' . urlencode($exception->getTraceAsString()) . 
+        '&snippet=' . urlencode($snippet) . 
+        '&line=' . urlencode($exception->getLine()) . 
+        '&code=' . urlencode($code) . 
+        '&file=' . urlencode($exception->getFile()) . 
+        '&documentation=' . 'comingsoong'
+      );
+      exit();
+      
     } else {
-      exit('404 error');
+      // return 404 error page
+      echo Madeam::makeRequest($config['error_controller'] . '/http404');
+      exit();
     }
   }
   

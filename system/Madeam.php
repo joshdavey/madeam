@@ -83,20 +83,34 @@ class Madeam {
     
     // set controller's class
     $controllerClass = 'Controller_' . str_replace(' ', '_', ucwords(str_replace('/', ' ', Madeam_Inflector::camelize($params['controller']))));
-    
+        
     try {
       // create controller instance
       $controller = new $controllerClass($params);
-    } catch (Madeam_Exception $e) {
+    } catch (Madeam_Exception $e) {      
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
         $controller = new Controller_App($params);
       } else {
+        /*
+        // I really don't like this code... Can we put it in the Madeam_Error calss?
+        // we gotta get outa here if we can't find an error controller to handle the error.
+        if ($params['controller'] == $config['error_controller']) {
+          if (MADEAM_ENABLE_DEBUG === true) {
+            exit('Missing Controller <b>' . $controllerClass . '</b>'); 
+          } else {
+            header(' ', '', 404);
+            exit();
+          }
+        }
+        */
+        
+        // no controller found = critical error. 
         $e->setMessage('Missing Controller <b>' . $controllerClass . '</b>');
         Madeam_Error::catchException($e, Madeam_Error::ERR_NOT_FOUND);
       }
     }
-     
-    try {   
+    
+    try {
       // before action callback
       $controller->callback('beforeAction');
       
@@ -158,7 +172,7 @@ class Madeam {
     if (substr($url, 0, 1) != "#") { 
       if (substr($url, 0, 1) == '/') {
         $url = PATH_TO_REL . substr($url, 1, strlen($url));
-      } elseif (!preg_match('/[a-z]+:/', $url, $matchs)) {
+      } elseif (!preg_match('/^[a-z]+:/', $url, $matchs)) {
         $url == "#" ? $url = "#" : $url = PATH_TO_URI . $url;
       }
     }    

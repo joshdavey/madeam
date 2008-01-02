@@ -17,6 +17,7 @@
 // directory splitter
 if (!defined('DS')) { define('DS', DIRECTORY_SEPARATOR); }
 
+// important paths
 if (!defined('PATH_TO_PUBLIC'))  { define('PATH_TO_PUBLIC', dirname(dirname(__FILE__)) . DS . 'public' . DS); }
 if (!defined('PATH_TO_PROJECT')) { define('PATH_TO_PROJECT', dirname(PATH_TO_PUBLIC) . DS); }
 
@@ -130,12 +131,12 @@ function file_lives($file) {
 }
 
 
-
 // save config to registry
 // ========================================================
 
 // save configuration to registry
 Madeam_Registry::set('config', $config);
+unset($config);
 
 
 // include routes

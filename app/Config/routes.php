@@ -6,8 +6,9 @@
  * urls by prefixing them with ":" and seperating them with "/".
  */
 
+
 // admin routes
-  Madeam_Router::connect(':controller/:action/:id', array('controller' => 'admin\/[^\/\.]+'));
+  Madeam_Router::connect(':controller/:action/:id', array('controller' => 'admin\/[^\/]+'));
 
 // default routes
   Madeam_Router::connect(':controller/:action/:id');

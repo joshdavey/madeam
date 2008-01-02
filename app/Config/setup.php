@@ -78,6 +78,12 @@ $cfg['enable_ajax_layout']  = false;
 
 
 /**
+ * When madeam encounters a system error it calls an error controller to display the error. Here you can 
+ * select which controller handles the errors by name.
+ */
+$cfg['error_controller']    = 'error';
+
+/**
  * List of Mime Types.
  */
 $cfg['mime_types']         = array(

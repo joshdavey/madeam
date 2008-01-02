@@ -70,7 +70,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @param string $sql
    * @return resource
    */
-  final public function execute($sql) {
+  final public function execute($sql, $returnAs = 'object') {
     global $db_connection; // this is the only good use of globals. But still I wish we could get rid of the global part
 
     // if we connect here we don't need to connect to the database until we execute a query
@@ -115,9 +115,16 @@ class Madeam_ActiveRecord extends Madeam_Model {
     return $this->link;
   }
 
-	final public function query($sql) {
+	final public function query($sql, $returnAs = 'object') {
 	  // execute query
 		$this->link =	$this->execute($sql);
+		
+		// fetch method
+		if ($returnAs == 'object') {
+		  $fetchMethod = 'mysql_fetch_object';
+		} else {
+		  $fetchMethod = 'mysql_fetch_array';
+		}
 
 		// check to see if this query returns a resource -- why not just check to see if it's a resource instead?
 		$matchs = array();
@@ -125,7 +132,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
 		if (count($matchs) > 0) {
 		  if ($this->numRows() > 0) {
-  			while ($this->entry = mysql_fetch_object($this->link)) {
+  			while ($this->entry = $fetchMethod($this->link)) {
   			  // don't prepare results of describe queries
   			  if ($matchs[0] != "DESCRIBE" && $matchs[0] != 'describe') {
   		      $this->prepareResult(); // should this be done?
@@ -143,7 +150,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
 	final public function describe() {
 	  $table = $this->setup['resource_name'];
-	  return $this->query("DESCRIBE $table");
+	  return $this->query("DESCRIBE $table", 'array');
 	}
 
   /**
@@ -166,8 +173,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // $this->article->findOne(32, true)->comment->findAll();
     // where article is the parent of comment
     if ($this->parent && $this->_sqlWhere == '1') {
-      $this->where($this->parent->setup['has_models'][$this->name]['foreign_key'] . " = '" . $this->parent->entry[$this->parent->setup['has_models'][$this->name]['primary_key']] . "'");
-      //$this->where($this->parent->setup['has_models'][$this->name]['foreign_key'] . " = '" . $this->parent->setup['has_models'][$this->name]['primary_key'] . "'");
+      $this->where($this->parent->setup['has_models'][$this->name]['foreign_key'] . " = '" . $this->parent->entry[$this->parent->setup['has_models'][$this->name]['primaryKey']] . "'");
+      //$this->where($this->parent->setup['has_models'][$this->name]['foreign_key'] . " = '" . $this->parent->setup['has_models'][$this->name]['primaryKey'] . "'");
     }
 
     // build select query and set resource link
@@ -221,7 +228,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
 
-              $this->entry[madeam_inflector::model_tableize($model)] = $tempmodel->findAll();
+              $this->entry[Madeam_Inflector::model_tableize($model)] = $tempmodel->findAll();
               unset($tempmodel);
             }
           }
@@ -232,7 +239,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
 
-              $this->entry[madeam_inflector::model_tableize($params['model'])] = $tempmodel
+              $this->entry[Madeam_Inflector::model_tableize($params['model'])] = $tempmodel
                 ->join($this->name)
                 ->findAll();
 
@@ -322,7 +329,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
   }
 
   /**
-   * Find a single row based on value of primary_key
+   * Find a single row based on value of primaryKey
    *
    * @param string/int $id
    * @return array/false
@@ -334,9 +341,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if ($id != -1) { $this->entryId = $id; }
 
     // set where
-    if ($this->entryId != -1 && $this->primary_key != false) {
+    if ($this->entryId != -1 && $this->primaryKey != false) {
       $table = $this->setup['resource_name'];
-      $this->where("$table.$this->primary_key = '$id'");
+      $this->where("$table.$this->primaryKey = '$id'");
     }
 
     // set limit
@@ -364,8 +371,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->reset();
 
     // validation callbacks
-    $this->before_validation();
-    $this->after_validation();
+    $this->beforeValidation();
+    $this->afterValidation();
 
     // before delete callback
     $this->beforeDelete();
@@ -387,7 +394,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
   /**
    * Creates/Updates a record in the database
    *
-   * An update is assumed if the primary_key has a value
+   * An update is assumed if the primaryKey has a value
    *
    * @param array $data
    */
@@ -399,8 +406,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->entry = $data;
 
     // set entryId
-    if (isset($this->entry[$this->primary_key]) && $this->entry[$this->primary_key] != null) {
-      $this->entryId = $this->entry[$this->primary_key];
+    if (isset($this->entry[$this->primaryKey]) && $this->entry[$this->primaryKey] != null) {
+      $this->entryId = $this->entry[$this->primaryKey];
     }
 
     // check to see whether this is going to be an insert or an update
@@ -416,14 +423,14 @@ class Madeam_ActiveRecord extends Madeam_Model {
     unset($inst);
 
     // before validation callback
-    $this->before_validation();
+    $this->beforeValidation();
 
     // validate data
     ////$this->load_validators();
-    $this->validate_entry($update);
+    $this->validateEntry($update);
 
     // after validation callback
-    $this->after_validation();
+    $this->afterValidation();
 
     // now that all the callbacks prior to updating/adding the new row have been called
     // we must check for any errors that may have been envoked.
@@ -445,8 +452,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
         if (is_array($value)) {
           $relations[$field] = $value;
 
-          // instead of just unsetting it, it should get it's primary_key value!
-          $this->entry[$field] = $value[$this->{madeam_inflector::model_nameize($field)}->primary_key];
+          // instead of just unsetting it, it should get it's primaryKey value!
+          $this->entry[$field] = $value[$this->{Madeam_Inflector::model_nameize($field)}->primaryKey];
         }
       }
       */
@@ -470,7 +477,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $entryId = $this->insert_id();
 
 			// set this so it can be used in afterSave
-			$this->entry[$this->primary_key] = $entryId;
+			$this->entry[$this->primaryKey] = $entryId;
 
 			// grab entry after it's been modified by callbacks
 			$entry = $this->entry;
@@ -479,7 +486,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       if ($entryId) {
         // check for fields that are arrays
         foreach ($relations as $model => $value) {
-          $model = madeam_inflector::model_nameize($model);
+          $model = Madeam_Inflector::model_nameize($model);
           if (in_array($model, array_keys($this->setup['has_and_belongs_to_many']))) {
             $this->habtmAdd($model, $entryId, $value);
           } else {
@@ -522,17 +529,17 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resourceName = madeam_inflector::model_habtm($model, $this->name);
-    $class->primary_key = false;
+    $class->resourceName = Madeam_Inflector::model_habtm($model, $this->name);
+    $class->primaryKey = false;
 
-    $this_key = madeam_inflector::model_foreign_key($this->name);
-    $relation_key = madeam_inflector::model_foreign_key($model);
+    $this_key = Madeam_Inflector::model_foreign_key($this->name);
+    $relation_key = Madeam_Inflector::model_foreign_key($model);
 
     //$this->ItemStore->findOne(1,2);
 
     foreach ($assoc as $val) {
       // check for duplicate
-      $class->where("$this_key = '$id' AND $relation_key = '$val'")->unbind_all()->findOne();
+      $class->where("$this_key = '$id' AND $relation_key = '$val'")->unbindAll()->findOne();
       if ($class->numRows() < 1) {
         $class->data = array($this_key => $id, $relation_key => $val);
         $class->execute($class->buildQueryInsert());
@@ -552,11 +559,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resource_name = madeam_inflector::model_habtm($model, $this->name);
-    $class->primary_key = false;
+    $class->resourceName = Madeam_Inflector::model_habtm($model, $this->name);
+    $class->primaryKey = false;
 
-    $this_key = madeam_inflector::model_foreign_key($this->name);
-    $relation_key = madeam_inflector::model_foreign_key($model);
+    $this_key = Madeam_Inflector::model_foreign_key($this->name);
+    $relation_key = Madeam_Inflector::model_foreign_key($model);
 
     foreach ($assoc as $val) {
       $class->data = array($this_key => $id, $relation_key => $val);
@@ -569,7 +576,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
 
  	final public function increase($id, $field, $amount = 1) {
-		if ($record =$this->fields($field, $this->primary_key)->findOne($id)) {
+		if ($record =$this->fields($field, $this->primaryKey)->findOne($id)) {
 			$record[$field] = $record[$field] + $amount;
 			if ($this->save($record)) {
 				return true;
@@ -580,7 +587,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 	}
 
 	final public function decrease($id, $field, $amount = 1) {
-		if ($record =$this->fields($field, $this->primary_key)->findOne($id)) {
+		if ($record =$this->fields($field, $this->primaryKey)->findOne($id)) {
 			$record[$field] = $record[$field] - $amount;
 			if ($this->save($record)) {
 				return true;
@@ -642,7 +649,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       }
 
       // primary key
-      if (in_array('primary_key', $opts)) {
+      if (in_array('primaryKey', $opts)) {
         $field[] = 'PRIMARY KEY';
       }
 
@@ -692,9 +699,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $table = $this->setup['resource_name'];
 
     if (empty($this->fields)) {
-      if ($this->primary_key != false) {
+      if ($this->primaryKey != false) {
         // why should we have to re-state the id? This is a hack! (only for JOINS)
-        $sql[] = "SELECT *, $table.$this->primary_key as $this->primary_key FROM $table";
+        $sql[] = "SELECT *, $table.$this->primaryKey as $this->primaryKey FROM $table";
       } else {
         $sql[] = "SELECT * FROM $table";
       }
@@ -746,8 +753,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $table = $this->setup['resource_name'];
 
     // remove primary key insert if it is null
-    if (!isset($this->data[$this->primary_key]) || $this->data[$this->primary_key] == null) {
-      unset($this->data[$this->primary_key]);
+    if (!isset($this->data[$this->primaryKey]) || $this->data[$this->primaryKey] == null) {
+      unset($this->data[$this->primaryKey]);
     }
 
     // add table name
@@ -801,9 +808,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $sql[] = 'WHERE ' . $this->_sqlWhere;
     } elseif ($this->entryId != -1) {
       if (is_int($this->entryId)) {
-        $sql[] = 'WHERE ' . $this->primary_key . ' = ' . $this->entryId;
+        $sql[] = 'WHERE ' . $this->primaryKey . ' = ' . $this->entryId;
       } else {
-        $sql[] = 'WHERE ' . $this->primary_key . ' = \'' . $this->entryId . '\'';
+        $sql[] = 'WHERE ' . $this->primaryKey . ' = \'' . $this->entryId . '\'';
       }
     } else {
       return false;
@@ -839,9 +846,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $sql[] = 'WHERE ' . $this->_sqlWhere;
     } elseif ($this->entryId != -1) {
       if (is_int($this->entryId)) {
-        $sql[] = 'WHERE ' . $this->primary_key . ' = ' . $this->entryId;
+        $sql[] = 'WHERE ' . $this->primaryKey . ' = ' . $this->entryId;
       } else {
-        $sql[] = 'WHERE ' . $this->primary_key . ' = \'' . $this->entryId . '\'';
+        $sql[] = 'WHERE ' . $this->primaryKey . ' = \'' . $this->entryId . '\'';
       }
     } else {
       return false;
@@ -921,7 +928,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
   }
 
   /**
-   * Sets the fields to be selected, automatically includes primary_key
+   * Sets the fields to be selected, automatically includes primaryKey
    *
    * @param list $fields
    */
@@ -965,7 +972,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
   final public function join($model, $on = false) {
 
-    $model = madeam_inflector::model_nameize($model);
+    $model = Madeam_Inflector::model_nameize($model);
     $table = $this->setup['resource_name'];
 
     if ($on == false) {
@@ -973,7 +980,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
         $relation = $this->setup['has_and_belongs_to_many'][$model];
 
-        $on = "$table.$this->primary_key = $relation[join_model].$relation[foreign_key]";
+        $on = "$table.$this->primaryKey = $relation[join_model].$relation[foreign_key]";
 
         $this->_sqlJoins[$model] = array('table' => $relation['join_model'], 'on' => $on);
 
@@ -983,18 +990,18 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
         // I wish there was a better way to do this...
         // make the user type in more info?
-        $foreign_table  = $this->$model->resource_name;
-        $foreign_pk     = $this->$model->primary_key;
+        $foreign_table  = $this->$model->resourceName;
+        $foreign_pk     = $this->$model->primaryKey;
 
         $on = "$table.$fk = $foreign_table.$foreign_pk";
 
-        $this->_sqlJoins[$model] = array('table' => $this->$model->resource_name, 'on' => $on);
+        $this->_sqlJoins[$model] = array('table' => $this->$model->resourceName, 'on' => $on);
       } else {
         t('this feature needs to be fixed - activeRecord join');
         $this->_sqlJoins[$model] = array('table' => $model, 'on' => $on);
       }
     } else {
-      $this->_sqlJoins[$model] = array('table' => $this->$model->resource_name, 'on' => $on);
+      $this->_sqlJoins[$model] = array('table' => $this->$model->resourceName, 'on' => $on);
     }
 
     return $this;
@@ -1046,8 +1053,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @return integer
    */
   final public function insertId() {
-    // this is necessary when the programmer has to specify a primary_key value when the
-    // primary_key does not auto increment or is not an integer
+    // this is necessary when the programmer has to specify a primaryKey value when the
+    // primaryKey does not auto increment or is not an integer
     if ($this->entryId != -1) {
       return $this->entryId;
     } else {
