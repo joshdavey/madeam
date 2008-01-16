@@ -4,7 +4,8 @@ h1.madeam { border-bottom: solid 8px #555; padding-top: 90px; }
 p.madeam { padding: 6px; }
 code.madeam { margin-left: 10px; letter-spacing: 0.03em; font-family: "Trebuchet MS", Helvetica; font-weight: bold; font-size: 1.1em; background: #fffad4; padding: 6px; display: block; border-bottom: solid 4px #555; }
 
-#madeam-error { font-family: Courier New; font-size: 0.7em; margin: 10px; overflow: auto; }
+#madeam-error { font-family: Courier New; font-size: 0.7em; margin: 10px;}
+#madeam-error pre { overflow: auto; }
 
 /* =universal
 -------------------------------------- */

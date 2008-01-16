@@ -14,8 +14,22 @@
  */
 
 class Madeam_Router {
-  public static $routes  = array(); // regex, names, params, http_request_method -- damn these really need to be cached! (Store them in a text file?)
-  public static $links   = array(); // a place to store the magic smart links
+  public static $routes           = array(); // regex, names, params -- damn these really need to be cached! (Store them in a text file?)
+  public static $links            = array(); // a place to store the magic smart links
+  
+  // do we really need this
+  public static $actionMethodMap  = array(
+    array('action' => 'index',  'method' => 'get',    'id' => false),
+    array('action' => 'show',   'method' => 'get',    'id' => true),
+    array('action' => 'delete', 'method' => 'delete', 'id' => true),
+    array('action' => 'edit',   'method' => 'put',    'id' => true),
+    array('action' => 'edit',   'method' => 'post',   'id' => false),
+    array('action' => 'add',    'method' => 'post',   'id' => false)
+  );
+  
+  public static $resourceMap      = array(
+    
+  );
 
   /**
    * This cool method adds paths by formatting the string the user has entered and turning it into a regular expression
@@ -23,9 +37,8 @@ class Madeam_Router {
    *
    * @param string $route
    * @param array $params
-   * @param string $http_method (GET, POST, DELETE?, PUT?)
    */
-  public static function connect($route, $params = array(), $http_request_method = 'GET') {
+  public static function connect($route, $params = array()) {
     if (!is_array(self::$routes)) { self::$routes = array(); }
     
     // root route - doesn't require parsing
@@ -63,7 +76,7 @@ class Madeam_Router {
       $regexp = '/^' . implode('', $mini_exp) . '\/?([.]*)$/';
 
       // add to routes list
-		  self::$routes[] = array($regexp, $names, $params, $http_request_method);
+		  self::$routes[] = array($regexp, $names, $params);
     }
   }
 
@@ -134,7 +147,7 @@ class Madeam_Router {
         $params = $route[2]; // default values
 
         // set derived params
-        foreach ($route[1] as $key => $name) { @$params[$name] = $match[$key]; }
+        foreach ($route[1] as $key => $name) { $params[$name] = $match[$key]; }
 
         // flag as matched
         $matchs++;
@@ -149,8 +162,14 @@ class Madeam_Router {
       //header("HTTP/1.0 404 Not Found");
       //ob_clean();
       //readfile(ERROR_DIR . '404.html');
-			test($uri);
-      exit();
+			//test($uri);
+      //exit();
+      
+      throw new Madeam_Exception('Unable to find page');
+      
+      // but what about returning the params if we throw an error?
+      
+      return $params;
     }
 
     // get params from uri
@@ -167,7 +186,7 @@ class Madeam_Router {
     !isset($params['layout']) || $params['layout'] == null ? $params['layout'] = '0' : false ;
     !isset($format) || $format == null ? $params['format'] = $config['default_format'] : $params['format'] = $format;
 
-
+    
     return $params;
   }
 

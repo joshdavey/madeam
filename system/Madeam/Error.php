@@ -1,4 +1,17 @@
 <?php
+/**
+ * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
+ * Copyright (c)	2006, Joshua Davey
+ *								24 Ridley Gardens, Toronto, Ontario, Canada
+ *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright		Copyright (c) 2006, Joshua Davey
+ * @link				http://www.madeam.com
+ * @package			madeam
+ * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
 class Madeam_Error {
   
   const ERR_CRITICAL  = 0;
@@ -10,7 +23,7 @@ class Madeam_Error {
 		"You should really fix this.",
 		"Just blame Josh Davey.",
 		"This is the last time I trust open source software.",
-		"Did you intend on launching a nuclear missile? Because it's too late to stop it.",
+		"Did you intend on launching a nuclear missile? Because it's too late to stop it now.",
 		"This is neither a horse, or a stable.",
 		"What have you done!?",
 		"Oh @%&#",
@@ -20,11 +33,13 @@ class Madeam_Error {
 	
   
   public static function catchException(Exception $exception, $code = 100) {
-    
+    // get config
     $config = Madeam_Registry::get('config');
     
+    // clean output buffer
+    ob_clean();
+    
     if (MADEAM_ENABLE_DEBUG === true) {
-      
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets)-1)];
       

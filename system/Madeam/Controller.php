@@ -19,7 +19,7 @@ class Madeam_Controller {
   protected $layout       = 'master';  
   protected $represent    = false;
   
-  protected $view;
+  protected $actionView;
   protected $isRendered   = false;
   protected $viewParser;
 
@@ -71,17 +71,17 @@ class Madeam_Controller {
     $match = array();
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
        // set model class name
-      $comp_class = 'Component_' . $name;
+      $modelClass = 'Model_' . $name;
 
       // create component instance
-      $inst = new $comp_class($this);
-      $this->$name = $inst;
-      return $inst;
+      $model = new $modelClass();
+      $this->$name = $model;
+      return $model;
     }
   }
 
   public function __call($name, $args) {
-    if (!file_exists($this->view)) {
+    if (!file_exists($this->viewFile)) {
       throw new Madeam_Exception('Missing Action <b>' . $name . '</b> in <b>' . get_class($this) . '</b> controller', Madeam_Exception::ERR_ACTION_MISSING);
     }
   }
@@ -147,7 +147,7 @@ class Madeam_Controller {
    * @param string $view
    */
   final protected function setView($view) {
-    $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->format;
+    $this->viewFile = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->format;
   }
 
   /**
@@ -202,10 +202,10 @@ class Madeam_Controller {
 
       if ($data === true) {
         // include view's template file
-        if (file_exists($this->view)) {
-          include($this->view);
+        if (file_exists($this->viewFile)) {
+          include($this->viewFile);
         } else {
-          throw new Madeam_Exception('Missing View <b>' . substr($this->view, strlen(PATH_TO_VIEW)) . '</b>', Madeam_Exception::ERR_VIEW_MISSING);
+          throw new Madeam_Exception('Missing View <b>' . substr($this->viewFile, strlen(PATH_TO_VIEW)) . '</b>', Madeam_Exception::ERR_VIEW_MISSING);
         }
         
 				/*
@@ -213,7 +213,7 @@ class Madeam_Controller {
 				if (method_exists('madeamParser', $parser)) {
 					unset($this->data['header_for_layout']);
 					unset($this->data['params']);
-					madeamParser::$parser($this->view, $this->data);
+					madeamParser::$parser($this->viewFile, $this->data);
 				}
 				*/
 				
@@ -227,7 +227,7 @@ class Madeam_Controller {
 				/*
 				$parser = $this->format;
         if (method_exists('madeamParser', $parser)) {
-					$content_for_layout = madeamParser::$parser($this->view, $data);
+					$content_for_layout = madeamParser::$parser($this->viewFile, $data);
 				} else {
 					$content_for_layout = null;
 				}
