@@ -1,1 +1,14 @@
-<?php echo $params['error']; ?>
+
+
+<div id="madeam-error">
+  <p style="font-size: 1.4em; font-weight: bold; color: #666; "><?php echo $snippet; ?></p>
+  <h1>Error:</h1>
+  <p>
+  <?php echo $error; ?>
+  <br />
+  <?php echo $file; ?> on line <?php echo $line; ?>
+  </p>
+  
+  <h1>Backtrace:</h1>
+  <pre class="backtrace"><?php echo $backtrace; ?></pre>
+</div>
