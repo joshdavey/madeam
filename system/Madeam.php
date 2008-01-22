@@ -67,11 +67,11 @@ class Madeam {
     // get request parameters from uri
     // example input: 'posts/show/32'
     $params = Madeam_Router::parseUri($uri);
-    
+
     // get instance of configuration from registry
     $config = Madeam_Registry::get('config');
-    
-    // because we allow controllers to be grouped into sub folders we need to recognize this when 
+
+    // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
     // they should be able to just type in 'admin' because 'index' is the default controller in that
     // group of controllers. To make this possible we check to see if a directory exists that is named
@@ -80,14 +80,15 @@ class Madeam {
     // note: there is a consequence for this feature which means if you have a directory named 'admin'
     // you can't have a controller named 'controller_admin'
     if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['controller']))) { $params['controller'] .= '/' . $config['default_controller']; }
-    
+
     // set controller's class
+    $params['controller'] = preg_replace("/[^A-Za-z0-9_]/", null, $params['controller']); // strip of the dirt
     $controllerClass = 'Controller_' . str_replace(' ', '_', ucwords(str_replace('/', ' ', Madeam_Inflector::camelize($params['controller']))));
-        
+
     try {
       // create controller instance
       $controller = new $controllerClass($params);
-    } catch (Madeam_Exception $e) {      
+    } catch (Madeam_Exception $e) {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
         $controller = new Controller_App($params);
       } else {
@@ -96,46 +97,46 @@ class Madeam {
         // we gotta get outa here if we can't find an error controller to handle the error.
         if ($params['controller'] == $config['error_controller']) {
           if (MADEAM_ENABLE_DEBUG === true) {
-            exit('Missing Controller <b>' . $controllerClass . '</b>'); 
+            exit('Missing Controller <b>' . $controllerClass . '</b>');
           } else {
             header(' ', '', 404);
             exit();
           }
         }
         */
-        
-        // no controller found = critical error. 
+
+        // no controller found = critical error.
         $e->setMessage('Missing Controller <b>' . $controllerClass . '</b>');
         Madeam_Error::catchException($e, Madeam_Error::ERR_NOT_FOUND);
       }
     }
-    
+
     try {
       // before action callback
       $controller->callback('beforeAction');
-      
+
       // call action
       if ($params['action'] != 'callback') {
         $controller->{Madeam_Inflector::camelize($params['action'])}();
       } else {
         throw new Madeam_Exception('You cannot call an action "callback".');
       }
-      
+
       // after action callback
       $controller->callback('beforeRender');
-      
+
       // render
       $controller->callback('render');
-      
+
       // after render callback
       $controller->callback('afterRender');
-      
+
       // return output
       return $controller->output;
     } catch (Madeam_Exception $e) {
       Madeam_Error::catchException($e, Madeam_Error::ERR_NOT_FOUND);
     }
-      
+
   }
 
   /**
@@ -152,16 +153,16 @@ class Madeam {
       Madeam_Logger::log('Tried redirecting when headers already sent. (Check for echos before script redirects)');
     }
   }
-  
+
   /**
    * Enter description here...
    *
    * @param unknown_type $var
    */
   public static function debug($var) {
-    
+
   }
-  
+
   /**
    * Enter description here...
    *
@@ -169,13 +170,13 @@ class Madeam {
    * @return unknown
    */
   public static function url($url) {
-    if (substr($url, 0, 1) != "#") { 
+    if (substr($url, 0, 1) != "#") {
       if (substr($url, 0, 1) == '/') {
         $url = PATH_TO_REL . substr($url, 1, strlen($url));
       } elseif (!preg_match('/^[a-z]+:/', $url, $matchs)) {
         $url == "#" ? $url = "#" : $url = PATH_TO_URI . $url;
       }
-    }    
+    }
     return $url;
   }
 }

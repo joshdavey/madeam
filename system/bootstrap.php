@@ -41,7 +41,7 @@ define('MADEAM_ENABLE_DEBUG',       $config['enable_debug']);
 define('MADEAM_ENABLE_CACHE',       $config['enable_cache']);
 define('MADAEM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
 
-// set PATH_TO_URI based on whether mod_rewrite is turned on or off. 
+// set PATH_TO_URI based on whether mod_rewrite is turned on or off.
 // If it's off then we need to add the SCRIPT_FILENAME at the end.
 if (isset($_GET['uri'])) {
   $public_dir = basename(PATH_TO_PUBLIC);
@@ -93,10 +93,10 @@ function Madeam_Autoload($class) {
 
   // set class file name
   $file = str_replace('_', DS, $class) . '.php';
-  
+
   // include class file
   if (file_lives($file)) { require $file; }
-  
+
   if (!class_exists($class, false) && !interface_exists($class, false)) {
     eval("class $class {}");
 	  throw new Madeam_Exception('Missing Class ' . $class, Madeam_Exception::ERR_CLASS_MISSING);
@@ -120,13 +120,13 @@ spl_autoload_register('Madeam_Autoload');
  */
 function file_lives($file) {
   $paths = explode(PATH_SEPARATOR, get_include_path());
-  
+
   foreach ($paths as $path) {
     if (is_file($path . $file)) {
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -146,7 +146,7 @@ unset($config);
 if (!Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', -1)) {
   // include routes configuration
   require PATH_TO_APP . 'Config' . DS . 'routes.php';
-  
+
   // save routes to cache
   Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
 }
@@ -159,7 +159,7 @@ if (!Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', -1)) {
  */
 function Madeam_uncaughtException($e) {
   echo 'Uncaught Exception: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile();
-  
+
   return true;
 }
 
@@ -177,13 +177,13 @@ set_exception_handler('Madeam_uncaughtException');
  * @param unknown_type $line
  */
 function Madeam_errorHandler($code, $string, $file, $line) {
-  $exception = new Madeam_Exception($string, $code);  
+  $exception = new Madeam_Exception($string, $code);
   $exception->setLine($line);
   $exception->setFile($file);
   throw $exception;
-  
+
   return true;
-} 
+}
 
 /**
  * Set error handler
@@ -201,7 +201,7 @@ set_error_handler('Madeam_errorHandler');
 function test($var = null) {
 	static $tests;
 	$tests++;
-	
+
 	for($i = 0; $i < (6 - strlen($tests)); $i++) { $tests = '0' . $tests; }
 
 	if (is_array($var) || is_object($var)) {
