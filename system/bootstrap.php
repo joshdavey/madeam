@@ -98,6 +98,7 @@ function Madeam_Autoload($class) {
   if (file_lives($file)) { require $file; }
 
   if (!class_exists($class, false) && !interface_exists($class, false)) {
+    $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
     eval("class $class {}");
 	  throw new Madeam_Exception('Missing Class ' . $class, Madeam_Exception::ERR_CLASS_MISSING);
   }
