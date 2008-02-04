@@ -14,11 +14,11 @@
  */
 class Madeam_Controller {
 	public    $output      = null;
-  
+
   protected $scaffold     = false;
-  protected $layout       = 'master';  
+  protected $layout       = 'master';
   protected $represent    = false;
-  
+
   protected $actionView;
   protected $isRendered   = false;
   protected $viewParser;
@@ -141,7 +141,7 @@ class Madeam_Controller {
 
   /**
    * This takes the full path to the view.
-   * 
+   *
    * For example: "posts/show" and not "show"
    *
    * @param string $view
@@ -190,7 +190,7 @@ class Madeam_Controller {
   final protected function render($data = true, $rendered = true) {
     // sometimes the developer may want to tell the view not to render from the controller's action
     if ($data === false) { $this->isRendered = true; }
-    
+
     // consider: checking if it's rendered based on if there is anything in the output buffer? does that make sense?
     if ($this->isRendered === false) {
       // output buffering
@@ -198,7 +198,7 @@ class Madeam_Controller {
 
       foreach($this as $key => $value) { $$key = $value; }
       //extract($this->data, EXTR_OVERWRITE); // which one is faster?
-      
+
 
       if ($data === true) {
         // include view's template file
@@ -207,7 +207,7 @@ class Madeam_Controller {
         } else {
           throw new Madeam_Exception('Missing View <b>' . substr($this->viewFile, strlen(PATH_TO_VIEW)) . '</b>', Madeam_Exception::ERR_VIEW_MISSING);
         }
-        
+
 				/*
 				$parser = $this->format;
 				if (method_exists('madeamParser', $parser)) {
@@ -216,7 +216,7 @@ class Madeam_Controller {
 					madeamParser::$parser($this->viewFile, $this->data);
 				}
 				*/
-				
+
         // grab result of inclusion
         $content_for_layout = ob_get_contents();
         // clear output
@@ -261,7 +261,7 @@ class Madeam_Controller {
       $this->isRendered = $rendered;
 
       $this->output = $content_for_layout;
-      
+
       return $this->output;
     }
 
@@ -303,7 +303,7 @@ class Madeam_Controller {
   /* come up with a better naming convention for these methods */
   protected function beforeAction() {
   }
-  
+
   protected function beforeRender() {
   }
 

@@ -14,42 +14,40 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class help_html {
+class Help_Html {
 
   public static function link($label, $link = null, $_params = array()) {
     $params = array();
-    $params['href'] = self::url($link);
-    $params['id'] = madeam_inflector::underscorize(low($label)) . '_link';
-    
+    $params['href'] = Madeam::url($link);
+    $params['id'] = Madeam_Inflector::underscorize(low($label)) . '_link';
+
     $params = array_merge($params, $_params);
-    
+
     return self::wrappingTag('a', $label, $params);
   }
 
-  public static function img($src, $width = false, $height = false, $_params = array()) {
+  public static function img($src, $_params = array()) {
     $params = array();
-    $params['alt'] = madeam_inflector::underscorize($src);
-    $params['src'] = self::url($src);
-	
-		if ($width !== false) { $params['width'] 	= $width; }
-		if ($height !== false) { $params['height'] = $height; }
-    
+    $params['alt'] = Madeam_Inflector::underscorize($src);
+    $params['src'] = Madeam::url($src);
+
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('img', $params);
   }
-  
+
   public static function imgr($src, $toWidth = false, $toHeight = false, $_params = array()) {
     $params = array();
-    $params['alt'] = madeam_inflector::underscorize($src);
-    $params['src'] = self::url($src);
-		
+    $params['alt'] = Madeam_Inflector::underscorize($src);
+    $params['src'] = Madeam::url($src);
+
 		if ($toWidth !== false || $toHeight !== false) {
-			list($width, $height) = getimagesize(PUB_PATH . $src);
-    
+			list($width, $height) = getimagesize(PATH_TO_PUBLIC . $src);
+
 			$xscale = $width/$toWidth;
 			$yscale = $height/$toHeight;
-			
+
 			if ($yscale>$xscale) {
 				$new_width  = round($width * (1/$yscale));
 				$new_height = round($height * (1/$yscale));
@@ -57,26 +55,26 @@ class help_html {
 				$new_width  = round($width * (1/$xscale));
 				$new_height = round($height * (1/$xscale));
 			}
-			
+
 			$params['width'] 	= $new_width;
 			$params['height'] = $new_height;
 		}
-    
+
     $params = array_merge($params, $_params);
-    
+
     return self::tag('img', $params);
   }
 
 
   public static function css($src, $_params = array()) {
-    return '<link rel="stylesheet" href="' . self::url($src) . '.css" type="text/css" media="screen" />';
+    return '<link rel="stylesheet" href="' . Madeam::url($src) . '.css" type="text/css" media="screen" />';
   }
 
   public static function js($src, $_params = array()) {
-    return '<script src="' . self::url($src) . '.js" type="text/javascript"></script>';
+    return '<script src="' . Madeam::url($src) . '.js" type="text/javascript"></script>';
   }
-	
-	
+
+
 	/**
 	 * This method returns URLs that can be either relative or absolute.
 	 * If the url starts with "http://" or "https://" or any other protocol then the url is left as is.
@@ -84,18 +82,18 @@ class help_html {
 	 * If the url starts with none of the above we assume it's poitning to a resource like a controller
 	 */
 	public static function url($url) {
-	  
-	  if (substr($url, 0, 1) != "#") { 
+
+	  if (substr($url, 0, 1) != "#") {
       if (substr($url, 0, 1) == '/') {
         $url = REL_PATH . substr($url, 1, strlen($url));
       } elseif (!preg_match('/[a-z]+:/', $url, $matchs)) {
   			$url == "#" ? $url = "#" : $url = URI_PATH . $url;
   		}
 	  }
-		
+
     return $url;
   }
-  
+
 
   /**
    * Protected functions.
@@ -152,6 +150,6 @@ class help_html {
     }
     return implode(' ', $html);
   }
-	
+
 }
 ?>

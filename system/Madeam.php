@@ -92,7 +92,7 @@ class Madeam {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
         $controller = new Controller_App($params);
       } else {
-        /*
+/*
         // I really don't like this code... Can we put it in the Madeam_Error calss?
         // we gotta get outa here if we can't find an error controller to handle the error.
         if ($params['controller'] == $config['error_controller']) {
@@ -103,7 +103,7 @@ class Madeam {
             exit();
           }
         }
-        */
+*/
 
         // no controller found = critical error.
         $e->setMessage('Missing Controller <b>' . $controllerClass . '</b>');
@@ -119,7 +119,7 @@ class Madeam {
       if ($params['action'] != 'callback') {
         $controller->{Madeam_Inflector::camelize($params['action'])}();
       } else {
-        throw new Madeam_Exception('You cannot call an action "callback".');
+        throw new Madeam_Exception('You cannot call the action "callback".');
       }
 
       // after action callback
