@@ -163,7 +163,6 @@ class Madeam_Inflector {
 	}
 
 	public static function model_classize($string) {
-	  $string[0] = low($string[0]);
 	  return 'Model_' . self::camelize(self::singalize($string));
 	}
 

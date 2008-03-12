@@ -23,7 +23,9 @@ class Madeam_Logger {
     // append log to end of file
 		if (defined(PATH_TO_LOG)) { define('PATH_TO_LOG', '../log'); }
 		//test($message);
-    file_put_contents(PATH_TO_LOG . date($config['log_file_name']) . '.txt', $message . "\n", FILE_APPEND | LOCK_EX);
+		if (MADEAM_ENABLE_LOGGER === true) {
+      file_put_contents(PATH_TO_LOG . date($config['log_file_name']) . '.txt', $message . "\n", FILE_APPEND | LOCK_EX);
+		}
 
     if ($lvl < 25 && MADEAM_ENABLE_DEBUG === true) {
       self::show();

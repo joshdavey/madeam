@@ -39,6 +39,7 @@ unset($cfg, $env);
 define('MADAEM_ENVIRONMENT',        $config['environment']);
 define('MADEAM_ENABLE_DEBUG',       $config['enable_debug']);
 define('MADEAM_ENABLE_CACHE',       $config['enable_cache']);
+define('MADEAM_ENABLE_LOGGER',      $config['enable_logger']);
 define('MADAEM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
@@ -52,6 +53,7 @@ if (isset($_GET['uri'])) {
 
 // determine the relative path to the public directory
 define('PATH_TO_REL', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))));
+
 
 // major madeam directories
 if (!defined('PATH_TO_SYSTEM')) { define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS); }

@@ -14,13 +14,13 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class help_form extends help_html {
+class Help_Form extends Help_Html {
 
 	public static function open_post($name, $action = null, $_params = array()) {
 		$params = array();
 
     $params['id']     = 'form_' . low($name);
-    $params['action'] = self::url($action);
+    $params['action'] = Madeam::url($action);
     $params['method'] = 'post';
 
     $params = array_merge($params, $_params);
@@ -32,7 +32,7 @@ class help_form extends help_html {
 		$params = array();
 
     $params['id']     = 'form_' . low($name);
-    $params['action'] = self::url($action);
+    $params['action'] = Madeam::url($action);
     $params['method'] = 'get';
 
     $params = array_merge($params, $_params);
@@ -44,7 +44,7 @@ class help_form extends help_html {
 		$params = array();
 
     $params['id']     	= 'form_' . low($name);
-    $params['action'] 	= self::url($action);
+    $params['action'] 	= Madeam::url($action);
     $params['method'] 	= 'post';
 		$params['enctype']	= 'multipart/form-data';
 
@@ -322,7 +322,7 @@ class help_form extends help_html {
     $output = null;
 
     // create model instance
-    $modelname = madeam_inflector::model_classize($model);
+    $modelname = Madeam_Inflector::model_classize($model);
     $inst = new $modelname(1);
 
     // get fields
@@ -345,7 +345,7 @@ class help_form extends help_html {
       if ($settings['label']) {
         $field_label    = $settings['label'];
       } else {
-        $field_label    = madeam_inflector::sentencize($field_name);
+        $field_label    = Madeam_Inflector::sentencize($field_name);
       }
 
       // field parameters
@@ -430,7 +430,14 @@ class help_form extends help_html {
 		// get root of value
     $value = $_POST;
 
-    foreach($nodes as $node) { $value = @$value[$node]; }
+    foreach($nodes as $node) {
+      if (isset($value[$node])) {
+        $value = $value[$node];
+      } else {
+        $value = null;
+        break;
+      }
+    }
 
 		// if the value is empty then set it to the $setValue
     if (empty($value)) { $value = $setValue; }

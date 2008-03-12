@@ -80,14 +80,14 @@ class Madeam_Model {
     // the cache should be infinite if cache is enabled
     $this->cacheName .= $modelname . '.setup';
     if (!$this->setup = Madeam_Cache::read($this->cacheName, -1)) {
-      $this->setup['has_many']                 = array();
-      $this->setup['has_one']                  = array();
-      $this->setup['belongs_to']               = array();
-      $this->setup['has_and_belongs_to_many']  = array();
-      $this->setup['has_models']               = array(); // why is it called has_models? Change this please. Relationships maybe?
-      $this->setup['custom_fields']            = array(); // custom fields defined in model
-	    $this->setup['standard_fields']          = array(); // default fields in the database or file system
-	    $this->setup['validators']               = array();
+      $this->setup['hasMany']              = array();
+      $this->setup['hasOne']               = array();
+      $this->setup['belongsTo']            = array();
+      $this->setup['hasAndBelongsToMany']  = array();
+      $this->setup['hasModels']            = array(); // why is it called has_models? Change this please. Relationships maybe?
+      $this->setup['custom_fields']        = array(); // custom fields defined in model
+	    $this->setup['standard_fields']      = array(); // default fields in the database or file system
+	    $this->setup['validators']           = array();
 
 	    // set resourceName
       if ($this->resourceName == null) {
@@ -131,9 +131,9 @@ class Madeam_Model {
   public function __get($name) {
     // catch set_ method call
     $match = array();
-    if (preg_match("/^[A-Z]{1}/", $name, $match) && in_array($name, array_keys($this->setup['has_models']))) {
+    if (preg_match("/^[A-Z]{1}/", $name, $match) && in_array($name, array_keys($this->setup['hasModels']))) {
 
-      $model = $this->setup['has_models'][$name]['model'];
+      $model = $this->setup['hasModels'][$name]['model'];
 
       // set model class name
       $model_class = Madeam_Inflector::model_classize($model);
@@ -245,89 +245,90 @@ class Madeam_Model {
     foreach ($this->reflectionObj->getProperties() as $prop) {
 			// ignore private properties so we don't need to parse every single variable
 			if ($prop->isPublic() || $prop->isProtected()) {
-				if (preg_match("/^(has_many|has_one|belongs_to|has_and_belongs_to_many)_(.+)/", $prop->name, $found)) {
+				if (preg_match("/^(hasMany|hasOne|belongsTo|hasAndBelongsToMany)_(.+)/", $prop->name, $found)) {
 					$relationship = $found[1];
 					$model        = $found[2];
 					$params       = (array) $prop->getValue($this);
 
-					$this->{'add_' . $relationship}($model, $params);
+					$this->{'add' . ucfirst($relationship)}($model, $params);
 				}
 			}
     }
 
     // merge models
     // and add itself to the list of models
-    $this->setup['has_models'] = array_merge($this->setup['has_one'], $this->setup['has_many'], $this->setup['has_and_belongs_to_many'], $this->setup['belongs_to'], array($this->name => array('model' => $this->name)));
+    $this->setup['hasModels'] = array_merge($this->setup['hasOne'], $this->setup['hasMany'], $this->setup['hasAndBelongsToMany'], $this->setup['belongsTo'], array($this->name => array('model' => $this->name)));
   }
 
   final protected function addHasAndBelongsToMany($model, $params) {
     // set the model name
-    @$params['model'] == null ? $params['model'] = Madeam_Inflector::model_nameize($model) : $params['model'] = Madeam_Inflector::model_nameize($params['model']);
+    !isset($params['model']) ? $params['model'] = Madeam_Inflector::model_nameize($model) : $params['model'] = Madeam_Inflector::model_nameize($params['model']);
 
     // set name of field that identifies the foreign record
-    @$params['foreign_key'] == null ? $params['foreign_key'] = Madeam_Inflector::model_foreign_key($this->name) : false;
+    !isset($params['foreignKey']) ? $params['foreignKey'] = Madeam_Inflector::model_foreign_key($this->name) : false;
 
     // set associate's foreign key
-    @$params['associate_foreign_key'] == null ? $params['associate_foreign_key'] = Madeam_Inflector::model_foreign_key($model) : false;
+    !isset($params['associateForeignKey']) ? $params['associateForeignKey'] = Madeam_Inflector::model_foreign_key($model) : false;
 
     // set join model (table in the database that houses both foreign keys)
-    @$params['join_model'] == null ? $params['join_model'] = Madeam_Inflector::model_habtm($model, $this->name) : false;
+    !isset($params['joinModel']) ? $params['joinModel'] = Madeam_Inflector::model_habtm($model, $this->name) : false;
 
     // set primary key
-    @$params['primaryKey'] == null ? $params['primaryKey'] = $this->primaryKey : false;
+    !isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
 
     // set uniqueness
     isset($params['unique']) ? true : $params['unique'] = true;
 
-    $this->setup['has_and_belongs_to_many'][Madeam_Inflector::model_nameize($model)] = $params;
+    $this->setup['hasAndBelongsToMany'][Madeam_Inflector::model_nameize($model)] = $params;
   }
 
   final protected function addHasOne($model, $params) {
     // set name of field that identifies the foreign record
-    @$params['foreign_key'] == null ? $params['foreign_key'] = Madeam_Inflector::model_foreign_key($model) : false;
+    !isset($params['foreignKey']) ? $params['foreignKey'] = Madeam_Inflector::model_foreign_key($model) : false;
 
     // set the model name
-    @$params['model'] == null ? $params['model'] = Madeam_Inflector::model_nameize($model) : $params['model'] = Madeam_Inflector::model_nameize($params['model']);
+    !isset($params['model']) ? $params['model'] = Madeam_Inflector::model_nameize($model) : $params['model'] = Madeam_Inflector::model_nameize($params['model']);
 
     // set primary key
-    @$params['primaryKey'] == null ? $params['primaryKey'] = $this->primaryKey : false;
+    !isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
 
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
 
-    $this->setup['has_one'][Madeam_Inflector::model_nameize($model)] = $params;
+    $this->setup['hasOne'][Madeam_Inflector::model_nameize($model)] = $params;
   }
 
   final protected function addHasMany($model, $params) {
     // set name of field that identifies the foreign record
-    @$params['foreign_key'] == null ? $params['foreign_key'] = Madeam_Inflector::model_foreign_key($this->name) : false;
+    !isset($params['foreignKey']) ? $params['foreignKey'] = Madeam_Inflector::model_foreign_key($this->name) : false;
 
     // set the model name
-    @$params['model'] == null ? $params['model'] = Madeam_Inflector::model_nameize($model) : $params['model'] = Madeam_Inflector::model_nameize($params['model']);
+    !isset($params['model']) ? $params['model'] = Madeam_Inflector::model_nameize($model) : $params['model'] = Madeam_Inflector::model_nameize($params['model']);
 
     // set primary key
-    @$params['primaryKey'] == null ? $params['primaryKey'] = $this->primaryKey : false;
+    !isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
 
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     //t($params);
-    $this->setup['has_many'][Madeam_Inflector::model_nameize($model)] = $params;
+    $this->setup['hasMany'][Madeam_Inflector::model_nameize($model)] = $params;
   }
 
   final protected function addBelongsTo($model, $params) {
     // set name of field that identifies the foreign record
-    @$params['foreign_key'] == null ? $params['foreign_key'] = Madeam_Inflector::model_foreign_key($model) : false;
+    !isset($params['foreignKey']) ? $params['foreignKey'] = Madeam_Inflector::model_foreign_key($model) : false;
 
     // set the model name
-    @$params['model'] == null ? $params['model'] = Madeam_Inflector::model_nameize($model) : $params['model'] = Madeam_Inflector::model_nameize($params['model']);
+
+    !isset($params['model']) ? $params['model'] = Madeam_Inflector::model_nameize($model) : $params['model'] = Madeam_Inflector::model_nameize($params['model']);
 
     // set primary key
-    @$params['primaryKey'] == null ? $params['primaryKey'] = $this->primaryKey : false;
+    !isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
 
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
 
-    $this->setup['belongs_to'][Madeam_Inflector::model_nameize($model)] = $params;
+    $this->setup['belongsTo'][Madeam_Inflector::model_nameize($model)] = $params;
   }
 
   /**
@@ -347,10 +348,10 @@ class Madeam_Model {
       $method   = 'validate' . $validator['method'];
 
       $error_key = $this->name . MODEL_JOINT . $field;
-      
+
       // testing new Validation class
       test('Valid? ' . Madeam_Validate::$method($this->entry[$field], $args));
-        
+
 
       // validate to make sure the validating method doesn't return false. If it does then save the error
       if ($check_non_existent_fields === false || isset($this->entry[$field])) {
@@ -457,7 +458,7 @@ class Madeam_Model {
 
   final public function unbindAll() {
 		$exceptions = array();
-		$unbound 		= array_keys($this->setup['has_models']);
+		$unbound 		= array_keys($this->setup['hasModels']);
 
 		if (func_num_args() > 0) {
 			foreach (func_get_args() as $model) {

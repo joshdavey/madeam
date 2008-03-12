@@ -19,7 +19,7 @@ class Help_Html {
   public static function link($label, $link = null, $_params = array()) {
     $params = array();
     $params['href'] = Madeam::url($link);
-    $params['id'] = Madeam_Inflector::underscorize(low($label)) . '_link';
+    $params['id'] = Madeam_Inflector::underscorize(low(strip_tags($label))) . '_link';
 
     $params = array_merge($params, $_params);
 

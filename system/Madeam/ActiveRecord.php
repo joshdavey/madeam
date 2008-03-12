@@ -55,7 +55,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $this->where($match[2] . " = '$args[0]'");
       $this->delete();
     }*/
-    
+
     return false;
   }
 
@@ -118,7 +118,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 	final public function query($sql, $returnAs = 'object') {
 	  // execute query
 		$this->link =	$this->execute($sql);
-		
+
 		// fetch method
 		if ($returnAs == 'object') {
 		  $fetchMethod = 'mysql_fetch_object';
@@ -173,8 +173,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // $this->article->findOne(32, true)->comment->findAll();
     // where article is the parent of comment
     if ($this->parent && $this->_sqlWhere == '1') {
-      $this->where($this->parent->setup['has_models'][$this->name]['foreign_key'] . " = '" . $this->parent->entry[$this->parent->setup['has_models'][$this->name]['primaryKey']] . "'");
-      //$this->where($this->parent->setup['has_models'][$this->name]['foreign_key'] . " = '" . $this->parent->setup['has_models'][$this->name]['primaryKey'] . "'");
+      $this->where($this->parent->setup['hasModels'][$this->name]['foreignKey'] . " = '" . $this->parent->entry->{$this->parent->setup['hasModels'][$this->name]['primaryKey']} . "'");
+      //$this->where($this->parent->setup['hasModels'][$this->name]['foreignKey'] . " = '" . $this->parent->setup['hasModels'][$this->name]['primaryKey'] . "'");
     }
 
     // build select query and set resource link
@@ -189,8 +189,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
         // find related content
         if ($this->depth > 0) {
           // find has_ones
-          foreach ($this->setup['has_one'] as $model => $params) {
-            $fkey = $params['foreign_key'];
+          foreach ($this->setup['hasOne'] as $model => $params) {
+            $fkey = $params['foreignKey'];
             if (!in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->_sqlJoins))) {
               // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
               // clone object so we don't interupt it's state with reset()
@@ -198,14 +198,14 @@ class Madeam_ActiveRecord extends Madeam_Model {
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
 
-              $this->entry[$params['foreign_key']] = $tempmodel->findOne($this->entry[$fkey]);
+              $this->entry->$model = $tempmodel->findOne($this->entry->$fkey);
               unset($tempmodel);
             }
           }
 
           // find belongs_tos
-          foreach ($this->setup['belongs_to'] as $model => $params) {
-            $fkey = $params['foreign_key'];
+          foreach ($this->setup['belongsTo'] as $model => $params) {
+            $fkey = $params['foreignKey'];
             if (!in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->_sqlJoins))) {
               // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
               // clone object so we don't interupt it's state with reset()
@@ -215,31 +215,31 @@ class Madeam_ActiveRecord extends Madeam_Model {
               // An example of this is when you create a self-refrencing relationship in a table and name the relationship "sub_model" or "parent_model"
               $tempmodel->name = $model;
 
-              @$this->entry[$params['foreign_key']] = $tempmodel->findOne($this->entry[$fkey]);
+              $this->entry->$model = $tempmodel->findOne($this->entry->$fkey);
               unset($tempmodel);
             }
           }
 
           // find has_manies
-          foreach ($this->setup['has_many'] as $model => $params) {
+          foreach ($this->setup['hasMany'] as $model => $params) {
             // do not call if the user has not specified to call this data
             if (!in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->_sqlJoins))) {
               // clone object so we don't interupt it's state with reset()
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
 
-              $this->entry[Madeam_Inflector::model_tableize($model)] = $tempmodel->findAll();
+              $this->entry->{Madeam_Inflector::pluralize($model)} = $tempmodel->findAll();
               unset($tempmodel);
             }
           }
 
           // find has and belongs to manies
-          foreach ($this->setup['has_and_belongs_to_many'] as $model => $params) {
+          foreach ($this->setup['hasAndBelongsToMany'] as $model => $params) {
             if ((in_array($model,$this->fields) || empty($this->fields)) && !in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->_sqlJoins))) {
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
 
-              $this->entry[Madeam_Inflector::model_tableize($params['model'])] = $tempmodel
+              $this->entry->{Madeam_Inflector::model_tableize($params['model'])} = $tempmodel
                 ->join($this->name)
                 ->findAll();
 
@@ -487,7 +487,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
         // check for fields that are arrays
         foreach ($relations as $model => $value) {
           $model = Madeam_Inflector::model_nameize($model);
-          if (in_array($model, array_keys($this->setup['has_and_belongs_to_many']))) {
+          if (in_array($model, array_keys($this->setup['hasAndBelongsToMany']))) {
             $this->habtmAdd($model, $entryId, $value);
           } else {
             $this->$model->save($value);
@@ -976,17 +976,17 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $table = $this->setup['resource_name'];
 
     if ($on == false) {
-      if (in_array($model, array_keys($this->setup['has_and_belongs_to_many']))) {
+      if (in_array($model, array_keys($this->setup['hasAndBelongsToMany']))) {
 
-        $relation = $this->setup['has_and_belongs_to_many'][$model];
+        $relation = $this->setup['hasAndBelongsToMany'][$model];
 
         $on = "$table.$this->primaryKey = $relation[join_model].$relation[foreign_key]";
 
-        $this->_sqlJoins[$model] = array('table' => $relation['join_model'], 'on' => $on);
+        $this->_sqlJoins[$model] = array('table' => $relation['joinModel'], 'on' => $on);
 
-      } elseif (in_array($model, array_keys(array_merge($this->setup['has_one'], $this->setup['has_many'], $this->setup['belongs_to'])))) {
+      } elseif (in_array($model, array_keys(array_merge($this->setup['hasOne'], $this->setup['hasMany'], $this->setup['belongsTo'])))) {
 
-        $fk = $this->setup['has_models'][$model]['foreign_key'];
+        $fk = $this->setup['hasModels'][$model]['foreignKey'];
 
         // I wish there was a better way to do this...
         // make the user type in more info?
@@ -1034,7 +1034,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // $this->article->comment->depth(2)->fields('id', 'title');
     // $article = $this->article->findOne(32);
     // which will return an article with all of it's comments defined by it's sql modifiers like depth() and fields() and others
-    foreach ($this->setup['has_models'] as $model => $info) {
+    foreach ($this->setup['hasModels'] as $model => $info) {
       if (isset($this->$model)) {
         $this->$model->reset();
       }
@@ -1148,17 +1148,17 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // parse connection string as url
     $parsed_string = parse_url($string);
-  
+
     isset($parsed_string['scheme']) ? $details['driver']  = $parsed_string['scheme']  : $details['driver'] = null;
     isset($parsed_string['host'])   ? $details['host']    = $parsed_string['host']    : $details['host']   = null;
     isset($parsed_string['user'])   ? $details['user']    = $parsed_string['user']    : $details['user']   = null;
     isset($parsed_string['pass'])   ? $details['pass']    = $parsed_string['pass']    : $details['pass']   = null;
-  
+
     parse_str($parsed_string['query'], $options);
-  
+
     isset($options['name']) ? $details['name'] = $options['name'] : $details['name'] = null;
     isset($options['port']) ? $details['port'] = $options['port'] : $details['port'] = false;
-  
+
     return $details;
   }
 

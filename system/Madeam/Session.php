@@ -52,13 +52,17 @@ class Madeam_Session {
   public static function error($name, $msg) {
     $_SESSION[USER_ERROR_NAME][$name][] = $msg;
   }
-  
+
   public static function set($name, $value) {
     $_SESSION[$name] = $value;
   }
-  
+
   public static function get($name) {
-    return $_SESSION[$name];
+    if (isset($_SESSION[$name])) {
+        return $_SESSION[$name];
+    } else {
+      return false;
+    }
   }
 }
 ?>

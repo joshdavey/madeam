@@ -170,11 +170,13 @@ class Madeam {
    * @return unknown
    */
   public static function url($url) {
+    if ($url == null || $url == '/') { return PATH_TO_URI; }
+
     if (substr($url, 0, 1) != "#") {
       if (substr($url, 0, 1) == '/') {
         $url = PATH_TO_REL . substr($url, 1, strlen($url));
       } elseif (!preg_match('/^[a-z]+:/', $url, $matchs)) {
-        $url == "#" ? $url = "#" : $url = PATH_TO_URI . $url;
+        $url = PATH_TO_URI . $url;
       }
     }
     return $url;

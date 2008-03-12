@@ -26,6 +26,11 @@ class Madeam_Cache {
 	 * @return unknown
 	 */
 	public static function read($id, $life_time = 0) {
+
+	  // prefix id with environment name
+	  // the id is prefixed so that caches for one environment don't overlap another
+	  $id = MADAEM_ENVIRONMENT . '.' . $id;
+
 	  // check registry first
 	  if (Madeam_Registry::exists($id)) {
 	    return Madeam_Registry::get($id);
@@ -58,6 +63,11 @@ class Madeam_Cache {
 	 * @return unknown
 	 */
 	public static function save($id, $value, $store_in_registry = false) {
+
+	  // prefix id with environment name
+	  // the id is prefixed so that caches for one environment don't overlap another
+	  $id = MADAEM_ENVIRONMENT . '.' . $id;
+
 	  // store in registry
 		if ($store_in_registry === true) {
 		  Madeam_Registry::set($id, $value);
@@ -82,6 +92,11 @@ class Madeam_Cache {
 	 * @return unknown
 	 */
 	public static function start($id, $life_time = 0) {
+
+	  // prefix id with environment name
+	  // the id is prefixed so that caches for one environment don't overlap another
+	  $id = MADAEM_ENVIRONMENT . '.' . $id;
+
 		// check to see if cache is disabled
 		if (MADEAM_ENABLE_CACHE === false) { return false; }
 
@@ -117,6 +132,11 @@ class Madeam_Cache {
    * @param unknown_type $id
    */
 	public static function clear($id) {
+
+	  // prefix id with environment name
+	  // the id is prefixed so that caches for one environment don't overlap another
+	  $id = MADAEM_ENVIRONMENT . '.' . $id;
+
 	  // set file name
 		$file = PATH_TO_TMP . self::$dir . DS . md5($id);
 
@@ -132,6 +152,10 @@ class Madeam_Cache {
 	 * @return boolean
 	 */
 	public static function check($id) {
+
+	  // prefix id with environment name
+	  // the id is prefixed so that caches for one environment don't overlap another
+	  $id = MADAEM_ENVIRONMENT . '.' . $id;
 
 	  // check registry first
 	  if (Madeam_Registry::get($id)) { return true; }
