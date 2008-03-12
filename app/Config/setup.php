@@ -4,41 +4,48 @@
  */
 $cfg['environment'] = 'development';
 
-  
+
 /**
  * Setup Environments
- * 
- * The following variables are specific to the environment setup. For example you wouldn't 
+ *
+ * The following variables are specific to the environment setup. For example you wouldn't
  * want debug messages to appear in your production environment. Consider this when adding
  * your own configuration variables
- * 
+ *
  * [data_servers]
  * You can add as many data servers as you'd like to distribute load.
  *  driver://username:password@host?name=application&port=0000
- * 
+ *
  * [enable_cache]
  * If the cache is disabled then nothing will be cached. This is useful for debugging purposes.
  *  true:   cache is enabled
  *  false:  cache is disabled
- * 
+ *
  * [enable_debug]
  * When debugging is enabled debug messages will be displayed. For a development setup this is
  * perfect but you'll want to turn this off for production.
  *  true:   debug messages are displayed
  *  false:  no debug messages are shown. Recommended for production
+ *
+ * [enable_logger]
+ * Sometimes you may want to disable this to improve speed.
+ *  true:   logging is turned on
+ *  false:  logging is turned off
  */
 
 // development
   $env['development']['data_servers'][]  = 'mysql://root:@localhost?name=madeam';
   $env['development']['enable_cache']    = true;
   $env['development']['enable_debug']    = true;
+  $env['development']['enable_logger']   = true;
 
 // production
   $env['production']['data_servers'][]   = 'mysql://root:password@localhost?name=madeam';
   $env['production']['enable_cache']     = true;
   $env['production']['enable_debug']     = false;
+  $env['production']['enable_logger']    = true;
 
-  
+
 /**
  * This is the default controller called by the framework. This does NOT support
  * the format "sub/index". Its recommended that you leave this alone unless you really
@@ -60,9 +67,9 @@ $cfg['default_action']     = 'index';
 $cfg['default_format']     = 'html';
 
 /**
- * This is the name of the log files. You can use the date formats from http://ca3.php.net/date 
- * to custome the names and the accuracy of the logs. For example by default it's set to 'Y-m' 
- * which is the year and month but if you want to log it every day you could do 'Y-m-d'. 
+ * This is the name of the log files. You can use the date formats from http://ca3.php.net/date
+ * to custome the names and the accuracy of the logs. For example by default it's set to 'Y-m'
+ * which is the year and month but if you want to log it every day you could do 'Y-m-d'.
  * Obviously if you want to be really crazy you can even identify the logs by seconds.
  */
 $cfg['log_file_name']      = 'Y-m';
@@ -78,7 +85,7 @@ $cfg['enable_ajax_layout']  = false;
 
 
 /**
- * When madeam encounters a system error it calls an error controller to display the error. Here you can 
+ * When madeam encounters a system error it calls an error controller to display the error. Here you can
  * select which controller handles the errors by name.
  */
 $cfg['error_controller']    = 'error';
