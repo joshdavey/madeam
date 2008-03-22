@@ -73,7 +73,8 @@ class Madeam_Model {
     $modelname = get_class($this);
 
     // set name
-    $this->name = Madeam_Inflector::model_nameize(substr($modelname, 6)); // safely remove "Model" from the name
+    $this->name = Madeam_Inflector::model_nameize(substr($modelname, 6)); // safely remove "Model_" from the name
+
 
     // check cache for schema
     // if schema not cached get it from the database using describe()
