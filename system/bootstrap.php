@@ -180,6 +180,12 @@ set_exception_handler('Madeam_uncaughtException');
  * @param unknown_type $line
  */
 function Madeam_errorHandler($code, $string, $file, $line) {
+
+  // return regular PHP errors when they're non-fatal
+  if ($code == 2 || $code == 4 || $code == 8) {
+    return false;
+  }
+
   $exception = new Madeam_Exception($string, $code);
   $exception->setLine($line);
   $exception->setFile($file);
