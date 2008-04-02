@@ -40,7 +40,7 @@ class Madeam_Cache {
 		if (MADEAM_ENABLE_CACHE === false) { return false; }
 
 		// set file name
-		$file = PATH_TO_TMP . self::$dir . DS . md5($id);
+		$file = PATH_TO_TMP . self::$dir . DS . $id;
 
 		if (file_exists($file)) {
 			if ((time() - filemtime($file)) <= $life_time || $life_time == -1) {
@@ -78,7 +78,7 @@ class Madeam_Cache {
 		if (MADEAM_ENABLE_CACHE === false) { return false; }
 
 		// set file name
-		$file = PATH_TO_TMP . self::$dir . DS . md5($id);
+		$file = PATH_TO_TMP . self::$dir . DS . $id;
 
 		// save serialization to file
 		file_put_contents($file, serialize($value));
@@ -122,7 +122,8 @@ class Madeam_Cache {
 		$id = array_shift(self::$openCaches);
 		$cache = ob_get_contents();
 		self::save($id, $cache);
-		ob_clean();
+		//ob_clean();
+		ob_end_clean();
 		echo $cache;
 	}
 
@@ -138,7 +139,7 @@ class Madeam_Cache {
 	  $id = MADAEM_ENVIRONMENT . '.' . $id;
 
 	  // set file name
-		$file = PATH_TO_TMP . self::$dir . DS . md5($id);
+		$file = PATH_TO_TMP . self::$dir . DS . $id;
 
 		// save serialization to file
 		file_put_contents($file, null);
@@ -161,7 +162,7 @@ class Madeam_Cache {
 	  if (Madeam_Registry::get($id)) { return true; }
 
 	  // check file system cache
-		$file = PATH_TO_TMP . self::$dir . DS . md5($id);
+		$file = PATH_TO_TMP . self::$dir . DS . $id;
 		if (file_exists($file)) { return true; }
 
 		return false;
