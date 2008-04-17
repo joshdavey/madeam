@@ -431,7 +431,7 @@ class Madeam_Model {
     // I wish there was a faster way of doing this...
     foreach ($this->reflectionObj->getMethods() as $model_method) {
 			// make sure this method is either not a final method or is public so we don't need to parse every single method
-			if (!$model_method->isFinal() && $model_method->isPublic()) {
+			if (!$model_method->isFinal() && $model_method->isProtected()) {
 				// get method name
 				$model_method_name = $model_method->getName();
 				if (substr($model_method_name, 0, 1) != '_' && $parent_relf->hasMethod($model_method_name) == false) {
