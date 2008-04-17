@@ -346,7 +346,7 @@ class Madeam_Model {
   final protected function validateEntry($check_non_existent_fields = false) {
     foreach ($this->setup['validators'] as $validator) {
       $field    = $validator['args']['field'];
-      $method   = 'validate' . $validator['method'];
+      $method   = 'validate' . ucfirst($validator['method']);
 
       $error_key = $this->name . MODEL_JOINT . $field;
 
@@ -496,7 +496,7 @@ class Madeam_Model {
     return false;
   }
 
-  final protected function validateIsnotequal($v, $args) {
+  final protected function validateIsNotEqual($v, $args) {
     $not_values = $args['value'];
     if (is_array($not_values)) {
       if (!in_array($v, $not_values)) {
@@ -512,32 +512,32 @@ class Madeam_Model {
     }
   }
 
-  final protected function validateIsdatetime($v, $args) {
+  final protected function validateIsDatetime($v, $args) {
     return true;
   }
 
-  final protected function validateIsnotempty($v, $args) {
+  final protected function validateIsNotEmpty($v, $args) {
     if ($v == null) {
       return false;
     }
     return true;
   }
 
-  final protected function validateIsemail($v, $args) {
+  final protected function validateIsEmail($v, $args) {
     if (!preg_match('/^(([A-Za-z0-9]+_+)|([A-Za-z0-9]+\-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6}$/', $v)) {
       return false;
     }
     return true;
   }
 
-  final protected function validateIsexpression($v, $args) {
+  final protected function validateIsExpression($v, $args) {
     if (!preg_match($args['regexp'], $v)) {
       return false;
     }
     return true;
   }
 
-  final protected function validateIsisbn($v, $args) {
+  final protected function validateIsISBN($v, $args) {
     if (!preg_match('/^(97(8|9))?\d{9}(\d|X)$/', $v)) {
       return false;
     }
