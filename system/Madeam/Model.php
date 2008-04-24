@@ -351,7 +351,7 @@ class Madeam_Model {
       $error_key = $this->name . MODEL_JOINT . $field;
 
       // testing new Validation class
-      test('Valid? ' . Madeam_Validate::$method($this->entry[$field], $args));
+      //test('Valid? ' . Madeam_Validate::$method($this->entry[$field], $args));
 
 
       // validate to make sure the validating method doesn't return false. If it does then save the error

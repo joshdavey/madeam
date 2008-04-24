@@ -326,4 +326,13 @@ function rotate() {
 
   return $returned;
 }
+
+function modifedFilesExist() {
+  $path = PATH_TO_APP;
+  foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::KEY_AS_PATHNAME), RecursiveIteratorIterator::CHILD_FIRST) as $file => $info) {
+    echo $file . $info->getMTime()."<br />";
+  }
+}
+
+modifedFilesExist();
 ?>

@@ -13,44 +13,58 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Validate {
-  
+
   public static function isEmail($string) {
-    return false;
+    if (!preg_match('/^(([A-Za-z0-9]+_+)|([A-Za-z0-9]+\-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6}$/', $v)) {
+      return false;
+    }
+    return true;
   }
-  
+
   public static function isBetween($string, $maxLength, $minLength = 0) {
     return false;
   }
-  
+
   public static function isPattern($string, $regex) {
     return false;
   }
-  
+
   public static function isNotEmpty($string) {
     if ($string != null) { return true; }
     return false;
   }
-  
+
   public static function isDate($string) {
     return false;
   }
-  
-  public static function isISBN($string) {
+
+  public static function isDateTime($string) {
     return false;
   }
-  
+
+  public function isTime($string) {
+    return false;
+  }
+
+  public static function isISBN($string) {
+    if (!preg_match('/^(97(8|9))?\d{9}(\d|X)$/', $v)) {
+      return false;
+    }
+    return true;
+  }
+
   public static function isIP($string) {
     return false;
   }
-  
+
   public static function isPhone($string) {
     return false;
   }
-  
+
   public static function isUrl($string) {
     return false;
   }
-  
+
   public static function isNumber($string) {
     return false;
   }

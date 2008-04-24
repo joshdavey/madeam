@@ -18,8 +18,10 @@ $cfg['environment'] = 'development';
  *
  * [enable_cache]
  * If the cache is disabled then nothing will be cached. This is useful for debugging purposes.
- *  true:   cache is enabled
- *  false:  cache is disabled
+ *  0: disabled
+ *  1: cache disabled for routes and models
+ *  2: cache disabled for models
+ *  3: cache enabled for everything
  *
  * [enable_debug]
  * When debugging is enabled debug messages will be displayed. For a development setup this is
@@ -34,16 +36,20 @@ $cfg['environment'] = 'development';
  */
 
 // development
-  $env['development']['data_servers'][]  = 'mysql://root:@localhost?name=madeam';
-  $env['development']['enable_cache']    = true;
-  $env['development']['enable_debug']    = true;
-  $env['development']['enable_logger']   = true;
+  $env['development']['data_servers'][]     = 'mysql://root:@localhost?name=madeam';
+  $env['development']['enable_model_cache'] = 0;
+  $env['development']['enable_route_cache'] = 0;
+  $env['development']['enable_view_cache']  = 0;
+  $env['development']['enable_cache_clear'] = 1;
+
+  $env['development']['debug_level']        = 1;
+  $env['development']['enable_logger']      = 1;
 
 // production
   $env['production']['data_servers'][]   = 'mysql://root:password@localhost?name=madeam';
-  $env['production']['enable_cache']     = true;
-  $env['production']['enable_debug']     = false;
-  $env['production']['enable_logger']    = true;
+  $env['production']['cache_level']      = 1;
+  $env['production']['debug_level']      = 0;
+  $env['production']['enable_logger']    = 1;
 
 
 /**
