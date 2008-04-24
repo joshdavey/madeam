@@ -119,20 +119,12 @@ class Madeam_Controller {
       if (is_list($data)) {
         foreach ($data as $key => $$partial_name) {
           $_num++;
-          if (count($partial) > 0) {
-            include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->format);
-          } else {
-            include(PATH_TO_VIEW . str_replace('/', DS, $this->controller) . DS . '_' . implode($partial) . '.' . $this->format);
-          }
+          include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->format);
         }
       } else {
         $$partial_name = $data;
         $_num++;
-        if (count($partial) > 0) {
-          include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->format);
-        } else {
-          include(PATH_TO_VIEW . str_replace('/', DS, $this->controller) . DS . '_' . implode($partial) . '.' . $this->format);
-        }
+        include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->format);
       }
     }
 
@@ -175,18 +167,13 @@ class Madeam_Controller {
     }
   }
 
-  final protected function set($name, $value) {
-    $this->data[$name] = $value;
-
-    /*
-    $parser = "parser_' . $this->format;
-    if (class_exists($parser)) {
-    	if ($this->_parser == false) { $this->_parser = new $parser; }
-    	$this->_parser->set($name, $value);
-  	}
-  	*/
-  }
-
+  /**
+   * Enter description here...
+   *
+   * @param unknown_type $data
+   * @param unknown_type $rendered
+   * @return unknown
+   */
   final protected function render($data = true, $rendered = true) {
     // sometimes the developer may want to tell the view not to render from the controller's action
     if ($data === false) { $this->isRendered = true; }
