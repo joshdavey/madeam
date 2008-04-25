@@ -44,6 +44,8 @@ $cfg['environment'] = 'development';
 
   $env['development']['debug_level']        = 1;
   $env['development']['enable_logger']      = 1;
+  $env['development']['enable_cache']       = false;
+  $env['development']['enable_debug']       = 1;
 
 // production
   $env['production']['data_servers'][]   = 'mysql://root:password@localhost?name=madeam';

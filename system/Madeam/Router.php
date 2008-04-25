@@ -16,7 +16,7 @@
 class Madeam_Router {
   public static $routes           = array(); // regex, names, params -- damn these really need to be cached! (Store them in a text file?)
   public static $links            = array(); // a place to store the magic smart links
-  
+
   // do we really need this
   public static $actionMethodMap  = array(
     array('action' => 'index',  'method' => 'get',    'id' => false),
@@ -26,9 +26,9 @@ class Madeam_Router {
     array('action' => 'edit',   'method' => 'post',   'id' => false),
     array('action' => 'add',    'method' => 'post',   'id' => false)
   );
-  
+
   public static $resourceMap      = array(
-    
+
   );
 
   /**
@@ -40,7 +40,7 @@ class Madeam_Router {
    */
   public static function connect($route, $params = array()) {
     if (!is_array(self::$routes)) { self::$routes = array(); }
-    
+
     // root route - doesn't require parsing
     if ($route == '' || $route == '/') {
 			self::$routes[] = array('/^\/*$/', array(), $params);
@@ -73,7 +73,7 @@ class Madeam_Router {
       }
 
       // build route's regexp
-      $regexp = '/^' . implode('', $mini_exp) . '\/?([.]*)$/';
+      $regexp = '/^' . implode('', $mini_exp) . '\/?(.*)$/';
 
       // add to routes list
 		  self::$routes[] = array($regexp, $names, $params);
@@ -100,7 +100,7 @@ class Madeam_Router {
   public static function parseUri($uri = false) {
     // parse uri
     $parsed_uri = parse_url($uri);
-    
+
     // set uri
     if (isset($parsed_uri['path'])) {
       $extracted_path = explode(PATH_TO_URI, $parsed_uri['path'], 2);
@@ -111,14 +111,14 @@ class Madeam_Router {
 
     // set format
     $format = false;
-    $uri_anatomy = explode('.', $uri, 2);    
+    $uri_anatomy = explode('.', $uri, 2);
     if (count($uri_anatomy) > 1) {
       $format = array_pop($uri_anatomy);
       $uri = implode($uri_anatomy);
     } else {
       $uri = $uri_anatomy[0];
     }
-    
+
     // set get
     $get = array();
     if (isset($parsed_uri['query'])) {
@@ -164,29 +164,29 @@ class Madeam_Router {
       //readfile(ERROR_DIR . '404.html');
 			//test($uri);
       //exit();
-      
+
       throw new Madeam_Exception('Unable to find page');
-      
+
       // but what about returning the params if we throw an error?
-      
+
       return $params;
     }
 
     // get params from uri
     $params = array_merge($params, $gets);
-    
+
     // automagically disable the layout when making an AJAX call
     if (!MADAEM_ENABLE_AJAX_LAYOUT && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') { $params['layout'] = '0'; }
 
     $config = Madeam_Registry::get('config');
-    
+
     // set default values for controller and action
     !isset($params['controller']) || $params['controller'] == null ? $params['controller'] = $config['default_controller'] : false ;
     !isset($params['action']) || $params['action'] == null ? $params['action'] = $config['default_action'] : false ;
     !isset($params['layout']) || $params['layout'] == null ? $params['layout'] = '0' : false ;
     !isset($format) || $format == null ? $params['format'] = $config['default_format'] : $params['format'] = $format;
 
-    
+
     return $params;
   }
 
