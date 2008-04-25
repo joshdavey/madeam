@@ -78,11 +78,11 @@ class Madeam {
     // the same as the controller being called and then append the default controller name to the end
     // so 'admin' becomes 'admin/index' if the admin directory exists.
     // note: there is a consequence for this feature which means if you have a directory named 'admin'
-    // you can't have a controller named 'controller_admin'
+    // you can't have a controller named 'Controller_Admin'
     if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['controller']))) { $params['controller'] .= '/' . $config['default_controller']; }
 
     // set controller's class
-    $params['controller'] = preg_replace("/[^A-Za-z0-9_]/", null, $params['controller']); // strip of the dirt
+    $params['controller'] = preg_replace("/[^A-Za-z0-9_\-]/", null, $params['controller']); // strip off the dirt
     $controllerClass = 'Controller_' . str_replace(' ', '_', ucwords(str_replace('/', ' ', Madeam_Inflector::camelize($params['controller']))));
 
     try {

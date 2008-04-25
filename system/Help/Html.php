@@ -37,7 +37,7 @@ class Help_Html {
     return self::tag('img', $params);
   }
 
-  public static function imgr($src, $toWidth = false, $toHeight = false, $_params = array()) {
+  public static function imgResize($src, $toWidth = false, $toHeight = false, $_params = array()) {
     $params = array();
     $params['alt'] = Madeam_Inflector::underscorize($src);
     $params['src'] = Madeam::url($src);
@@ -72,26 +72,6 @@ class Help_Html {
 
   public static function js($src, $_params = array()) {
     return '<script src="' . Madeam::url($src) . '.js" type="text/javascript"></script>';
-  }
-
-
-	/**
-	 * This method returns URLs that can be either relative or absolute.
-	 * If the url starts with "http://" or "https://" or any other protocol then the url is left as is.
-	 * If the url starts with "/" then we assume that it's pointing to the public directory. Use "/" to point to static files
-	 * If the url starts with none of the above we assume it's poitning to a resource like a controller
-	 */
-	public static function url($url) {
-
-	  if (substr($url, 0, 1) != "#") {
-      if (substr($url, 0, 1) == '/') {
-        $url = REL_PATH . substr($url, 1, strlen($url));
-      } elseif (!preg_match('/[a-z]+:/', $url, $matchs)) {
-  			$url == "#" ? $url = "#" : $url = URI_PATH . $url;
-  		}
-	  }
-
-    return $url;
   }
 
 

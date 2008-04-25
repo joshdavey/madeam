@@ -16,11 +16,11 @@
  */
 class Help_Form extends Help_Html {
 
-	public static function open_post($name, $action = null, $_params = array()) {
+	public static function openPost($action = null, $_params = array()) {
 		$params = array();
 
-    $params['id']     = 'form_' . low($name);
-    $params['action'] = Madeam::url($action);
+		$params['action'] = Madeam::url($action);
+    $params['id']     = 'form_' . Madeam_Inflector::underscorize($params['action']);
     $params['method'] = 'post';
 
     $params = array_merge($params, $_params);
@@ -28,11 +28,11 @@ class Help_Form extends Help_Html {
     return self::openTag('form', $params);
 	}
 
-	public static function open_get($name, $action = null, $_params = array()) {
+	public static function openGet($action = null, $_params = array()) {
 		$params = array();
 
-    $params['id']     = 'form_' . low($name);
     $params['action'] = Madeam::url($action);
+    $params['id']     = 'form_' . Madeam_Inflector::underscorize($params['action']);
     $params['method'] = 'get';
 
     $params = array_merge($params, $_params);
@@ -40,11 +40,11 @@ class Help_Form extends Help_Html {
     return self::openTag('form', $params);
 	}
 
-	public static function open_file($name, $action = null, $_params = array()) {
+	public static function openFile($action = null, $_params = array()) {
 		$params = array();
 
-    $params['id']     	= 'form_' . low($name);
-    $params['action'] 	= Madeam::url($action);
+    $params['action']   = Madeam::url($action);
+    $params['id']       = 'form_' . Madeam_Inflector::underscorize($params['action']);
     $params['method'] 	= 'post';
 		$params['enctype']	= 'multipart/form-data';
 
