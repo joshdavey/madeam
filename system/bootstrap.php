@@ -334,5 +334,5 @@ function modifedFilesExist() {
   }
 }
 
-//modifedFilesExist();
+modifedFilesExist();
 ?>
