@@ -160,7 +160,7 @@ class Madeam {
    * @param unknown_type $var
    */
   public static function debug($var) {
-
+    test($var);
   }
 
   /**
@@ -180,6 +180,15 @@ class Madeam {
       }
     }
     return $url;
+  }
+
+  /**
+   * When any file is modified in the application directory this method clears
+   * the cache.
+   *
+   */
+  public static function clearCacheOnUpdate() {
+
   }
 }
 

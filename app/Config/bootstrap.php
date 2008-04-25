@@ -1,19 +1,32 @@
 <?php
-// Welcome to your applications bootstrap
-
 /**
- * If you're using any third party libraries that require their own autoload function now
- * is your chance to include them.
+ * Welcome to the application bootstrap file.
  */
 
-// spl_autoload_register('PEAR2_Autoload');
 
-// set error handling
-error_reporting(E_ALL);
-
-// uncomment to enable unicode
+# uncomment to enable unicode
 mb_internal_encoding("UTF-8");
 
-// uncomment to set content type to utf8
+
+# uncomment to set content type to utf8
 header ('Content-type: text/html; charset=utf-8');
+
+
+
+# development environment settings
+if (MADAEM_ENVIRONMENT == 'development') {
+
+  # set error reporting level
+  error_reporting(E_ALL);
+
+}
+
+# production environment settings
+elseif (MADEAM_ENVIRONMENT == 'production') {
+
+  error_reporting(0);
+
+}
+
+
 ?>
