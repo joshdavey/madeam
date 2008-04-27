@@ -327,6 +327,19 @@ function rotate() {
   return $returned;
 }
 
+/**
+ * This function converts arrays to objects.
+ *
+ * Note: I found it here: http://blog.primalskill.com/?p=13 but not sure who the original author is.
+ * It is super awesome and whoever made it has mad skillz.
+ *
+ * @param array $data
+ * @return object
+ */
+function array2obj($data) {
+  return is_array($data) ? (object) array_map(__FUNCTION__,$data) : $data;
+}
+
 function modifedFilesExist() {
   $path = PATH_TO_APP;
   foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::KEY_AS_PATHNAME), RecursiveIteratorIterator::CHILD_FIRST) as $file => $info) {

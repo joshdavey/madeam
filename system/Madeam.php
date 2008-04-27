@@ -82,8 +82,16 @@ class Madeam {
     if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['controller']))) { $params['controller'] .= '/' . $config['default_controller']; }
 
     // set controller's class
-    $params['controller'] = preg_replace("/[^A-Za-z0-9_\-]/", null, $params['controller']); // strip off the dirt
-    $controllerClass = 'Controller_' . str_replace(' ', '_', ucwords(str_replace('/', ' ', Madeam_Inflector::camelize($params['controller']))));
+
+    $params['controller'] = preg_replace("/[^A-Za-z0-9_\-\/]/", null, $params['controller']); // strip off the dirt
+
+    $controllerClassNodes = explode('/', $params['controller']);
+    foreach ($controllerClassNodes as &$node) {
+      $node = Madeam_Inflector::camelize($node);
+      $node = ucfirst($node);
+    }
+
+    $controllerClass = 'Controller_' . implode('_', $controllerClassNodes);
 
     try {
       // create controller instance
@@ -179,6 +187,7 @@ class Madeam {
         $url = PATH_TO_URI . $url;
       }
     }
+
     return $url;
   }
 

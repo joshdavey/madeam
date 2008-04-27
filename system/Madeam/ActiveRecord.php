@@ -115,7 +115,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     return $this->link;
   }
 
-	final public function query($sql, $returnAs = 'object') {
+	final public function query($sql, $returnAs = 'array') {
 	  // execute query
 		$this->link =	$this->execute($sql);
 
@@ -173,7 +173,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // $this->article->findOne(32, true)->comment->findAll();
     // where article is the parent of comment
     if ($this->parent && $this->_sqlWhere == '1') {
-      $this->where($this->parent->setup['hasModels'][$this->name]['foreignKey'] . " = '" . $this->parent->entry->{$this->parent->setup['hasModels'][$this->name]['primaryKey']} . "'");
+      $this->where($this->parent->setup['hasModels'][$this->name]['foreignKey'] . " = '" . $this->parent->entry[$this->parent->setup['hasModels'][$this->name]['primaryKey']] . "'");
       //$this->where($this->parent->setup['hasModels'][$this->name]['foreignKey'] . " = '" . $this->parent->setup['hasModels'][$this->name]['primaryKey'] . "'");
     }
 
@@ -182,7 +182,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     if (is_resource($this->link)) {
       // get data
-      while ($this->entry = mysql_fetch_object($this->link)) {
+      //while ($this->entry = mysql_fetch_object($this->link)) {
+      while ($this->entry = mysql_fetch_array($this->link)) {
         // adds custom fields
         $this->prepareResult();
 
@@ -198,7 +199,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
 
-              $this->entry->$model = $tempmodel->findOne($this->entry->$fkey);
+              $this->entry[$model] = $tempmodel->findOne($this->entry[$fkey]);
               unset($tempmodel);
             }
           }
@@ -215,7 +216,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               // An example of this is when you create a self-refrencing relationship in a table and name the relationship "sub_model" or "parent_model"
               $tempmodel->name = $model;
 
-              $this->entry->$model = $tempmodel->findOne($this->entry->$fkey);
+              $this->entry[$model] = $tempmodel->findOne($this->entry[$fkey]);
               unset($tempmodel);
             }
           }
@@ -228,7 +229,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
 
-              $this->entry->{Madeam_Inflector::pluralize($model)} = $tempmodel->findAll();
+              $this->entry[Madeam_Inflector::pluralize($model)] = $tempmodel->findAll();
               unset($tempmodel);
             }
           }
@@ -239,7 +240,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
 
-              $this->entry->{Madeam_Inflector::model_tableize($params['model'])} = $tempmodel
+              $this->entry[Madeam_Inflector::model_tableize($params['model'])] = $tempmodel
                 ->join($this->name)
                 ->findAll();
 
@@ -474,7 +475,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       }
 
       // grab entry id before it's overwritten by something that happens in afterSave()
-      $entryId = $this->insert_id();
+      $entryId = $this->insertId();
 
 			// set this so it can be used in afterSave
 			$this->entry[$this->primaryKey] = $entryId;

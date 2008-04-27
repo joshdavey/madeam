@@ -180,7 +180,7 @@ class Madeam_Model {
     foreach ($this->reflectionObj->getProperties() as $prop) {
 
 			// filter out private variables. The less we need to parse the better
-			if ($prop->isPublic() || $prop->isProtected()) {
+			if ($prop->isPublic()) {
 				// get property name
 				$property_name = $prop->name;
 
@@ -245,7 +245,7 @@ class Madeam_Model {
   final protected function loadRelations() {
     foreach ($this->reflectionObj->getProperties() as $prop) {
 			// ignore private properties so we don't need to parse every single variable
-			if ($prop->isPublic() || $prop->isProtected()) {
+			if ($prop->isPublic()) {
 				if (preg_match("/^(hasMany|hasOne|belongsTo|hasAndBelongsToMany)_(.+)/", $prop->name, $found)) {
 					$relationship = $found[1];
 					$model        = $found[2];
