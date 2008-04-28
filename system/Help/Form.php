@@ -173,11 +173,12 @@ class Help_Form extends Help_Html {
     return self::tag('input', $params);
   }
 
-  public static function submit($name = 'Submit', $value = 'Submit', $_params = array()) {
+  public static function submit($value = 'Submit', $_params = array()) {
     $params = array();
-		if ($name != 'Submit') { $params['name'] = $name; }
-		if ($value == 'Submit') { $params['value'] = $name; } else { $params['value']  = $value; }
-    $params['id']     = self::nameToId($name . '_btn');
+    if (!isset($params['name'])) { $params['name'] = 'Submit'; }
+
+		$params['value']  = $value;
+    $params['id']     = self::nameToId($value . '_btn');
     $params['type']   = 'submit';
 
     $params = array_merge($params, $_params);
@@ -186,8 +187,8 @@ class Help_Form extends Help_Html {
   }
 
   //re-named submit
-  public static function send($name = 'Submit', $value = 'Submit', $_params = array()) {
-    return self::submit($name, $value, $_params);
+  public static function send($value = 'Submit', $_params = array()) {
+    return self::submit($value, $_params);
   }
 
   public static function reset($name = 'Reset', $_params = array()) {

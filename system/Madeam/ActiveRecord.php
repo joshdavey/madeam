@@ -70,7 +70,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @param string $sql
    * @return resource
    */
-  final public function execute($sql, $returnAs = 'object') {
+  final public function execute($sql, $returnAs = 'array') {
     global $db_connection; // this is the only good use of globals. But still I wish we could get rid of the global part
 
     // if we connect here we don't need to connect to the database until we execute a query
@@ -123,7 +123,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 		if ($returnAs == 'object') {
 		  $fetchMethod = 'mysql_fetch_object';
 		} else {
-		  $fetchMethod = 'mysql_fetch_array';
+		  $fetchMethod = 'mysql_fetch_assoc';
 		}
 
 		// check to see if this query returns a resource -- why not just check to see if it's a resource instead?
@@ -149,7 +149,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 	}
 
 	final public function describe() {
-	  $table = $this->setup['resource_name'];
+	  $table = $this->setup['resourceName'];
 	  return $this->query("DESCRIBE $table", 'array');
 	}
 
@@ -183,7 +183,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if (is_resource($this->link)) {
       // get data
       //while ($this->entry = mysql_fetch_object($this->link)) {
-      while ($this->entry = mysql_fetch_array($this->link)) {
+      while ($this->entry = mysql_fetch_assoc($this->link)) {
         // adds custom fields
         $this->prepareResult();
 
@@ -204,7 +204,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
             }
           }
 
-          // find belongs_tos
+          // find belongsTos
           foreach ($this->setup['belongsTo'] as $model => $params) {
             $fkey = $params['foreignKey'];
             if (!in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->_sqlJoins))) {
@@ -221,7 +221,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
             }
           }
 
-          // find has_manies
+          // find hasManies
           foreach ($this->setup['hasMany'] as $model => $params) {
             // do not call if the user has not specified to call this data
             if (!in_array($model, array_values($this->unbound)) && !in_array($model, array_keys($this->_sqlJoins))) {
@@ -240,7 +240,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               $tempmodel = clone $this->{$params['model']};
               $tempmodel->name = $model;
 
-              $this->entry[Madeam_Inflector::model_tableize($params['model'])] = $tempmodel
+              $this->entry[Madeam_Inflector::pluralize($params['model'])] = $tempmodel
                 ->join($this->name)
                 ->findAll();
 
@@ -253,7 +253,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
         $this->data[] = $this->entry;
       }
     }
-
 
     // find callback
     $this->afterFind();
@@ -343,7 +342,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // set where
     if ($this->entryId != -1 && $this->primaryKey != false) {
-      $table = $this->setup['resource_name'];
+      $table = $this->setup['resourceName'];
       $this->where("$table.$this->primaryKey = '$id'");
     }
 
@@ -454,7 +453,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
           $relations[$field] = $value;
 
           // instead of just unsetting it, it should get it's primaryKey value!
-          $this->entry[$field] = $value[$this->{Madeam_Inflector::model_nameize($field)}->primaryKey];
+          $this->entry[$field] = $value[$this->{Madeam_Inflector::modelNameize($field)}->primaryKey];
         }
       }
       */
@@ -463,7 +462,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $this->data = $this->entry;
 
       // filter out fields that don't exist in the model
-      $this->data = array_intersect_key($this->data, array_flip($this->setup['standard_fields']));
+      $this->data = array_intersect_key($this->data, array_flip($this->setup['standardFields']));
 
       // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
       if ($update === true) {
@@ -487,7 +486,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       if ($entryId) {
         // check for fields that are arrays
         foreach ($relations as $model => $value) {
-          $model = Madeam_Inflector::model_nameize($model);
+          $model = Madeam_Inflector::modelNameize($model);
           if (in_array($model, array_keys($this->setup['hasAndBelongsToMany']))) {
             $this->habtmAdd($model, $entryId, $value);
           } else {
@@ -609,11 +608,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // drop table -- this doesn't work yet
     if ($drop == true) {
-      $sql[] = 'DROP TABLE IF EXISTS `' . $this->setup['resource_name'] . "`; \n";
+      $sql[] = 'DROP TABLE IF EXISTS `' . $this->setup['resourceName'] . "`; \n";
     }
 
     // initial query decleration
-    $sql[] = 'CREATE TABLE IF NOT EXISTS `' . $this->setup['resource_name'] . '` (';
+    $sql[] = 'CREATE TABLE IF NOT EXISTS `' . $this->setup['resourceName'] . '` (';
 
     // add fields
     $fields = array();
@@ -697,7 +696,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   final private function buildQuerySelect() {
     $sql = array();
-    $table = $this->setup['resource_name'];
+    $table = $this->setup['resourceName'];
 
     if (empty($this->fields)) {
       if ($this->primaryKey != false) {
@@ -751,7 +750,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   final private function buildQueryInsert() {
     $sql = array();
-    $table = $this->setup['resource_name'];
+    $table = $this->setup['resourceName'];
 
     // remove primary key insert if it is null
     if (!isset($this->data[$this->primaryKey]) || $this->data[$this->primaryKey] == null) {
@@ -783,7 +782,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   final private function buildQueryUpdate() {
     $sql = array();
-    $table = $this->setup['resource_name'];
+    $table = $this->setup['resourceName'];
 
     // add table name
     $sql[] = 'UPDATE ' . $table . ' SET';
@@ -840,7 +839,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $sql = array();
 
     // add table name
-    $sql[] = 'DELETE FROM ' . $this->setup['resource_name'];
+    $sql[] = 'DELETE FROM ' . $this->setup['resourceName'];
 
     // add where condition
     if ($this->_sqlWhere != 1) {
@@ -936,7 +935,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
   final public function fields() {
 
     foreach(func_get_args() as $field) {
-      if (in_array($field, $this->setup['standard_fields'])) {
+      if (in_array($field, $this->setup['standardFields'])) {
 	    	$this->_sqlFields[] = $field;
   		}
 
@@ -973,15 +972,15 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
   final public function join($model, $on = false) {
 
-    $model = Madeam_Inflector::model_nameize($model);
-    $table = $this->setup['resource_name'];
+    $model = Madeam_Inflector::modelNameize($model);
+    $table = $this->setup['resourceName'];
 
     if ($on == false) {
       if (in_array($model, array_keys($this->setup['hasAndBelongsToMany']))) {
 
         $relation = $this->setup['hasAndBelongsToMany'][$model];
 
-        $on = "$table.$this->primaryKey = $relation[join_model].$relation[foreign_key]";
+        $on = "$table.$this->primaryKey = $relation[joinModel].$relation[foreignKey]";
 
         $this->_sqlJoins[$model] = array('table' => $relation['joinModel'], 'on' => $on);
 
@@ -998,7 +997,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
         $this->_sqlJoins[$model] = array('table' => $this->$model->resourceName, 'on' => $on);
       } else {
-        t('this feature needs to be fixed - activeRecord join');
+        test('this feature needs to be fixed - activeRecord join');
         $this->_sqlJoins[$model] = array('table' => $model, 'on' => $on);
       }
     } else {

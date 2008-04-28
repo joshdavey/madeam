@@ -162,16 +162,16 @@ class Madeam_Inflector {
 	  return ucfirst(self::specialize(' ', $string));
 	}
 
-	public static function model_classize($string) {
+	public static function modelClassize($string) {
 	  return 'Model_' . self::camelize(self::singalize($string));
 	}
 
-	public static function model_tableize($string) {
+	public static function modelTableize($string) {
 	  $string[0] = low($string[0]);
 	  return self::underscorize((self::pluralize($string)));
 	}
 
-	public static function model_nameize($string) {
+	public static function modelNameize($string) {
 	  $string[0] = low($string[0]);
 	  return ucfirst(self::camelize((self::singalize($string))));
 	}
@@ -183,14 +183,14 @@ class Madeam_Inflector {
 	 * @param string $table2
 	 * @return string
 	 */
-	public static function model_habtm($table1, $table2) {
-	  $models = array(self::model_tableize($table1), self::model_tableize($table2));
+	public static function modelHabtm($table1, $table2) {
+	  $models = array(self::modelTableize($table1), self::modelTableize($table2));
 	  asort($models);
 	  $models = array_values($models);
 	  return $models[0] . '_' . $models[1];
 	}
 
-	public static function model_foreign_key($string) {
+	public static function modelForeignKey($string) {
 	  $string[0] = low($string[0]);
 	  return self::singalize(self::underscorize($string));
 	}
