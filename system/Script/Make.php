@@ -50,7 +50,7 @@ class Script_Make extends Madeam_Script {
         $this->out_create("application $app_name in " . CURRENT_DIR);
       }
 
-      if ($this->full_copy(dirname(MADEAM_PATH), CURRENT_DIR . $app_name)) {
+      if ($this->full_copy(dirname(PATH_TO_MADEAM), CURRENT_DIR . $app_name)) {
         return true;
       } else {
         return false;
