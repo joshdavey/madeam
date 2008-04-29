@@ -149,12 +149,12 @@ class Madeam_Inflector {
 	}
 
 
-	public static function fslashize($word) {
+	public static function forwardSlashize($word) {
     return self::specialize('/', $word);
 	}
 
 
-	public static function bslashize($word) {
+	public static function backwordSlashize($word) {
     return self::specialize('\\', $word);
 	}
 
