@@ -1,50 +1,70 @@
 <?php
-// The script file name is the name of the script that includes the bootstrap and runs the framework
-if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__)); }
+/**
+ * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
+ * Copyright (c)	2006, Joshua Davey
+ *								24 Ridley Gardens, Toronto, Ontario, Canada
+ *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright		Copyright (c) 2006, Joshua Davey
+ * @link				http://www.madeam.com
+ * @package			madeam
+ * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
+class Madeam_Console_CLI {
 
-// set forein path
-if (!defined('FOREIGN_PATH')) { define('FOREIGN_PATH', dirname(__FILE__)); }
+  protected function out_menu($label, $options = array()) {
+    out();
+    out($label);
+    out('---------------');
+    foreach ($options as $opt) {
+      out('| ' . $opt);
+    }
+    out('---------------');
+  }
 
-// really weird bug when I installed zend core made SERVER_NAME inaccessible and threw a notice error
-// this is a simple hack to fix that
-if (!isset($_SERVER['SERVER_NAME'])) { $_SERVER['SERVER_NAME'] = 'localhost'; }
+  protected function out_error($msg) {
+    out('error  ' . $msg);
+  }
 
-// get our bearings
-$current_dir = getcwd();
+  protected function out_create($msg) {
+    out('create ' . $msg);
+  }
 
-define('CURRENT_DIR', $current_dir . DIRECTORY_SEPARATOR);
+  protected function out_delete($msg) {
+    out('delete ' . $msg);
+  }
 
-// define root application path
-if (file_exists('Madeam/Console/cli.php')) {
-  define('PROJECT_PATH', CURRENT_DIR);
-  // www
-} else {
-  // location of cli.php (www/madeam)
+  protected function out_get($name, $msg = null) {
+    out();
+    if ($msg != null) { out($msg); }
+    out($name . '>', 0);
+  }
+
+  protected function get_yesno($msg) {
+    $this->out_get('[y/n]', $msg);
+    $command = $this->get();
+
+    if ($command == 'y') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  protected function get_command($msg) {
+    $this->out_get($msg);
+    return $this->get();
+  }
+
+  protected function get() {
+    $command = get();
+    if ($command == 'exit') {
+      exit();
+    } else {
+      return $command;
+    }
+  }
+
 }
-
-// change the current working directory to our foreign path
-// foreign path is anything that executes outside of the public directory
-chdir(FOREIGN_PATH);    // www/madeam
-
-// include boostrap and include all of the madeam core files and configurations
-require '../bootstrap.php';
-
-$console = new madeam_console;
-$console->initialize();
-
-
-// standard output function
-function out($string = null, $newline = 1) {
-	if ($newline == 1) {
-		fwrite(STDOUT, ' ' . $string . "\n");
-	} else {
-		fwrite(STDOUT, ' ' . $string);
-	}
-}
-
-// standard input function
-function get() {
-	return trim(fgets(STDIN));
-}
-
-?>

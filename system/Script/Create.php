@@ -1,5 +1,5 @@
 <?php
-class Script_Create extends Madeam_Script {
+class Script_Create extends Madeam_Console_Script {
 
 	public $description = 'The create console allows you to generate models, views and controllers';
 
@@ -43,8 +43,8 @@ class Script_Create extends Madeam_Script {
 		}
 
 		// set controller name and class name
-		$controller_name = madeam_inflector::underscorize(low($params['name']));
-		$controller_class_name = 'controller_' . $controller_name;
+		$controller_name = Madeam_Inflector::underscorize(low($params['name']));
+		$controller_class_name = 'Controller_' . $controller_name;
 
 		// Send message to user that we are creating the controller
 		$this->out_create('controller ' . $controller_name);
@@ -56,7 +56,7 @@ class Script_Create extends Madeam_Script {
     $controller_contents .= "\n\n}\n?>";
 
     // save file contents to file
-    $this->create_file($controller_class_name . '.php', APP_PATH . 'controller' . DS, $controller_contents);
+    $this->create_file($controller_class_name . '.php', PATH_TO_CONTROLLER, $controller_contents);
 
     // completed with no errors
 	  return true;
@@ -74,8 +74,8 @@ class Script_Create extends Madeam_Script {
 	  if (!isset($params['type'])) { $type = 'activerecord'; } else { $type = $params['type']; }
 
     // set model name and class name
-    $model_name = madeam_inflector::model_nameize($params['name']);
-    $model_class_name = madeam_inflector::model_classize($model_name);
+    $model_name = Madeam_Inflector::modelNameize($params['name']);
+    $model_class_name = Madeam_Inflector::modelClassize($model_name);
 
     // define model class
 	  $model_contents = "<?php\nclass $model_class_name extends madeam_$type {";
@@ -84,7 +84,7 @@ class Script_Create extends Madeam_Script {
     $model_contents .= "\n\n}\n?>";
 
     // save file
-    if ($this->create_file($model_class_name . '.php', APP_PATH . 'model' . DS, $model_contents) === true) {
+    if ($this->create_file($model_class_name . '.php', PATH_TO_APP . 'model' . DS, $model_contents) === true) {
       return true;
     }
 
@@ -111,12 +111,12 @@ class Script_Create extends Madeam_Script {
 
 	  // this needs a re-write because it should allow depth greater than 1 directory
 	  // make controller directory if it does not already exist
-    if (!file_exists(APP_PATH . 'view' . DS . dirname($view_name))) {
-      mkdir(APP_PATH . 'view' . DS . dirname($view_name));
+    if (!file_exists(PATH_TO_APP . 'view' . DS . dirname($view_name))) {
+      mkdir(PATH_TO_APP . 'view' . DS . dirname($view_name));
     }
 
 	  // save contents to new view file
-    if ($this->create_file($view_name . '.' . $view_format, APP_PATH . 'view' . DS, $view_contents) === true) {
+    if ($this->create_file($view_name . '.' . $view_format, PATH_TO_APP . 'view' . DS, $view_contents) === true) {
       return true;
     }
 
@@ -139,14 +139,14 @@ class Script_Create extends Madeam_Script {
 		}
 
 		// set controller name and class name
-		$controller_name = madeam_inflector::underscorize(low($params['name']));
+		$controller_name = Madeam_Inflector::underscorize(low($params['name']));
 		$controller_class_name = 'controller_' . $controller_name;
 
 		// Send message to user that we are creating the controller
 		$this->out_create('controller ' . $controller_name);
 
 		// determine scaffold directory
-		$dir = VENDOR_PATH . SCAFFOLD_PATH . $scaffold . DS;
+		$dir = PATH_TO_ANTHOLOGY . SCAFFOLD_PATH . $scaffold . DS;
 		$actions_dir = $dir . 'action' . DS;
 		$views_dir = $dir . 'view' . DS;
 
@@ -169,8 +169,8 @@ class Script_Create extends Madeam_Script {
           if (substr_count($function_code, '$this->represent') > 0) {
             if (isset($params['represent'])) {
               // set model name and class name
-              $model_name = madeam_inflector::model_nameize($params['represent']);
-  		        $model_class_name = madeam_inflector::model_classize($model_name);
+              $model_name = Madeam_Inflector::modelNameize($params['represent']);
+  		        $model_class_name = Madeam_Inflector::modelClassize($model_name);
 
               // determine scaffolding key
               $model = new $model_class_name;
@@ -181,7 +181,7 @@ class Script_Create extends Madeam_Script {
               $function_code = str_replace('$this->scaffold_controller', "'$controller_name'", $function_code);
 
               // replace $this->represent with model name
-              $function_code = str_replace('madeam_inflector::pluralize($this->represent)', "'" . madeam_inflector::pluralize($model_name) . "'", $function_code);
+              $function_code = str_replace('Madeam_Inflector::pluralize($this->represent)', "'" . Madeam_Inflector::pluralize($model_name) . "'", $function_code);
               $function_code = str_replace('{$this->represent}', $model_name, $function_code);
               $function_code = str_replace('$this->represent', "'$model_name'", $function_code);
             } else {
@@ -208,7 +208,7 @@ class Script_Create extends Madeam_Script {
     $controller_contents .= "\n\n}\n?>";
 
     // save file contents to file
-    $this->create_file($controller_class_name . '.php', APP_PATH . 'controller' . DS, $controller_contents);
+    $this->create_file($controller_class_name . '.php', PATH_TO_APP . 'controller' . DS, $controller_contents);
 
     // read scaffold directory for views
 		if ($dh = opendir($views_dir)) {
@@ -222,8 +222,8 @@ class Script_Create extends Madeam_Script {
           if (substr_count($function_code, '$this->represent') > 0) {
             if (isset($params['represent'])) {
               // set model name and class name
-              $model_name = madeam_inflector::model_nameize($params['represent']);
-  		        $model_class_name = madeam_inflector::model_classize($model_name);
+              $model_name = Madeam_Inflector::modelNameize($params['represent']);
+  		        $model_class_name = Madeam_Inflector::modelClassize($model_name);
 
               // determine scaffolding key
               $model = new $model_class_name;
@@ -234,7 +234,7 @@ class Script_Create extends Madeam_Script {
               $view_code = str_replace('$this->scaffold_controller', "'$controller_name'", $function_code);
 
               // replace $this->represent with model name
-              $view_code = str_replace('madeam_inflector::pluralize($this->represent)', "'" . madeam_inflector::pluralize($model_name) . "'", $view_code);
+              $view_code = str_replace('Madeam_Inflector::pluralize($this->represent)', "'" . Madeam_Inflector::pluralize($model_name) . "'", $view_code);
               $view_code = str_replace('{$this->represent}', $model_name, $view_code);
               $view_code = str_replace('$this->represent', "'$model_name'", $view_code);
             } else {
@@ -250,11 +250,11 @@ class Script_Create extends Madeam_Script {
           $this->out_create('view ' . $view_name);
 
           // make controller directory if it does not already exist
-          if (!file_exists(APP_PATH . 'view' . DS . $controller_name)) {
-            mkdir(APP_PATH . 'view' . DS . $controller_name);
+          if (!file_exists(PATH_TO_VIEW . $controller_name)) {
+            mkdir(PATH_TO_VIEW . $controller_name);
           }
 
-          $this->create_file($view_name . $ext, APP_PATH . 'view' . DS . $controller_name . DS, $view_code);
+          $this->create_file($view_name . $ext, PATH_TO_VIEW . $controller_name . DS, $view_code);
         }
       }
       closedir($dh);

@@ -12,7 +12,7 @@
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Console extends Madeam_CLI {
+class Madeam_Console extends Madeam_Console_CLI {
 
   public function initialize() {
     array_shift($_SERVER['argv']);
@@ -86,7 +86,7 @@ class Madeam_Console extends Madeam_CLI {
   }
 
   protected function scriptCommand($script_name, $command_name, $args) {
-    $script_name = 'script_' . $script_name;
+    $script_name = 'Script_' . ucfirst($script_name);
     $script 	= new $script_name;
   	$requires = $script->{'require_' . $command_name};
 
@@ -99,7 +99,7 @@ class Madeam_Console extends Madeam_CLI {
   	// if the command requires to be in the application's root path then check it.
   	// If we aren't in the applicatin's root path then tell the user and exit
   	if (!in_array($command_name, (array) $script->execute_outside_root)) {
-  		if (!file_exists(PUBLIC_PATH . DS . 'bootstrap.php')) {
+  		if (!file_exists(PATH_TO_SYSTEM . 'bootstrap.php')) {
   			oute('Please point Madeam to the root directory of your application.');
   			exit();
   		}
