@@ -1,7 +1,8 @@
 <?php
+/*
 // directory splitter
   define('DS', DIRECTORY_SEPARATOR);
-  
+
 // define script file name
 	define('SCRIPT_FILENAME', basename(__FILE__));
 
@@ -10,7 +11,9 @@
 
 // set public path
 	define('PATH_TO_PUBLIC', PATH_TO_SCRIPT . 'public' . DS);
-	
+
 // include dispatcher in web root
 	require PATH_TO_PUBLIC . 'index.php';
+*/
+	require 'public/index.php';
 ?>

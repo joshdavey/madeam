@@ -14,37 +14,37 @@
  */
 class Madeam_Console_CLI {
 
-  protected function out_menu($label, $options = array()) {
-    out();
-    out($label);
-    out('---------------');
+  static public function outMenu($label, $options = array()) {
+    self::out();
+    self::out($label);
+    self::out('---------------');
     foreach ($options as $opt) {
-      out('| ' . $opt);
+      self::out('| ' . $opt);
     }
-    out('---------------');
+    self::out('---------------');
   }
 
-  protected function out_error($msg) {
-    out('error  ' . $msg);
+  static public function outError($msg) {
+    self::out('error  ' . $msg);
   }
 
-  protected function out_create($msg) {
-    out('create ' . $msg);
+  static public function outCreate($msg) {
+    self::out('create ' . $msg);
   }
 
-  protected function out_delete($msg) {
-    out('delete ' . $msg);
+  static public function outDelete($msg) {
+    self::out('delete ' . $msg);
   }
 
-  protected function out_get($name, $msg = null) {
-    out();
-    if ($msg != null) { out($msg); }
-    out($name . '>', 0);
+  static public function outGet($name, $msg = null) {
+    self::out();
+    if ($msg != null) { self::out($msg); }
+    self::out($name . '>', 0);
   }
 
-  protected function get_yesno($msg) {
-    $this->out_get('[y/n]', $msg);
-    $command = $this->get();
+  static public function getYN($msg) {
+    self::outGet('[y/n]', $msg);
+    $command = self::get();
 
     if ($command == 'y') {
       return true;
@@ -53,18 +53,27 @@ class Madeam_Console_CLI {
     }
   }
 
-  protected function get_command($msg) {
-    $this->out_get($msg);
-    return $this->get();
+  static public function getCommand($msg) {
+    self::outGet($msg);
+    return self::get();
   }
 
-  protected function get() {
-    $command = get();
+  static public function get() {
+    $command = trim(fgets(STDIN));
     if ($command == 'exit') {
       exit();
     } else {
       return $command;
     }
   }
+
+  static public function out($string = null, $newline = 1) {
+  	if ($newline == 1) {
+  		fwrite(STDOUT, ' ' . $string . "\n");
+  	} else {
+  		fwrite(STDOUT, ' ' . $string);
+  	}
+  }
+
 
 }

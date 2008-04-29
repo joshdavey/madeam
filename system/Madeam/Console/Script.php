@@ -12,23 +12,23 @@
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Console_Script extends Madeam_Console_CLI {
+class Madeam_Console_Script {
 
   public $execute_outside_root = array();
   public $command_requirements = array();
 
-  protected function create_file($file_name, $file_path, $file_content) {
+  protected function createFile($file_name, $file_path, $file_content) {
     if (substr($file_path, -1) !== DS) { $file_path = $file_path . DS; }
     $file = $file_path . $file_name;
 
     if (file_exists($file)) {
-      if ($this->get_yesno('The file ' . $file_name . ' already exists. Overwrite?') === false) {
+      if (Madeam_Console_CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
         return false;
       }
     }
 
     if (file_put_contents($file, $file_content)) {
-      $this->out_create('file ' . $file);
+      Madeam_Console_CLI::outCreate('file ' . $file);
       return true;
     }
   }

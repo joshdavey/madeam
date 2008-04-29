@@ -13,13 +13,11 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-
 // directory splitter
 if (!defined('DS')) { define('DS', DIRECTORY_SEPARATOR); }
 
-// important paths
-if (!defined('PATH_TO_PUBLIC'))  { define('PATH_TO_PUBLIC', dirname(dirname(__FILE__)) . DS . 'public' . DS); }
-if (!defined('PATH_TO_PROJECT')) { define('PATH_TO_PROJECT', dirname(PATH_TO_PUBLIC) . DS); }
+// define project directory
+if (!defined('PATH_TO_PROJECT')) { define('PATH_TO_PROJECT', dirname(dirname(__FILE__)) . DS); }
 
 // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
 if (substr($_SERVER['DOCUMENT_ROOT'], -1) != '/') { $_SERVER['DOCUMENT_ROOT'] .= '/'; }
@@ -35,6 +33,12 @@ require PATH_TO_APP . 'Config' . DS . 'setup.php';
 $config = array_merge($env[$cfg['environment']], $cfg);
 unset($cfg, $env);
 
+// define path to public directory
+if (!defined('PATH_TO_PUBLIC'))  { define('PATH_TO_PUBLIC', dirname(dirname(__FILE__)) . DS . $config['public_directory_name'] . DS); }
+
+// this is the name of the script that executes in the public directory
+define('SCRIPT_FILENAME', 'index.php');
+
 // turn configs into constants for speed?
 define('MADAEM_ENVIRONMENT',        $config['environment']);
 define('MADEAM_ENABLE_DEBUG',       $config['enable_debug']);
@@ -45,10 +49,10 @@ define('MADAEM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
 // If it's off then we need to add the SCRIPT_FILENAME at the end.
 if (isset($_GET['uri'])) {
-  $public_dir = basename(PATH_TO_PUBLIC);
-	define('PATH_TO_URI', '/' . substr(str_replace(DS, '/', substr(PATH_TO_SCRIPT, strlen($_SERVER['DOCUMENT_ROOT']), -strlen($public_dir))), 0, -1));
+  $publicDir = basename(PATH_TO_PUBLIC);
+	define('PATH_TO_URI', '/' . substr(str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']), -strlen($publicDir))), 0, -1));
 } else {
-	define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_SCRIPT, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
+	define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
 }
 
 // determine the relative path to the public directory

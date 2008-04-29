@@ -53,26 +53,30 @@ $cfg['environment'] = 'development';
   $env['production']['debug_level']      = 0;
   $env['production']['enable_logger']    = 1;
 
+/**
+ * The name of the public directory.
+ */
+$cfg['public_directory_name']   = 'public';
 
 /**
  * This is the default controller called by the framework. This does NOT support
  * the format "sub/index". Its recommended that you leave this alone unless you really
  * need to change it. (highly unlikely).
  */
-$cfg['default_controller'] = 'index';
+$cfg['default_controller']      = 'index';
 
 /**
  * This is the controller's default action that will be called if no other
  * action is requested. This should be left untouched unless unlikely circumstances
  * require that it be something else.
  */
-$cfg['default_action']     = 'index';
+$cfg['default_action']          = 'index';
 
 /**
  * This is the default file extension for Views and Layouts.
  * The "." is not necessary. Only the name.
  */
-$cfg['default_format']     = 'html';
+$cfg['default_format']          = 'html';
 
 /**
  * This is the name of the log files. You can use the date formats from http://ca3.php.net/date
@@ -80,7 +84,7 @@ $cfg['default_format']     = 'html';
  * which is the year and month but if you want to log it every day you could do 'Y-m-d'.
  * Obviously if you want to be really crazy you can even identify the logs by seconds.
  */
-$cfg['log_file_name']      = 'Y-m';
+$cfg['log_file_name']           = 'Y-m';
 
 
 /**
@@ -89,14 +93,14 @@ $cfg['log_file_name']      = 'Y-m';
  * things for you. To avoid including a layout with the content being called set the ajax_layout to "false".
  * By default this is already done for you. To include layouts when making ajax calls set it to "true".
  */
-$cfg['enable_ajax_layout']  = false;
+$cfg['enable_ajax_layout']      = false;
 
 
 /**
  * When madeam encounters a system error it calls an error controller to display the error. Here you can
  * select which controller handles the errors by name.
  */
-$cfg['error_controller']    = 'error';
+$cfg['error_controller']        = 'error';
 
 /**
  * List of Mime Types.

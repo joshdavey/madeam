@@ -43,20 +43,20 @@ class Script_Create extends Madeam_Console_Script {
 		}
 
 		// set controller name and class name
-		$controller_name = Madeam_Inflector::underscorize(low($params['name']));
-		$controller_class_name = 'Controller_' . $controller_name;
+		$controllerName = Madeam_Inflector::underscorize(low($params['name']));
+		$controllerClassName = 'Controller_' . $controllerName;
 
 		// Send message to user that we are creating the controller
-		$this->out_create('controller ' . $controller_name);
+		Madeam_Console_CLI::outCreate('Controller ' . $controllerName);
 
 		// define controller class in controller file contents
-		$controller_contents = "<?php\nclass $controller_class_name extends controller_app {";
+		$controllerContents = "<?php\nclass $controllerClassName extends Controller_App {";
 
     // close class definition
-    $controller_contents .= "\n\n}\n?>";
+    $controllerContents .= "\n\n}\n?>";
 
     // save file contents to file
-    $this->create_file($controller_class_name . '.php', PATH_TO_CONTROLLER, $controller_contents);
+    $this->createFile($controllerClassName . '.php', PATH_TO_CONTROLLER, $controllerContents);
 
     // completed with no errors
 	  return true;
@@ -74,17 +74,17 @@ class Script_Create extends Madeam_Console_Script {
 	  if (!isset($params['type'])) { $type = 'activerecord'; } else { $type = $params['type']; }
 
     // set model name and class name
-    $model_name = Madeam_Inflector::modelNameize($params['name']);
-    $model_class_name = Madeam_Inflector::modelClassize($model_name);
+    $modelName = Madeam_Inflector::modelNameize($params['name']);
+    $modelClassName = Madeam_Inflector::modelClassize($modelName);
 
     // define model class
-	  $model_contents = "<?php\nclass $model_class_name extends madeam_$type {";
+	  $modelContents = "<?php\nclass $modelClassName extends madeam_$type {";
 
 	  // close class definition
-    $model_contents .= "\n\n}\n?>";
+    $modelContents .= "\n\n}\n?>";
 
     // save file
-    if ($this->create_file($model_class_name . '.php', PATH_TO_APP . 'model' . DS, $model_contents) === true) {
+    if ($this->createFile($modelClassName . '.php', PATH_TO_APP . 'Model' . DS, $modelContents) === true) {
       return true;
     }
 
@@ -100,23 +100,23 @@ class Script_Create extends Madeam_Console_Script {
    */
 	function view($params) {
 	  // set view name
-	  $view_name = $params['name'];
+	  $viewName = $params['name'];
 
 	  // set file contents
-	  $view_contents = $view_name . ' view';
+	  $viewContents = $viewName . ' view';
 
 	  // set view format
-	  if (!isset($params['format'])) { $view_format = 'html'; } else { $view_format = $params['format']; }
+	  if (!isset($params['format'])) { $viewFormat = 'html'; } else { $viewFormat = $params['format']; }
 
 
 	  // this needs a re-write because it should allow depth greater than 1 directory
 	  // make controller directory if it does not already exist
-    if (!file_exists(PATH_TO_APP . 'view' . DS . dirname($view_name))) {
-      mkdir(PATH_TO_APP . 'view' . DS . dirname($view_name));
+    if (!file_exists(PATH_TO_APP . 'view' . DS . dirname($viewName))) {
+      mkdir(PATH_TO_APP . 'view' . DS . dirname($viewName));
     }
 
 	  // save contents to new view file
-    if ($this->create_file($view_name . '.' . $view_format, PATH_TO_APP . 'view' . DS, $view_contents) === true) {
+    if ($this->createFile($viewName . '.' . $viewFormat, PATH_TO_APP . 'View' . DS, $viewContents) === true) {
       return true;
     }
 
@@ -139,11 +139,11 @@ class Script_Create extends Madeam_Console_Script {
 		}
 
 		// set controller name and class name
-		$controller_name = Madeam_Inflector::underscorize(low($params['name']));
-		$controller_class_name = 'controller_' . $controller_name;
+		$controllerName = Madeam_Inflector::underscorize(low($params['name']));
+		$controllerClassName = 'Controller_' . $controllerName;
 
 		// Send message to user that we are creating the controller
-		$this->out_create('controller ' . $controller_name);
+		Madeam_Console_CLI::outCreate('Controller ' . $controllerName);
 
 		// determine scaffold directory
 		$dir = PATH_TO_ANTHOLOGY . SCAFFOLD_PATH . $scaffold . DS;
@@ -151,7 +151,7 @@ class Script_Create extends Madeam_Console_Script {
 		$views_dir = $dir . 'view' . DS;
 
 		// define controller class in controller file contents
-		$controller_contents = "<?php\nclass $controller_class_name extends controller_app {";
+		$controllerContents = "<?php\nclass $controllerClassName extends controller_app {";
 
     // read scaffold directory for actions
 		if ($dh = opendir($actions_dir)) {
@@ -178,14 +178,14 @@ class Script_Create extends Madeam_Console_Script {
               $function_code = str_replace('$this->scaffold_key', "'$scaffold_key'", $function_code);
 
               // replace $this->scaffold_controller with controller name
-              $function_code = str_replace('$this->scaffold_controller', "'$controller_name'", $function_code);
+              $function_code = str_replace('$this->scaffold_controller', "'$controllerName'", $function_code);
 
               // replace $this->represent with model name
               $function_code = str_replace('Madeam_Inflector::pluralize($this->represent)', "'" . Madeam_Inflector::pluralize($model_name) . "'", $function_code);
               $function_code = str_replace('{$this->represent}', $model_name, $function_code);
               $function_code = str_replace('$this->represent', "'$model_name'", $function_code);
             } else {
-              $this->out_error('This scaffold requires that it represents a model');
+              Madeam_Console_CLI::outError('This scaffold requires that it represents a model');
               return false;
             }
           }
@@ -194,21 +194,21 @@ class Script_Create extends Madeam_Console_Script {
           $function_name = substr($file, 0, -4);
 
           // build function
-          $controller_contents .= "\n\n\n  function $function_name() {";
-          $controller_contents .= "\n    $function_code";
-          $controller_contents .= "\n  }";
+          $controllerContents .= "\n\n\n  function $function_name() {";
+          $controllerContents .= "\n    $function_code";
+          $controllerContents .= "\n  }";
 
-          $this->out_create('action ' . $function_name);
+          Madeam_Console_CLI::outCreate('action ' . $function_name);
         }
       }
       closedir($dh);
     }
 
     // close class definition
-    $controller_contents .= "\n\n}\n?>";
+    $controllerContents .= "\n\n}\n?>";
 
     // save file contents to file
-    $this->create_file($controller_class_name . '.php', PATH_TO_APP . 'controller' . DS, $controller_contents);
+    $this->createFile($controllerClassName . '.php', PATH_TO_CONTROLLER, $controllerContents);
 
     // read scaffold directory for views
 		if ($dh = opendir($views_dir)) {
@@ -238,7 +238,7 @@ class Script_Create extends Madeam_Console_Script {
               $view_code = str_replace('{$this->represent}', $model_name, $view_code);
               $view_code = str_replace('$this->represent', "'$model_name'", $view_code);
             } else {
-              $this->out_error('This scaffold requires that it represents a model');
+              Madeam_Console_CLI::outError('This scaffold requires that it represents a model');
               return false;
             }
           }
@@ -247,14 +247,14 @@ class Script_Create extends Madeam_Console_Script {
           $ext = '.' . substr($file, strrpos($file, '.') + 1);
           $view_name = substr($file, 0, -strlen($ext));
 
-          $this->out_create('view ' . $view_name);
+          Madeam_Console_CLI::outCreate('view ' . $view_name);
 
           // make controller directory if it does not already exist
           if (!file_exists(PATH_TO_VIEW . $controller_name)) {
             mkdir(PATH_TO_VIEW . $controller_name);
           }
 
-          $this->create_file($view_name . $ext, PATH_TO_VIEW . $controller_name . DS, $view_code);
+          $this->createFile($view_name . $ext, PATH_TO_VIEW . $controller_name . DS, $view_code);
         }
       }
       closedir($dh);

@@ -29,7 +29,7 @@ class Madeam_Console extends Madeam_Console_CLI {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
       if ($script !== false) {
-        $this->out_error("Sorry the script you entered does not exist.");
+        Madeam_Console_CLI::outError("Sorry the script you entered does not exist.");
       }
 
       // reset console
@@ -40,9 +40,9 @@ class Madeam_Console extends Madeam_Console_CLI {
 
       if ($script == null) {
         // ask them for the script of the console they'd like to use
-        $this->out_menu('Scripts', $scripts);
+        Madeam_Console_CLI::outMenu('Scripts', $scripts);
 
-        $script = $this->get_command('script');
+        $script = Madeam_Console_CLI::getCommand('script');
       }
 
     } while (!in_array($script, $scripts));
@@ -55,7 +55,7 @@ class Madeam_Console extends Madeam_Console_CLI {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
       if ($command !== false) {
-        $this->out_error("Sorry the command you entered does not exist.");
+        Madeam_Console_CLI::outError("Sorry the command you entered does not exist.");
       }
 
       // reset command
@@ -65,9 +65,9 @@ class Madeam_Console extends Madeam_Console_CLI {
       if (isset($args[0])) { $command = array_shift($args); }
 
       if ($command == null) {
-        $this->out_menu('Commands', $commands);
+        Madeam_Console_CLI::outMenu('Commands', $commands);
 
-        $command = $this->get_command('command');
+        $command = Madeam_Console_CLI::getCommand('command');
       }
     } while (!in_array($command, $commands));
 
@@ -100,7 +100,7 @@ class Madeam_Console extends Madeam_Console_CLI {
   	// If we aren't in the applicatin's root path then tell the user and exit
   	if (!in_array($command_name, (array) $script->execute_outside_root)) {
   		if (!file_exists(PATH_TO_SYSTEM . 'bootstrap.php')) {
-  			oute('Please point Madeam to the root directory of your application.');
+  			Madeam_Console_CLI::outError('Please point Madeam to the root directory of your application.');
   			exit();
   		}
   	}
@@ -117,6 +117,22 @@ class Madeam_Console extends Madeam_Console_CLI {
   		$params[$name] = $value;
   	}
   	return $params;
+  }
+
+  protected function createFile($file_name, $file_path, $file_content) {
+    if (substr($file_path, -1) !== DS) { $file_path = $file_path . DS; }
+    $file = $file_path . $file_name;
+
+    if (file_exists($file)) {
+      if (Madeam_Console_CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
+        return false;
+      }
+    }
+
+    if (file_put_contents($file, $file_content)) {
+      Madeam_Console_CLI::outCreate('file ' . $file);
+      return true;
+    }
   }
 
 }

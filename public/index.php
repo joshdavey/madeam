@@ -16,34 +16,17 @@
  */
 
 // start benchmark
-$time_start = microtime(true);
+  $benchmarkStart = microtime(true);
 
-// directory splitter
-  if (!defined('DS')) { define('DS', DIRECTORY_SEPARATOR); }
-
-// The script file name is the name of the script that includes the bootstrap and runs the framework
-  if (!defined('SCRIPT_FILENAME')) { define('SCRIPT_FILENAME', basename(__FILE__)); }
-
-// set forein path
-  if (!defined('PATH_TO_SCRIPT')) { define('PATH_TO_SCRIPT', dirname(__FILE__) . DS); }
-
-// set public path
-  if (!defined('PATH_TO_PUBLIC')) { define('PATH_TO_PUBLIC', PATH_TO_SCRIPT); }
-
-// set path to project
-  if (!defined('PATH_TO_PROJECT')) { define('PATH_TO_PROJECT', dirname(PATH_TO_PUBLIC) . DS); }  
-  
 // include boostrap and include all of the madeam core files and configurations
-  require PATH_TO_PROJECT . DS . 'system' . DS . 'bootstrap.php';
-  
+  require '..' . DIRECTORY_SEPARATOR . 'system' . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 // dispatch calls the framework and returns the resulting output
   echo Madeam::dispatch();
 
-
 // end benchmark
-  $time_end = microtime(true);
-  $time = $time_end - $time_start;
+  $benchmarkEnd = microtime(true);
+  $time = $benchmarkEnd - $benchmarkStart;
 
 /*
 echo $time . '<br />';
