@@ -1,6 +1,11 @@
 #AddHandler application/x-httpd-php5 php
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    #RewriteCond %{REQUEST_FILENAME} public_html/$ [OR]
+    #RewriteCond %{REQUEST_FILENAME} public_html$
+    #RewriteRule ^(.*)$ index.php?uri=$1 [QSA,L]
+
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php?uri=$1 [QSA,L]
