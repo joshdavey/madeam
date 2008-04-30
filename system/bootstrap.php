@@ -73,8 +73,8 @@ define('PATH_TO_LOG', 		    PATH_TO_PROJECT . 'etc' . DS . 'log' . DS);
 define('PATH_TO_TMP', 		    PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
 
 // set include paths
-$include_paths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_ANTHOLOGY, ini_get('include_path'));
-ini_set('include_path', implode(PATH_SEPARATOR, $include_paths));
+$includePaths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_ANTHOLOGY, ini_get('include_path'));
+ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
 
 // define user errors variable name for $_SESSION
 // example: $_SESSION[USER_ERROR_NAME];
@@ -315,17 +315,17 @@ function rotate() {
   static $groups;
   $values = func_get_args();
 
-  $group_name = implode($values);
+  $groupName = implode($values);
 
-  if (!$groups[$group_name]) {
+  if (!$groups[$groupName]) {
     array_unshift($values, 'offset');
-    $groups[$group_name] = $values;
+    $groups[$groupName] = $values;
   }
 
-  $returned = next($groups[$group_name]);
+  $returned = next($groups[$groupName]);
 
-  if ($returned == $groups[$group_name][count($groups[$group_name])-1]) {
-    reset($groups[$group_name]);
+  if ($returned == $groups[$groupName][count($groups[$groupName])-1]) {
+    reset($groups[$groupName]);
   }
 
   return $returned;
