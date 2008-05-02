@@ -15,6 +15,8 @@
  * @author      Joshua Davey
  */
 
+mysql_connect();
+
 // start benchmark
   $benchmarkStart = microtime(true);
   
@@ -31,49 +33,7 @@
   $benchmarkEnd = microtime(true);
   $time = $benchmarkEnd - $benchmarkStart;
 
-/*
-echo $time . '<br />';
-
-// log execution time
-//madeam_logger::log("Execution time: $time seconds" . $_SERVER['REQUEST_URI']);
-
-
-echo 'display_errors = ' . ini_get('display_errors') . "<br />";
-echo 'register_globals = ' . ini_get('register_globals') . "<br />";
-echo 'post_max_size = ' . ini_get('post_max_size') . "<br />";
-echo 'post_max_size+1 = ' . (ini_get('post_max_size')+1) . "<br />";
-echo 'short_open_tag = ' . ini_get('short_open_tag') . "<br />";
-
-
-//note: for some reason the get_included_files() causes failed requests when doing benchmarks
-$x=0;
-foreach(get_included_files() as $file) {
-  echo ++$x . ' ' . $file . "<br />";
-}
-*/
-/*
-
-// developer mode
-echo '<div id="madeam_dev_bar">The Developer Bar - Loadtime: ' . $time . ' seconds </div>';
-<style>
-#madeam_dev_bar { position: absolute; left: 0; bottom: 0; right: 0; padding: 4px; height: 100px; border: solid 1px #000; background: #335599; color: #fff; }
-</style>
-*/
-
-//ini_set('include_path',
-// session.save_path
-// split sessions into multiple directories
-/*
-$a['b']['c'] = array();
-// slow 2 extra hash lookups per access
-for($i = 0; $i < 5; $i++)
-$a['b']['c'][$i] = $i;
-
-// much faster reference based approach
-$ref =& $a['b']['c'];
-for($i = 0; $i < 5; $i++)
-$ref[$i] = $i;
-*/
-//register_shutdown_function();
+// interesting stuff
+  //echo 'Execution Time: ' . $time . '<br />'; foreach (get_included_files() as $file) { isset($x) ? ++$x : $x = 1; echo $x . ' ' . $file . '<br />'; }
 ?>
 
