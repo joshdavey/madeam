@@ -17,6 +17,9 @@
 
 // start benchmark
   $benchmarkStart = microtime(true);
+  
+// set the public directory as our current working directory
+  chdir(dirname(__FILE__));
 
 // include boostrap and include all of the madeam core files and configurations
   require '..' . DIRECTORY_SEPARATOR . 'system' . DIRECTORY_SEPARATOR . 'bootstrap.php';
