@@ -15,11 +15,9 @@
  * @author      Joshua Davey
  */
 
-mysql_connect();
-
 // start benchmark
   $benchmarkStart = microtime(true);
-  
+
 // set the public directory as our current working directory
   chdir(dirname(__FILE__));
 
