@@ -44,7 +44,7 @@ $cfg['environment'] = 'development';
 
   $env['development']['debug_level']        = 1;
   $env['development']['enable_logger']      = 1;
-  $env['development']['enable_cache']       = false;
+  $env['development']['enable_cache']       = 0;
   $env['development']['enable_debug']       = 1;
 
 // production

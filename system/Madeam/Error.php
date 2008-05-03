@@ -39,7 +39,7 @@ class Madeam_Error {
     // clean output buffer
     ob_clean();
 
-    if (MADEAM_ENABLE_DEBUG === true) {
+    if (MADEAM_ENABLE_DEBUG == true) {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets)-1)];
 
