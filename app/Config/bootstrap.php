@@ -3,6 +3,9 @@
  * Welcome to the application bootstrap file.
  */
 
+//echo date_default_timezone_get();
+date_default_timezone_set('America/Toronto');
+
 
 # uncomment to enable unicode
 if (function_exists('mb_internal_encoding')) {
