@@ -105,7 +105,7 @@ class Help_Html {
    * @param string $name
    */
   protected static function nameToId($name) {
-		return str_replace(MODEL_JOINT, '_', low($name));
+		return str_replace(MADEAM_ASSOCIATION_JOINT, '_', low($name));
   }
 
   /**

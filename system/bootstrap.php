@@ -47,16 +47,27 @@ define('MADEAM_ENABLE_LOGGER',      $config['enable_logger']);
 define('MADAEM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
-// If it's off then we need to add the SCRIPT_FILENAME at the end.
-if (isset($_GET['uri'])) {
+// mod_rewrite is on when $_GET['madeamURI'] exists. You can see it defined in the public .htaccess file
+if (isset($_GET['madeamURI'])) {
   $publicDir = basename(PATH_TO_PUBLIC);
 	define('PATH_TO_URI', '/' . substr(str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']), -strlen($publicDir))), 0, -1));
+	define('MADAEM_REWRITE_URI', $_GET['madeamURI']);
 } else {
 	define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
+	define('MADAEM_REWRITE_URI', false);
 }
 
 // determine the relative path to the public directory
 define('PATH_TO_REL', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))));
+
+// madeamURI is defined in the public .htaccess file. Many developers may not notice it because of
+// it's transparency during development. We unset it here incase developers are using the $_GET query string
+// for any reason. An example of where it might be an unexpected problem is when taking the has of the query
+// string to identify the page. This problem was first noticed in some OpenID libraries
+unset($_GET['madeamURI']);
+
+// remove it fromt he query string as well
+$_SERVER['QUERY_STRING'] = preg_replace('/&?madeamURI=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
 
 
 // major madeam directories
@@ -77,22 +88,22 @@ $includePaths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_ANTHOLOGY, ini_get('i
 ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
 
 // define user errors variable name for $_SESSION
-// example: $_SESSION[USER_ERROR_NAME];
-define('USER_ERROR_NAME', 'muerrors');
+// example: $_SESSION[MADEAM_USER_ERROR_NAME];
+define('MADEAM_USER_ERROR_NAME', 'muerrors');
 
 // this is used for passing misc data from one page to the other
-define('FLASH_DATA_NAME', 'mflash');
+define('MADEAM_FLASH_DATA_NAME', 'mflash');
 
 // this sets how many pages the flash has to live (ptl: pages to live)
-define('FLASH_LIFE_NAME', 'mflife');
+define('MADEAM_FLASH_LIFE_NAME', 'mflife');
 
 // this is used for passing post data from one page to the next
 // the post data is merged with the flash post data on the next page
-define('FLASH_POST_NAME', 'mfpost');
+define('MADEAM_FLASH_POST_NAME', 'mfpost');
 
-// Model joiner
+// Used for joining models and other associations
 // example use: "user.name"
-define('MODEL_JOINT', '.');
+define('MADEAM_ASSOCIATION_JOINT', '.');
 
 // autoload function
 function Madeam_Autoload($class) {

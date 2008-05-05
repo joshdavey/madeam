@@ -436,7 +436,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // we must check for any errors that may have been envoked.
     // if there aren't any then continue as usual.
     // if not then skip adding/updating
-    if (!isset($_SESSION[USER_ERROR_NAME]) || count($_SESSION[USER_ERROR_NAME]) < 1) {
+    if (!isset($_SESSION[MADEAM_USER_ERROR_NAME]) || count($_SESSION[MADEAM_USER_ERROR_NAME]) < 1) {
       // do standard field formats
       $this->standardFieldFormats();
 

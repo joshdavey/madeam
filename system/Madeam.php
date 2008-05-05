@@ -26,16 +26,16 @@ class Madeam {
     $output = Madeam::makeRequest(Madeam_Router::currentUri() . '?showLayout=1');
 
     // destroy user error notices
-    if (isset($_SESSION[USER_ERROR_NAME])) {
-      unset($_SESSION[USER_ERROR_NAME]);
+    if (isset($_SESSION[MADEAM_USER_ERROR_NAME])) {
+      unset($_SESSION[MADEAM_USER_ERROR_NAME]);
     }
 
     // destroy flash data when it's life runs out
-		if (isset($_SESSION[FLASH_LIFE_NAME])) {
-			if (--$_SESSION[FLASH_LIFE_NAME] < 1) {
-				unset($_SESSION[FLASH_LIFE_NAME]);
-				if (isset($_SESSION[FLASH_DATA_NAME])) {
-					unset($_SESSION[FLASH_DATA_NAME]);
+		if (isset($_SESSION[MADEAM_FLASH_LIFE_NAME])) {
+			if (--$_SESSION[MADEAM_FLASH_LIFE_NAME] < 1) {
+				unset($_SESSION[MADEAM_FLASH_LIFE_NAME]);
+				if (isset($_SESSION[MADEAM_FLASH_DATA_NAME])) {
+					unset($_SESSION[MADEAM_FLASH_DATA_NAME]);
 				}
 			}
 		}

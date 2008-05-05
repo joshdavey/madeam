@@ -16,7 +16,7 @@
  */
 class Madeam_Session {
 
-  public static function start($sess_id = false) {
+  static public function start($sess_id = false) {
 		// load session by ID
     if ($sess_id) { session_id($sess_id); }
 
@@ -26,38 +26,54 @@ class Madeam_Session {
 		}
 
 		// merge post data with flash post data
-		if (isset($_SESSION[FLASH_DATA_NAME][FLASH_POST_NAME])) {
-      $_POST = array_merge($_SESSION[FLASH_DATA_NAME][FLASH_POST_NAME], $_POST);
+		if (isset($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME])) {
+      $_POST = array_merge($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME], $_POST);
     }
   }
 
-  public static function destroy() {
+  static public function destroy() {
     session_destroy();
   }
 
-  public static function flash($name, $data) {
-    $_SESSION[FLASH_DATA_NAME][$name] = $data;
+  static public function flashSet($name, $data) {
+    $_SESSION[MADEAM_FLASH_DATA_NAME][$name] = $data;
   }
 
-	public static function flashPost() {
+  static public function flashGet($name) {
+    if (isset($_SESSION[MADEAM_FLASH_DATA_NAME][$name])) {
+			return $_SESSION[MADEAM_FLASH_DATA_NAME][$name];
+		} else {
+		  return false;
+		}
+  }
+
+	static public function flashPost() {
 	  if (isset($_POST)) {
-			$_SESSION[FLASH_DATA_NAME][FLASH_POST_NAME] = $_POST;
+			$_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME] = $_POST;
 		}
 	}
 
-	public static function flashLife($pagesToLive = 1) {
-	  $_SESSION[FLASH_LIFE_NAME] = $pagesToLive;
+	static public function flashDestroy($name = false) {
+	  if ($name === false) {
+	    unset($_SESSION[MADEAM_FLASH_DATA_NAME]);
+	  } else {
+	    unset($_SESSION[MADEAM_FLASH_DATA_NAME][$name]);
+	  }
 	}
 
-  public static function error($name, $msg) {
-    $_SESSION[USER_ERROR_NAME][$name][] = $msg;
+	static public function flashLife($pagesToLive = 1) {
+	  $_SESSION[MADEAM_FLASH_LIFE_NAME] = $pagesToLive;
+	}
+
+  static public function error($name, $msg) {
+    $_SESSION[MADEAM_USER_ERROR_NAME][$name][] = $msg;
   }
 
-  public static function set($name, $value) {
+  static public function set($name, $value) {
     $_SESSION[$name] = $value;
   }
 
-  public static function get($name) {
+  static public function get($name) {
     if (isset($_SESSION[$name])) {
         return $_SESSION[$name];
     } else {

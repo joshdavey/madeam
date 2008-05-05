@@ -348,7 +348,7 @@ class Madeam_Model {
       $field    = $validator['args']['field'];
       $method   = 'validate' . ucfirst($validator['method']);
 
-      $error_key = $this->name . MODEL_JOINT . $field;
+      $error_key = $this->name . MADEAM_ASSOCIATION_JOINT . $field;
 
       // testing new Validation class
       //test('Valid? ' . Madeam_Validate::$method($this->entry[$field], $args));
@@ -358,7 +358,7 @@ class Madeam_Model {
       if ($check_non_existent_fields === false || isset($this->entry[$field])) {
         if ($this->$method(@$this->entry[$field], $validator['args']) === false) {
 					$this->session->error($error_key, $this->parseValidateMessage($validator['args']));
-          //$_SESSION[USER_ERROR_NAME][$error_key][] = $this->parseValidateMessage($validator['args']);
+          //$_SESSION[MADEAM_MADEAM_USER_ERROR_NAME][$error_key][] = $this->parseValidateMessage($validator['args']);
         }
       }
     }

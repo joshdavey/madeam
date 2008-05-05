@@ -195,8 +195,8 @@ class Madeam_Router {
    */
   public static function currentUri() {
     // we can check to see if mod_rewrite is enabled if $_GET['uri'] exists.
-    if (isset($_GET['uri'])) {
-      return '/' . $_GET['uri'];
+    if (MADAEM_REWRITE_URI !== false) {
+      return '/' . MADAEM_REWRITE_URI;
     } else {
       $url = explode(SCRIPT_FILENAME, $_SERVER['REQUEST_URI']);
 			// check if it split it into 2 peices.

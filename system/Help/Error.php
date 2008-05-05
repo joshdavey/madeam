@@ -19,8 +19,8 @@ class Help_Error extends help_html {
   public static function all($name = 'errors', $_params = array()) {
 		$errors_box = null;
 
-    if (isset($_SESSION[USER_ERROR_NAME])) {
-			$errors = $_SESSION[USER_ERROR_NAME];
+    if (isset($_SESSION[MADEAM_USER_ERROR_NAME])) {
+			$errors = $_SESSION[MADEAM_USER_ERROR_NAME];
 
       $params['name']   = $name;
       $params['id']     = self::nameToId($name);
@@ -49,9 +49,9 @@ class Help_Error extends help_html {
   public static function single($name, $message = false) {
     $error_tag = null;
 
-    if (isset($_SESSION[USER_ERROR_NAME][$name])) {
+    if (isset($_SESSION[MADEAM_USER_ERROR_NAME][$name])) {
       $error_tag .= self::openTag('ul', array('class' => 'error'));
-      foreach ($_SESSION[USER_ERROR_NAME][$name] as $error) {
+      foreach ($_SESSION[MADEAM_USER_ERROR_NAME][$name] as $error) {
         if ($message) {
           $error_tag .= self::wrappingTag('li', $message);
         } else {
