@@ -37,7 +37,9 @@ class Madeam_Error {
     $config = Madeam_Registry::get('config');
 
     // clean output buffer
-    ob_clean();
+    if (ob_get_clean()) {
+      ob_clean();
+    }
 
     if (MADEAM_ENABLE_DEBUG == true) {
       // get random snippet
@@ -53,6 +55,7 @@ class Madeam_Error {
         '&file=' . urlencode($exception->getFile()) .
         '&documentation=' . 'comingsoong'
       );
+      
       exit();
 
     } else {
