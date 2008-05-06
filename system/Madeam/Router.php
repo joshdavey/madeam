@@ -176,7 +176,7 @@ class Madeam_Router {
     $params = array_merge($params, $gets);
 
     // automagically disable the layout when making an AJAX call
-    if (!MADAEM_ENABLE_AJAX_LAYOUT && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') { $params['layout'] = '0'; }
+    if (!MADEAM_ENABLE_AJAX_LAYOUT && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') { $params['layout'] = '0'; }
 
     $config = Madeam_Registry::get('config');
 
@@ -195,8 +195,8 @@ class Madeam_Router {
    */
   public static function currentUri() {
     // we can check to see if mod_rewrite is enabled if $_GET['uri'] exists.
-    if (MADAEM_REWRITE_URI !== false) {
-      return '/' . MADAEM_REWRITE_URI;
+    if (MADEAM_REWRITE_URI !== false) {
+      return '/' . MADEAM_REWRITE_URI;
     } else {
       $url = explode(SCRIPT_FILENAME, $_SERVER['REQUEST_URI']);
 			// check if it split it into 2 peices.

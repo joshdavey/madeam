@@ -40,21 +40,21 @@ if (!defined('PATH_TO_PUBLIC'))  { define('PATH_TO_PUBLIC', dirname(dirname(__FI
 define('SCRIPT_FILENAME', 'index.php');
 
 // turn configs into constants for speed?
-define('MADAEM_ENVIRONMENT',        $config['environment']);
+define('MADEAM_ENVIRONMENT',        $config['environment']);
 define('MADEAM_ENABLE_DEBUG',       $config['enable_debug']);
 define('MADEAM_ENABLE_CACHE',       $config['enable_cache']);
 define('MADEAM_ENABLE_LOGGER',      $config['enable_logger']);
-define('MADAEM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
+define('MADEAM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
 // mod_rewrite is on when $_GET['madeamURI'] exists. You can see it defined in the public .htaccess file
 if (isset($_GET['madeamURI'])) {
   $publicDir = basename(PATH_TO_PUBLIC);
 	define('PATH_TO_URI', '/' . substr(str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']), -strlen($publicDir))), 0, -1));
-	define('MADAEM_REWRITE_URI', $_GET['madeamURI']);
+	define('MADEAM_REWRITE_URI', $_GET['madeamURI']);
 } else {
 	define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
-	define('MADAEM_REWRITE_URI', false);
+	define('MADEAM_REWRITE_URI', false);
 }
 
 // determine the relative path to the public directory

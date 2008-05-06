@@ -29,7 +29,7 @@ class Madeam_Cache {
 
 	  // prefix id with environment name
 	  // the id is prefixed so that caches for one environment don't overlap another
-	  $id = MADAEM_ENVIRONMENT . '.' . $id;
+	  $id = MADEAM_ENVIRONMENT . '.' . $id;
 
 	  // check registry first
 	  if (Madeam_Registry::exists($id)) {
@@ -66,7 +66,7 @@ class Madeam_Cache {
 
 	  // prefix id with environment name
 	  // the id is prefixed so that caches for one environment don't overlap another
-	  $id = MADAEM_ENVIRONMENT . '.' . $id;
+	  $id = MADEAM_ENVIRONMENT . '.' . $id;
 
 	  // store in registry
 		if ($store_in_registry === true) {
@@ -95,7 +95,7 @@ class Madeam_Cache {
 
 	  // prefix id with environment name
 	  // the id is prefixed so that caches for one environment don't overlap another
-	  $id = MADAEM_ENVIRONMENT . '.' . $id;
+	  $id = MADEAM_ENVIRONMENT . '.' . $id;
 
 		// check to see if cache is disabled
 		if (MADEAM_ENABLE_CACHE === false) { return false; }
@@ -136,7 +136,7 @@ class Madeam_Cache {
 
 	  // prefix id with environment name
 	  // the id is prefixed so that caches for one environment don't overlap another
-	  $id = MADAEM_ENVIRONMENT . '.' . $id;
+	  $id = MADEAM_ENVIRONMENT . '.' . $id;
 
 	  // set file name
 		$file = PATH_TO_TMP . self::$dir . DS . $id;
@@ -156,7 +156,7 @@ class Madeam_Cache {
 
 	  // prefix id with environment name
 	  // the id is prefixed so that caches for one environment don't overlap another
-	  $id = MADAEM_ENVIRONMENT . '.' . $id;
+	  $id = MADEAM_ENVIRONMENT . '.' . $id;
 
 	  // check registry first
 	  if (Madeam_Registry::get($id)) { return true; }

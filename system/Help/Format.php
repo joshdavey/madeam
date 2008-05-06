@@ -1,28 +1,66 @@
 <?php
-class help_format {
+class Help_Format {
 
-  function date($format, $date) {
+  static public $dateFormat     = 'd F o';
+  static public $datetimeFormat = 'd F o H:i:s';
+  static public $moneyFormat    = '%';
 
-    $timestamp = null;
-    
-    // check current format of date
-    
-    if        // timestamp
-    (preg_match('/[0-9]{9}/', $date)) {
-      
-    } elseif  // datetime
-    (preg_match('//')) {
-      
-    } elseif  // date
-    (preg_match('//')) {
-      
+  /**
+   * Enter description here...
+   *
+   * @param string $date
+   * @param string $format
+   * @return string
+   */
+  static public function date($date = false, $format = false) {
+    // set format if not defined
+    if ($format === false) { $format = self::$dateFormat; }
+
+    if ($date === false) {
+      return date($format, time());
+    } else {
+      if (($time = strtotime($date)) !== false) {
+        return date($format, $time);
+      } else {
+        return false;
+      }
     }
-
-    return date($format, time());
   }
 
-  function money($amount, $commas = true) {
-    return $amount;
+  /**
+   * Enter description here...
+   *
+   * @param string $date
+   * @param string $format
+   * @return string
+   */
+  static public function datetime($date = false, $format = false) {
+    // set format if not defined
+    if ($format === false) { $format = self::$datetimeFormat; }
+
+    if ($date === false) {
+      return date($format, time());
+    } else {
+      if (($time = strtotime($date)) !== false) {
+        return date($format, $time);
+      } else {
+        return false;
+      }
+    }
+  }
+
+  /**
+   * Enter description here...
+   *
+   * @param integer $number
+   * @param string $format
+   * @return string
+   */
+  static public function money($number, $format = false) {
+    // set format if not defined
+    if ($format === false) { $format = self::$moneyFormat; }
+
+    return money_format($format, (int) $number);
   }
 
 }
