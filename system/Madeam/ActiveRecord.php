@@ -47,11 +47,12 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   public function __call($name, $args) {
     $match = array();
-    if (preg_match("/^find_([a-z]+)_by_(.*)/", $name, $match)) {
+    if (preg_match("/^find([a-zA-Z]+)By_(.*)/", $name, $match)) {
       $this->where($match[2] . " = '$args[0]'");
-      $function = 'find_' . $match[1];
+      $function = 'find' . $match[1];
+      if (method_exists($this, $function));
       return $this->$function();
-    } /*elseif (preg_match("/^delete_by_(.*)/", $name, $match)) {
+    } /*elseif (preg_match("/^deleteBy_(.*)/", $name, $match)) {
       $this->where($match[2] . " = '$args[0]'");
       $this->delete();
     }*/
@@ -185,7 +186,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       //while ($this->entry = mysql_fetch_object($this->link)) {
       while ($this->entry = mysql_fetch_assoc($this->link)) {
         // adds custom fields
-        $this->prepareResult();
+        $this->prepareResults();
 
         // find related content
         if ($this->depth > 0) {
