@@ -33,23 +33,23 @@ class Madeam_Controller {
     }
     
     // set params
-    $this->get           = $get;
-    $this->post          = $post;
-    $this->request       = $post + $get; // experimental (in hopes of having just request and not get or post)
-    $this->requestMethod = $requestMethod;
+    $this->_get           = $get;
+    $this->_post          = $post;
+    $this->_request       = $post + $get; // experimental (in hopes of having just request and not get or post)
+    $this->_requestMethod = $requestMethod;
 
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
-      $this->scaffoldController  = $this->get['controller'];
+      $this->scaffoldController  = $this->_get['controller'];
       $this->scaffoldKey         = $this->{$this->represent}->getPrimaryKey();
     }
 
     // set view
-    $this->setView($this->get['controller'] . '/' . $this->get['action']);
+    $this->setView($this->_get['controller'] . '/' . $this->_get['action']);
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
-    if ($this->get['useLayout'] == '0' || $this->get['useLayout'] == 'false') {
+    if ($this->_get['useLayout'] == '0' || $this->_get['useLayout'] == 'false') {
       $this->setLayout(false);
     } else {
       $this->setLayout($this->layout);
@@ -133,12 +133,12 @@ class Madeam_Controller {
       if (is_list($data)) {
         foreach ($data as $key => $$partialName) {
           $_num++;
-          include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->get['format']);
+          include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->_get['format']);
         }
       } else {
         $$partialName = $data;
         $_num++;
-        include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->get['format']);
+        include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->_get['format']);
       }
     }
 
@@ -153,7 +153,7 @@ class Madeam_Controller {
    * @param string $view
    */
   final protected function setView($view) {
-    $this->viewFile = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->get['format'];
+    $this->viewFile = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->_get['format'];
   }
 
   /**
@@ -166,17 +166,17 @@ class Madeam_Controller {
 
     if (func_num_args() < 2) {
       if (is_string($layouts)) {
-        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->get['format'];
+        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->_get['format'];
       } elseif (is_array($layouts)) {
         foreach ($layouts as $layout) {
-          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->get['format'];
+          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->_get['format'];
         }
       } else {
         $this->layout = false;
       }
     } else {
       foreach (funcget_args() as $layout) {
-        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->get['format'];
+        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->_get['format'];
       }
     }
   }
@@ -210,7 +210,7 @@ class Madeam_Controller {
         }
 
 				/*
-				$parser = $this->get['format'];
+				$parser = $this->_get['format'];
 				if (method_exists('madeamParser', $parser)) {
 					unset($this->data['header_for_layout']);
 					unset($this->data['params']);
@@ -226,7 +226,7 @@ class Madeam_Controller {
         // set $content_for_layout to $data which is just a string
 				$content_for_layout = $data;
 				/*
-				$parser = $this->get['format'];
+				$parser = $this->_get['format'];
         if (method_exists('madeamParser', $parser)) {
 					$content_for_layout = madeamParser::$parser($this->viewFile, $data);
 				} else {
