@@ -13,7 +13,7 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Controller {
-	public    $output      = null;
+	public    $finalOutput  = null;
 
   protected $scaffold     = false;
   protected $layout       = 'master';
@@ -26,31 +26,30 @@ class Madeam_Controller {
   protected $scaffoldController;
   protected $scaffoldKey;
 
-  public function __construct($params) {
+  public function __construct($get, $post, $requestMethod) {
     // load represented model
     if (is_string($this->represent)) {
-      $this->represent = Madeam_Inflector::model_nameize($this->represent);
+      $this->represent = Madeam_Inflector::modelNameize($this->represent);
     }
-
-    // assign params
-    foreach ($params as $name => $value) {
-      if (!isset($this->$name)) {
-        $this->$name = $value;
-      }
-    }
+    
+    // set params
+    $this->get           = $get;
+    $this->post          = $post;
+    $this->request       = $post + $get; // experimental (in hopes of having just request and not get or post)
+    $this->requestMethod = $requestMethod;
 
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
-      $this->scaffoldController  = $this->controller;
-      $this->scaffoldKey         = $this->{$this->represent}->get_primary_key();
+      $this->scaffoldController  = $this->get['controller'];
+      $this->scaffoldKey         = $this->{$this->represent}->getPrimaryKey();
     }
 
     // set view
-    $this->setView($this->controller . '/' . $this->action);
+    $this->setView($this->get['controller'] . '/' . $this->get['action']);
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
-    if ($this->showLayout == '0' || $this->showLayout == 'false') {
+    if ($this->get['useLayout'] == '0' || $this->get['useLayout'] == 'false') {
       $this->setLayout(false);
     } else {
       $this->setLayout($this->layout);
@@ -67,7 +66,7 @@ class Madeam_Controller {
    * @param string $name
    * @return object
    */
-  public function __get($name) {
+  public function _get($name) {
     $match = array();
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
        // set model class name
@@ -86,27 +85,42 @@ class Madeam_Controller {
     }
   }
 
-  /**
-   * Final methods. (Actions cannot have the same name as these methods)
-   * =======================================================================
-   */
-
   final public function callback($callback) {
     return $this->$callback();
   }
 
+  /**
+   * Enter description here...
+   *
+   * @param unknown_type $uri
+   * @return unknown
+   */
   final protected function callAction($uri) {
     return Madeam::callAction($uri);
   }
 
-  final protected function callPartial($partial_path, $data = array(), $start = 0, $limit = false) {
+  /**
+   * Enter description here...
+   *
+   * @param unknown_type $partialPath
+   * @param unknown_type $data
+   * @param unknown_type $start
+   * @param unknown_type $limit
+   * @return unknown
+   */
+  final protected function callPartial($partialPath, $data = array(), $start = 0, $limit = false) {
     if (!empty($data)) {
       // internal counter can be accessed in the view
       $_num = $start;
+      
+      /**
+       * IMPORTANT! We should have our render logic in here! 
+       * I want to be able to use partials as templates!!!!!!!!!
+       */
 
       // get partial name
-      $partial = explode('/', $partial_path);
-      $partial_name = array_pop($partial);
+      $partial = explode('/', $partialPath);
+      $partialName = array_pop($partial);
 
       // splice array so that it is within the range defined by $start and $limit
       if ($limit !== false) {
@@ -117,14 +131,14 @@ class Madeam_Controller {
 
       // set variables
       if (is_list($data)) {
-        foreach ($data as $key => $$partial_name) {
+        foreach ($data as $key => $$partialName) {
           $_num++;
-          include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->format);
+          include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->get['format']);
         }
       } else {
-        $$partial_name = $data;
+        $$partialName = $data;
         $_num++;
-        include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partial_name . '.' . $this->format);
+        include(PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->get['format']);
       }
     }
 
@@ -139,7 +153,7 @@ class Madeam_Controller {
    * @param string $view
    */
   final protected function setView($view) {
-    $this->viewFile = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->format;
+    $this->viewFile = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->get['format'];
   }
 
   /**
@@ -152,17 +166,17 @@ class Madeam_Controller {
 
     if (func_num_args() < 2) {
       if (is_string($layouts)) {
-        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->format;
+        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->get['format'];
       } elseif (is_array($layouts)) {
         foreach ($layouts as $layout) {
-          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->format;
+          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->get['format'];
         }
       } else {
         $this->layout = false;
       }
     } else {
-      foreach (func_get_args() as $layout) {
-        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->format;
+      foreach (funcget_args() as $layout) {
+        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->get['format'];
       }
     }
   }
@@ -196,7 +210,7 @@ class Madeam_Controller {
         }
 
 				/*
-				$parser = $this->format;
+				$parser = $this->get['format'];
 				if (method_exists('madeamParser', $parser)) {
 					unset($this->data['header_for_layout']);
 					unset($this->data['params']);
@@ -212,7 +226,7 @@ class Madeam_Controller {
         // set $content_for_layout to $data which is just a string
 				$content_for_layout = $data;
 				/*
-				$parser = $this->format;
+				$parser = $this->get['format'];
         if (method_exists('madeamParser', $parser)) {
 					$content_for_layout = madeamParser::$parser($this->viewFile, $data);
 				} else {
@@ -247,9 +261,9 @@ class Madeam_Controller {
       // mark view as rendered
       $this->isRendered = $rendered;
 
-      $this->output = $content_for_layout;
+      $this->finalOutput = $content_for_layout;
 
-      return $this->output;
+      return $this->finalOutput;
     }
 
     return false;

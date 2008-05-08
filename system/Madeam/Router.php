@@ -14,19 +14,20 @@
  */
 
 class Madeam_Router {
-  public static $routes           = array(); // regex, names, params -- damn these really need to be cached! (Store them in a text file?)
+  public static $routes           = array(); // regex, names, params
   public static $links            = array(); // a place to store the magic smart links
 
   // do we really need this
-  public static $actionMethodMap  = array(
+  public static $actionRequestMethodMap  = array(
     array('action' => 'index',  'method' => 'get',    'id' => false),
     array('action' => 'show',   'method' => 'get',    'id' => true),
+    array('action' => 'view',   'method' => 'get',    'id' => true), // same as show
     array('action' => 'delete', 'method' => 'delete', 'id' => true),
     array('action' => 'edit',   'method' => 'put',    'id' => true),
     array('action' => 'edit',   'method' => 'post',   'id' => false),
     array('action' => 'add',    'method' => 'post',   'id' => false)
   );
-
+  
   public static $resourceMap      = array(
 
   );
@@ -183,7 +184,7 @@ class Madeam_Router {
     // set default values for controller and action
     !isset($params['controller']) || $params['controller'] == null ? $params['controller'] = $config['default_controller'] : false ;
     !isset($params['action']) || $params['action'] == null ? $params['action'] = $config['default_action'] : false ;
-    !isset($params['layout']) || $params['layout'] == null ? $params['layout'] = '0' : false ;
+    !isset($params['useLayout']) || $params['useLayout'] == null ? $params['useLayout'] = '0' : false ;
     !isset($format) || $format == null ? $params['format'] = $config['default_format'] : $params['format'] = $format;
 
 

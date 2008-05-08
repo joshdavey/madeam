@@ -47,10 +47,14 @@ class Madeam_Session {
 		}
   }
 
-	static public function flashPost() {
-	  if (isset($_POST)) {
-			$_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME] = $_POST;
-		}
+	static public function flashPost($postData = false) {
+	  if ($postData !== false) {
+	    $_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME] = $postData;
+	  } else {
+  	  if (isset($_POST)) {
+  			$_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME] = $_POST;
+  		}
+	  }
 	}
 
 	static public function flashDestroy($name = false) {

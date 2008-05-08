@@ -22,8 +22,10 @@ class Madeam {
     // call user front controller?
   	// include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
 
+  	if (isset($_GET['useLayout'])) { $useLayout = $_GET['useLayout']; } else { $useLayout = 1; }
+  	
     // call controller action
-    $output = Madeam::makeRequest(Madeam_Router::currentUri() . '?showLayout=1');
+    $output = Madeam::makeRequest(Madeam_Router::currentUri() . '?useLayout=' . $useLayout);
 
     // destroy user error notices
     if (isset($_SESSION[MADEAM_USER_ERROR_NAME])) {
@@ -95,10 +97,10 @@ class Madeam {
 
     try {
       // create controller instance
-      $controller = new $controllerClass($params);
+      $controller = new $controllerClass($params, $_POST, $_SERVER['REQUEST_METHOD']);
     } catch (Madeam_Exception $e) {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
-        $controller = new Controller_App($params);
+        $controller = new Controller_App($params, $_POST, $_SERVER['REQUEST_METHOD']);
       } else {
 /*
         // I really don't like this code... Can we put it in the Madeam_Error calss?
@@ -140,7 +142,7 @@ class Madeam {
       $controller->callback('afterRender');
 
       // return output
-      return $controller->output;
+      return $controller->finalOutput;
     } catch (Madeam_Exception $e) {
       Madeam_Error::catchException($e, Madeam_Error::ERR_NOT_FOUND);
     }
@@ -158,7 +160,7 @@ class Madeam {
       header('Location:  ' . self::url($url));
       if ($exit) { exit; }
     } else {
-      Madeam_Logger::log('Tried redirecting when headers already sent. (Check for echos before script redirects)');
+      Madeam_Logger::log('Tried redirecting when headers already sent. (Check for echos before redirects)');
     }
   }
 
