@@ -23,7 +23,7 @@ class Madeam {
   	// include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
 
   	if (isset($_GET['useLayout'])) { $useLayout = $_GET['useLayout']; } else { $useLayout = 1; }
-  	
+
     // call controller action
     $output = Madeam::makeRequest(Madeam_Router::currentUri() . '?useLayout=' . $useLayout);
 
@@ -39,6 +39,11 @@ class Madeam {
 				if (isset($_SESSION[MADEAM_FLASH_DATA_NAME])) {
 					unset($_SESSION[MADEAM_FLASH_DATA_NAME]);
 				}
+			} else {
+			  if (isset($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME])) {
+  			  $_POST = array_merge($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME], $_POST);
+  			  $_SERVER['REQUEST_METHOD'] = 'POST';
+			  }
 			}
 		}
 

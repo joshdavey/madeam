@@ -21,14 +21,7 @@ class Madeam_Session {
     if ($sess_id) { session_id($sess_id); }
 
 		// start session
-    if (!isset($_SESSION)) {
-			session_start();
-		}
-
-		// merge post data with flash post data
-		if (isset($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME])) {
-      $_POST = array_merge($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME], $_POST);
-    }
+    if (!isset($_SESSION)) { session_start(); }
   }
 
   static public function destroy() {
