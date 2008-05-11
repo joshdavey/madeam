@@ -25,7 +25,7 @@ class Madeam {
   	if (isset($_GET['useLayout'])) { $useLayout = $_GET['useLayout']; } else { $useLayout = 1; }
 
     // call controller action
-    $output = Madeam::makeRequest(Madeam_Router::currentUri() . '?useLayout=' . $useLayout);
+    $output = Madeam::makeRequest(Madeam_Router::getCurrentURI() . '?useLayout=' . $useLayout);
 
     // destroy user error notices
     if (isset($_SESSION[MADEAM_USER_ERROR_NAME])) {
@@ -73,7 +73,7 @@ class Madeam {
   public static function makeRequest($uri) {
     // get request parameters from uri
     // example input: 'posts/show/32'
-    $params = Madeam_Router::parseUri($uri);
+    $params = Madeam_Router::parseURI($uri);
 
     // get instance of configuration from registry
     $config = Madeam_Registry::get('config');
@@ -98,14 +98,15 @@ class Madeam {
       $node = ucfirst($node);
     }
 
+    // set controller class
     $controllerClass = 'Controller_' . implode('_', $controllerClassNodes);
 
     try {
       // create controller instance
-      $controller = new $controllerClass($params, $_POST, $_SERVER['REQUEST_METHOD']);
+      $controller = new $controllerClass($params);
     } catch (Madeam_Exception $e) {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
-        $controller = new Controller_App($params, $_POST, $_SERVER['REQUEST_METHOD']);
+        $controller = new Controller_App($params);
       } else {
 /*
         // I really don't like this code... Can we put it in the Madeam_Error calss?

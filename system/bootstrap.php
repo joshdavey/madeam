@@ -51,7 +51,7 @@ define('MADEAM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
 if (isset($_GET['madeamURI'])) {
   $publicDir = basename(PATH_TO_PUBLIC);
 	define('PATH_TO_URI', '/' . substr(str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']), -strlen($publicDir))), 0, -1));
-	define('MADEAM_REWRITE_URI', $_GET['madeamURI']);
+	define('MADEAM_REWRITE_URI', '/' . $_GET['madeamURI']);
 } else {
 	define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
 	define('MADEAM_REWRITE_URI', false);
@@ -195,7 +195,7 @@ set_exception_handler('Madeam_uncaughtException');
  * @param unknown_type $line
  */
 function Madeam_errorHandler($code, $string, $file, $line) {
-  
+
   // return regular PHP errors when they're non-fatal
   if ($code == 2 || $code == 4 || $code == 8) { return false; }
 

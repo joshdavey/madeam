@@ -27,7 +27,7 @@ class Madeam_Router {
     array('action' => 'edit',   'method' => 'post',   'id' => false),
     array('action' => 'add',    'method' => 'post',   'id' => false)
   );
-  
+
   public static $resourceMap      = array(
 
   );
@@ -98,13 +98,13 @@ class Madeam_Router {
    * @param string $uri
    * @return array
    */
-  public static function parseUri($uri = false) {
+  public static function parseURI($uri = false) {
     // parse uri
-    $parsed_uri = parse_url($uri);
+    $parsedURI = parse_url($uri);
 
     // set uri
-    if (isset($parsed_uri['path'])) {
-      $extracted_path = explode(PATH_TO_URI, $parsed_uri['path'], 2);
+    if (isset($parsedURI['path'])) {
+      $extracted_path = explode(PATH_TO_URI, $parsedURI['path'], 2);
       $uri = array_pop($extracted_path);
     } else {
       $uri = null;
@@ -112,18 +112,18 @@ class Madeam_Router {
 
     // set format
     $format = false;
-    $uri_anatomy = explode('.', $uri, 2);
-    if (count($uri_anatomy) > 1) {
-      $format = array_pop($uri_anatomy);
-      $uri = implode($uri_anatomy);
+    $URIAnatomy = explode('.', $uri, 2);
+    if (count($URIAnatomy) > 1) {
+      $format = array_pop($URIAnatomy);
+      $uri = implode($URIAnatomy);
     } else {
-      $uri = $uri_anatomy[0];
+      $uri = $URIAnatomy[0];
     }
 
     // set get
     $get = array();
-    if (isset($parsed_uri['query'])) {
-      $query = $parsed_uri['query'];
+    if (isset($parsedURI['query'])) {
+      $query = $parsedURI['query'];
 
       // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
       parse_str($query, $get); // assigns $get array of query params
@@ -177,7 +177,7 @@ class Madeam_Router {
     $params = array_merge($params, $gets);
 
     // automagically disable the layout when making an AJAX call
-    if (!MADEAM_ENABLE_AJAX_LAYOUT && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') { $params['layout'] = '0'; }
+    if (!MADEAM_ENABLE_AJAX_LAYOUT && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') { $params['useLayout'] = '0'; }
 
     $config = Madeam_Registry::get('config');
 
@@ -193,11 +193,11 @@ class Madeam_Router {
 
   /**
    * returns the current uri
+   * @return string
    */
-  public static function currentUri() {
-    // we can check to see if mod_rewrite is enabled if $_GET['uri'] exists.
+  public static function getCurrentURI() {
     if (MADEAM_REWRITE_URI !== false) {
-      return '/' . MADEAM_REWRITE_URI;
+      return MADEAM_REWRITE_URI;
     } else {
       $url = explode(SCRIPT_FILENAME, $_SERVER['REQUEST_URI']);
 			// check if it split it into 2 peices.
