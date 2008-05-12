@@ -34,6 +34,20 @@ class Madeam_Controller {
 
     // set params
     $this->params = $params;
+    
+    // set request information
+    $this->_get;
+    $this->_post;
+    $this->_session;
+    $this->_cookie;
+    $this->_requestMethod;
+    
+    // after controller executes merge session information with existing session
+    //$_SESSION = array_merge($_SESSION, $this->_session);
+    // ... but how do this make it any less global? I guess it doesn't...
+    // what if we tracked all opened controllers and at the end of the request we merge all their session information...??? better...
+    // $this->makeRequest('posts/index', $post, $session, $
+
 
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
