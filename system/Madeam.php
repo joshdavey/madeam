@@ -33,19 +33,19 @@ class Madeam {
     }
 
     // destroy flash data when it's life runs out
-		if (isset($_SESSION[MADEAM_FLASH_LIFE_NAME])) {
-			if (--$_SESSION[MADEAM_FLASH_LIFE_NAME] < 1) {
-				unset($_SESSION[MADEAM_FLASH_LIFE_NAME]);
-				if (isset($_SESSION[MADEAM_FLASH_DATA_NAME])) {
-					unset($_SESSION[MADEAM_FLASH_DATA_NAME]);
-				}
-			} else {
-			  if (isset($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME])) {
-  			  $_POST = array_merge($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME], $_POST);
-  			  $_SERVER['REQUEST_METHOD'] = 'POST';
-			  }
+	if (isset($_SESSION[MADEAM_FLASH_LIFE_NAME])) {
+		if (--$_SESSION[MADEAM_FLASH_LIFE_NAME] < 1) {
+			unset($_SESSION[MADEAM_FLASH_LIFE_NAME]);
+			if (isset($_SESSION[MADEAM_FLASH_DATA_NAME])) {
+				unset($_SESSION[MADEAM_FLASH_DATA_NAME]);
 			}
+		} else {
+		  if (isset($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME])) {
+			  $_POST = array_merge($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME], $_POST);
+			  $_SERVER['REQUEST_METHOD'] = 'POST';
+		  }
 		}
+	}
 
     // return output
     return $output;
@@ -70,7 +70,7 @@ class Madeam {
    * @param string $url -- example: controller/action/32?foo=bar
    * @return string
    */
-  public static function makeRequest($uri) {
+  public static function makeRequest($uri, $post = false, $session = false, $cookie = false) {
     // get request parameters from uri
     // example input: 'posts/show/32'
     $params = Madeam_Router::parseURI($uri);
@@ -89,7 +89,6 @@ class Madeam {
     if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['controller']))) { $params['controller'] .= '/' . $config['default_controller']; }
 
     // set controller's class
-
     $params['controller'] = preg_replace("/[^A-Za-z0-9_\-\/]/", null, $params['controller']); // strip off the dirt
 
     $controllerClassNodes = explode('/', $params['controller']);
