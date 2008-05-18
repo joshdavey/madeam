@@ -137,15 +137,38 @@ class Madeam_Controller {
   }
   
   public function __destruct() {
-    /*
-    foreach ($this->requestCookie as $cookieName => $cookieValue) {
-      if (is_array($cookieValue)) {
-        setcookie($cookieName, $cookieValue['value'], $cookieValue['expire'], $cookieValue['path'], $cookieValue['domain'], $cookieValue['secure'], $cookieValue['httponly']);
-      } else {
-        setcookie($cookieName, $cookieValue);
-      }      
+    
+    if (!headers_sent()) {
+      
+      // we need to destroy cookies that are unset
+      // compare $_COOKIE and $this->requestCookie
+      // delete unset cookies
+      
+      foreach ($this->requestCookie as $cookieName => $cookieValue) {
+        if (isset($_COOKIE[$cookieName])) { test(); continue; }
+        
+        $cExpire    = (60 * 60 * 24);
+        $cPath      = dirname(PATH_TO_REL);
+        $cDomain    = $_SERVER['SERVER_NAME'];
+        $cSecure    = false;
+        $cHttpOnly  = false;
+        $cValue     = null;
+        
+        if (is_array($cookieValue)) {
+          if (isset($cookieValue['expire']))    { $cExpire    = $cookieValue['expire']; }
+          if (isset($cookieValue['path']))      { $cPath      = $cookieValue['path']; }
+          if (isset($cookieValue['domain']))    { $cDomain    = $cookieValue['domain']; }
+          if (isset($cookieValue['secure']))    { $cSecure    = $cookieValue['secure']; }
+          if (isset($cookieValue['httponly']))  { $cHttpOnly  = $cookieValue['httponly']; }
+          if (isset($cookieValue['value']))     { $cValue     = $cookieValue['value']; }
+        } else {
+          $cValue = $cookieValue;
+        }
+        
+        setcookie($cookieName, $cValue, $cExpire, $cPath, $cDomain, $cSecure, $cHttpOnly);   
+      }
     }
-	*/
+    
   }
 
   /**

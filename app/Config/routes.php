@@ -11,5 +11,3 @@
 
 // default routes
   Madeam_Router::connect(':controller/:action/:id');
-
-?>

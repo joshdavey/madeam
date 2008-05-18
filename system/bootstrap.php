@@ -80,6 +80,7 @@ $_SERVER['QUERY_STRING'] = preg_replace('/&?madeamURI=[^&]*&?/', null, $_SERVER[
 if (! defined('PATH_TO_SYSTEM')) {
   define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS);
 }
+
 // application files
 define('PATH_TO_VIEW', PATH_TO_APP . 'View' . DS);
 define('PATH_TO_CONTROLLER', PATH_TO_APP . 'Controller' . DS);
@@ -87,9 +88,11 @@ define('PATH_TO_MODEL', PATH_TO_APP . 'Model' . DS);
 define('PATH_TO_LAYOUT', PATH_TO_VIEW);
 define('PATH_TO_LOG', PATH_TO_PROJECT . 'etc' . DS . 'log' . DS);
 define('PATH_TO_TMP', PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
+
 // set include paths
 $includePaths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_ANTHOLOGY, ini_get('include_path'));
 ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
+
 // define user errors variable name for $_SESSION
 // example: $_SESSION[MADEAM_USER_ERROR_NAME];
 define('MADEAM_USER_ERROR_NAME', 'muerrors');
@@ -118,11 +121,14 @@ function Madeam_Autoload($class) {
     throw new Madeam_Exception('Missing Class ' . $class, Madeam_Exception::ERR_CLASS_MISSING);
   }
 }
-// include application bootstrap
-require PATH_TO_APP . 'Config' . DS . 'bootstrap.php';
+
+
 // idea... use this as a last resort when all autoloads fail.
 // have this one throw an exception or make a last resort to check every path for the file.
 spl_autoload_register('Madeam_Autoload');
+
+// include application bootstrap
+require PATH_TO_APP . 'Config' . DS . 'bootstrap.php';
 
 /**
  * Checks to see if a relative file exists by checking each include path.

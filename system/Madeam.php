@@ -107,6 +107,7 @@ class Madeam {
     
     // set controller class
     $controllerClass = 'Controller_' . implode('_', $controllerClassNodes);
+    
     try {
       // create controller instance
       $controller = new $controllerClass($params, $requestPost, $requestCookie, $_SERVER['REQUEST_METHOD']);
@@ -151,8 +152,14 @@ class Madeam {
       // after render callback
       $controller->callback('afterRender');
       
+      // get final output
+      $finalOutput = $controller->finalOutput;
+      
+      // delete controller
+      unset($controller);
+      
       // return output
-      return $controller->finalOutput;
+      return $finalOutput;
     } catch(Madeam_Exception $e) {
       Madeam_Error::catchException($e, Madeam_Error::ERR_NOT_FOUND);
     }

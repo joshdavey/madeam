@@ -36,7 +36,7 @@ $cfg['environment'] = 'development';
  */
 
 // development
-  $env['development']['data_servers'][]     = 'mysql://root:@localhost?name=madeam';
+  $env['development']['data_servers'][]     = 'mysql://username:password@localhost?name=madeam';
   $env['development']['enable_model_cache'] = 0;
   $env['development']['enable_route_cache'] = 0;
   $env['development']['enable_view_cache']  = 0;
@@ -48,10 +48,10 @@ $cfg['environment'] = 'development';
   $env['development']['enable_debug']       = 1;
 
 // production
-  $env['production']['data_servers'][]   = 'mysql://root:password@localhost?name=madeam';
-  $env['production']['cache_level']      = 1;
-  $env['production']['debug_level']      = 0;
-  $env['production']['enable_logger']    = 1;
+  $env['production']['data_servers'][]    = 'mysql://username:password@localhost?name=madeam';
+  $env['production']['cache_level']       = 1;
+  $env['production']['debug_level']       = 0;
+  $env['production']['enable_logger']     = 1;
 
 /**
  * The name of the public directory.
@@ -84,7 +84,7 @@ $cfg['default_format']          = 'html';
  * which is the year and month but if you want to log it every day you could do 'Y-m-d'.
  * Obviously if you want to be really crazy you can even identify the logs by seconds.
  */
-$cfg['log_file_name']           = 'Y-m';
+$cfg['log_file_name']           = 'Y-m-d';
 
 
 /**
@@ -366,5 +366,4 @@ $config['mobile_browsers'] = array(
   'ericsson'			  => 'Ericsson',
   'blackBerry'		  => 'BlackBerry',
   'motorola'			  => 'Motorola'
-);	
-?>
+);
