@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -17,11 +18,14 @@
 class Madeam_Session {
 
   static public function start($sess_id = false) {
-		// load session by ID
-    if ($sess_id) { session_id($sess_id); }
-
-		// start session
-    if (!isset($_SESSION)) { session_start(); }
+    // load session by ID
+    if ($sess_id) {
+      session_id($sess_id);
+    }
+    // start session
+    if (! isset($_SESSION)) {
+      session_start();
+    }
   }
 
   static public function destroy() {
@@ -34,33 +38,33 @@ class Madeam_Session {
 
   static public function flashGet($name) {
     if (isset($_SESSION[MADEAM_FLASH_DATA_NAME][$name])) {
-			return $_SESSION[MADEAM_FLASH_DATA_NAME][$name];
-		} else {
-		  return false;
-		}
+      return $_SESSION[MADEAM_FLASH_DATA_NAME][$name];
+    } else {
+      return false;
+    }
   }
 
-	static public function flashPost($postData = false) {
-	  if ($postData !== false) {
-	    $_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME] = $postData;
-	  } else {
-  	  if (isset($_POST)) {
-  			$_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME] = $_POST;
-  		}
-	  }
-	}
+  static public function flashPost($postData = false) {
+    if ($postData !== false) {
+      $_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME] = $postData;
+    } else {
+      if (isset($_POST)) {
+        $_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME] = $_POST;
+      }
+    }
+  }
 
-	static public function flashDestroy($name = false) {
-	  if ($name === false) {
-	    unset($_SESSION[MADEAM_FLASH_DATA_NAME]);
-	  } else {
-	    unset($_SESSION[MADEAM_FLASH_DATA_NAME][$name]);
-	  }
-	}
+  static public function flashDestroy($name = false) {
+    if ($name === false) {
+      unset($_SESSION[MADEAM_FLASH_DATA_NAME]);
+    } else {
+      unset($_SESSION[MADEAM_FLASH_DATA_NAME][$name]);
+    }
+  }
 
-	static public function flashLife($pagesToLive = 1) {
-	  $_SESSION[MADEAM_FLASH_LIFE_NAME] = $pagesToLive;
-	}
+  static public function flashLife($pagesToLive = 1) {
+    $_SESSION[MADEAM_FLASH_LIFE_NAME] = $pagesToLive;
+  }
 
   static public function error($name, $msg) {
     $_SESSION[MADEAM_USER_ERROR_NAME][$name][] = $msg;
@@ -72,7 +76,7 @@ class Madeam_Session {
 
   static public function get($name) {
     if (isset($_SESSION[$name])) {
-        return $_SESSION[$name];
+      return $_SESSION[$name];
     } else {
       return false;
     }

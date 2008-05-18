@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -13,10 +14,11 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Component {
+
   private $_controller;
 
   public function __construct(&$_controller) {
-    $this->_controller =& $_controller;
+    $this->_controller = & $_controller;
   }
 }
 ?>

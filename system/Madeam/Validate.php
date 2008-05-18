@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -15,7 +16,7 @@
 class Madeam_Validate {
 
   public static function isEmail($string) {
-    if (!preg_match('/^(([A-Za-z0-9]+_+)|([A-Za-z0-9]+\-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6}$/', $v)) {
+    if (! preg_match('/^(([A-Za-z0-9]+_+)|([A-Za-z0-9]+\-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6}$/', $v)) {
       return false;
     }
     return true;
@@ -30,7 +31,9 @@ class Madeam_Validate {
   }
 
   public static function isNotEmpty($string) {
-    if ($string != null) { return true; }
+    if ($string != null) {
+      return true;
+    }
     return false;
   }
 
@@ -47,7 +50,7 @@ class Madeam_Validate {
   }
 
   public static function isISBN($string) {
-    if (!preg_match('/^(97(8|9))?\d{9}(\d|X)$/', $v)) {
+    if (! preg_match('/^(97(8|9))?\d{9}(\d|X)$/', $v)) {
       return false;
     }
     return true;

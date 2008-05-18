@@ -1,13 +1,19 @@
 <?php
+
 class Help_Format {
 
-  static public $dateFormat       = 'd F o';
-  static public $datetimeFormat   = 'd F o H:i:s';
-  static public $moneyFormat      = '%';
-  static public $numberThousands  = ',';
-  static public $numberDecimals   = 0;
-  static public $numberDecimal    = '.';
-  
+  public static $dateFormat = 'd F o';
+
+  public static $datetimeFormat = 'd F o H:i:s';
+
+  public static $moneyFormat = '%';
+
+  public static $numberThousands = ',';
+
+  public static $numberDecimals = 0;
+
+  public static $numberDecimal = '.';
+
   /**
    * Enter description here...
    *
@@ -17,8 +23,9 @@ class Help_Format {
    */
   static public function date($date = false, $format = false) {
     // set format if not defined
-    if ($format === false) { $format = self::$dateFormat; }
-
+    if ($format === false) {
+      $format = self::$dateFormat;
+    }
     if ($date === false) {
       return date($format, time());
     } else {
@@ -39,8 +46,9 @@ class Help_Format {
    */
   static public function datetime($date = false, $format = false) {
     // set format if not defined
-    if ($format === false) { $format = self::$datetimeFormat; }
-
+    if ($format === false) {
+      $format = self::$datetimeFormat;
+    }
     if ($date === false) {
       return date($format, time());
     } else {
@@ -61,8 +69,9 @@ class Help_Format {
    */
   static public function money($number, $format = false) {
     // set format if not defined
-    if ($format === false) { $format = self::$moneyFormat; }
-
+    if ($format === false) {
+      $format = self::$moneyFormat;
+    }
     if (function_exists('money_format')) {
       return money_format($format, (int) $number);
     } else {
@@ -81,12 +90,16 @@ class Help_Format {
    */
   static public function number($number, $decimals = false, $decimalPoint = false, $thousands = false) {
     // set formats if not defined
-    if ($decimals     === false)  { $decimals     = self::$numberDecimals; }
-    if ($decimalPoint === false)  { $decimalPoint = self::$numberDecimal; }
-    if ($thousands    === false)  { $thousands    = self::$numberThousands; }
-    
+    if ($decimals === false) {
+      $decimals = self::$numberDecimals;
+    }
+    if ($decimalPoint === false) {
+      $decimalPoint = self::$numberDecimal;
+    }
+    if ($thousands === false) {
+      $thousands = self::$numberThousands;
+    }
     return number_format((int) $number, $decimals, $decimalPoint, $thousands);
   }
-  
 }
 ?>

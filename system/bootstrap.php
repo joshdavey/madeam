@@ -12,19 +12,24 @@
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-
 // directory splitter
-if (!defined('DS')) { define('DS', DIRECTORY_SEPARATOR); }
+if (! defined('DS')) {
+  define('DS', DIRECTORY_SEPARATOR);
+}
 
 // define project directory
-if (!defined('PATH_TO_PROJECT')) { define('PATH_TO_PROJECT', dirname(dirname(__FILE__)) . DS); }
+if (! defined('PATH_TO_PROJECT')) {
+  define('PATH_TO_PROJECT', dirname(dirname(__FILE__)) . DS);
+}
 
 // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
-if (substr($_SERVER['DOCUMENT_ROOT'], -1) != '/') { $_SERVER['DOCUMENT_ROOT'] .= '/'; }
+if (substr($_SERVER['DOCUMENT_ROOT'], - 1) != '/') {
+  $_SERVER['DOCUMENT_ROOT'] .= '/';
+}
 
 // set key paths
-define('PATH_TO_APP',         PATH_TO_PROJECT . 'app' . DS);
-define('PATH_TO_ANTHOLOGY',   PATH_TO_APP . 'Anthology' . DS);
+define('PATH_TO_APP', PATH_TO_PROJECT . 'app' . DS);
+define('PATH_TO_ANTHOLOGY', PATH_TO_APP . 'Anthology' . DS);
 
 // include base setup configuration
 require PATH_TO_APP . 'Config' . DS . 'setup.php';
@@ -34,27 +39,29 @@ $config = array_merge($env[$cfg['environment']], $cfg);
 unset($cfg, $env);
 
 // define path to public directory
-if (!defined('PATH_TO_PUBLIC'))  { define('PATH_TO_PUBLIC', dirname(dirname(__FILE__)) . DS . $config['public_directory_name'] . DS); }
+if (! defined('PATH_TO_PUBLIC')) {
+  define('PATH_TO_PUBLIC', dirname(dirname(__FILE__)) . DS . $config['public_directory_name'] . DS);
+}
 
 // this is the name of the script that executes in the public directory
 define('SCRIPT_FILENAME', 'index.php');
 
 // turn configs into constants for speed?
-define('MADEAM_ENVIRONMENT',        $config['environment']);
-define('MADEAM_ENABLE_DEBUG',       $config['enable_debug']);
-define('MADEAM_ENABLE_CACHE',       $config['enable_cache']);
-define('MADEAM_ENABLE_LOGGER',      $config['enable_logger']);
+define('MADEAM_ENVIRONMENT', $config['environment']);
+define('MADEAM_ENABLE_DEBUG', $config['enable_debug']);
+define('MADEAM_ENABLE_CACHE', $config['enable_cache']);
+define('MADEAM_ENABLE_LOGGER', $config['enable_logger']);
 define('MADEAM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
 // mod_rewrite is on when $_GET['madeamURI'] exists. You can see it defined in the public .htaccess file
 if (isset($_GET['madeamURI'])) {
   $publicDir = basename(PATH_TO_PUBLIC);
-	define('PATH_TO_URI', '/' . substr(str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']), -strlen($publicDir))), 0, -1));
-	define('MADEAM_REWRITE_URI', '/' . $_GET['madeamURI']);
+  define('PATH_TO_URI', '/' . substr(str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']), - strlen($publicDir))), 0, - 1));
+  define('MADEAM_REWRITE_URI', '/' . $_GET['madeamURI']);
 } else {
-	define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
-	define('MADEAM_REWRITE_URI', false);
+  define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
+  define('MADEAM_REWRITE_URI', false);
 }
 
 // determine the relative path to the public directory
@@ -65,69 +72,55 @@ define('PATH_TO_REL', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($
 // for any reason. An example of where it might be an unexpected problem is when taking the has of the query
 // string to identify the page. This problem was first noticed in some OpenID libraries
 unset($_GET['madeamURI']);
-
 // remove it fromt he query string as well
 $_SERVER['QUERY_STRING'] = preg_replace('/&?madeamURI=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
-
-
 // major madeam directories
-if (!defined('PATH_TO_SYSTEM')) { define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS); }
-
+if (! defined('PATH_TO_SYSTEM')) {
+  define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS);
+}
 // application files
-define('PATH_TO_VIEW',        PATH_TO_APP . 'View' . DS);
-define('PATH_TO_CONTROLLER',  PATH_TO_APP . 'Controller' . DS);
-define('PATH_TO_MODEL',       PATH_TO_APP . 'Model' . DS);
-
-define('PATH_TO_LAYOUT',      PATH_TO_VIEW);
-
-define('PATH_TO_LOG', 		    PATH_TO_PROJECT . 'etc' . DS . 'log' . DS);
-define('PATH_TO_TMP', 		    PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
-
+define('PATH_TO_VIEW', PATH_TO_APP . 'View' . DS);
+define('PATH_TO_CONTROLLER', PATH_TO_APP . 'Controller' . DS);
+define('PATH_TO_MODEL', PATH_TO_APP . 'Model' . DS);
+define('PATH_TO_LAYOUT', PATH_TO_VIEW);
+define('PATH_TO_LOG', PATH_TO_PROJECT . 'etc' . DS . 'log' . DS);
+define('PATH_TO_TMP', PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
 // set include paths
 $includePaths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_ANTHOLOGY, ini_get('include_path'));
 ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
-
 // define user errors variable name for $_SESSION
 // example: $_SESSION[MADEAM_USER_ERROR_NAME];
 define('MADEAM_USER_ERROR_NAME', 'muerrors');
-
 // this is used for passing misc data from one page to the other
 define('MADEAM_FLASH_DATA_NAME', 'mflash');
-
 // this sets how many pages the flash has to live (ptl: pages to live)
 define('MADEAM_FLASH_LIFE_NAME', 'mflife');
-
 // this is used for passing post data from one page to the next
 // the post data is merged with the flash post data on the next page
 define('MADEAM_FLASH_POST_NAME', 'mfpost');
-
 // Used for joining models and other associations
 // example use: "user.name"
 define('MADEAM_ASSOCIATION_JOINT', '.');
 
 // autoload function
 function Madeam_Autoload($class) {
-
   // set class file name
   $file = str_replace('_', DS, $class) . '.php';
-
   // include class file
-  if (file_lives($file)) { require $file; }
-
-  if (!class_exists($class, false) && !interface_exists($class, false)) {
+  if (file_lives($file)) {
+    require $file;
+  }
+  if (! class_exists($class, false) && ! interface_exists($class, false)) {
     $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
     eval("class $class {}");
-	  throw new Madeam_Exception('Missing Class ' . $class, Madeam_Exception::ERR_CLASS_MISSING);
+    throw new Madeam_Exception('Missing Class ' . $class, Madeam_Exception::ERR_CLASS_MISSING);
   }
 }
-
 // include application bootstrap
 require PATH_TO_APP . 'Config' . DS . 'bootstrap.php';
-
 // idea... use this as a last resort when all autoloads fail.
 // have this one throw an exception or make a last resort to check every path for the file.
 spl_autoload_register('Madeam_Autoload');
-
 
 /**
  * Checks to see if a relative file exists by checking each include path.
@@ -138,37 +131,26 @@ spl_autoload_register('Madeam_Autoload');
  */
 function file_lives($file) {
   $paths = explode(PATH_SEPARATOR, get_include_path());
-
   foreach ($paths as $path) {
     if (is_file($path . $file)) {
       return true;
     }
   }
-
   return false;
 }
-
-
-// save config to registry
-// ========================================================
 
 // save configuration to registry
 Madeam_Registry::set('config', $config);
 unset($config);
 
-
 // include routes
-// ========================================================
-
 // check cache for routes
-if (!Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', -1)) {
+if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1)) {
   // include routes configuration
   require PATH_TO_APP . 'Config' . DS . 'routes.php';
-
   // save routes to cache
   Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
 }
-
 
 /**
  * Enter description here...
@@ -177,10 +159,8 @@ if (!Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', -1)) {
  */
 function Madeam_uncaughtException($e) {
   echo 'Uncaught Exception: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile();
-
   return true;
 }
-
 /**
  * Set exception handler
  */
@@ -195,44 +175,39 @@ set_exception_handler('Madeam_uncaughtException');
  * @param unknown_type $line
  */
 function Madeam_errorHandler($code, $string, $file, $line) {
-
   // return regular PHP errors when they're non-fatal
   if ($code == 2 || $code == 4 || $code == 8) { return false; }
-
+  
   $exception = new Madeam_Exception($string, $code);
   $exception->setLine($line);
   $exception->setFile($file);
   throw $exception;
-
   return true;
 }
-
 /**
  * Set error handler
  */
 set_error_handler('Madeam_errorHandler');
 
-
 // function library
 // ========================================================
-
 /**
  * This function exists as a quick tool for developers to test
  * if a funciton executes and how many times.
  */
 function test($var = null) {
-	static $tests;
-	$tests++;
-
-	for($i = 0; $i < (6 - strlen($tests)); $i++) { $tests = '0' . $tests; }
-
-	if (is_array($var) || is_object($var)) {
-		echo '<br /><pre>[TEST::' . $tests . '] &nbsp;&nbsp;' . "\n";
-		print_r($var);
-		echo ' &nbsp;&nbsp;</pre>' . "\n";
-	} else {
-		echo "<br /> [TEST::" . $tests . "] &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
-	}
+  static $tests;
+  $tests ++;
+  for ($i = 0; $i < (6 - strlen($tests)); $i ++) {
+    $tests = '0' . $tests;
+  }
+  if (is_array($var) || is_object($var)) {
+    echo '<br /><pre>[TEST::' . $tests . '] &nbsp;&nbsp;' . "\n";
+    print_r($var);
+    echo ' &nbsp;&nbsp;</pre>' . "\n";
+  } else {
+    echo "<br /> [TEST::" . $tests . "] &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
+  }
 }
 
 /**
@@ -245,31 +220,26 @@ function test($var = null) {
  */
 function is_list($data) {
   $matching_entries = 1;
-  $entries_checked  = 0;
-  $keys_string      = null;
-
+  $entries_checked = 0;
+  $keys_string = null;
   // lists must be represented as arrays
   if (is_array($data)) {
-    foreach($data as $entry) {
+    foreach ($data as $entry) {
       // each entry must be an array
       if (is_array($entry)) {
-        $entries_checked++; // record that an entry has been checked
-
+        $entries_checked ++; // record that an entry has been checked
         // get keys
         $keys = array_keys($entry);
-
         // sort the keys so that they are always in alphabetical order and therefore always comparable
         asort($keys);
-
         // compare keys string -- do not need to compare the first one.
         if ($entries_checked != 1) {
           if ($keys_string == implode($keys)) {
-            $matching_entries++;
+            $matching_entries ++;
           } else {
             break;
           }
         }
-
         // set keys_string for entry so that it can be compared to the next one
         $keys_string = implode($keys);
       } else {
@@ -277,7 +247,6 @@ function is_list($data) {
       }
     }
   }
-
   // the data is in list format if all the entries match
   if ($entries_checked == $matching_entries) {
     return true;
@@ -322,20 +291,15 @@ function low($word) {
 function rotate() {
   static $groups;
   $values = func_get_args();
-
   $groupName = implode($values);
-
-  if (!$groups[$groupName]) {
+  if (! $groups[$groupName]) {
     array_unshift($values, 'offset');
     $groups[$groupName] = $values;
   }
-
   $returned = next($groups[$groupName]);
-
-  if ($returned == $groups[$groupName][count($groups[$groupName])-1]) {
+  if ($returned == $groups[$groupName][count($groups[$groupName]) - 1]) {
     reset($groups[$groupName]);
   }
-
   return $returned;
 }
 
@@ -349,15 +313,14 @@ function rotate() {
  * @return object
  */
 function array2obj($data) {
-  return is_array($data) ? (object) array_map(__FUNCTION__,$data) : $data;
+  return is_array($data) ? (object) array_map(__FUNCTION__, $data) : $data;
 }
 
 function modifedFilesExist() {
   $path = PATH_TO_APP;
   foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::KEY_AS_PATHNAME), RecursiveIteratorIterator::CHILD_FIRST) as $file => $info) {
-    echo $file . $info->getMTime()."<br />";
+    echo $file . $info->getMTime() . "<br />";
   }
 }
-
 //modifedFilesExist();
 ?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -17,61 +18,47 @@ class Madeam_Console extends Madeam_Console_CLI {
   public function initialize() {
     array_shift($_SERVER['argv']);
     $args = $_SERVER['argv'];
-
-    $script  = false;
+    $script = false;
     $command = false;
-
-
     // get list of available consoles
     $scripts = array('make', 'create', 'delete', 'cache', 'test');
-
     do {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
       if ($script !== false) {
         Madeam_Console_CLI::outError("Sorry the script you entered does not exist.");
       }
-
       // reset console
       $script = false;
-
       // check to see if the console exists in the args
-      if (isset($args[0])) { $script = array_shift($args); }
-
+      if (isset($args[0])) {
+        $script = array_shift($args);
+      }
       if ($script == null) {
         // ask them for the script of the console they'd like to use
         Madeam_Console_CLI::outMenu('Scripts', $scripts);
-
         $script = Madeam_Console_CLI::getCommand('script');
       }
-
-    } while (!in_array($script, $scripts));
-
-
+    } while(! in_array($script, $scripts));
     // get list of available commands
     $commands = array('controller', 'scaffold', 'view', 'model', 'app');
-
     do {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
       if ($command !== false) {
         Madeam_Console_CLI::outError("Sorry the command you entered does not exist.");
       }
-
       // reset command
       $command = false;
-
       // check to see if the command exists in the args
-      if (isset($args[0])) { $command = array_shift($args); }
-
+      if (isset($args[0])) {
+        $command = array_shift($args);
+      }
       if ($command == null) {
         Madeam_Console_CLI::outMenu('Commands', $commands);
-
         $command = Madeam_Console_CLI::getCommand('command');
       }
-    } while (!in_array($command, $commands));
-
-
+    } while(! in_array($command, $commands));
     // execute commands
     if ($this->scriptCommand($script, $command, $args) === true) {
       out();
@@ -80,60 +67,55 @@ class Madeam_Console extends Madeam_Console_CLI {
       out();
       out("Aborted");
     }
-
     // unset arguments -- they are only for first time use
     $args = array();
   }
 
   protected function scriptCommand($script_name, $command_name, $args) {
     $script_name = 'Script_' . ucfirst($script_name);
-    $script 	= new $script_name;
-  	$requires = $script->{'require_' . $command_name};
-
-    if (!empty($args)) {
+    $script = new $script_name();
+    $requires = $script->{'require_' . $command_name};
+    if (! empty($args)) {
       $params = $this->parseArguments($args);
     } else {
       $params = array();
     }
-
-  	// if the command requires to be in the application's root path then check it.
-  	// If we aren't in the applicatin's root path then tell the user and exit
-  	if (!in_array($command_name, (array) $script->execute_outside_root)) {
-  		if (!file_exists(PATH_TO_SYSTEM . 'bootstrap.php')) {
-  			Madeam_Console_CLI::outError('Please point Madeam to the root directory of your application.');
-  			exit();
-  		}
-  	}
-
-  	return $script->$command_name($params);
+    // if the command requires to be in the application's root path then check it.
+    // If we aren't in the applicatin's root path then tell the user and exit
+    if (! in_array($command_name, (array) $script->execute_outside_root)) {
+      if (! file_exists(PATH_TO_SYSTEM . 'bootstrap.php')) {
+        Madeam_Console_CLI::outError('Please point Madeam to the root directory of your application.');
+        exit();
+      }
+    }
+    return $script->$command_name($params);
   }
 
   protected function parseArguments($commands) {
-  	$params = array();
-  	foreach ($commands as $command) {
-  		$nodes = explode('=', $command);
-  		$name = $nodes[0];
-  		$value = $nodes[1];
-  		$params[$name] = $value;
-  	}
-  	return $params;
+    $params = array();
+    foreach ($commands as $command) {
+      $nodes = explode('=', $command);
+      $name = $nodes[0];
+      $value = $nodes[1];
+      $params[$name] = $value;
+    }
+    return $params;
   }
 
   protected function createFile($file_name, $file_path, $file_content) {
-    if (substr($file_path, -1) !== DS) { $file_path = $file_path . DS; }
+    if (substr($file_path, - 1) !== DS) {
+      $file_path = $file_path . DS;
+    }
     $file = $file_path . $file_name;
-
     if (file_exists($file)) {
       if (Madeam_Console_CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
         return false;
       }
     }
-
     if (file_put_contents($file, $file_content)) {
       Madeam_Console_CLI::outCreate('file ' . $file);
       return true;
     }
   }
-
 }
 ?>

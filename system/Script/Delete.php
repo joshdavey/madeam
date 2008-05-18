@@ -1,5 +1,5 @@
 <?php
-class Script_Delete extends Madeam_Script {
 
+class Script_Delete extends Madeam_Script {
 }
 ?>

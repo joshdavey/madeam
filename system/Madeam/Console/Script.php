@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -15,18 +16,19 @@
 class Madeam_Console_Script {
 
   public $execute_outside_root = array();
+
   public $command_requirements = array();
 
   protected function createFile($file_name, $file_path, $file_content) {
-    if (substr($file_path, -1) !== DS) { $file_path = $file_path . DS; }
+    if (substr($file_path, - 1) !== DS) {
+      $file_path = $file_path . DS;
+    }
     $file = $file_path . $file_name;
-
     if (file_exists($file)) {
       if (Madeam_Console_CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
         return false;
       }
     }
-
     if (file_put_contents($file, $file_content)) {
       Madeam_Console_CLI::outCreate('file ' . $file);
       return true;

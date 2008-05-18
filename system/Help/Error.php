@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -17,38 +18,34 @@
 class Help_Error extends help_html {
 
   public static function all($name = 'errors', $_params = array()) {
-		$errors_box = null;
-
+    $errors_box = null;
     if (isset($_SESSION[MADEAM_USER_ERROR_NAME])) {
-			$errors = $_SESSION[MADEAM_USER_ERROR_NAME];
-
-      $params['name']   = $name;
-      $params['id']     = self::nameToId($name);
-      $params['class']  = 'errors';
-
+      $errors = $_SESSION[MADEAM_USER_ERROR_NAME];
+      $params['name'] = $name;
+      $params['id'] = self::nameToId($name);
+      $params['class'] = 'errors';
       // create list
       $errors_box = self::openTag('div', $params);
-        $errors_box .= self::wrappingTag('h1', 'Errors');
+      $errors_box .= self::wrappingTag('h1', 'Errors');
+      $errors_box .= self::openTag('ul');
+      foreach ($errors as $field => $errors) {
+        $errors_box .= self::wrappingTag('li', $field);
         $errors_box .= self::openTag('ul');
-          foreach($errors as $field => $errors) {
-            $errors_box .= self::wrappingTag('li', $field);
-
-            $errors_box .= self::openTag('ul');
-              foreach($errors as $error) { $errors_box .= self::wrappingTag('li', $error); }
-            $errors_box .= self::closedTag('ul');
-          }
+        foreach ($errors as $error) {
+          $errors_box .= self::wrappingTag('li', $error);
+        }
         $errors_box .= self::closedTag('ul');
+      }
+      $errors_box .= self::closedTag('ul');
       $errors_box .= self::closedTag('div');
-
       return $errors_box;
     } else {
-			return $errors_box;
-		}
+      return $errors_box;
+    }
   }
 
   public static function single($name, $message = false) {
     $error_tag = null;
-
     if (isset($_SESSION[MADEAM_USER_ERROR_NAME][$name])) {
       $error_tag .= self::openTag('ul', array('class' => 'error'));
       foreach ($_SESSION[MADEAM_USER_ERROR_NAME][$name] as $error) {
@@ -60,9 +57,7 @@ class Help_Error extends help_html {
       }
       $error_tag .= self::closedTag('ul');
     }
-
     return $error_tag;
   }
-
 }
 ?>
