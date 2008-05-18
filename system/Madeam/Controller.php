@@ -145,7 +145,7 @@ class Madeam_Controller {
       // delete unset cookies
       
       foreach ($this->requestCookie as $cookieName => $cookieValue) {
-        if (isset($_COOKIE[$cookieName])) { test(); continue; }
+        if (isset($_COOKIE[$cookieName])) { continue; }
         
         $cExpire    = (60 * 60 * 24);
         $cPath      = dirname(PATH_TO_REL);
