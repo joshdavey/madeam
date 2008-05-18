@@ -72,8 +72,10 @@ define('PATH_TO_REL', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($
 // for any reason. An example of where it might be an unexpected problem is when taking the has of the query
 // string to identify the page. This problem was first noticed in some OpenID libraries
 unset($_GET['madeamURI']);
+
 // remove it fromt he query string as well
 $_SERVER['QUERY_STRING'] = preg_replace('/&?madeamURI=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
+
 // major madeam directories
 if (! defined('PATH_TO_SYSTEM')) {
   define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS);
@@ -323,4 +325,3 @@ function modifedFilesExist() {
   }
 }
 //modifedFilesExist();
-?>

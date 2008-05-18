@@ -1160,4 +1160,3 @@ class Madeam_ActiveRecord extends Madeam_Model {
     return $details;
   }
 }
-?>

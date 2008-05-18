@@ -25,4 +25,3 @@ class Madeam_Config {
     return self::$heap[$name];
   }
 }
-?>

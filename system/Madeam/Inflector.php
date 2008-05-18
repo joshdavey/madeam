@@ -172,4 +172,3 @@ class Madeam_Inflector {
     return $string;
   }
 }
-?>

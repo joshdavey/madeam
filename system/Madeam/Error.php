@@ -37,7 +37,7 @@ class Madeam_Error {
     $config = Madeam_Registry::get('config');
     
     // clean output buffer
-    ob_clean();
+    if (ob_get_level() > 0) { ob_clean(); }
     
     if (MADEAM_ENABLE_DEBUG == true) {
       // get random snippet
@@ -52,4 +52,3 @@ class Madeam_Error {
     }
   }
 }
-?>

@@ -105,4 +105,3 @@ class Madeam_Registry extends ArrayIterator {
     }
   }
 }
-?>

@@ -541,4 +541,3 @@ class Madeam_Model {
     return $this->setup;
   }
 }
-?>

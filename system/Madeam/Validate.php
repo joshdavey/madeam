@@ -72,4 +72,3 @@ class Madeam_Validate {
     return false;
   }
 }
-?>

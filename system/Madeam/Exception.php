@@ -49,4 +49,3 @@ class Madeam_Exception extends Exception {
     $this->file = $file;
   }
 }
-?>

@@ -21,4 +21,3 @@ class Madeam_Component {
     $this->_controller = & $_controller;
   }
 }
-?>

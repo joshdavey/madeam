@@ -118,4 +118,3 @@ class Madeam_Console extends Madeam_Console_CLI {
     }
   }
 }
-?>

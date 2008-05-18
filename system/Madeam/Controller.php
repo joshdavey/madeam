@@ -113,23 +113,23 @@ class Madeam_Controller {
     }
     
     // set request information
-    $this->requestGet      = $requestGet;
-    $this->requestPost     = $requestPost;
-    $this->requestCookie   = $requestCookie;
-    $this->requestMethod   = $requestMethod;   
+    $this->requestGet       = $requestGet;
+    $this->requestPost      = $requestPost;
+    $this->requestCookie    = $requestCookie;
+    $this->requestMethod    = $requestMethod;
     
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
-      $this->scaffoldController = $this->params['controller'];
+      $this->scaffoldController = $this->requestGet['controller'];
       $this->scaffoldKey = $this->{$this->represent}->getPrimaryKey();
     }
     
     // set view
-    $this->setView($this->params['controller'] . '/' . $this->params['action']);
+    $this->setView($this->requestGet['controller'] . '/' . $this->requestGet['action']);
     
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
-    if ($this->params['useLayout'] == '0' || $this->requestGet['useLayout'] == 'false') {
+    if (isset($this->requestGet['useLayout']) && ($this->requestGet['useLayout'] == '0' || $this->requestGet['useLayout'] == 'false')) {
       $this->setLayout(false);
     } else {
       $this->setLayout($this->layout);
@@ -186,8 +186,13 @@ class Madeam_Controller {
    * @param unknown_type $uri
    * @return unknown
    */
-  final protected function callAction($uri) {
-    return Madeam::callAction($uri);
+  final protected function callAction($uri, $params = array()) {
+    
+    if (!isset($params['get']))     { $params['get']    = $this->requestGet; }
+    if (!isset($params['post']))    { $params['post']   = $this->requestPost; }
+    if (!isset($params['cookie']))  { $params['cookie'] = $this->requestCookie; }
+    
+    return Madeam::makeRequest($uri, $params['get'], $params['post'], $params['cookie']);
   }
 
   /**
@@ -378,4 +383,3 @@ class Madeam_Controller {
 
   protected function afterRender() {}
 }
-?>
