@@ -33,5 +33,5 @@
 
 // interesting stuff
   //echo 'Execution Time: ' . $time . '<br />'; foreach (get_included_files() as $file) { isset($x) ? ++$x : $x = 1; echo $x . ' ' . $file . '<br />'; }
-?>
+
 
