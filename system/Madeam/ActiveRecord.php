@@ -189,8 +189,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
         // therefore if all we're doing is loading a cached page we won't need a database connection
         if (!isset($_GLOBAL['databaseConnection']) || !is_resource($_GLOBAL['databasConnection'])) {
           // parse DB information
-          $config = Madeam_Registry::get('config');
-          $servers = $config['data_servers'];
+          $servers = Madeam_Config::get('data_servers');
           $serverConnectionString = $servers[$this->server];
           $server = $this->parseDbConnection($serverConnectionString);
 

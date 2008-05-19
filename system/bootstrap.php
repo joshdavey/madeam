@@ -29,7 +29,7 @@ if (substr($_SERVER['DOCUMENT_ROOT'], - 1) != '/') {
 
 // set key paths
 define('PATH_TO_APP', PATH_TO_PROJECT . 'app' . DS);
-define('PATH_TO_ANTHOLOGY', PATH_TO_APP . 'Anthology' . DS);
+define('PATH_TO_LIB', PATH_TO_PROJECT . 'library' . DS);
 
 // include base setup configuration
 require PATH_TO_APP . 'Config' . DS . 'setup.php';
@@ -95,7 +95,7 @@ define('PATH_TO_LOG', PATH_TO_PROJECT . 'etc' . DS . 'log' . DS);
 define('PATH_TO_TMP', PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
 
 // set include paths
-$includePaths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_ANTHOLOGY, ini_get('include_path'));
+$includePaths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_LIB, ini_get('include_path'));
 ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
 
 // define user errors variable name for $_SESSION
@@ -170,7 +170,7 @@ if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1)) {
 }
 
 // save configuration to registry
-Madeam_Registry::set('config', $config);
+Madeam_Config::set($config);
 unset($config);
 
 /**

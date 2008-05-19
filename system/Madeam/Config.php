@@ -15,10 +15,14 @@
  */
 class Madeam_Config {
 
-  static $heap;
+  public static $heap;
 
-  public static function set($name, $value) {
-    self::$heap[$name] = $value;
+  public static function set() {
+    if (func_num_args() == 2) {
+      self::$heap[func_get_arg(0)] = func_get_arg(1);
+    } else {
+      self::$heap = func_get_arg(0);
+    }
   }
 
   public static function get($name) {

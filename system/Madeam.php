@@ -83,9 +83,6 @@ class Madeam {
     // pass uri as a _GET variable
     $params['uri'] = $uri;
 
-    // get instance of configuration from registry
-    $config = Madeam_Registry::get('config');
-
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
     // they should be able to just type in 'admin' because 'index' is the default controller in that
@@ -95,7 +92,7 @@ class Madeam {
     // note: there is a consequence for this feature which means if you have a directory named 'admin'
     // you can't have a controller named 'Controller_Admin'
     if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['controller']))) {
-      $params['controller'] .= '/' . $config['default_controller'];
+      $params['controller'] .= '/' . Madeam_Config::get('default_controller');
     }
 
     // set controller's class

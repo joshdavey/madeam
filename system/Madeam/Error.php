@@ -55,9 +55,6 @@ class Madeam_Error {
       return;
     }
 
-    // get config
-    $config = Madeam_Registry::get('config');
-
     // clean output buffer
     if (ob_get_level() > 0) { ob_clean(); }
 
@@ -65,11 +62,11 @@ class Madeam_Error {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
       // call error controller and pass information
-      echo Madeam::makeRequest($config['error_controller'] . '/debug?error=' . urlencode(nl2br($exception->getMessage())) . '&backtrace=' . urlencode($exception->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($exception->getLine()) . '&code=' . urlencode($exception->getCode()) . '&file=' . urlencode($exception->getFile()) . '&documentation=' . 'comingsoong&useLayout=1');
+      echo Madeam::makeRequest(Madeam_Config::get('error_controller') . '/debug?error=' . urlencode(nl2br($exception->getMessage())) . '&backtrace=' . urlencode($exception->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($exception->getLine()) . '&code=' . urlencode($exception->getCode()) . '&file=' . urlencode($exception->getFile()) . '&documentation=' . 'comingsoong&useLayout=1');
       exit();
     } else {
       // return 404 error page
-      echo Madeam::makeRequest($config['error_controller'] . '/http404');
+      echo Madeam::makeRequest(Madeam_Config::get('error_controller') . '/http404');
       exit();
     }
   }

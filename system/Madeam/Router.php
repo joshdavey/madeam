@@ -90,7 +90,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
   public static function parseURI($uri = false) {
     // parse uri
     $parsedURI = parse_url($uri);
-    
+
     // set uri
     if (isset($parsedURI['path'])) {
       $extracted_path = explode(PATH_TO_URI, $parsedURI['path'], 2);
@@ -98,7 +98,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     } else {
       $uri = null;
     }
-    
+
     // set format
     $format = false;
     $URIAnatomy = explode('.', $uri, 2);
@@ -108,7 +108,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     } else {
       $uri = $URIAnatomy[0];
     }
-    
+
     // set get
     $get = array();
     if (isset($parsedURI['query'])) {
@@ -116,22 +116,22 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
       // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
       parse_str($query, $get); // assigns $get array of query params
     }
-    
+
     // merge manual $_GETs with http $_GETs
     //$gets = array_merge($get, $_GET); // http $_GETs overide manual $_GETs
     $gets = $get;
-    
+
     // makes sure the first character is "/"
     if (substr($uri, 0, 1) != '/') {
       $uri = '/' . $uri;
     }
-    
+
     // define params as array
     $params = array();
-    
+
     // matchs count
     $matchs = 0;
-    
+
     // match uri to route map
     foreach (self::$routes as $route) {
       if (preg_match($route[0], $uri, $match) /*&& count($route[1]) >= (count($match) - 1) && $_SERVER['REQUEST_METHOD'] == $route[3]*/) {
@@ -164,13 +164,12 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     if (! MADEAM_ENABLE_AJAX_LAYOUT && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
       $params['useLayout'] = '0';
     }
-    
-    $config = Madeam_Registry::get('config');
-    // set default values for controller and action
-    ! isset($params['controller']) || $params['controller'] == null ? $params['controller'] = $config['default_controller'] : false;
-    ! isset($params['action']) || $params['action'] == null ? $params['action'] = $config['default_action'] : false;
+
+    ! isset($params['controller']) || $params['controller'] == null ? $params['controller'] = Madeam_Config::get('default_controller') : false;
+    ! isset($params['action']) || $params['action'] == null ? $params['action'] = Madeam_Config::get('default_action') : false;
     ! isset($params['useLayout']) || $params['useLayout'] == null ? $params['useLayout'] = '0' : false;
-    ! isset($format) || $format == null ? $params['format'] = $config['default_format'] : $params['format'] = $format;
+    ! isset($format) || $format == null ? $params['format'] = Madeam_Config::get('default_format') : $params['format'] = $format;
+
     return $params;
   }
 
