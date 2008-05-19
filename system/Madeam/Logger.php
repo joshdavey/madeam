@@ -23,7 +23,6 @@ class Madeam_Logger {
     // append log to end of file
     if (defined(PATH_TO_LOG)) { define('PATH_TO_LOG', '../log'); }
 
-    //test($message);
     if (MADEAM_ENABLE_LOGGER == true) {
       file_put_contents(PATH_TO_LOG . date($config['log_file_name']) . '.txt', date("d-m-o H:i:s") . ' | ' . $message . "\n", FILE_APPEND | LOCK_EX);
     }

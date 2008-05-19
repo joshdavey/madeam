@@ -32,8 +32,7 @@ class Madeam_Exception extends Exception {
     $file = basename($this->getFile());
     $line = $this->getLine();
     $exception = substr(get_class($this), 17);
-    $data = json_encode($_GET);
-    $message = sprintf("%1$.20s | %2$-28s | %3$-4s | %4$-10s | %5$0s | %6$0s", $date, $file, $line, $exception, $message, $data);
+    //$message = sprintf("%1$.20s | %2$-28s | %3$-4s | %4$-10s | %5$0s", $date, $file, $line, $exception, $message);
     parent::__construct($message, $code);
   }
 

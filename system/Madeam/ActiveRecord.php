@@ -161,9 +161,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if (preg_match("/^find([a-zA-Z]+)By_(.*)/", $name, $match)) {
       $this->where($match[2] . " = '$args[0]'");
       $function = 'find' . $match[1];
-      if (method_exists($this, $function))
-        ;
-      return $this->$function();
+      if (method_exists($this, $function)) {
+        return $this->$function();
+      }
     } /*elseif (preg_match("/^deleteBy_(.*)/", $name, $match)) {
       $this->where($match[2] . " = '$args[0]'");
       $this->delete();
@@ -182,51 +182,60 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @return resource
    */
   final public function execute($sql, $returnAs = 'array') {
-    // if we connect here we don't need to connect to the database until we execute a query
-    // therefore if all we're doing is loading a cached page we won't need a database connection
-    if (!isset($_GLOBAL['databaseConnection']) || !is_resource($_GLOBAL['databasConnection'])) {
-      // parse DB information
-      $config = Madeam_Registry::get('config');
-      $servers = $config['data_servers'];
-      $serverConnectionString = $servers[$this->server];
-      $server = $this->parseDbConnection($serverConnectionString);
 
       try {
-        if (isset($server['port']) && $server['port'] != false) {
-          $_GLOBAL['databaseConnection'] = mysql_connect($server['host'] . ':' . $server['port'], $server['user'], $server['pass']);
-          if ($_GLOBAL['databaseConnection'] === false) {
-            throw new Madeam_Exception(mysql_error());
-          }
-        } else {
-          $_GLOBAL['databaseConnection'] = mysql_connect($server['host'], $server['user'], $server['pass']);
-          if ($_GLOBAL['databaseConnection'] === false) {
-            throw new Madeam_Exception(mysql_error());
+
+        // if we connect here we don't need to connect to the database until we execute a query
+        // therefore if all we're doing is loading a cached page we won't need a database connection
+        if (!isset($_GLOBAL['databaseConnection']) || !is_resource($_GLOBAL['databasConnection'])) {
+          // parse DB information
+          $config = Madeam_Registry::get('config');
+          $servers = $config['data_servers'];
+          $serverConnectionString = $servers[$this->server];
+          $server = $this->parseDbConnection($serverConnectionString);
+
+          // create database connection
+          if (isset($server['port']) && $server['port'] != false) {
+            $_GLOBAL['databaseConnection'] = mysql_connect($server['host'] . ':' . $server['port'], $server['user'], $server['pass']);
+            if ($_GLOBAL['databaseConnection'] === false) {
+              throw new Madeam_Exception_ConnectionFail(mysql_error());
+            }
+          } else {
+            $_GLOBAL['databaseConnection'] = mysql_connect($server['host'], $server['user'], $server['pass']);
+            if ($_GLOBAL['databaseConnection'] === false) {
+              throw new Madeam_Exception_ConnectionFail(mysql_error());
+            }
           }
         }
-      } catch (Madeam_Exception $e) {
-        $e->setMessage(mysql_error() . '. Check connection string in setup.');
-        Madeam_Error::catchException($e, Madeam_Error);
-      }
 
-      if (is_resource($_GLOBAL['databaseConnection'])) {
-        if (! @mysql_select_db($server['name'], $_GLOBAL['databaseConnection'])) {
+        // select database
+        if (! mysql_select_db($server['name'], $_GLOBAL['databaseConnection'])) {
           // failed to find selected database
-          Madeam_Logger::log(mysql_error(), 0);
+          throw new Madeam_Exception_MissingResource(mysql_error());
         }
-      } else {
-        // failed to connect to the database
-        Madeam_Logger::log(mysql_error(), 0);
+
+        // for debugging only
+        $this->sql = $sql;
+
+        // log
+        Madeam_Logger::log($sql);
+
+        // execute mysql query
+        $this->link = mysql_query($sql, $_GLOBAL['databaseConnection']);
+
+        // check for errors
+        if (mysql_error()) {
+          throw new Madeam_Exception_QueryFail(mysql_error() . '<br />' . $sql);
+        }
+
+      } catch (Madeam_Exception_ConnectionFail $e) {
+        $e->setMessage(mysql_error() . '. Check connection string in setup.');
+        Madeam_Error::catchException($e);
+      } catch (Madeam_Exception_MissingResource $e) {
+        Madeam_Error::catchException($e);
+      } catch (Madeam_Exception_QueryFail $e) {
+        Madeam_Error::catchException($e);
       }
-    }
-
-    // execute mysql query
-    $this->link = mysql_query($sql);
-
-    // log query
-    Madeam_Logger::log($sql, 100);
-
-    // log sql error if any
-    if (mysql_error()) { Madeam_Logger::log(mysql_error()); }
 
     return $this->link;
   }
@@ -808,9 +817,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $sql[] = "LIMIT $this->_sqlStart";
     }
 
-    $this->sql = implode(' ', $sql) . ';';
-
-    return $this->sql;
+    return implode(' ', $sql) . ';';
   }
 
   /**
@@ -836,9 +843,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // build query
     //test(implode(' ', $sql));
 
-    $this->sql = implode(' ', $sql) . ';';
-
-    return $this->sql;
+    return implode(' ', $sql) . ';';
   }
 
   /**
@@ -886,9 +891,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     }
     // build query
     //test(implode(' ', $sql));
-    $this->sql = implode(' ', $sql) . ';';
-
-    return $this->sql;
+    return implode(' ', $sql) . ';';
   }
 
   /**
@@ -921,9 +924,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $sql[] = 'LIMIT 1';
     }
     //test(implode(' ', $sql));
-    $this->sql = implode(' ', $sql) . ';';
-
-    return $this->sql;
+    return implode(' ', $sql) . ';';
   }
 
   /**
