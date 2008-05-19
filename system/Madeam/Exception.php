@@ -15,17 +15,17 @@
  */
 class Madeam_Exception extends Exception {
 
-  const ERR_VIEW_MISSING = 100;
+  const THROW_VIEW_MISSING = 100;
 
-  const ERR_CONTORLLER_MISSING = 101;
+  const THROW_CONTORLLER_MISSING = 101;
 
-  const ERR_ACTION_MISSING = 102;
+  const THROW_ACTION_MISSING = 102;
 
-  const ERR_CLASS_MISSING = 103;
+  const THROW_CLASS_MISSING = 103;
 
-  const ERR_FILE_MISSING = 104;
+  const THROW_FILE_MISSING = 104;
 
-  const ERR_METHOD_MISSING = 105;
+  const THROW_METHOD_MISSING = 105;
 
   public function __construct($message, $code = 0) {
     $date = date('M d o H:i:s');

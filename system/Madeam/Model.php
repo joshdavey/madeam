@@ -75,15 +75,19 @@ class Madeam_Model {
     if ($depth !== false) {
       $this->depth = $depth;
     }
+
     // adjust depth
     // the depth measures how deep you want the relationships to go.
     if ($this->depth > 0) {
       $this->depth --;
     }
+
     // get class name
     $modelname = get_class($this);
+
     // set name
     $this->name = Madeam_Inflector::modelNameize(substr($modelname, 6)); // safely remove "Model_" from the name
+
     // check cache for schema
     // if schema not cached get it from the database using describe()
     // the cache should be infinite if cache is enabled
@@ -97,22 +101,29 @@ class Madeam_Model {
       $this->setup['customFields'] = array(); // custom fields defined in model
       $this->setup['standardFields'] = array(); // default fields in the database or file system
       $this->setup['validators'] = array();
+
       // set resourceName
       if ($this->resourceName == null) {
         $this->setup['resourceName'] = Madeam_Inflector::modelTableize($this->name);
       } else {
         $this->setup['resourceName'] = $this->resourceName;
       }
+
       // pre-load a reflection of this class for use in parseing the meta data and methods
       $this->loadReflection();
+
       // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
       $this->loadRelations();
+
       // pre-load custom fields
       $this->loadCustomFields();
+
       // load schema
       $this->loadSchema();
+
       // load standard fields
       $this->loadStandardFields();
+
       // load validators
       $this->loadValidators();
       Madeam_Cache::save($this->cacheName, $this->setup, true);

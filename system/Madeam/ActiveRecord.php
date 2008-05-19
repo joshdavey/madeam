@@ -22,7 +22,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   protected $label = null;
 
-  
+
   /**
    * Connection Resource
    *
@@ -49,7 +49,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @var string
    */
-  protected $sql = null;
+  public $sql = null;
 
   /**
    * Query resource link
@@ -184,19 +184,32 @@ class Madeam_ActiveRecord extends Madeam_Model {
   final public function execute($sql, $returnAs = 'array') {
     // if we connect here we don't need to connect to the database until we execute a query
     // therefore if all we're doing is loading a cached page we won't need a database connection
-    if (! is_resource($_GLOBAL['databasConnection'])) {
+    if (!isset($_GLOBAL['databaseConnection']) || !is_resource($_GLOBAL['databasConnection'])) {
       // parse DB information
       $config = Madeam_Registry::get('config');
       $servers = $config['data_servers'];
       $serverConnectionString = $servers[$this->server];
       $server = $this->parseDbConnection($serverConnectionString);
-      if (isset($server['port']) && $server['port'] != false) {
-        $_GLOBAL['databasConnection'] = mysql_connect($server['host'] . ':' . $server['port'], $server['user'], $server['pass']);
-      } else {
-        $_GLOBAL['databasConnection'] = mysql_connect($server['host'], $server['user'], $server['pass']);
+
+      try {
+        if (isset($server['port']) && $server['port'] != false) {
+          $_GLOBAL['databaseConnection'] = mysql_connect($server['host'] . ':' . $server['port'], $server['user'], $server['pass']);
+          if ($_GLOBAL['databaseConnection'] === false) {
+            throw new Madeam_Exception(mysql_error());
+          }
+        } else {
+          $_GLOBAL['databaseConnection'] = mysql_connect($server['host'], $server['user'], $server['pass']);
+          if ($_GLOBAL['databaseConnection'] === false) {
+            throw new Madeam_Exception(mysql_error());
+          }
+        }
+      } catch (Madeam_Exception $e) {
+        $e->setMessage(mysql_error() . '. Check connection string in setup.');
+        Madeam_Error::catchException($e, Madeam_Error);
       }
-      if (is_resource($db_connection)) {
-        if (! @mysql_select_db($server['name'], $_GLOBAL['databasConnection'])) {
+
+      if (is_resource($_GLOBAL['databaseConnection'])) {
+        if (! @mysql_select_db($server['name'], $_GLOBAL['databaseConnection'])) {
           // failed to find selected database
           Madeam_Logger::log(mysql_error(), 0);
         }
@@ -205,44 +218,44 @@ class Madeam_ActiveRecord extends Madeam_Model {
         Madeam_Logger::log(mysql_error(), 0);
       }
     }
-    
+
     // execute mysql query
     $this->link = mysql_query($sql);
-    
+
     // log query
     Madeam_Logger::log($sql, 100);
-    
+
     // log sql error if any
     if (mysql_error()) { Madeam_Logger::log(mysql_error()); }
-    
+
     return $this->link;
   }
 
   final public function query($sql, $returnAs = 'array') {
     // execute query
     $this->link = $this->execute($sql);
-    
+
     // fetch method
     if ($returnAs == 'object') {
       $fetchMethod = 'mysql_fetch_object';
     } else {
       $fetchMethod = 'mysql_fetch_assoc';
     }
-    
+
     // check to see if this query returns a resource -- why not just check to see if it's a resource instead?
     $matchs = array();
     preg_match('/^DESCRIBE|SELECT/', $sql, $matchs);
     if (count($matchs) > 0) {
       if ($this->numRows() > 0) {
-        while($this->entry = $fetchMethod($this->link)) {          
+        while($this->entry = $fetchMethod($this->link)) {
           // don't prepare results of describe queries
           if ($matchs[0] != "DESCRIBE" && $matchs[0] != 'describe') {
             $this->prepareResult(); // should this be done?
           }
-          
+
           $this->data[] = $this->entry;
         }
-        
+
         return $this->data;
       } else {
         return array(); // return empty data
@@ -268,10 +281,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   final public function find() {
     $this->data = array();
-    
+
     // find callback
     $this->beforeFind();
-    
+
     // if this is a child model then filter the results to make sure they are related to this model's parent
     // this stuff is for when chaining models like:
     // $this->article->findOne(32, true)->comment->findAll();
@@ -280,7 +293,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $this->where($this->parent->setup['hasModels'][$this->name]['foreignKey'] . " = '" . $this->parent->entry[$this->parent->setup['hasModels'][$this->name]['primaryKey']] . "'");
       //$this->where($this->parent->setup['hasModels'][$this->name]['foreignKey'] . " = '" . $this->parent->setup['hasModels'][$this->name]['primaryKey'] . "'");
     }
-    
+
     // build select query and set resource link
     $this->link = $this->execute($this->buildQuerySelect());
     if (is_resource($this->link)) {
@@ -289,7 +302,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       while($this->entry = mysql_fetch_assoc($this->link)) {
         // adds custom fields
         $this->prepareResults();
-        
+
         // find related content
         if ($this->depth > 0) {
           // find has_ones
@@ -304,7 +317,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               unset($tempmodel);
             }
           }
-          
+
           // find belongsTos
           foreach ($this->setup['belongsTo'] as $model => $params) {
             $fkey = $params['foreignKey'];
@@ -319,7 +332,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               unset($tempmodel);
             }
           }
-          
+
           // find hasManies
           foreach ($this->setup['hasMany'] as $model => $params) {
             // do not call if the user has not specified to call this data
@@ -331,7 +344,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
               unset($tempmodel);
             }
           }
-          
+
           // find has and belongs to manies
           foreach ($this->setup['hasAndBelongsToMany'] as $model => $params) {
             if ((in_array($model, $this->fields) || empty($this->fields)) && ! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
@@ -345,23 +358,23 @@ class Madeam_ActiveRecord extends Madeam_Model {
         $this->data[] = $this->entry;
       }
     }
-    
+
     // find callback
     $this->afterFind();
-    
+
     // return data
     if ($this->numRows() > 0) {
       // grab data before it's reset
       $data = $this->data;
-      
+
       // reset all sql values and data
       $this->reset();
       return $data;
     }
-    
+
     // reset all sql values and data
     $this->reset();
-    
+
     // failed to return any rows
     return false;
   }
@@ -424,25 +437,25 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   final public function findOne($id = -1, $chain = false) {
     $this->entry = array();
-    
+
     // set entryId
     if ($id != - 1) {
       $this->entryId = $id;
     }
-    
+
     // set where
     if ($this->entryId != - 1 && $this->primaryKey != false) {
       $table = $this->setup['resourceName'];
       $this->where("$table.$this->primaryKey = '$id'");
     }
-    
+
     // set limit
     $this->limit(1);
-    
+
     // find stuff!
     $this->data = $this->find();
     $this->entry = $this->data[0];
-    
+
     if ($chain) {
       // return object because this entry is being chained
       return $this;
@@ -459,22 +472,22 @@ class Madeam_ActiveRecord extends Madeam_Model {
   final public function delete($id = -1) {
     // reset all sql values and data
     $this->reset();
-    
+
     // validation callbacks
     $this->beforeValidation();
     $this->afterValidation();
-    
+
     // before delete callback
     $this->beforeDelete();
     if ($id != - 1) {
       $this->entryId = $id;
     }
-    
+
     $this->execute($this->buildQueryDelete());
-    
+
     // after delete callback
     $this->afterDelete();
-    
+
     // check success
     if ($this->affectedRows() > 0) {
       return true;
@@ -493,34 +506,34 @@ class Madeam_ActiveRecord extends Madeam_Model {
   final public function save($data) {
     // true/false
     $update = false;
-    
+
     // set $this->entry so it is accessible in callbacks
     $this->entry = $data;
-    
+
     // set entryId
     if (isset($this->entry[$this->primaryKey]) && $this->entry[$this->primaryKey] != null) {
       $this->entryId = $this->entry[$this->primaryKey];
     }
-    
+
     // check to see whether this is going to be an insert or an update
     $name = get_class($this);
     $inst = new $name();
-    
+
     // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
     if ($this->entryId != - 1 && $inst->findOne($this->entryId)) {
       $update = true;
     }
-    
+
     // unset duplicate of this model to save on sweet sweet memory
     unset($inst);
-    
+
     // before validation callback
     $this->beforeValidation();
-    
+
     // validate data
     ////$this->load_validators();
     $this->validateEntry($update);
-    
+
     // after validation callback
     $this->afterValidation();
     // now that all the callbacks prior to updating/adding the new row have been called
@@ -530,7 +543,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if (! isset($_SESSION[MADEAM_USER_ERROR_NAME]) || count($_SESSION[MADEAM_USER_ERROR_NAME]) < 1) {
       // do standard field formats
       $this->standardFieldFormats();
-      
+
       // before save callback
       $this->beforeSave();
       /*
@@ -549,10 +562,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
       */
       // set data as row after callbacks have altered $this->entry
       $this->data = $this->entry;
-      
+
       // filter out fields that don't exist in the model
       $this->data = array_intersect_key($this->data, array_flip($this->setup['standardFields']));
-      
+
       // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
       if ($update === true) {
         $this->isUpdate = true; // can be used by the dev to figure out if it's an insert or update when using callbacks
@@ -561,13 +574,13 @@ class Madeam_ActiveRecord extends Madeam_Model {
         $this->isInsert = true; // can be used by the dev to figure out if it's an insert or update when using callbacks
         $this->execute($this->buildQueryInsert());
       }
-      
+
       // grab entry id before it's overwritten by something that happens in afterSave()
       $entryId = $this->insertId();
-      
+
       // set this so it can be used in afterSave
       $this->entry[$this->primaryKey] = $entryId;
-      
+
       // grab entry after it's been modified by callbacks
       $entry = $this->entry;
       /*
@@ -585,25 +598,25 @@ class Madeam_ActiveRecord extends Madeam_Model {
       */
       // after save callback
       $this->afterSave();
-      
+
       // reset all sql values and data
       $this->reset();
-      
+
       return $entry;
     } else {
       // reset all sql values and data
       $this->reset();
       return false;
     }
-    
+
     // reset all sql values and data
     $this->reset();
-    
+
     // return data
     if ($this->affectedRows() > 0) {
       return $this->data;
     }
-    
+
     // failed to return any rows
     return false;
   }
@@ -612,18 +625,18 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if (! is_array($assoc)) {
       $assoc = array($assoc);
     }
-    
+
     // clone current class just because...
     // this is not cool though because this means shit is going to be validated when it shouldn't be.
     // do we need to call beforeSave and all the other callbacks or just not worry about it?
     $class = clone $this;
-    
+
     // set table name
     $class->resourceName = Madeam_Inflector::model_habtm($model, $this->name);
     $class->primaryKey = false;
     $this_key = Madeam_Inflector::model_foreign_key($this->name);
     $relation_key = Madeam_Inflector::model_foreign_key($model);
-    
+
     //$this->ItemStore->findOne(1,2);
     foreach ($assoc as $val) {
       // check for duplicate
@@ -638,24 +651,24 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
   final public function habtmDelete($model, $id, $assoc = array()) {
     if (! is_array($assoc)) { $assoc = array($assoc); }
-    
+
     // clone current class just because...
     // this is not cool though because this means shit is going to be validated when it shouldn't be.
     // do we need to call beforeSave and all the other callbacks or just not worry about it?
     $class = clone $this;
-    
+
     // set table name
     $class->resourceName = Madeam_Inflector::model_habtm($model, $this->name);
     $class->primaryKey = false;
     $this_key = Madeam_Inflector::model_foreign_key($this->name);
     $relation_key = Madeam_Inflector::model_foreign_key($model);
-    
+
     foreach ($assoc as $val) {
       $class->data = array($this_key => $id, $relation_key => $val);
       $class->where("$this_key = '$id' AND $relation_key = '$val'");
       $class->execute($class->buildQueryDelete());
     }
-    
+
     unset($class);
   }
 
@@ -794,7 +807,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
     } elseif ($this->_sqlStart !== false && $this->_sqlRange === false) {
       $sql[] = "LIMIT $this->_sqlStart";
     }
-    return implode(' ', $sql) . ';';
+
+    $this->sql = implode(' ', $sql) . ';';
+
+    return $this->sql;
   }
 
   /**
@@ -819,7 +835,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $sql[] = "('" . @implode("','", array_values($this->data)) . "')";
     // build query
     //test(implode(' ', $sql));
-    return implode(' ', $sql) . ';';
+
+    $this->sql = implode(' ', $sql) . ';';
+
+    return $this->sql;
   }
 
   /**
@@ -867,7 +886,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
     }
     // build query
     //test(implode(' ', $sql));
-    return implode(' ', $sql) . ';';
+    $this->sql = implode(' ', $sql) . ';';
+
+    return $this->sql;
   }
 
   /**
@@ -900,7 +921,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $sql[] = 'LIMIT 1';
     }
     //test(implode(' ', $sql));
-    return implode(' ', $sql) . ';';
+    $this->sql = implode(' ', $sql) . ';';
+
+    return $this->sql;
   }
 
   /**
@@ -1038,6 +1061,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->depth = 2;
     $this->isInsert = false;
     $this->isUpdate = false;
+    //$this->sql = null;
     //$this->link           = false;
     // reset child models
     // this is so we can do stuff like...

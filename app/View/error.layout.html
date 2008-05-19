@@ -1,14 +1,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-  <title>Powered By Madeam PHP MVC Framework</title>
+  <title><?php echo $_pageTitle; ?></title>
   <!-- include css style sheet -->
   <?php echo Help_Html::css('/css/madeam'); ?>
 </head>
 <body>
 
+  <!-- =header -->
+  <div id="header">
+    <h1 class="madeam container"><?php echo $requestGet['snippet']; ?></h1>
+  </div>
+
+  <!-- =content -->
+  <div id="content" class="container">
     <!-- content placeholder -->
     <?php echo $content_for_layout; ?>
+  </div>
 
 </body>
 </html>

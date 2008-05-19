@@ -1,13 +1,13 @@
 
 <div id="madeam-error">
-  <p style="font-size: 1.4em; font-weight: bold; color: #666; "><?php echo $snippet; ?></p>
   <h1>Error:</h1>
   <p>
-  <?php echo $error; ?>
+  <?php echo $requestGet['error']; ?>
   <br />
-  <?php echo $file; ?> on line <?php echo $line; ?>
+  <?php echo $requestGet['file']; ?> on line <?php echo $requestGet['line']; ?>
   </p>
-  
+
+  <br />
   <h1>Backtrace:</h1>
-  <pre class="backtrace"><?php echo $backtrace; ?></pre>
+  <pre class="backtrace"><?php echo $requestGet['backtrace']; ?></pre>
 </div>

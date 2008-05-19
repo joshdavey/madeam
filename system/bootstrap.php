@@ -47,11 +47,11 @@ if (! defined('PATH_TO_PUBLIC')) {
 define('SCRIPT_FILENAME', 'index.php');
 
 // turn configs into constants for speed?
-define('MADEAM_ENVIRONMENT', $config['environment']);
-define('MADEAM_ENABLE_DEBUG', $config['enable_debug']);
-define('MADEAM_ENABLE_CACHE', $config['enable_cache']);
-define('MADEAM_ENABLE_LOGGER', $config['enable_logger']);
-define('MADEAM_ENABLE_AJAX_LAYOUT', $config['enable_ajax_layout']);
+define('MADEAM_ENVIRONMENT',          $config['environment']);
+define('MADEAM_ENABLE_DEBUG',         $config['enable_debug']);
+define('MADEAM_ENABLE_CACHE',         $config['enable_cache']);
+define('MADEAM_ENABLE_LOGGER',        $config['enable_logger']);
+define('MADEAM_ENABLE_AJAX_LAYOUT',   $config['enable_ajax_layout']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
 // mod_rewrite is on when $_GET['madeamURI'] exists. You can see it defined in the public .htaccess file
@@ -115,10 +115,11 @@ function Madeam_Autoload($class) {
   if (file_lives($file)) {
     require $file;
   }
+
   if (! class_exists($class, false) && ! interface_exists($class, false)) {
     $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
     eval("class $class {}");
-    throw new Madeam_Exception('Missing Class ' . $class, Madeam_Exception::ERR_CLASS_MISSING);
+    throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
   }
 }
 
@@ -185,7 +186,7 @@ set_exception_handler('Madeam_uncaughtException');
 function Madeam_errorHandler($code, $string, $file, $line) {
   // return regular PHP errors when they're non-fatal
   if ($code == 2 || $code == 4 || $code == 8) { return false; }
-  
+
   $exception = new Madeam_Exception($string, $code);
   $exception->setLine($line);
   $exception->setFile($file);

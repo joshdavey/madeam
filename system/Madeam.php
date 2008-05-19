@@ -23,17 +23,17 @@ class Madeam {
   public static function dispatch() {
     // call user front controller?
     // include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
-    
+
     if (!isset($_GET['useLayout'])) { $_GET['useLayout'] = 1; }
-    
+
     // call controller action
     $output = Madeam::makeRequest(Madeam_Router::getCurrentURI(), $_GET, $_POST, $_COOKIE);
-    
+
     // destroy user error notices
     if (isset($_SESSION[MADEAM_USER_ERROR_NAME])) {
       unset($_SESSION[MADEAM_USER_ERROR_NAME]);
     }
-    
+
     // destroy flash data when it's life runs out
     if (isset($_SESSION[MADEAM_FLASH_LIFE_NAME])) {
       if (-- $_SESSION[MADEAM_FLASH_LIFE_NAME] < 1) {
@@ -48,7 +48,7 @@ class Madeam {
         }
       }
     }
-    
+
     // return output
     return $output;
   }
@@ -76,15 +76,16 @@ class Madeam {
     // get request parameters from uri
     // example input: 'posts/show/32'
     $params = Madeam_Router::parseURI($uri);
-    
+
+    // combine GETs
     $params = array_merge($params, $requestGet);
-    
+
     // pass uri as a _GET variable
     $params['uri'] = $uri;
-    
+
     // get instance of configuration from registry
     $config = Madeam_Registry::get('config');
-    
+
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
     // they should be able to just type in 'admin' because 'index' is the default controller in that
@@ -96,7 +97,7 @@ class Madeam {
     if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['controller']))) {
       $params['controller'] .= '/' . $config['default_controller'];
     }
-    
+
     // set controller's class
     $params['controller'] = preg_replace("/[^A-Za-z0-9_\-\/]/", null, $params['controller']); // strip off the dirt
     $controllerClassNodes = explode('/', $params['controller']);
@@ -104,14 +105,14 @@ class Madeam {
       $node = Madeam_Inflector::camelize($node);
       $node = ucfirst($node);
     }
-    
+
     // set controller class
     $controllerClass = 'Controller_' . implode('_', $controllerClassNodes);
-    
+
     try {
       // create controller instance
       $controller = new $controllerClass($params, $requestPost, $requestCookie, $_SERVER['REQUEST_METHOD']);
-    } catch(Madeam_Exception $e) {
+    } catch(Madeam_Exception_AutoloadFail $e) {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
         $controller = new Controller_App($params);
       } else {
@@ -129,39 +130,42 @@ class Madeam {
 */
         // no controller found = critical error.
         $e->setMessage('Missing Controller <b>' . $controllerClass . '</b>');
-        Madeam_Error::catchException($e, Madeam_Error::ERR_NOT_FOUND);
+        Madeam_Error::catchException($e);
       }
     }
+
     try {
       // before action callback
       $controller->callback('beforeAction');
-      
+
       // call action
       if ($params['action'] != 'callback') {
         $controller->{Madeam_Inflector::camelize($params['action'])}();
       } else {
-        throw new Madeam_Exception('You cannot call the action "callback".');
+        throw new Madeam_Exception_MissingAction('You cannot call the action "callback".');
       }
-      
+
       // after action callback
       $controller->callback('beforeRender');
-      
+
       // render
       $controller->callback('render');
-      
+
       // after render callback
       $controller->callback('afterRender');
-      
+
       // get final output
       $finalOutput = $controller->finalOutput;
-      
+
       // delete controller
       unset($controller);
-      
+
       // return output
       return $finalOutput;
-    } catch(Madeam_Exception $e) {
-      Madeam_Error::catchException($e, Madeam_Error::ERR_NOT_FOUND);
+    } catch (Madeam_Exception_MissingAction $e) {
+      Madeam_Error::catchException($e);
+    } catch (Madeam_Exception_MissingView $e) {
+      Madeam_Error::catchException($e);
     }
   }
 
@@ -181,7 +185,7 @@ class Madeam {
       Madeam_Logger::log('Tried redirecting when headers already sent. (Check for echos before redirects)');
     }
   }
-  
+
   /**
    * Enter description here...
    *
@@ -192,7 +196,7 @@ class Madeam {
     if ($url == null || $url == '/') {
       return PATH_TO_URI;
     }
-    
+
     if (substr($url, 0, 1) != "#") {
       if (substr($url, 0, 1) == '/') {
         $url = PATH_TO_REL . substr($url, 1, strlen($url));

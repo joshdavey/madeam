@@ -77,28 +77,28 @@ class Madeam_Controller {
    * @var unknown_type
    */
   protected $scaffoldKey;
-  
+
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
   protected $requestMethod;
-  
+
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
   protected $requestGet;
-  
+
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
   protected $requestPost;
-  
+
   /**
    * Enter description here...
    *
@@ -111,22 +111,22 @@ class Madeam_Controller {
     if (is_string($this->represent)) {
       $this->represent = Madeam_Inflector::modelNameize($this->represent);
     }
-    
+
     // set request information
     $this->requestGet       = $requestGet;
     $this->requestPost      = $requestPost;
     $this->requestCookie    = $requestCookie;
     $this->requestMethod    = $requestMethod;
-    
+
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
       $this->scaffoldController = $this->requestGet['controller'];
       $this->scaffoldKey = $this->{$this->represent}->getPrimaryKey();
     }
-    
+
     // set view
     $this->setView($this->requestGet['controller'] . '/' . $this->requestGet['action']);
-    
+
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
     if (isset($this->requestGet['useLayout']) && ($this->requestGet['useLayout'] == '0' || $this->requestGet['useLayout'] == 'false')) {
@@ -135,25 +135,25 @@ class Madeam_Controller {
       $this->setLayout($this->layout);
     }
   }
-  
+
   public function __destruct() {
-    
+
     if (!headers_sent()) {
-      
+
       // we need to destroy cookies that are unset
       // compare $_COOKIE and $this->requestCookie
       // delete unset cookies
-      
+
       foreach ($this->requestCookie as $cookieName => $cookieValue) {
         if (isset($_COOKIE[$cookieName])) { continue; }
-        
+
         $cExpire    = (60 * 60 * 24);
         $cPath      = dirname(PATH_TO_REL);
         $cDomain    = $_SERVER['SERVER_NAME'];
         $cSecure    = false;
         $cHttpOnly  = false;
         $cValue     = null;
-        
+
         if (is_array($cookieValue)) {
           if (isset($cookieValue['expire']))    { $cExpire    = $cookieValue['expire']; }
           if (isset($cookieValue['path']))      { $cPath      = $cookieValue['path']; }
@@ -164,11 +164,11 @@ class Madeam_Controller {
         } else {
           $cValue = $cookieValue;
         }
-        
-        setcookie($cookieName, $cValue, $cExpire, $cPath, $cDomain, $cSecure, $cHttpOnly);   
+
+        setcookie($cookieName, $cValue, $cExpire, $cPath, $cDomain, $cSecure, $cHttpOnly);
       }
     }
-    
+
   }
 
   /**
@@ -195,7 +195,7 @@ class Madeam_Controller {
 
   public function __call($name, $args) {
     if (! file_exists($this->viewFile)) {
-      throw new Madeam_Exception('Missing Action <b>' . $name . '</b> in <b>' . get_class($this) . '</b> controller', Madeam_Exception::ERR_ACTION_MISSING);
+      throw new Madeam_Exception_MissingAction('Missing Action <b>' . $name . '</b> in <b>' . get_class($this) . '</b> controller');
     }
   }
 
@@ -210,11 +210,11 @@ class Madeam_Controller {
    * @return unknown
    */
   final protected function callAction($uri, $params = array()) {
-    
+
     if (!isset($params['get']))     { $params['get']    = $this->requestGet; }
     if (!isset($params['post']))    { $params['post']   = $this->requestPost; }
     if (!isset($params['cookie']))  { $params['cookie'] = $this->requestCookie; }
-    
+
     return Madeam::makeRequest($uri, $params['get'], $params['post'], $params['cookie']);
   }
 
@@ -304,20 +304,20 @@ class Madeam_Controller {
   final protected function render($data = true, $rendered = true) {
     // sometimes the developer may want to tell the view not to render from the controller's action
     if ($data === false) { $this->isRendered = true; }
-    
+
     // consider: checking if it's rendered based on if there is anything in the output buffer? does that make sense?
     if ($this->isRendered === false) {
       // output buffering
       ob_start();
       foreach ($this as $key => $value) { $$key = $value; }
-      
+
       //extract($this->data, EXTR_OVERWRITE); // which one is faster?
       if ($data === true) {
         // include view's template file
         if (file_exists($this->viewFile)) {
           include ($this->viewFile);
         } else {
-          throw new Madeam_Exception('Missing View <b>' . substr($this->viewFile, strlen(PATH_TO_VIEW)) . '</b>', Madeam_Exception::ERR_VIEW_MISSING);
+          throw new Madeam_Exception_MissingView('Missing View <b>' . substr($this->viewFile, strlen(PATH_TO_VIEW)) . '</b>', Madeam_Exception::ERR_VIEW_MISSING);
         }
         /*
 				$parser = $this->requestGet['format'];
