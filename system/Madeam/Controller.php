@@ -317,7 +317,7 @@ class Madeam_Controller {
         if (file_exists($this->viewFile)) {
           include ($this->viewFile);
         } else {
-          throw new Madeam_Exception_MissingView('Missing View <b>' . substr($this->viewFile, strlen(PATH_TO_VIEW)) . '</b>', Madeam_Exception::ERR_VIEW_MISSING);
+          throw new Madeam_Exception_MissingView('Missing View <strong>' . substr($this->viewFile, strlen(PATH_TO_VIEW)) . '</strong>');
         }
         /*
 				$parser = $this->requestGet['format'];

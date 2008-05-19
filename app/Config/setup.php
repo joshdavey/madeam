@@ -16,12 +16,23 @@ $cfg['environment'] = 'development';
  * You can add as many data servers as you'd like to distribute load.
  *  driver://username:password@host?name=application&port=0000
  *
- * [enable_cache]
- * If the cache is disabled then nothing will be cached. This is useful for debugging purposes.
- *  0: disabled
- *  1: cache disabled for routes and models
- *  2: cache disabled for models
- *  3: cache enabled for everything
+ * [cache_models]
+ *   true: models are cached
+ *   false: models aren't cached
+ *
+ * [cache_routes]
+ *   true: routes are cached
+ *   false: routes aren't cached
+ *
+ * [cache_inline]
+ *   true: inline text is cached
+ *   false: inline text isn't cached
+ *
+ * [clear_cache]
+ * This is a feature for developers that clears the cache whenever changes are made to any of the
+ * application files.
+ *   true: clear cache
+ *   false: do not clear cache
  *
  * [enable_debug]
  * When debugging is enabled debug messages will be displayed. For a development setup this is
@@ -33,25 +44,31 @@ $cfg['environment'] = 'development';
  * Sometimes you may want to disable this to improve speed.
  *  true:   logging is turned on
  *  false:  logging is turned off
+ *
+ * [inline_errors]
+ *   true: all errors are displayed inline;
  */
 
 // development
-  $env['development']['data_servers'][]     = 'mysql://root:@localhost?name=madeam';
-  $env['development']['enable_model_cache'] = 0;
-  $env['development']['enable_route_cache'] = 0;
-  $env['development']['enable_view_cache']  = 0;
-  $env['development']['enable_cache_clear'] = 1;
-
-  $env['development']['debug_level']        = 1;
-  $env['development']['enable_logger']      = 1;
-  $env['development']['enable_cache']       = 0;
-  $env['development']['enable_debug']       = 1;
+  $env['development']['data_servers'][] = 'mysql://root:@localhost?name=madeam';
+  $env['development']['cache_models']   = false;
+  $env['development']['cache_routes']   = false;
+  $env['development']['cache_inline']   = false; // views
+  $env['development']['clear_cache']    = true;
+  $env['development']['enable_debug']   = true;
+  $env['development']['enable_logger']  = true;
+  $env['development']['inline_errors']  = false;
 
 // production
-  $env['production']['data_servers'][]    = 'mysql://username:password@localhost?name=application';
-  $env['production']['cache_level']       = 1;
-  $env['production']['debug_level']       = 0;
-  $env['production']['enable_logger']     = 1;
+  $env['production']['data_servers'][]  = 'mysql://username:password@localhost?name=madeam';
+  $env['production']['cache_models']    = true;
+  $env['production']['cache_routes']    = true;
+  $env['production']['cache_inline']    = true; // views
+  $env['production']['clear_cache']     = false;
+  $env['production']['enable_debug']    = false;
+  $env['production']['enable_logger']   = true;
+  $env['production']['inline_errors']   = false;
+
 
 /**
  * The name of the public directory.

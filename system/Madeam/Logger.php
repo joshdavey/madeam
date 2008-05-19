@@ -18,16 +18,14 @@ class Madeam_Logger {
   public static $logs = array();
 
   public static function log($message, $lvl = 25) {
-    self::$logs[] = $message;
     $config = Madeam_Registry::get('config');
-    // append log to end of file
-    if (defined(PATH_TO_LOG)) { define('PATH_TO_LOG', '../log'); }
+
+    $date = date("d-m-o H:i:s");
+
+    self::$logs[] = array('message' => $message, 'datetime' => $date);
 
     if (MADEAM_ENABLE_LOGGER == true) {
-      file_put_contents(PATH_TO_LOG . date($config['log_file_name']) . '.txt', date("d-m-o H:i:s") . ' | ' . $message . "\n", FILE_APPEND | LOCK_EX);
-    }
-    if ($lvl < 25 && MADEAM_ENABLE_DEBUG === true) {
-      self::show();
+      file_put_contents(PATH_TO_LOG . date($config['log_file_name']) . '.txt', $date . ' | ' . $message . "\n", FILE_APPEND | LOCK_EX);
     }
   }
 }

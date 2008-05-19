@@ -47,10 +47,15 @@ if (! defined('PATH_TO_PUBLIC')) {
 define('SCRIPT_FILENAME', 'index.php');
 
 // turn configs into constants for speed?
-define('MADEAM_ENVIRONMENT',          $config['environment']);
-define('MADEAM_ENABLE_DEBUG',         $config['enable_debug']);
-define('MADEAM_ENABLE_CACHE',         $config['enable_cache']);
-define('MADEAM_ENABLE_LOGGER',        $config['enable_logger']);
+define('MADEAM_ENVIRONMENT',    $config['environment']);
+define('MADEAM_ENABLE_DEBUG',   $config['enable_debug']);
+define('MADEAM_ENABLE_LOGGER',  $config['enable_logger']);
+define('MADEAM_CACHE_MODELS',   $config['cache_models']);
+define('MADEAM_CACHE_ROUTES',   $config['cache_routes']);
+define('MADEAM_CACHE_INLINE',   $config['cache_inline']);
+define('MADEAM_CLEAR_CACHE',    $config['clear_cache']);
+define('MADEAM_INLINE_ERRORS',  $config['inline_errors']);
+
 define('MADEAM_ENABLE_AJAX_LAYOUT',   $config['enable_ajax_layout']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
@@ -96,13 +101,17 @@ ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
 // define user errors variable name for $_SESSION
 // example: $_SESSION[MADEAM_USER_ERROR_NAME];
 define('MADEAM_USER_ERROR_NAME', 'muerrors');
+
 // this is used for passing misc data from one page to the other
 define('MADEAM_FLASH_DATA_NAME', 'mflash');
+
 // this sets how many pages the flash has to live (ptl: pages to live)
 define('MADEAM_FLASH_LIFE_NAME', 'mflife');
+
 // this is used for passing post data from one page to the next
 // the post data is merged with the flash post data on the next page
 define('MADEAM_FLASH_POST_NAME', 'mfpost');
+
 // Used for joining models and other associations
 // example use: "user.name"
 define('MADEAM_ASSOCIATION_JOINT', '.');
@@ -148,32 +157,35 @@ function file_lives($file) {
   return false;
 }
 
-// save configuration to registry
-Madeam_Registry::set('config', $config);
-unset($config);
-
 // include routes
 // check cache for routes
 if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1)) {
   // include routes configuration
   require PATH_TO_APP . 'Config' . DS . 'routes.php';
+
   // save routes to cache
-  Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
+  if ($config['cache_routes']) {
+    Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
+  }
 }
+
+// save configuration to registry
+Madeam_Registry::set('config', $config);
+unset($config);
 
 /**
  * Enter description here...
  *
  * @param unknown_type $e
  */
-function Madeam_uncaughtException($e) {
+function Madeam_UncaughtException($e) {
   echo 'Uncaught Exception: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile();
   return true;
 }
 /**
  * Set exception handler
  */
-set_exception_handler('Madeam_uncaughtException');
+set_exception_handler('Madeam_UncaughtException');
 
 /**
  * Enter description here...
@@ -183,7 +195,7 @@ set_exception_handler('Madeam_uncaughtException');
  * @param unknown_type $file
  * @param unknown_type $line
  */
-function Madeam_errorHandler($code, $string, $file, $line) {
+function Madeam_ErrorHandler($code, $string, $file, $line) {
   // return regular PHP errors when they're non-fatal
   if ($code == 2 || $code == 4 || $code == 8) { return false; }
 
@@ -196,7 +208,7 @@ function Madeam_errorHandler($code, $string, $file, $line) {
 /**
  * Set error handler
  */
-set_error_handler('Madeam_errorHandler');
+set_error_handler('Madeam_ErrorHandler');
 
 // function library
 // ========================================================

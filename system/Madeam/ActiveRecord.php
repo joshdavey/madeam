@@ -225,15 +225,18 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
         // check for errors
         if (mysql_error()) {
-          throw new Madeam_Exception_QueryFail(mysql_error() . '<br />' . $sql);
+          throw new Madeam_Exception_QueryFail(null, 2);
         }
 
       } catch (Madeam_Exception_ConnectionFail $e) {
-        $e->setMessage(mysql_error() . '. Check connection string in setup.');
+        $e->setMessage(mysql_error() . '. Check connection string in setup file.');
         Madeam_Error::catchException($e);
       } catch (Madeam_Exception_MissingResource $e) {
+        $e->setMessage(mysql_error() . '. Check connection string in setup file.');
         Madeam_Error::catchException($e);
       } catch (Madeam_Exception_QueryFail $e) {
+        $trace = $e->getTrace();
+        $e->setMessage('See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[3]['class'] . "</strong> \n" . mysql_error() . "\n" . $sql);
         Madeam_Error::catchException($e);
       }
 

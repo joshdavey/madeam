@@ -28,7 +28,33 @@ class Madeam_Error {
   	"Is this your idea of web 3.0?"
   );
 
+  /**
+   * Error Codes
+   *
+   * 1      | E_ERROR n
+   * 2      | E_WARNING y
+   * 4      | E_PARSE y
+   * 8      | E_NOTICE y
+   * 16     | E_CORE_ERROR n
+   * 32     | E_CORE_WARNNING y
+   * 64     | E_COMPILE_ERROR n
+   * 128    | E_COMPILE_WARNING y
+   * 256    | E_USER_ERROR n
+   * 512    | E_USER_WARNING y
+   * 1024   | E_USER_NOTICE y
+   * 6143   | E_ALL n
+   * 2048   | E_STRICT y
+   * 4096   | E_RECOVERABLE_ERROR y
+   */
+
   public static function catchException(Exception $exception) {
+    // check if inline errors are enabled and the error is not fatal
+    if (MADEAM_INLINE_ERRORS === true && !in_array($exception->getCode(), array(1, 16, 64, 256, 6143))) {
+      echo nl2br($exception->getMessage());
+      echo '<br />' . $exception->getFile() . ' on line ' . $exception->getLine();
+      return;
+    }
+
     // get config
     $config = Madeam_Registry::get('config');
 
@@ -39,7 +65,7 @@ class Madeam_Error {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
       // call error controller and pass information
-      echo Madeam::makeRequest($config['error_controller'] . '/debug?error=' . urlencode($exception->getMessage()) . '&backtrace=' . urlencode($exception->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($exception->getLine()) . '&code=' . urlencode($exception->getCode()) . '&file=' . urlencode($exception->getFile()) . '&documentation=' . 'comingsoong&useLayout=1');
+      echo Madeam::makeRequest($config['error_controller'] . '/debug?error=' . urlencode(nl2br($exception->getMessage())) . '&backtrace=' . urlencode($exception->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($exception->getLine()) . '&code=' . urlencode($exception->getCode()) . '&file=' . urlencode($exception->getFile()) . '&documentation=' . 'comingsoong&useLayout=1');
       exit();
     } else {
       // return 404 error page

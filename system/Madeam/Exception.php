@@ -15,19 +15,7 @@
  */
 class Madeam_Exception extends Exception {
 
-  const THROW_VIEW_MISSING = 100;
-
-  const THROW_CONTORLLER_MISSING = 101;
-
-  const THROW_ACTION_MISSING = 102;
-
-  const THROW_CLASS_MISSING = 103;
-
-  const THROW_FILE_MISSING = 104;
-
-  const THROW_METHOD_MISSING = 105;
-
-  public function __construct($message, $code = 0) {
+  public function __construct($message = null, $code = 1) {
     $date = date('M d o H:i:s');
     $file = basename($this->getFile());
     $line = $this->getLine();
