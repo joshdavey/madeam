@@ -15,24 +15,64 @@
  */
 class Madeam_Exception extends Exception {
 
+  private static $funSnippets = array(
+  	"Don't worry, be happy. It could be worse.",
+  	"Did someone make a boo boo?",
+  	"You should really fix this.",
+  	"Just blame Josh Davey.",
+  	"This is the last time I trust open source software.",
+  	"Did you intend on launching a nuclear missile? Because it's too late to stop...",
+  	"This is neither a horse, or a stable.",
+  	"What have you done!?",
+  	"Oh @%&#!",
+  	"The tech bubble burst! Run, save yourself!",
+  	"Is this your idea of web 3.0?"
+  );
+
+  /**
+   * Error Codes
+   *
+   * 1      | E_ERROR n
+   * 2      | E_WARNING y
+   * 4      | E_PARSE y
+   * 8      | E_NOTICE y
+   * 16     | E_CORE_ERROR n
+   * 32     | E_CORE_WARNNING y
+   * 64     | E_COMPILE_ERROR n
+   * 128    | E_COMPILE_WARNING y
+   * 256    | E_USER_ERROR n
+   * 512    | E_USER_WARNING y
+   * 1024   | E_USER_NOTICE y
+   * 6143   | E_ALL n
+   * 2048   | E_STRICT y
+   * 4096   | E_RECOVERABLE_ERROR y
+   */
+
   public function __construct($message = null, $code = 1) {
-    $date = date('M d o H:i:s');
-    $file = basename($this->getFile());
-    $line = $this->getLine();
-    $exception = substr(get_class($this), 17);
-    //$message = sprintf("%1$.20s | %2$-28s | %3$-4s | %4$-10s | %5$0s", $date, $file, $line, $exception, $message);
     parent::__construct($message, $code);
   }
 
-  public function setMessage($message) {
-    $this->message = $message;
-  }
+  public static function catchException(Exception $e) {
+    // check if inline errors are enabled and the error is not fatal
+    if (MADEAM_INLINE_ERRORS === true && !in_array($e->getCode(), array(1, 16, 64, 256, 6143))) {
+      echo nl2br($e->getMessage());
+      echo '<br />' . $e->getFile() . ' on line ' . $e->getLine();
+      return;
+    }
 
-  public function setLine($line) {
-    $this->line = $line;
-  }
+    // clean output buffer
+    if (ob_get_level() > 0) { ob_clean(); }
 
-  public function setFile($file) {
-    $this->file = $file;
+    if (MADEAM_ENABLE_DEBUG == true) {
+      // get random snippet
+      $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
+      // call error controller and pass information
+      echo Madeam::makeRequest(Madeam_Config::get('error_controller') . '/debug?error=' . urlencode(nl2br($e->getMessage())) . '&backtrace=' . urlencode($e->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($e->getLine()) . '&code=' . urlencode($e->getCode()) . '&file=' . urlencode($e->getFile()) . '&documentation=' . 'comingsoong&useLayout=1');
+      exit();
+    } else {
+      // return 404 error page
+      echo Madeam::makeRequest(Madeam_Config::get('error_controller') . '/http404');
+      exit();
+    }
   }
 }

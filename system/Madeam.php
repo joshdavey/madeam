@@ -127,7 +127,7 @@ class Madeam {
 */
         // no controller found = critical error.
         $e->setMessage('Missing Controller <b>' . $controllerClass . '</b>');
-        Madeam_Error::catchException($e);
+        Madeam_Exception::catchException($e);
       }
     }
 
@@ -160,9 +160,9 @@ class Madeam {
       // return output
       return $finalOutput;
     } catch (Madeam_Exception_MissingAction $e) {
-      Madeam_Error::catchException($e);
+      Madeam_Exception::catchException($e);
     } catch (Madeam_Exception_MissingView $e) {
-      Madeam_Error::catchException($e);
+      Madeam_Exception::catchException($e);
     }
   }
 

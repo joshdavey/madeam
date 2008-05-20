@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Change this to select the environment settings you'd like to run with.
  */
@@ -46,7 +47,8 @@ $cfg['environment'] = 'development';
  *  false:  logging is turned off
  *
  * [inline_errors]
- *   true: all errors are displayed inline;
+ *   true: all errors are displayed inline
+ *   false: errors will be displayed by Madeam's error handling controller
  */
 
 // development

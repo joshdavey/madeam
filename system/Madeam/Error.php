@@ -17,13 +17,14 @@ class Madeam_Error {
 
   private static $funSnippets = array(
   	"Don't worry, be happy. It could be worse.",
-  	"Oops. Did someone make a boo boo?",
+  	"Did someone make a boo boo?",
   	"You should really fix this.",
   	"Just blame Josh Davey.",
   	"This is the last time I trust open source software.",
-  	"Did you intend on launching a nuclear missile? Because it's too late to stop it now.",
+  	"Did you intend on launching a nuclear missile? Because it's too late to stop...",
   	"This is neither a horse, or a stable.",
-  	"What have you done!?", "Oh @%&#",
+  	"What have you done!?",
+  	"Oh @%&#!",
   	"The tech bubble burst! Run, save yourself!",
   	"Is this your idea of web 3.0?"
   );
