@@ -185,10 +185,19 @@ class Madeam_Controller {
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
       // set model class name
       $modelClass = 'Model_' . $name;
+      
+      // testing idea of not needing to create models in protoptype stage of site
+      // this should still check to see if a table exists... 
+      // or maybe we can just let it throw a SQL error which works just as well
+      if (!class_exists($modelClass, false)) {
+        eval("class $modelClass extends Madeam_ActiveRecord2 {}");
+      }
+      
       // create component instance
       $model = new $modelClass();
       $this->$name = $model;
       return $model;
+      
     }
     return false;
   }

@@ -52,7 +52,7 @@ $cfg['environment'] = 'development';
  */
 
 // development
-  $env['development']['data_servers'][] = 'mysql://root:@localhost?name=madeam';
+  $env['development']['data_servers'][] = 'mysql://username:password@localhost?name=madeam';
   $env['development']['cache_models']   = false;
   $env['development']['cache_routes']   = false;
   $env['development']['cache_inline']   = false; // views
