@@ -214,12 +214,11 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
       } catch (PDOException $e) {
         Madeam_Exception::catchException($e, array('file', 'line', 'message'));
       } catch (Madeam_Exception_MissingResource $e) {
-        $e->setMessage(mysql_error() . '. Check connection string in setup file.');
-        Madeam_Exception::catchException($e);
+        Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
       } catch (Madeam_Exception_QueryFail $e) {
-        $trace = $e->getTrace();
-        $error = self::$_pdo->errorInfo();
-        $e->setMessage('See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[3]['class'] . "</strong> \n" . $error[2] . "\n" . $sql);
+        //$trace = $e->getTrace();
+        //$error = self::$_pdo->errorInfo();
+        //$e->setMessage('See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[3]['class'] . "</strong> \n" . $error[2] . "\n" . $sql);
         Madeam_Exception::catchException($e);
       }
 
