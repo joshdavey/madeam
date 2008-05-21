@@ -623,10 +623,10 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resourceName = Madeam_Inflector::model_habtm($model, $this->name);
+    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->name);
     $class->primaryKey = false;
     $this_key = Madeam_Inflector::model_foreign_key($this->name);
-    $relation_key = Madeam_Inflector::model_foreign_key($model);
+    $relation_key = Madeam_Inflector::modelForeignKey($model);
 
     //$this->ItemStore->findOne(1,2);
     foreach ($assoc as $val) {
@@ -649,10 +649,10 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resourceName = Madeam_Inflector::model_habtm($model, $this->name);
+    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->name);
     $class->primaryKey = false;
-    $this_key = Madeam_Inflector::model_foreign_key($this->name);
-    $relation_key = Madeam_Inflector::model_foreign_key($model);
+    $this_key = Madeam_Inflector::modelForeignKey($this->name);
+    $relation_key = Madeam_Inflector::modelForeignKey($model);
 
     foreach ($assoc as $val) {
       $class->data = array($this_key => $id, $relation_key => $val);
