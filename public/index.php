@@ -34,4 +34,22 @@
 // interesting stuff
   //echo 'Execution Time: ' . $time . '<br />'; foreach (get_included_files() as $file) { isset($x) ? ++$x : $x = 1; echo $x . ' ' . $file . '<br />'; }
 
+/*
+<style>
+html, body { position: fixed; left: 0; right: 0; top: 0; bottom: 214px; overflow: auto; }
+</style>
+<div style="height: 200px; background: #fff; position: fixed; left: 0; right: 0; bottom: 0; overflow: auto; border-top: solid 4px #000; padding: 4px; ">
+<p>test</p>
+<p>test</p>
+<p>test</p>
+<p>test</p>
+<p>test</p>
+<p>test</p>
+<p>test</p>
+<p>test</p>
+<p>test</p>
+<p>test</p>
+<p>test</p>
+</div>
 
+*/
