@@ -87,7 +87,7 @@ class Madeam_Cache {
     $id = MADEAM_ENVIRONMENT . '.' . $id;
 
     // check if inline cache is enabled
-    if (MADEAM_CACHE_INLINE === false) {
+    if (Madeam_Config::get('cache_inline') === false) {
       return false;
     }
 
@@ -108,7 +108,7 @@ class Madeam_Cache {
    */
   public static function stop() {
     // check if inline cache is enabled
-    if (MADEAM_CACHE_INLINE === false) {
+    if (Madeam_Config::get('cache_inline') === false) {
       return false;
     }
 

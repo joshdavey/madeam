@@ -127,7 +127,7 @@ class Madeam_Model {
       // load validators
       $this->loadValidators();
 
-      if (MADEAM_CACHE_MODELS === true) {
+      if (Madeam_Config::get('cache_models') === true) {
         Madeam_Cache::save($this->cacheName, $this->setup, true);
       }
     }

@@ -32,7 +32,7 @@ class Madeam_Controller {
   /**
    * Enter description here...
    *
-   * @var unknown_type
+   * @var string/array
    */
   protected $layout = 'master';
 
@@ -41,14 +41,21 @@ class Madeam_Controller {
    *
    * @var unknown_type
    */
-  protected $represent = false;
+  protected $view = null;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $actionView;
+  protected $data = array();
+
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
+  protected $represent = false;
 
   /**
    * Enter description here...
@@ -83,28 +90,28 @@ class Madeam_Controller {
    *
    * @var unknown_type
    */
-  protected $requestMethod;
+  public $requestMethod;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $requestGet;
+  public $requestGet;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $requestPost;
+  public $requestPost;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $requestCookie;
+  public $requestCookie;
 
   public function __construct($requestGet = array(), $requestPost = array(), $requestCookie = array(), $requestMethod = 'GET') {
     // load represented model
@@ -117,6 +124,11 @@ class Madeam_Controller {
     $this->requestPost      = $requestPost;
     $this->requestCookie    = $requestCookie;
     $this->requestMethod    = $requestMethod;
+
+    // for consideration...
+    // combine all request information into a single variable
+    $this->request = array_merge($requestGet, $requestPost, $requestCookie);
+    $this->request['method'] = $requestMethod;
 
     // scaffold config
     if ($this->scaffold == true && $this->represent == true) {
@@ -134,6 +146,9 @@ class Madeam_Controller {
     } else {
       $this->setLayout($this->layout);
     }
+
+    // execute
+
   }
 
   public function __destruct() {
@@ -185,25 +200,25 @@ class Madeam_Controller {
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
       // set model class name
       $modelClass = 'Model_' . $name;
-      
+
       // testing idea of not needing to create models in protoptype stage of site
-      // this should still check to see if a table exists... 
+      // this should still check to see if a table exists...
       // or maybe we can just let it throw a SQL error which works just as well
       if (!class_exists($modelClass, false)) {
         eval("class $modelClass extends Madeam_ActiveRecord2 {}");
       }
-      
+
       // create component instance
       $model = new $modelClass();
       $this->$name = $model;
       return $model;
-      
+
     }
     return false;
   }
 
   public function __call($name, $args) {
-    if (! file_exists($this->viewFile)) {
+    if (! file_exists($this->view)) {
       throw new Madeam_Exception_MissingAction('Missing Action <b>' . $name . '</b> in <b>' . get_class($this) . '</b> controller');
     }
   }
@@ -276,7 +291,7 @@ class Madeam_Controller {
    * @param string $view
    */
   final protected function setView($view) {
-    $this->viewFile = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->requestGet['format'];
+    $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->requestGet['format'];
   }
 
   /**
@@ -284,7 +299,7 @@ class Madeam_Controller {
    *
    * @param string/boolean/array $layouts
    */
-  final protected function setLayout($layouts) {
+  final public function setLayout($layouts) {
     $this->layout = array();
     if (func_num_args() < 2) {
       if (is_string($layouts)) {
@@ -294,13 +309,79 @@ class Madeam_Controller {
           $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->requestGet['format'];
         }
       } else {
-        $this->layout = false;
+        $this->layout = array(false);
       }
     } else {
       foreach (funcget_args() as $layout) {
         $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->requestGet['format'];
       }
     }
+  }
+
+  final public function getView() {
+    return $this->view;
+  }
+
+  final public function getLayout() {
+    return $this->layout;
+  }
+
+  final public function getData() {
+    return $this->data;
+  }
+
+  final protected function render($data = true) {
+    if ($data !== false) {
+
+      // create parser instance
+      $viewParserClass = 'Parser_' . ucfirst($this->requestGet['format']);
+      $viewParser = new $viewParserClass($this);
+
+      if (file_exists($this->view)) {
+        // get list of private and protected vars because we don't want them to go to the view
+        $refl = new ReflectionClass($this);
+        $properties = $refl->getProperties(ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
+
+        $excludedProperties = array();
+        foreach ($properties as $prop) { $excludedProperties[] = $prop->getName(); }
+
+        // set the data to be passed to the view and exclude private and protected parameters
+        foreach ($this as $key => $value) {
+          if (!in_array($key, $excludedProperties)) {
+            $this->data[$key] = $value;
+          }
+        }
+
+        $viewParser->renderView();
+      } else {
+        if (isset($this->{Madeam_Inflector::singalize($this->requestGet['controller'])})) {
+          $this->data[Madeam_Inflector::singalize($this->requestGet['controller'])] = $this->{Madeam_Inflector::singalize($this->requestGet['controller'])};
+        } elseif (isset($this->{Madeam_Inflector::pluralize($this->requestGet['controller'])})) {
+          $this->data[Madeam_Inflector::pluralize($this->requestGet['controller'])] = $this->{Madeam_Inflector::pluralize($this->requestGet['controller'])};
+        }
+
+        $viewParser->missingView();
+      }
+
+      foreach ($this->layout as $layoutFile) {
+        if ($layoutFile) {
+          if (file_exists($layoutFile)) {
+            // include layout if it exists
+            $viewParser->renderLayout($layoutFile);
+          } else {
+            $viewParser->missingLayout($layoutFile);
+          }
+        }
+      }
+
+      // set final output
+      $this->finalOutput = $viewParser->getOutput();
+    } else {
+      // set final output as null
+      $this->finalOutput = null;
+    }
+
+    return;
   }
 
   /**
@@ -310,7 +391,7 @@ class Madeam_Controller {
    * @param unknown_type $rendered
    * @return unknown
    */
-  final protected function render($data = true, $rendered = true) {
+  final protected function render2($data = true, $rendered = true) {
     // sometimes the developer may want to tell the view not to render from the controller's action
     if ($data === false) { $this->isRendered = true; }
 
@@ -318,62 +399,41 @@ class Madeam_Controller {
     if ($this->isRendered === false) {
       // output buffering
       ob_start();
-      foreach ($this as $key => $value) { $$key = $value; }
 
-      //extract($this->data, EXTR_OVERWRITE); // which one is faster?
       if ($data === true) {
         // include view's template file
-        if (file_exists($this->viewFile)) {
-          include ($this->viewFile);
+        if (file_exists($this->view)) {
+          $parserClass = 'Parser_' . ucfirst($this->requestGet['format']);
+  				$parser = new $parserClass;
+
+  				$this->content_for_layout = $parser->renderView($this->view, $this);
         } else {
-          throw new Madeam_Exception_MissingView('Missing View <strong>' . substr($this->viewFile, strlen(PATH_TO_VIEW)) . '</strong>');
+          $parser->missingView();
+          throw new Madeam_Exception_MissingView('Missing View <strong>' . substr($this->view, strlen(PATH_TO_VIEW)) . '</strong>');
         }
-        /*
-				$parser = $this->requestGet['format'];
-				if (method_exists('madeamParser', $parser)) {
-					unset($this->data['header_for_layout']);
-					unset($this->data['params']);
-					madeamParser::$parser($this->viewFile, $this->data);
-				}
-				*/
-        // grab result of inclusion
-        $content_for_layout = ob_get_contents();
-        // clear output
-        ob_clean();
       } elseif (is_string($data)) { // this needs to change
         // set $content_for_layout to $data which is just a string
-        $content_for_layout = $data;
-        /*
-				$parser = $this->requestGet['format'];
-        if (method_exists('madeamParser', $parser)) {
-					$content_for_layout = madeamParser::$parser($this->viewFile, $data);
-				} else {
-					$content_for_layout = null;
-				}
-				*/
+        $this->content_for_layout = $data;
       }
+
       // loop through layouts
       // the layouts are rendered in order they are in the array
-      if (is_array($this->layout)) {
-        foreach ($this->layout as $layout) {
-          if ($layout && file_exists($layout)) {
-            // include layout if it exists
-            include ($layout);
-          } else {
-            // otherwise just output the content
-            echo $content_for_layout;
-          }
-          // get contents of output buffering
-          $content_for_layout = ob_get_contents();
-          // clean ob
-          ob_clean();
+      foreach ($this->layout as $layoutFile) {
+        if ($layoutFile && file_exists($layoutFile)) {
+          // include layout if it exists
+          $viewParser->renderLayout($layout);
+        } else {
+          $viewParser->missingLayout();
         }
       }
+
       // end ouptut buffering
       ob_end_clean();
+
       // mark view as rendered
       $this->isRendered = $rendered;
-      $this->finalOutput = $content_for_layout;
+      $this->finalOutput = $this->content_for_layout;
+
       return $this->finalOutput;
     }
     return false;

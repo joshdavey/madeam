@@ -15,15 +15,57 @@
  */
 class Madeam_Logger {
 
-  public static $logs = array();
+  private $logs = array();
 
-  public static function log($message, $lvl = 25) {
-    $date = date("d-m-o H:i:s");
+  /**
+   * Stores this registry's instance
+   *
+   * @var boolean/madeam_registry object
+   */
+  private static $_instance = array();
 
-    self::$logs[] = array('message' => $message, 'datetime' => $date);
-
-    if (MADEAM_ENABLE_LOGGER == true) {
-      file_put_contents(PATH_TO_LOG . date(Madeam_Config::get('log_file_name')) . '.txt', $date . ' | ' . $message . "\n", FILE_APPEND | LOCK_EX);
+  public static function setInstance($instance) {
+    if (! Madeam_Logger::$_instance) {
+      Madeam_Logger::$_instance = $instance;
+    } else {
+      throw new Madeam_Exception('Registry instance already exists');
     }
   }
+
+  /**
+   * Creates a new instance of the registry if it does not exist.
+   * If it does exist then it returns the already existing instance.
+   *
+   * @return madeam_registry object
+   */
+  public static function getInstance() {
+    if (! Madeam_Logger::$_instance) {
+      Madeam_Logger::$_instance = new Madeam_Logger(array());
+    }
+    return Madeam_Logger::$_instance;
+  }
+
+
+  public function log($message, $lvl = 25) {
+    $registry = self::getInstance();
+
+    $date = date("d-m-o H:i:s");
+
+    $registry->logs[] = array('message' => $message, 'datetime' => $date);
+  }
+
+  public function __destruct() {
+    $registry = self::getInstance();
+
+    $requestLog = null;
+    foreach ($registry->logs as $log) {
+      $requestLog .= $log['datetime'] . ' | ' . $log['message'] . "\n";
+    }
+
+    if (Madeam_Config::get('enable_logger') == true && $requestLog != null) {
+      $requestLog .= '------------------' . "\n";
+      file_put_contents(PATH_TO_LOG . date(Madeam_Config::get('log_file_name')) . '.txt',  $requestLog, FILE_APPEND | LOCK_EX);
+    }
+  }
+
 }

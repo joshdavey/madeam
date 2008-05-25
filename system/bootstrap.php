@@ -48,15 +48,6 @@ define('SCRIPT_FILENAME', 'index.php');
 
 // turn configs into constants for speed?
 define('MADEAM_ENVIRONMENT',    $config['environment']);
-define('MADEAM_ENABLE_DEBUG',   $config['enable_debug']);
-define('MADEAM_ENABLE_LOGGER',  $config['enable_logger']);
-define('MADEAM_CACHE_MODELS',   $config['cache_models']);
-define('MADEAM_CACHE_ROUTES',   $config['cache_routes']);
-define('MADEAM_CACHE_INLINE',   $config['cache_inline']);
-define('MADEAM_CLEAR_CACHE',    $config['clear_cache']);
-define('MADEAM_INLINE_ERRORS',  $config['inline_errors']);
-
-define('MADEAM_ENABLE_AJAX_LAYOUT',   $config['enable_ajax_layout']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
 // mod_rewrite is on when $_GET['madeamURI'] exists. You can see it defined in the public .htaccess file
@@ -200,8 +191,8 @@ function Madeam_ErrorHandler($code, $string, $file, $line) {
   if ($code == 2 || $code == 4 || $code == 8) { return false; }
 
   $exception = new Madeam_Exception($string, $code);
-  $exception->setLine($line);
-  $exception->setFile($file);
+  //$exception->setLine($line);
+  //$exception->setFile($file);
   throw $exception;
   return true;
 }

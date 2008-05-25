@@ -52,26 +52,51 @@ class Madeam_Exception extends Exception {
     parent::__construct($message, $code);
   }
 
-  public static function catchException(Exception $e) {
+  public static function catchException(Exception $e, $override = array()) {
+
+    if (isset($override['message'])) {
+      $message = $override['message'];
+    } else {
+      $message = $e->getMessage();
+    }
+
+    if (isset($override['code'])) {
+      $code = $override['code'];
+    } else {
+      $code = $e->getCode();
+    }
+
+    if (isset($override['line'])) {
+      $line = $override['line'];
+    } else {
+      $line = $e->getLine();
+    }
+
+    if (isset($override['file'])) {
+      $file = $override['file'];
+    } else {
+      $file = $e->getFile();
+    }
+
     // check if inline errors are enabled and the error is not fatal
-    if (MADEAM_INLINE_ERRORS === true && !in_array($e->getCode(), array(1, 16, 64, 256, 6143))) {
-      echo nl2br($e->getMessage());
-      echo '<br />' . $e->getFile() . ' on line ' . $e->getLine();
+    if (Madeam_Config::get('inline_errors') === true && !in_array($code, array(1, 16, 64, 256, 6143))) {
+      echo nl2br($message);
+      echo '<br />' . $file . ' on line ' . $line;
       return;
     }
 
     // clean output buffer
     if (ob_get_level() > 0) { ob_clean(); }
 
-    if (MADEAM_ENABLE_DEBUG == true) {
+    if (Madeam_Config::get('enable_debug') == true) {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
       // call error controller and pass information
-      echo Madeam::makeRequest(Madeam_Config::get('error_controller') . '/debug?error=' . urlencode(nl2br($e->getMessage())) . '&backtrace=' . urlencode($e->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($e->getLine()) . '&code=' . urlencode($e->getCode()) . '&file=' . urlencode($e->getFile()) . '&documentation=' . 'comingsoong&useLayout=1');
+      echo Madeam::makeRequest(Madeam_Config::get('error_controller') . '/debug?error=' . urlencode(nl2br($message)) . '&backtrace=' . urlencode($e->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($line) . '&code=' . urlencode($code) . '&file=' . urlencode($file) . '&documentation=' . 'comingsoong&useLayout=1');
       exit();
     } else {
       // return 404 error page
-      echo Madeam::makeRequest(Madeam_Config::get('error_controller') . '/http404');
+      echo Madeam::makeRequest(Madeam_Config::get('error_controller') . '/http404&useLayout=1');
       exit();
     }
   }

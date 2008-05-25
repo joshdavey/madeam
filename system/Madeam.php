@@ -117,7 +117,7 @@ class Madeam {
         // I really don't like this code... Can we put it in the Madeam_Error calss?
         // we gotta get outa here if we can't find an error controller to handle the error.
         if ($params['controller'] == $config['error_controller']) {
-          if (MADEAM_ENABLE_DEBUG === true) {
+          if (Madeam_Config::get('enable_debug') === true) {
             exit('Missing Controller <b>' . $controllerClass . '</b>');
           } else {
             header(' ', '', 404);
@@ -178,7 +178,7 @@ class Madeam {
         exit();
       }
     } else {
-      Madeam_Logger::log('Tried redirecting when headers already sent. (Check for echos before redirects)');
+      Madeam_Logger::getInstance()->log('Tried redirecting when headers already sent. (Check for echos before redirects)');
     }
   }
 

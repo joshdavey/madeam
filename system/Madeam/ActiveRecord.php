@@ -217,7 +217,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
         $this->sql = $sql;
 
         // log
-        Madeam_Logger::log($sql);
+        Madeam_Logger::getInstance()->log($sql);
 
         // execute mysql query
         $this->link = mysql_query($sql, $_GLOBAL['databaseConnection']);

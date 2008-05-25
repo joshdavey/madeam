@@ -161,7 +161,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     // get params from uri
     $params = array_merge($params, $gets);
     // automagically disable the layout when making an AJAX call
-    if (! MADEAM_ENABLE_AJAX_LAYOUT && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+    if (! Madeam_Config::get('enable_ajax_layout') && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
       $params['useLayout'] = '0';
     }
 

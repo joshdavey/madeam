@@ -205,21 +205,21 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
         // for debugging only
         $this->sql = $sql;
 
-        // log
-        Madeam_Logger::log($sql);
+        // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
+        Madeam_Logger::getInstance()->log($sql);
 
         // link
         $result = self::$_pdo->query($sql);
 
       } catch (PDOException $e) {
-        Madeam_Exception::catchException($e, array('file', 'line', 'message'));
-      } catch (Madeam_Exception_MissingResource $e) {
-        Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
-      } catch (Madeam_Exception_QueryFail $e) {
-        //$trace = $e->getTrace();
-        //$error = self::$_pdo->errorInfo();
-        //$e->setMessage('See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[3]['class'] . "</strong> \n" . $error[2] . "\n" . $sql);
-        Madeam_Exception::catchException($e);
+        if (!is_object(self::$_pdo)) {
+          // if the _pdo variable isn't an object it means it failed to connected
+          Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
+        } else {
+          $trace = $e->getTrace();
+          $error = self::$_pdo->errorInfo();
+          Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
+        }
       }
 
     return $result;
@@ -681,74 +681,6 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
       }
     }
     return false;
-  }
-
-  /**
-   * Creates table
-   * Soon this method will have migration abilities but for now it just creates tables...
-   */
-  final public function migrate($drop = false) {
-    $sql = array(); // our query in array form -- soon to be imploded
-    $uniques = array(); // list of fields that have unique values
-    // drop table -- this doesn't work yet
-    if ($drop == true) {
-      $sql[] = 'DROP TABLE IF EXISTS `' . $this->setup['resourceName'] . "`; \n";
-    }
-    // initial query decleration
-    $sql[] = 'CREATE TABLE IF NOT EXISTS `' . $this->setup['resourceName'] . '` (';
-    // add fields
-    $fields = array();
-    foreach ($this->schema as $name => $opts) {
-      $field = array();
-      // Field type
-      if (! empty($opts['values'])) {
-        // values (enum and set)
-        $field[] = "`$name` $opts[type]('" . implode("','", $opts['values']) . "')";
-      } elseif ($opts['size'] != null) {
-        // size
-        $field[] = "`$name` $opts[type]($opts[size])";
-      } else {
-        // neither
-        $field[] = "`$name` $opts[type]";
-      }
-      // NULL?
-      if ($opts['null'] == false) {
-        $field[] = 'NOT NULL';
-      } else {
-        $field[] = 'NULL';
-      }
-      // default value
-      if ($opts['default'] != null) {
-        $field[] = "DEFAULT '$opts[default]'";
-      }
-      // auto increment
-      if (in_array('auto_increment', $opts)) {
-        $field[] = 'AUTO_INCREMENT';
-      }
-      // primary key
-      if (in_array('primaryKey', $opts)) {
-        $field[] = 'PRIMARY KEY';
-      }
-      // unique
-      if (in_array('unique', $opts)) {
-        $uniques[] = $name;
-      }
-      // add to list of fields
-      $fields[] = implode(' ', $field);
-    }
-    // add fields
-    $sql[] = implode(", ", $fields);
-    // add uniques
-    if (! empty($uniques)) {
-      $sql[] = 'UNIQUE (`' . implode('`,`', $uniques) . '`)';
-    }
-    // close
-    $sql[] = ')';
-    // create query string
-    $sql = implode(' ', $sql);
-    // create table
-    $this->execute($sql);
-    return true;
   }
 
   /**
