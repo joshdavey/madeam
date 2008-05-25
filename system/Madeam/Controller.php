@@ -233,7 +233,7 @@ class Madeam_Controller {
    * @param unknown_type $uri
    * @return unknown
    */
-  final protected function callAction($uri, $params = array()) {
+  final public function callAction($uri, $params = array()) {
 
     if (!isset($params['get']))     { $params['get']    = $this->requestGet; }
     if (!isset($params['post']))    { $params['post']   = $this->requestPost; }
@@ -251,7 +251,7 @@ class Madeam_Controller {
    * @param unknown_type $limit
    * @return unknown
    */
-  final protected function callPartial($partialPath, $data = array(), $start = 0, $limit = false) {
+  final public function callPartial($partialPath, $data = array(), $start = 0, $limit = false) {
     if (! empty($data)) {
       // internal counter can be accessed in the view
       $_num = $start;

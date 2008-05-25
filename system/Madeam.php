@@ -24,10 +24,14 @@ class Madeam {
     // call user front controller?
     // include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
 
-    if (!isset($_GET['useLayout'])) { $_GET['useLayout'] = 1; }
+    if (!isset($_GET['useLayout'])) {
+      $useLayout = 'useLayout=1';
+    } else {
+      $useLayout = null;
+    }
 
     // call controller action
-    $output = Madeam::makeRequest(Madeam_Router::getCurrentURI(), $_GET, $_POST, $_COOKIE);
+    $output = Madeam::makeRequest(Madeam_Router::getCurrentURI() . $useLayout, $_GET, $_POST, $_COOKIE);
 
     // destroy user error notices
     if (isset($_SESSION[MADEAM_USER_ERROR_NAME])) {
@@ -78,7 +82,7 @@ class Madeam {
     $params = Madeam_Router::parseURI($uri);
 
     // combine GETs
-    $params = array_merge($params, $requestGet);
+    $params = array_merge($requestGet, $params);
 
     // pass uri as a _GET variable
     $params['uri'] = $uri;
