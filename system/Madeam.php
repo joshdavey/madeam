@@ -136,26 +136,24 @@ class Madeam {
 
     try {
       // before action callback
-      $controller->callback('beforeAction');
+      $controller->beforeAction();
 
       // call action
-      if ($params['action'] != 'callback') {
-        $controller->{Madeam_Inflector::camelize($params['action'])}();
-      } else {
-        throw new Madeam_Exception_MissingAction('You cannot call the action "callback".');
-      }
+      $params['action'] = Madeam_Inflector::camelize($params['action']);
+      $controller->{$params['action']}();
+      //throw new Madeam_Exception_MissingAction('You cannot call this action');
 
       // after action callback
-      $controller->callback('beforeRender');
+      $controller->beforeRender();
 
       // render
-      $controller->callback('render');
+      $controller->render();
 
       // after render callback
-      $controller->callback('afterRender');
+      $controller->afterRender();
 
       // get final output
-      $finalOutput = $controller->finalOutput;
+      $finalOutput = $controller->getOutput();
 
       // delete controller
       unset($controller);

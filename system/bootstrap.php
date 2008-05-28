@@ -30,6 +30,7 @@ if (substr($_SERVER['DOCUMENT_ROOT'], - 1) != '/') {
 // set key paths
 define('PATH_TO_APP', PATH_TO_PROJECT . 'app' . DS);
 define('PATH_TO_LIB', PATH_TO_PROJECT . 'library' . DS);
+define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS);
 
 // include base setup configuration
 require PATH_TO_APP . 'Config' . DS . 'setup.php';
@@ -72,10 +73,6 @@ unset($_GET['madeamURI']);
 // remove it fromt he query string as well
 $_SERVER['QUERY_STRING'] = preg_replace('/&?madeamURI=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
 
-// major madeam directories
-if (! defined('PATH_TO_SYSTEM')) {
-  define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS);
-}
 
 // application files
 define('PATH_TO_VIEW', PATH_TO_APP . 'View' . DS);
@@ -128,9 +125,6 @@ function Madeam_Autoload($class) {
 // have this one throw an exception or make a last resort to check every path for the file.
 spl_autoload_register('Madeam_Autoload');
 
-// include application bootstrap
-require PATH_TO_APP . 'Config' . DS . 'bootstrap.php';
-
 /**
  * Checks to see if a relative file exists by checking each include path.
  * Special thanks to Ahmad Nassri from PHP-Infinity for the proof of concept.
@@ -147,6 +141,14 @@ function file_lives($file) {
   }
   return false;
 }
+
+/*
+Madeam_Config::set('association_join', '.');
+Madeam_Config::set('flash_post_name', 'mfpost');
+Madeam_Config::set('flash_data_name', 'mflash');
+Madeam_Config::set('flash_life_name', 'mflife');
+Madeam_Config::set('user_error_name', 'muerrors');
+*/
 
 // include routes
 // check cache for routes
@@ -335,3 +337,7 @@ function modifedFilesExist() {
   }
 }
 //modifedFilesExist();
+
+
+// include application bootstrap
+require PATH_TO_APP . 'Config' . DS . 'bootstrap.php';

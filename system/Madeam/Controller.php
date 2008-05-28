@@ -20,7 +20,7 @@ class Madeam_Controller {
    *
    * @var unknown_type
    */
-  public $finalOutput = null;
+  protected $finalOutput = null;
 
   /**
    * Enter description here...
@@ -223,10 +223,6 @@ class Madeam_Controller {
     }
   }
 
-  final public function callback($callback) {
-    return $this->$callback();
-  }
-
   /**
    * Enter description here...
    *
@@ -330,28 +326,32 @@ class Madeam_Controller {
     return $this->data;
   }
 
-  final protected function render($data = true) {
+  final public function getOutput() {
+    return $this->finalOutput;
+  }
+
+  final public function render($data = true) {
     if ($data !== false) {
 
       // create parser instance
       $viewParserClass = 'Parser_' . ucfirst($this->requestGet['format']);
       $viewParser = new $viewParserClass($this);
 
-      if (file_exists($this->view)) {
-        // get list of private and protected vars because we don't want them to go to the view
-        $refl = new ReflectionClass($this);
-        $properties = $refl->getProperties(ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
+      // get list of private and protected vars because we don't want them to go to the view
+      $refl = new ReflectionClass($this);
+      $properties = $refl->getProperties(ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
 
-        $excludedProperties = array();
-        foreach ($properties as $prop) { $excludedProperties[] = $prop->getName(); }
+      $excludedProperties = array();
+      foreach ($properties as $prop) { $excludedProperties[] = $prop->getName(); }
 
-        // set the data to be passed to the view and exclude private and protected parameters
-        foreach ($this as $key => $value) {
-          if (!in_array($key, $excludedProperties)) {
-            $this->data[$key] = $value;
-          }
+      // set the data to be passed to the view and exclude private and protected parameters
+      foreach ($this as $key => $value) {
+        if (!in_array($key, $excludedProperties)) {
+          $this->data[$key] = $value;
         }
+      }
 
+      if (file_exists($this->view)) {
         $viewParser->renderView();
       } else {
         if (isset($this->{Madeam_Inflector::singalize($this->requestGet['controller'])})) {
@@ -381,7 +381,7 @@ class Madeam_Controller {
       $this->finalOutput = null;
     }
 
-    return;
+    return true;
   }
 
   /**
@@ -391,7 +391,7 @@ class Madeam_Controller {
    * @param unknown_type $rendered
    * @return unknown
    */
-  final protected function render2($data = true, $rendered = true) {
+  final public function render2($data = true, $rendered = true) {
     // sometimes the developer may want to tell the view not to render from the controller's action
     if ($data === false) { $this->isRendered = true; }
 
@@ -469,9 +469,9 @@ class Madeam_Controller {
    */
   /* what about re-naming these like this: _beforeAction() or before_action()? */
   /* come up with a better naming convention for these methods */
-  protected function beforeAction() {}
+  public function beforeAction() {}
 
-  protected function beforeRender() {}
+  public function beforeRender() {}
 
-  protected function afterRender() {}
+  public function afterRender() {}
 }
