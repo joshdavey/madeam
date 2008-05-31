@@ -117,49 +117,20 @@ class Madeam {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
         $controller = new Controller_App($params);
       } else {
-        /*
-        // I really don't like this code... Can we put it in the Madeam_Error calss?
-        // we gotta get outa here if we can't find an error controller to handle the error.
-        if ($params['controller'] == $config['error_controller']) {
-          if (Madeam_Config::get('enable_debug') === true) {
-            exit('Missing Controller <b>' . $controllerClass . '</b>');
-          } else {
-            header(' ', '', 404);
-            exit();
-          }
-        }
-*/
         // no controller found = critical error.
         Madeam_Exception::catchException($e, array('message' => 'Missing Controller <b>' . $controllerClass . '</b>'));
       }
     }
 
     try {
-      // before action callback
-      $controller->beforeAction();
-
-      // call action
-      $params['action'] = Madeam_Inflector::camelize($params['action']);
-      $controller->{$params['action']}();
-      //throw new Madeam_Exception_MissingAction('You cannot call this action');
-
-      // after action callback
-      $controller->beforeRender();
-
-      // render
-      $controller->render();
-
-      // after render callback
-      $controller->afterRender();
-
-      // get final output
-      $finalOutput = $controller->getOutput();
+      // process request
+      $output = $controller->process();
 
       // delete controller
       unset($controller);
 
       // return output
-      return $finalOutput;
+      return $output;
     } catch (Madeam_Exception_MissingAction $e) {
       Madeam_Exception::catchException($e);
     } catch (Madeam_Exception_MissingView $e) {
@@ -180,7 +151,7 @@ class Madeam {
         exit();
       }
     } else {
-      Madeam_Logger::getInstance()->log('Tried redirecting when headers already sent. (Check for echos before redirects)');
+      throw new Madeam_Exception_HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
     }
   }
 

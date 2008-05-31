@@ -19,7 +19,7 @@ class Madeam_Model {
 
   protected $depth = 2; // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
 
-  protected $reflectionObj;
+  protected $reflection;
 
   protected $name = null; // -- this needs to be re-named to _name and made protected
 
@@ -185,7 +185,7 @@ class Madeam_Model {
    * You can also set arguments in the array. For example: "array('message' => 'Oops', 'max' => 255)".
    */
   final protected function loadValidators() {
-    foreach ($this->reflectionObj->getProperties() as $prop) {
+    foreach ($this->reflection->getProperties() as $prop) {
       // filter out private variables. The less we need to parse the better
       if ($prop->isPublic()) {
         // get property name
@@ -227,7 +227,8 @@ class Madeam_Model {
    */
   final protected function loadFields() {
     $fields = array();
-    foreach ($this->reflectionObj->getProperties() as $prop) {
+    $props = $this->reflection->getProperties();
+    foreach ($props as $prop) {
       $property_name = $prop->name;
       if (preg_match("/field_(.+)/", $property_name, $found)) {
         $field_name = $found[1];
@@ -243,7 +244,8 @@ class Madeam_Model {
    * This method parses all the class properties to find relationships
    */
   final protected function loadRelations() {
-    foreach ($this->reflectionObj->getProperties() as $prop) {
+    $props = $this->reflection->getProperties();
+    foreach ($props as $prop) {
       // ignore private properties so we don't need to parse every single variable
       if ($prop->isPublic()) {
         if (preg_match("/^(hasMany|hasOne|belongsTo|hasAndBelongsToMany)_(.+)/", $prop->name, $found)) {
@@ -317,7 +319,7 @@ class Madeam_Model {
    * pre-loads it when the object is constructed
    */
   final protected function loadReflection() {
-    $this->reflectionObj = new ReflectionClass(get_class($this));
+    $this->reflection = new ReflectionClass(get_class($this));
   }
 
   /**
@@ -391,20 +393,21 @@ class Madeam_Model {
    */
   final protected function loadCustomFields() {
     // get the name of the model's instance.
-    //$reflectionObj = new ReflectionClass(get_class($this));
+    //$reflection = new ReflectionClass(get_class($this));
     // get the name of it's parent (example parents: activeRecord. activeFile, etc...)
-    $parent = $this->reflectionObj->getParentClass()->getName();
+    $parent = $this->reflection->getParentClass()->getName();
     // create instance of parent so we can compare the methods
-    $parent_relf = new ReflectionClass($parent);
+    $parentReflection = new ReflectionClass($parent);
     // check each method to find out whethere it's a new field or not
     // I wish there was a faster way of doing this...
-    foreach ($this->reflectionObj->getMethods() as $model_method) {
+    $methods = $this->reflection->getMethods();
+    foreach ($methods as $method) {
       // make sure this method is either not a final method or is public so we don't need to parse every single method
-      if (! $model_method->isFinal() && $model_method->isProtected()) {
+      if (! $method->isFinal() && $method->isProtected()) {
         // get method name
-        $model_method_name = $model_method->getName();
-        if (substr($model_method_name, 0, 1) != '_' && $parent_relf->hasMethod($model_method_name) == false) {
-          $this->setup['customFields'][] = $model_method_name;
+        $methodName = $method->getName();
+        if (substr($methodName, 0, 1) != '_' && $parentReflection->hasMethod($methodName) == false) {
+          $this->setup['customFields'][] = $methodName;
         }
       }
     }
@@ -442,70 +445,6 @@ class Madeam_Model {
     $this->{'add_' . $relation}($model, $params);
     return $this;
   }
-
-  /**
-   * Validating Methods
-   * =======================================================================
-   */
-  final protected function validateLength($v, $args) {
-    $len = strlen($v);
-    $min = (int) $args['min'];
-    $max = (int) $args['max'];
-    if (($len >= $min && $len <= $max) || ($len >= $min && $max == 0)) {
-      return true;
-    }
-    return false;
-  }
-
-  final protected function validateIsNotEqual($v, $args) {
-    $not_values = $args['value'];
-    if (is_array($not_values)) {
-      if (! in_array($v, $not_values)) {
-        return true;
-      }
-      return false;
-    } else {
-      if ($not_values != $v) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }
-
-  final protected function validateIsDatetime($v, $args) {
-    return true;
-  }
-
-  final protected function validateIsNotEmpty($v, $args) {
-    if ($v == null) {
-      return false;
-    }
-    return true;
-  }
-
-  final protected function validateIsEmail($v, $args) {
-    if (! preg_match('/^(([A-Za-z0-9]+_+)|([A-Za-z0-9]+\-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6}$/', $v)) {
-      return false;
-    }
-    return true;
-  }
-
-  final protected function validateIsExpression($v, $args) {
-    if (! preg_match($args['regexp'], $v)) {
-      return false;
-    }
-    return true;
-  }
-
-  final protected function validateIsISBN($v, $args) {
-    if (! preg_match('/^(97(8|9))?\d{9}(\d|X)$/', $v)) {
-      return false;
-    }
-    return true;
-  }
-
-  final protected function validateIsUnique($v, $args) {}
 
   /**
    * Callback functions

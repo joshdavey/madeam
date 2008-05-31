@@ -14,7 +14,10 @@ code.madeam { margin-bottom: 14px; margin-left: 10px; letter-spacing: 0.03em; fo
 
 /* =body
 -------------------------------------- */
-body { line-height: 1.6em; font-family: Arial, "Lucida Grande", arial, helvetica, sans-serif; font-size: 16px; background: #0c1531; }
+body { line-height: 1.6em; font-family: Arial, "Lucida Grande", arial, helvetica, sans-serif; font-size: 16px; 
+background: #0c1531; 
+background: #ccc; 
+}
 
 
 /* =prep

@@ -1,10 +1,12 @@
 <?php
 class Controller_Error extends Madeam_Controller {
 
-  protected $layout = 'error';
-
-  public function beforeAction() {
-    $this->pageTitle = 'Madeam PHP MVC Framework';
+  public $layout = 'error';
+  
+  public $beforeFilter_prepare;
+  
+  public function prepare() {
+    $this->pageTitle = 'Oops.';
   }
 
 }

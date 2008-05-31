@@ -20,70 +20,56 @@ class Madeam_Controller {
    *
    * @var unknown_type
    */
-  protected $finalOutput = null;
+  private $output = null;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $scaffold = false;
+  public $scaffold = false;
 
   /**
    * Enter description here...
    *
    * @var string/array
    */
-  protected $layout = 'master';
+  public $layout = 'master';
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $view = null;
+  public $view = null;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $data = array();
+  public $data = array();
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $represent = false;
+  public $represent = false;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $isRendered = false;
+  private $parser;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  protected $viewParser;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  protected $scaffoldController;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  protected $scaffoldKey;
+  private $scaffoldController;
 
   /**
    * Enter description here...
@@ -112,6 +98,27 @@ class Madeam_Controller {
    * @var unknown_type
    */
   public $requestCookie;
+  
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
+  public $params;
+  
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
+  private $setup = array();
+  
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
+  private $reflection;
 
   public function __construct($requestGet = array(), $requestPost = array(), $requestCookie = array(), $requestMethod = 'GET') {
     // load represented model
@@ -127,32 +134,46 @@ class Madeam_Controller {
 
     // for consideration...
     // combine all request information into a single variable
-    $this->request = array_merge($requestGet, $requestPost, $requestCookie);
-    $this->request['method'] = $requestMethod;
+    $this->params = array_merge($requestGet, $requestPost, $requestCookie);
+    $this->params['method'] = $requestMethod;
+    
+    $this->data['params'] = $this->params;
+    
+    // define setup
+    $this->setup['beforeFilter'] = $this->setup['beforeRender'] = $this->setup['afterRender'] = array();
 
     // scaffold config
-    if ($this->scaffold == true && $this->represent == true) {
-      $this->scaffoldController = $this->requestGet['controller'];
-      $this->scaffoldKey = $this->{$this->represent}->getPrimaryKey();
-    }
+    $this->scaffoldController = $this->requestGet['controller'];
 
     // set view
-    $this->setView($this->requestGet['controller'] . '/' . $this->requestGet['action']);
+    $this->view($this->requestGet['controller'] . '/' . $this->requestGet['action']);
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
     if (isset($this->requestGet['useLayout']) && ($this->requestGet['useLayout'] == '0' || $this->requestGet['useLayout'] == 'false')) {
-      $this->setLayout(false);
+      $this->layout(false);
     } else {
-      $this->setLayout($this->layout);
+      $this->layout($this->layout);
     }
-
-    // execute
-
+    
+    // create parser instance
+    $parserClassName = 'Parser_' . ucfirst($this->requestGet['format']);
+    $this->parser = new $parserClassName($this);
+    
+    // reflection
+    $this->reflection = new ReflectionClass($this);
+    
+    $properties = $this->reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+    foreach ($properties as $property) {
+      $matches = array();
+      if (preg_match('/^(beforeFilter|beforeRender|afterRender)_([a-zA-Z0-9]*)(_except)?/', $property->getName(), $matches)) {
+        $this->setup[$matches[1]][] = $matches[2];
+      }
+    }
   }
 
+  /*
   public function __destruct() {
-
     if (!headers_sent()) {
 
       // we need to destroy cookies that are unset
@@ -183,37 +204,36 @@ class Madeam_Controller {
         setcookie($cookieName, $cValue, $cExpire, $cPath, $cDomain, $cSecure, $cHttpOnly);
       }
     }
-
   }
+  */
 
-  /**
-   * Handle variable gets.
-   * This magic method exists to handle instances of models and components when they're called.
-   * If the instance of a model or component doesn't exist we create it here.
-   * This is so we don't need to pre-load all of them.
-   *
-   * @param string $name
-   * @return object
-   */
   public function __get($name) {
     $match = array();
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
       // set model class name
-      $modelClass = 'Model_' . $name;
+      $modelClassName = 'Model_' . $name;
 
       // testing idea of not needing to create models in protoptype stage of site
       // this should still check to see if a table exists...
       // or maybe we can just let it throw a SQL error which works just as well
-      if (!class_exists($modelClass, false)) {
-        eval("class $modelClass extends Madeam_ActiveRecord2 {}");
+      if (!class_exists($modelClassName, false)) {
+        eval("class $modelClassName extends Madeam_ActiveRecord2 {}");
       }
 
-      // create component instance
-      $model = new $modelClass();
+      // create model instance
+      $model = new $modelClassName();
       $this->$name = $model;
       return $model;
-
+    } elseif (preg_match('/^_[A-Z]{1}/', $name, $match)) {
+      // set component class name
+      $componentClassName = 'Component_' . $name;
+      
+      // create component instance
+      $component = new $componentClassName();
+      $component->$name = $component;
+      return $component;
     }
+    
     return false;
   }
 
@@ -222,32 +242,53 @@ class Madeam_Controller {
       throw new Madeam_Exception_MissingAction('Missing Action <b>' . $name . '</b> in <b>' . get_class($this) . '</b> controller');
     }
   }
+  
+  public function __set($name, $value) {
+    if (!preg_match('/^(?:_[A-Z]|[A-Z]){1}/', $name)) {
+      $this->data[$name] = $value;
+    }
+  }
+  
+  public function __unset($name) {
+    unset($this->data[$name]);
+  }
+  
+  final public function process() {
+    
+    // beforeFilter callbacks
+    foreach ($this->setup['beforeFilter'] as $callback) {
+      $this->$callback();
+    }
+    
+    // action
+    $this->{$this->params['action'].'Action'}();
+    
+    // beforeRender callbacks
+    foreach ($this->setup['beforeRender'] as $callback) {
+      $this->$callback();
+    }
+    
+    // render
+    $this->render();
+    
+    // afterRender callbacks
+    foreach ($this->setup['afterRender'] as $callback) {
+      $this->$callback();
+    }
+    
+    // return response
+    return $this->output;
+  }
 
-  /**
-   * Enter description here...
-   *
-   * @param unknown_type $uri
-   * @return unknown
-   */
-  final public function callAction($uri, $params = array()) {
-
+  final public function request($uri, $params) {
     if (!isset($params['get']))     { $params['get']    = $this->requestGet; }
     if (!isset($params['post']))    { $params['post']   = $this->requestPost; }
     if (!isset($params['cookie']))  { $params['cookie'] = $this->requestCookie; }
 
     return Madeam::makeRequest($uri, $params['get'], $params['post'], $params['cookie']);
   }
-
-  /**
-   * Enter description here...
-   *
-   * @param unknown_type $partialPath
-   * @param unknown_type $data
-   * @param unknown_type $start
-   * @param unknown_type $limit
-   * @return unknown
-   */
-  final public function callPartial($partialPath, $data = array(), $start = 0, $limit = false) {
+  
+  final public function partial($path, $data, $start = 0, $limit = false) {
     if (! empty($data)) {
       // internal counter can be accessed in the view
       $_num = $start;
@@ -279,23 +320,11 @@ class Madeam_Controller {
     return false;
   }
 
-  /**
-   * This takes the full path to the view.
-   *
-   * For example: "posts/show" and not "show"
-   *
-   * @param string $view
-   */
-  final protected function setView($view) {
+  final public function view($view) {
     $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->requestGet['format'];
   }
 
-  /**
-   * Enter description here...
-   *
-   * @param string/boolean/array $layouts
-   */
-  final public function setLayout($layouts) {
+  final public function layout($layouts) {
     $this->layout = array();
     if (func_num_args() < 2) {
       if (is_string($layouts)) {
@@ -314,45 +343,10 @@ class Madeam_Controller {
     }
   }
 
-  final public function getView() {
-    return $this->view;
-  }
-
-  final public function getLayout() {
-    return $this->layout;
-  }
-
-  final public function getData() {
-    return $this->data;
-  }
-
-  final public function getOutput() {
-    return $this->finalOutput;
-  }
-
   final public function render($data = true) {
     if ($data !== false) {
-
-      // create parser instance
-      $viewParserClass = 'Parser_' . ucfirst($this->requestGet['format']);
-      $viewParser = new $viewParserClass($this);
-
-      // get list of private and protected vars because we don't want them to go to the view
-      $refl = new ReflectionClass($this);
-      $properties = $refl->getProperties(ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
-
-      $excludedProperties = array();
-      foreach ($properties as $prop) { $excludedProperties[] = $prop->getName(); }
-
-      // set the data to be passed to the view and exclude private and protected parameters
-      foreach ($this as $key => $value) {
-        if (!in_array($key, $excludedProperties)) {
-          $this->data[$key] = $value;
-        }
-      }
-
       if (file_exists($this->view)) {
-        $viewParser->renderView();
+        $this->parser->renderView();
       } else {
         if (isset($this->{Madeam_Inflector::singalize($this->requestGet['controller'])})) {
           $this->data[Madeam_Inflector::singalize($this->requestGet['controller'])] = $this->{Madeam_Inflector::singalize($this->requestGet['controller'])};
@@ -360,118 +354,32 @@ class Madeam_Controller {
           $this->data[Madeam_Inflector::pluralize($this->requestGet['controller'])] = $this->{Madeam_Inflector::pluralize($this->requestGet['controller'])};
         }
 
-        $viewParser->missingView();
+        $this->parser->missingView();
       }
 
       foreach ($this->layout as $layoutFile) {
         if ($layoutFile) {
           if (file_exists($layoutFile)) {
             // include layout if it exists
-            $viewParser->renderLayout($layoutFile);
+            $this->parser->renderLayout($layoutFile);
           } else {
-            $viewParser->missingLayout($layoutFile);
+            $this->parser->missingLayout($layoutFile);
           }
         }
       }
 
       // set final output
-      $this->finalOutput = $viewParser->getOutput();
+      $this->output = $this->parser->getOutput();
     } else {
       // set final output as null
-      $this->finalOutput = null;
+      $this->output = null;
     }
 
     return true;
   }
-
-  /**
-   * Enter description here...
-   *
-   * @param unknown_type $data
-   * @param unknown_type $rendered
-   * @return unknown
-   */
-  final public function render2($data = true, $rendered = true) {
-    // sometimes the developer may want to tell the view not to render from the controller's action
-    if ($data === false) { $this->isRendered = true; }
-
-    // consider: checking if it's rendered based on if there is anything in the output buffer? does that make sense?
-    if ($this->isRendered === false) {
-      // output buffering
-      ob_start();
-
-      if ($data === true) {
-        // include view's template file
-        if (file_exists($this->view)) {
-          $parserClass = 'Parser_' . ucfirst($this->requestGet['format']);
-  				$parser = new $parserClass;
-
-  				$this->content_for_layout = $parser->renderView($this->view, $this);
-        } else {
-          $parser->missingView();
-          throw new Madeam_Exception_MissingView('Missing View <strong>' . substr($this->view, strlen(PATH_TO_VIEW)) . '</strong>');
-        }
-      } elseif (is_string($data)) { // this needs to change
-        // set $content_for_layout to $data which is just a string
-        $this->content_for_layout = $data;
-      }
-
-      // loop through layouts
-      // the layouts are rendered in order they are in the array
-      foreach ($this->layout as $layoutFile) {
-        if ($layoutFile && file_exists($layoutFile)) {
-          // include layout if it exists
-          $viewParser->renderLayout($layout);
-        } else {
-          $viewParser->missingLayout();
-        }
-      }
-
-      // end ouptut buffering
-      ob_end_clean();
-
-      // mark view as rendered
-      $this->isRendered = $rendered;
-      $this->finalOutput = $this->content_for_layout;
-
-      return $this->finalOutput;
-    }
-    return false;
+  
+  final public function scaffold($action) {
+    require (SCAFFOLD_PATH . $this->scaffold . '/action/' . $action . '.php');
   }
-
-  /**
-   * Scaffold Actions
-   * =======================================================================
-   */
-  public function _scaffold_index() {
-    include (SCAFFOLD_PATH . $this->scaffold . '/action/index.php');
-  }
-
-  public function _scaffold_show() {
-    include (SCAFFOLD_PATH . $this->scaffold . '/action/show.php');
-  }
-
-  public function _scaffold_add() {
-    include (SCAFFOLD_PATH . $this->scaffold . '/action/add.php');
-  }
-
-  public function _scaffold_edit() {
-    include (SCAFFOLD_PATH . $this->scaffold . '/action/edit.php');
-  }
-
-  public function _scaffold_delete() {
-    include (SCAFFOLD_PATH . $this->scaffold . '/action/delete.php');
-  }
-
-  /**
-   * Callback functions
-   * =======================================================================
-   */
-  /* what about re-naming these like this: _beforeAction() or before_action()? */
-  /* come up with a better naming convention for these methods */
-  public function beforeAction() {}
-
-  public function beforeRender() {}
-
-  public function afterRender() {}
+  
 }

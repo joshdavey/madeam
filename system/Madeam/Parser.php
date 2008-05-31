@@ -1,15 +1,15 @@
 <?php
 class Madeam_Parser {
 
-  protected $_controller;
-  protected $_output;
+  protected $controller;
+  protected $output;
 
   public function __construct($controller) {
-    $this->_controller = $controller;
+    $this->controller = $controller;
   }
 
   public function getOutput() {
-    return $this->_output;
+    return $this->output;
   }
 
 }

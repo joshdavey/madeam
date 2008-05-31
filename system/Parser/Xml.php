@@ -3,7 +3,7 @@
 class Parser_Xml extends Madeam_Parser {
 
   public function renderView() {
-    $data = $this->_controller->getData();
+    $data = $this->controller->data;
 
     $xml = new XmlWriter();
     $xml->openMemory();
@@ -14,8 +14,8 @@ class Parser_Xml extends Madeam_Parser {
 
     $xml->endElement();
 
-    $this->_output = $xml->outputMemory(true);
-    return $this->_output;
+    $this->output = $xml->outputMemory(true);
+    return $this->output;
   }
 
   public function missingView() {
@@ -24,7 +24,7 @@ class Parser_Xml extends Madeam_Parser {
   }
 
   public function renderLayout() {
-    return $this->_output;
+    return $this->output;
   }
 
   public function missingLayout() {
@@ -44,4 +44,3 @@ class Parser_Xml extends Madeam_Parser {
   }
 
 }
-?>

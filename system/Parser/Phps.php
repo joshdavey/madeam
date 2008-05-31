@@ -3,9 +3,9 @@
 class Parser_Phps extends Madeam_Parser {
 
   public function renderView() {
-    $data = $this->_controller->getData();
-    $this->_output = serialize($data);
-    return $this->_output;
+    $data = $this->controller->data;
+    $this->output = serialize($data);
+    return $this->output;
   }
 
   public function missingView() {
@@ -14,7 +14,7 @@ class Parser_Phps extends Madeam_Parser {
   }
 
   public function renderLayout() {
-    return $this->_output;
+    return $this->output;
   }
 
   public function missingLayout() {
@@ -22,4 +22,3 @@ class Parser_Phps extends Madeam_Parser {
   }
 
 }
-?>
