@@ -98,21 +98,21 @@ class Madeam_Controller {
    * @var unknown_type
    */
   public $requestCookie;
-  
+
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
   public $params;
-  
+
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
   private $setup = array();
-  
+
   /**
    * Enter description here...
    *
@@ -136,9 +136,9 @@ class Madeam_Controller {
     // combine all request information into a single variable
     $this->params = array_merge($requestGet, $requestPost, $requestCookie);
     $this->params['method'] = $requestMethod;
-    
+
     $this->data['params'] = $this->params;
-    
+
     // define setup
     $this->setup['beforeFilter'] = $this->setup['beforeRender'] = $this->setup['afterRender'] = array();
 
@@ -155,14 +155,14 @@ class Madeam_Controller {
     } else {
       $this->layout($this->layout);
     }
-    
+
     // create parser instance
     $parserClassName = 'Parser_' . ucfirst($this->requestGet['format']);
     $this->parser = new $parserClassName($this);
-    
+
     // reflection
     $this->reflection = new ReflectionClass($this);
-    
+
     $properties = $this->reflection->getProperties(ReflectionProperty::IS_PUBLIC);
     foreach ($properties as $property) {
       $matches = array();
@@ -227,13 +227,13 @@ class Madeam_Controller {
     } elseif (preg_match('/^_[A-Z]{1}/', $name, $match)) {
       // set component class name
       $componentClassName = 'Component_' . $name;
-      
+
       // create component instance
-      $component = new $componentClassName();
+      $component = new $componentClassName($this);
       $component->$name = $component;
       return $component;
     }
-    
+
     return false;
   }
 
@@ -242,40 +242,40 @@ class Madeam_Controller {
       throw new Madeam_Exception_MissingAction('Missing Action <b>' . $name . '</b> in <b>' . get_class($this) . '</b> controller');
     }
   }
-  
+
   public function __set($name, $value) {
     if (!preg_match('/^(?:_[A-Z]|[A-Z]){1}/', $name)) {
       $this->data[$name] = $value;
     }
   }
-  
+
   public function __unset($name) {
     unset($this->data[$name]);
   }
-  
+
   final public function process() {
-    
+
     // beforeFilter callbacks
     foreach ($this->setup['beforeFilter'] as $callback) {
       $this->$callback();
     }
-    
+
     // action
     $this->{$this->params['action'].'Action'}();
-    
+
     // beforeRender callbacks
     foreach ($this->setup['beforeRender'] as $callback) {
       $this->$callback();
     }
-    
+
     // render
     $this->render();
-    
+
     // afterRender callbacks
     foreach ($this->setup['afterRender'] as $callback) {
       $this->$callback();
     }
-    
+
     // return response
     return $this->output;
   }
@@ -287,7 +287,7 @@ class Madeam_Controller {
 
     return Madeam::makeRequest($uri, $params['get'], $params['post'], $params['cookie']);
   }
-  
+
   final public function partial($path, $data, $start = 0, $limit = false) {
     if (! empty($data)) {
       // internal counter can be accessed in the view
@@ -377,9 +377,9 @@ class Madeam_Controller {
 
     return true;
   }
-  
+
   final public function scaffold($action) {
     require (SCAFFOLD_PATH . $this->scaffold . '/action/' . $action . '.php');
   }
-  
+
 }

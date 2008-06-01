@@ -17,7 +17,7 @@ class Madeam_Component {
 
   private $_controller;
 
-  public function __construct(&$_controller) {
-    $this->_controller = & $_controller;
+  public function __construct($_controller) {
+    $this->_controller = $_controller;
   }
 }
