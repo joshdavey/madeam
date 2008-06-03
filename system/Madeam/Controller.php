@@ -214,9 +214,12 @@ class Madeam_Controller {
       // testing idea of not needing to create models in protoptype stage of site
       // this should still check to see if a table exists...
       // or maybe we can just let it throw a SQL error which works just as well
+      /*
+      // this isn't working because the class is eval()ed in the autoload function
       if (!class_exists($modelClassName)) {
         eval("class $modelClassName extends Madeam_ActiveRecord2 {}");
-      }
+      } 
+      */
 
       // create model instance
       $model = new $modelClassName();
