@@ -286,34 +286,32 @@ class Madeam_Controller {
     return Madeam::makeRequest($uri, $params['get'], $params['post'], $params['cookie']);
   }
 
-  final public function partial($path, $data, $start = 0, $limit = false) {
-    if (! empty($data)) {
-      // internal counter can be accessed in the view
-      $_num = $start;
-      /**
-       * IMPORTANT! We should have our render logic in here!
-       * I want to be able to use partials as templates!!!!!!!!!
-       */
-      // get partial name
-      $partial = explode('/', $partialPath);
-      $partialName = array_pop($partial);
-      // splice array so that it is within the range defined by $start and $limit
-      if ($limit !== false) {
-        $data = array_splice($data, $start, $limit);
-      } else {
-        $data = array_splice($data, $start);
-      }
-      // set variables
-      if (is_list($data)) {
-        foreach ($data as $key => $$partialName) {
-          $_num ++;
-          include (PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->requestGet['format']);
-        }
-      } else {
-        $$partialName = $data;
+  final public function partial($path, $data = array(), $start = 0, $limit = false) {
+    // internal counter can be accessed in the view
+    $_num = $start;
+    /**
+     * IMPORTANT! We should have our render logic in here!
+     * I want to be able to use partials as templates!!!!!!!!!
+     */
+    // get partial name
+    $partial = explode('/', $partialPath);
+    $partialName = array_pop($partial);
+    // splice array so that it is within the range defined by $start and $limit
+    if ($limit !== false) {
+      $data = array_splice($data, $start, $limit);
+    } else {
+      $data = array_splice($data, $start);
+    }
+    // set variables
+    if (is_list($data)) {
+      foreach ($data as $key => $$partialName) {
         $_num ++;
         include (PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->requestGet['format']);
       }
+    } else {
+      $$partialName = $data;
+      $_num ++;
+      include (PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->requestGet['format']);
     }
     return false;
   }

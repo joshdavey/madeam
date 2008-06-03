@@ -156,7 +156,6 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
    * @return array/boolean
    */
   public function __call($name, $args) {
-    test($name);
     $match = array();
     if (preg_match("/^find([a-zA-Z]+)By_(.*)/", $name, $match)) {
       $this->where($match[2] . " = '$args[0]'");
