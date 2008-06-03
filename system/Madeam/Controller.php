@@ -137,8 +137,6 @@ class Madeam_Controller {
     $this->params = array_merge($requestGet, $requestPost, $requestCookie);
     $this->params['method'] = $requestMethod;
 
-    $this->data['params'] = $this->params;
-
     // define setup
     $this->setup['beforeFilter'] = $this->setup['beforeRender'] = $this->setup['afterRender'] = array();
 
@@ -216,7 +214,7 @@ class Madeam_Controller {
       // testing idea of not needing to create models in protoptype stage of site
       // this should still check to see if a table exists...
       // or maybe we can just let it throw a SQL error which works just as well
-      if (!class_exists($modelClassName, false)) {
+      if (!class_exists($modelClassName)) {
         eval("class $modelClassName extends Madeam_ActiveRecord2 {}");
       }
 
@@ -345,6 +343,10 @@ class Madeam_Controller {
 
   final public function render($data = true) {
     if ($data !== false) {
+
+      // pass params to view
+      $this->data['params'] = $this->params;
+
       if (file_exists($this->view)) {
         $this->parser->renderView();
       } else {

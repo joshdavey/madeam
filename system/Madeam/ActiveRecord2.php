@@ -156,6 +156,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
    * @return array/boolean
    */
   public function __call($name, $args) {
+    test($name);
     $match = array();
     if (preg_match("/^find([a-zA-Z]+)By_(.*)/", $name, $match)) {
       $this->where($match[2] . " = '$args[0]'");
@@ -163,11 +164,11 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
       if (method_exists($this, $function)) {
         return $this->$function();
       }
-    } /*elseif (preg_match("/^deleteBy_(.*)/", $name, $match)) {
+    } elseif (preg_match("/^deleteBy_(.*)/", $name, $match)) {
       $this->where($match[2] . " = '$args[0]'");
       $this->delete();
-    }*/
-    return false;
+    }
+    return true;
   }
 
   /**
@@ -227,7 +228,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
 
   final public function query($sql, $returnAs = 'array') {
     // execute query
-    $result = $this->execute($sql);
+    $link = $this->execute($sql);
 
     // fetch method
     if ($returnAs == 'object') {
@@ -240,20 +241,18 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     $matchs = array();
     preg_match('/^DESCRIBE|SELECT/', $sql, $matchs);
     if (count($matchs) > 0) {
-      if ($this->numRows() > 0) {
-        while($this->entry = $fetchMethod($this->link)) {
-          // don't prepare results of describe queries
-          if ($matchs[0] != "DESCRIBE" && $matchs[0] != 'describe') {
-            $this->prepareResult(); // should this be done?
-          }
-
-          $this->data[] = $this->entry;
+      $results = $link->fetchAll(PDO::FETCH_ASSOC);
+      foreach ($results as $result) {
+        $this->entry = $result;
+        // don't prepare results of describe queries
+        if ($matchs[0] != "DESCRIBE" && $matchs[0] != 'describe') {
+          $this->prepareResult(); // should this be done?
         }
 
-        return $this->data;
-      } else {
-        return array(); // return empty data
+        $this->data[] = $this->entry;
       }
+
+      return $this->data;
     } else {
       return $result;
     }

@@ -115,12 +115,16 @@ class Madeam {
       $controller = new $controllerClass($params, $requestPost, $requestCookie, $_SERVER['REQUEST_METHOD']);
     } catch(Madeam_Exception_AutoloadFail $e) {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
-        //$params['controller'] = 'app'; // this should be set...
+        $view = $params['controller'] . '/' . $params['action'];
+        $params['controller'] = 'app';
         $controller = new Controller_App($params);
+        $this->view($view);
       } elseif (is_file(PATH_TO_VIEW . $params['controller'] . '.' . $params['format'])) {
-        //$params['controller'] = 'app'; // this should be set...
+        $view = $params['controller'];
+        $params['action'] = $params['controller'];
+        $params['controller'] = 'app';
         $controller = new Controller_App($params);
-        $controller->view($params['controller']);
+        $controller->view($view);
       } else {
         // no controller found = critical error.
         Madeam_Exception::catchException($e, array('message' => 'Missing Controller <b>' . $controllerClass . '</b>'));
