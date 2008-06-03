@@ -174,6 +174,12 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     return false;
   }
 
+  public function callback($name) {
+    foreach ($this->setup[$name] as $callback => $args) {
+      $this->$callback($args);
+    }
+  }
+
   /**
    * Query Methods
    * =======================================================================
@@ -279,7 +285,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     $this->data = array();
 
     // find callback
-    $this->beforeFind();
+    $this->callback('beforeFind');
 
     // if this is a child model then filter the results to make sure they are related to this model's parent
     // this stuff is for when chaining models like:
@@ -357,7 +363,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     }
 
     // find callback
-    $this->afterFind();
+    $this->callback('afterFind');
 
     // grab data before it's reset
     if ($fetch == 'all') {

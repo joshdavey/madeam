@@ -33,41 +33,6 @@ class Madeam_Model {
 
   protected $cacheName = 'madeam.model.';
 
-  /**
-   * This member variable is where all the model setup information is stored.
-   *
-   * behaviors
-   *	array of behaviors
-   *
-   * custom_fields
-   * 	array of custom fields
-   *
-   * standard_fields
-   *  array of standard_fields
-   *
-   * schema
-   *	array of fields and their properties that exist prior to the custom fields
-   *
-   * has_one
-   *	array of has_one relationships
-   *
-   * has_many
-   *	array of has_many relationships
-   *
-   * belongs_to
-   *	array of belongs_to relationships
-   *
-   * has_and_belongs_to_many
-   *	array of has_and_belongs_to_many relationships
-   *
-   * has_models
-   *	array of all relationships
-   *
-   * primaryKey
-   *	this model's primary key -- defaults to "id"
-   *
-   *
-   */
   protected $setup = array();
 
   public function __construct($depth = false) {
@@ -101,6 +66,18 @@ class Madeam_Model {
       $this->setup['customFields'] = array(); // custom fields defined in model
       $this->setup['standardFields'] = array(); // default fields in the database or file system
       $this->setup['validators'] = array();
+      $this->setup['beforeSave'] = array();
+      $this->setup['afterSave'] = array();
+      $this->setup['beforeCreate'] = array();
+      $this->setup['afterCreate'] = array();
+      $this->setup['beforeUpdate'] = array();
+      $this->setup['afterUpdate'] = array();
+      $this->setup['beforeFind'] = array();
+      $this->setup['afterFind'] = array();
+      $this->setup['beforeValidate'] = array();
+      $this->setup['afterValidate'] = array();
+      $this->setup['beforeDelete'] = array();
+      $this->setup['afterDelete'] = array();
 
       // set resourceName
       if ($this->resourceName == null) {
@@ -126,6 +103,9 @@ class Madeam_Model {
 
       // load validators
       $this->loadValidators();
+
+      // load callbacks
+      $this->loadCallbacks();
 
       if (Madeam_Config::get('cache_models') === true) {
         Madeam_Cache::save($this->cacheName, $this->setup, true);
@@ -185,25 +165,24 @@ class Madeam_Model {
    * You can also set arguments in the array. For example: "array('message' => 'Oops', 'max' => 255)".
    */
   final protected function loadValidators() {
-    foreach ($this->reflection->getProperties() as $prop) {
-      // filter out private variables. The less we need to parse the better
-      if ($prop->isPublic()) {
-        // get property name
-        $property_name = $prop->name;
-        if (preg_match("/validate_(.+)/", $property_name, $found)) {
-          // get value of validator property
-          $args = $prop->getValue($this);
-          // seperate bits of validate call by _
-          $validate = explode('_', $found[1]);
-          // get method name
-          $method = $validate[count($validate) - 1];
-          // remove method name from the end of validate var
-          array_pop($validate);
-          // implode remains of $validate to get field name
-          $field = implode('_', $validate);
-          // add to validator list
-          $this->validator($field, $method, $args);
-        }
+    $props = $this->reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+    $matches = array();
+    foreach ($props as $prop) {
+      // get property name
+      $propertyName = $prop->name;
+      if (preg_match("/validate_(.+)/", $propertyName, $matches)) {
+        // get value of validator property
+        $args = $prop->getValue($this);
+        // seperate bits of validate call by _
+        $validate = explode('_', $matches[1]);
+        // get method name
+        $method = $validate[count($validate) - 1];
+        // remove method name from the end of validate var
+        array_pop($validate);
+        // implode remains of $validate to get field name
+        $field = implode('_', $validate);
+        // add to validator list
+        $this->validator($field, $method, $args);
       }
     }
   }
@@ -228,11 +207,12 @@ class Madeam_Model {
   final protected function loadFields() {
     $fields = array();
     $props = $this->reflection->getProperties();
+    $matches = array();
     foreach ($props as $prop) {
-      $property_name = $prop->name;
-      if (preg_match("/field_(.+)/", $property_name, $found)) {
-        $field_name = $found[1];
-        $fields[$field_name] = $this->{'field_' . $field_name};
+      $propertyName = $prop->name;
+      if (preg_match("/field_(.+)/", $propertyName, $matches)) {
+        $fieldName = $matches[1];
+        $fields[$fieldName] = $this->{'field_' . $fieldName};
       }
     }
     // it's called skeleton because $this->setup['schema'] is already being used for something else and this data set
@@ -244,21 +224,33 @@ class Madeam_Model {
    * This method parses all the class properties to find relationships
    */
   final protected function loadRelations() {
-    $props = $this->reflection->getProperties();
+    $props = $this->reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+    $matches = array();
     foreach ($props as $prop) {
-      // ignore private properties so we don't need to parse every single variable
-      if ($prop->isPublic()) {
-        if (preg_match("/^(hasMany|hasOne|belongsTo|hasAndBelongsToMany)_(.+)/", $prop->name, $found)) {
-          $relationship = $found[1];
-          $model = $found[2];
-          $params = (array) $prop->getValue($this);
-          $this->{'add' . ucfirst($relationship)}($model, $params);
-        }
+      if (preg_match("/^(hasMany|hasOne|belongsTo|hasAndBelongsToMany)_(.+)/", $prop->name, $matches)) {
+        $relationship = $matches[1];
+        $model = $matches[2];
+        $params = (array) $prop->getValue($this);
+        $this->{'add' . ucfirst($relationship)}($model, $params);
       }
     }
     // merge models
     // and add itself to the list of models
     $this->setup['hasModels'] = array_merge($this->setup['hasOne'], $this->setup['hasMany'], $this->setup['hasAndBelongsToMany'], $this->setup['belongsTo'], array($this->name => array('model' => $this->name)));
+  }
+
+  final protected function loadCallbacks() {
+    $props = $this->reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+    $matches = array();
+    foreach ($props as $prop) {
+      if (preg_match("/^(before|after)(Save|Validate|Update|Delete|Create|Find)_(.+)/", $prop->name, $matches)) {
+        $when   = $matches[1];
+        $action = $matches[2];
+        $method = $matches[3];
+        $params = (array) $prop->getValue($this);
+        $this->setup[$when.$action][$method] = $params;
+      }
+    }
   }
 
   final protected function addHasAndBelongsToMany($model, $params) {
@@ -400,15 +392,12 @@ class Madeam_Model {
     $parentReflection = new ReflectionClass($parent);
     // check each method to find out whethere it's a new field or not
     // I wish there was a faster way of doing this...
-    $methods = $this->reflection->getMethods();
+    $methods = $this->reflection->getMethods(ReflectionMethod::IS_PROTECTED || !ReflectionMethod::IS_FINAL);
     foreach ($methods as $method) {
-      // make sure this method is either not a final method or is public so we don't need to parse every single method
-      if (! $method->isFinal() && $method->isProtected()) {
-        // get method name
-        $methodName = $method->getName();
-        if (substr($methodName, 0, 1) != '_' && $parentReflection->hasMethod($methodName) == false) {
-          $this->setup['customFields'][] = $methodName;
-        }
+      // get method name
+      $methodName = $method->getName();
+      if (substr($methodName, 0, 1) != '_' && $parentReflection->hasMethod($methodName) == false) {
+        $this->setup['customFields'][] = $methodName;
       }
     }
   }
@@ -444,42 +433,6 @@ class Madeam_Model {
   final public function bind($model, $relation, $params) {
     $this->{'add_' . $relation}($model, $params);
     return $this;
-  }
-
-  /**
-   * Callback functions
-   * =======================================================================
-   */
-  protected function beforeSave() {
-    return true;
-  }
-
-  protected function afterSave() {
-    return true;
-  }
-
-  protected function beforeDelete() {
-    return true;
-  }
-
-  protected function afterDelete() {
-    return true;
-  }
-
-  protected function beforeValidation() {
-    return true;
-  }
-
-  protected function afterValidation() {
-    return true;
-  }
-
-  protected function beforeFind() {
-    return true;
-  }
-
-  protected function afterFind() {
-    return true;
   }
 
   /**
