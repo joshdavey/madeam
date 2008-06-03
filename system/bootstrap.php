@@ -172,7 +172,7 @@ unset($config);
  * @param unknown_type $e
  */
 function Madeam_UncaughtException($e) {
-  echo 'Uncaught Exception: ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile();
+  Madeam_Exception::catchException($e, array('message' => "Uncaught Exception: \n" . $e->getMessage()));
   return true;
 }
 /**

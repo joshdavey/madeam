@@ -83,7 +83,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
    *
    * @var resource/boolean
    */
-  private static $_pdo = false;
+  private static $_pdo = array();
 
   /**
    * Enter description here...
@@ -166,8 +166,12 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     } elseif (preg_match("/^deleteBy_(.*)/", $name, $match)) {
       $this->where($match[2] . " = '$args[0]'");
       $this->delete();
+    } else {
+      $backtrace = debug_backtrace();
+      throw new Madeam_Exception_MissingMethod("See line <strong>" . $backtrace[1]['line'] . "</strong> in <strong>" . $backtrace[1]['file'] . "</strong> \n Unknown method " . $name . ' in ' . get_class($this) . " model.");
     }
-    return true;
+
+    return false;
   }
 
   /**
@@ -186,7 +190,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
 
         // if we connect here we don't need to connect to the database until we execute a query
         // therefore if all we're doing is loading a cached page we won't need a database connection
-        if (self::$_pdo === false) {
+        if (!isset(self::$_pdo[$this->server])) {
           // parse DB information
           $servers = Madeam_Config::get('data_servers');
           $serverConnectionString = $servers[$this->server];
@@ -196,10 +200,10 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
           $pdoString = "$server[driver]:dbname=$server[name];host=$server[host]";
 
           // create database connection
-          self::$_pdo = new PDO($pdoString, $server['user'], $server['pass']);
+          self::$_pdo[$this->server] = new PDO($pdoString, $server['user'], $server['pass']);
 
           // set exception error handling
-          self::$_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+          self::$_pdo[$this->server]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
 
         // for debugging only
@@ -209,15 +213,15 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
         Madeam_Logger::getInstance()->log($sql);
 
         // link
-        $result = self::$_pdo->query($sql);
+        $result = self::$_pdo[$this->server]->query($sql);
 
       } catch (PDOException $e) {
-        if (!is_object(self::$_pdo)) {
+        if (!is_object(self::$_pdo[$this->server])) {
           // if the _pdo variable isn't an object it means it failed to connected
           Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
         } else {
           $trace = $e->getTrace();
-          $error = self::$_pdo->errorInfo();
+          $error = self::$_pdo[$this->server]->errorInfo();
           Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
         }
       }
@@ -1003,7 +1007,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     if ($this->entryId != - 1) {
       return $this->entryId;
     } else {
-      return self::$_pdo->lastInsertId();
+      return self::$_pdo[$this->server]->lastInsertId();
     }
   }
 
@@ -1013,7 +1017,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
    * @return int
    */
   final public function affectedRows() {
-    return self::$_pdo->rowCount();
+    return self::$_pdo[$this->server]->rowCount();
   }
 
   /**
