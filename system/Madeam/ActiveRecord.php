@@ -294,7 +294,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->data = array();
 
     // find callback
-    $this->beforeFind();
+    $this->callback('beforeFind');
 
     // if this is a child model then filter the results to make sure they are related to this model's parent
     // this stuff is for when chaining models like:
@@ -371,7 +371,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     }
 
     // find callback
-    $this->afterFind();
+    $this->callback('afterFind');
 
     // return data
     if ($this->numRows() > 0) {
@@ -485,11 +485,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->reset();
 
     // validation callbacks
-    $this->beforeValidation();
-    $this->afterValidation();
+    $this->callback('beforeValidation');
+    $this->callback('afterValidation');
 
     // before delete callback
-    $this->beforeDelete();
+    $this->callback('beforeDelete');
     if ($id != - 1) {
       $this->entryId = $id;
     }
@@ -497,7 +497,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->execute($this->buildQueryDelete());
 
     // after delete callback
-    $this->afterDelete();
+    $this->callback('afterDelete');
 
     // check success
     if ($this->affectedRows() > 0) {
@@ -539,14 +539,14 @@ class Madeam_ActiveRecord extends Madeam_Model {
     unset($inst);
 
     // before validation callback
-    $this->beforeValidation();
+    $this->callback('beforeValidation');
 
     // validate data
     ////$this->load_validators();
     $this->validateEntry($update);
 
     // after validation callback
-    $this->afterValidation();
+    $this->callback('afterValidation');
     // now that all the callbacks prior to updating/adding the new row have been called
     // we must check for any errors that may have been envoked.
     // if there aren't any then continue as usual.
@@ -556,7 +556,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $this->standardFieldFormats();
 
       // before save callback
-      $this->beforeSave();
+      $this->callback('beforeSave');
       /*
       // relations
       $relations = array();
@@ -608,7 +608,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       }
       */
       // after save callback
-      $this->afterSave();
+      $this->callback('afterSave');
 
       // reset all sql values and data
       $this->reset();
