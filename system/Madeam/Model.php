@@ -240,15 +240,23 @@ class Madeam_Model {
   }
 
   final protected function loadCallbacks() {
-    $props = $this->reflection->getProperties(ReflectionProperty::IS_PUBLIC);
-    $matches = array();
-    foreach ($props as $prop) {
-      if (preg_match("/^(before|after)(Save|Validate|Update|Delete|Create|Find)_(.+)/", $prop->name, $matches)) {
-        $when   = $matches[1];
-        $action = $matches[2];
-        $method = $matches[3];
-        $params = (array) $prop->getValue($this);
-        $this->setup[$when.$action][$method] = $params;
+    $methods = $this->reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
+    foreach ($methods as $method) {
+      // callback properties (name, include, exclude)
+      $callback = array();
+      
+      // set callback method name
+      $callback['name'] = $method->getName();
+      
+      $matches = array();
+      if (preg_match('/^((?:before|after)(?:Save|Validate|Update|Delete|Create|Find))(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {        
+               
+        $parameters = $method->getParameters();
+        foreach ($parameters as $parameter) {
+          // set parameters of callback (parameters in methods act as meta data for callbacks)
+          $callback[$parameter->getName()] = $parameter->getDefaultValue();
+        }
+        $this->setup[$matches[1]][] = $callback;
       }
     }
   }
@@ -402,6 +410,17 @@ class Madeam_Model {
     }
   }
 
+  /**
+   * Enter description here...
+   *
+   * @param unknown_type $name
+   */
+  final protected function callback($name) {
+    foreach ($this->setup[$name] as $callback) {
+      $this->{$callback['name']}();
+    }
+  }
+  
   protected function describe() {
     return array();
   }

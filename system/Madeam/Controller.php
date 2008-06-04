@@ -159,17 +159,30 @@ class Madeam_Controller {
     $this->parser = new $parserClassName($this);
 
     // reflection
-    $this->reflection = new ReflectionClass($this);
-
-    $properties = $this->reflection->getProperties(ReflectionProperty::IS_PUBLIC);
-    foreach ($properties as $property) {
+    $this->reflection = new ReflectionClass($this);    
+    
+    // check methods for callbacks
+    $methods = $this->reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
+    foreach ($methods as $method) {
+      // callback properties (name, include, exclude)
+      $callback = array();
+      
+      // set callback method name
+      $callback['name'] = $method->getName();
+      
       $matches = array();
-      if (preg_match('/^(beforeFilter|beforeRender|afterRender)_([a-zA-Z0-9]*)(_except)?/', $property->getName(), $matches)) {
-        $this->setup[$matches[1]][] = $matches[2];
+      if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {        
+        
+        $parameters = $method->getParameters();        
+        foreach ($parameters as $parameter) {
+          // set parameters of callback (parameters in methods act as meta data for callbacks)
+          $callback[$parameter->getName()] = $parameter->getDefaultValue();
+        }
+        $this->setup[$matches[1]][] = $callback;
       }
     }
   }
-
+  
   /*
   public function __destruct() {
     if (!headers_sent()) {
@@ -257,28 +270,28 @@ class Madeam_Controller {
   final public function process() {
 
     // beforeFilter callbacks
-    foreach ($this->setup['beforeFilter'] as $callback) {
-      $this->$callback();
-    }
+    $this->callback('beforeFilter');
 
     // action
     $this->{$this->params['action'].'Action'}();
 
     // beforeRender callbacks
-    foreach ($this->setup['beforeRender'] as $callback) {
-      $this->$callback();
-    }
+    $this->callback('beforeRender');
 
     // render
     $this->render();
 
     // afterRender callbacks
-    foreach ($this->setup['afterRender'] as $callback) {
-      $this->$callback();
-    }
+    $this->callback('afterRender');
 
     // return response
     return $this->output;
+  }
+  
+  final protected function callback($name) {
+    foreach ($this->setup[$name] as $callback) {
+      $this->{$callback['name']}();
+    }
   }
 
   final public function request($uri, $params) {

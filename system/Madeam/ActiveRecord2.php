@@ -174,12 +174,6 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     return false;
   }
 
-  public function callback($name) {
-    foreach ($this->setup[$name] as $callback => $args) {
-      $this->$callback($args);
-    }
-  }
-
   /**
    * Query Methods
    * =======================================================================
@@ -222,7 +216,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
         $result = self::$_pdo[$this->server]->query($sql);
 
       } catch (PDOException $e) {
-        if (!is_object(self::$_pdo[$this->server])) {
+        if (!isset(self::$_pdo[$this->server]) || !is_object(self::$_pdo[$this->server])) {
           // if the _pdo variable isn't an object it means it failed to connected
           Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
         } else {
@@ -473,11 +467,11 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     $this->reset();
 
     // validation callbacks
-    $this->beforeValidation();
-    $this->afterValidation();
+    $this->callback('beforeValidation');
+    $this->callback('afterValidation');
 
     // before delete callback
-    $this->beforeDelete();
+    $this->callback('beforeDelete');    
     if ($id != - 1) {
       $this->entryId = $id;
     }
@@ -485,7 +479,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     $this->execute($this->buildQueryDelete());
 
     // after delete callback
-    $this->afterDelete();
+    $this->callback('afterDelete'); 
 
     // check success
     if ($this->affectedRows() > 0) {
@@ -527,14 +521,14 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
     unset($inst);
 
     // before validation callback
-    $this->beforeValidation();
+    $this->callback('beforeValidation'); 
 
     // validate data
     ////$this->load_validators();
     $this->validateEntry($update);
 
     // after validation callback
-    $this->afterValidation();
+    $this->callback('afterValidation'); 
     // now that all the callbacks prior to updating/adding the new row have been called
     // we must check for any errors that may have been envoked.
     // if there aren't any then continue as usual.
@@ -544,7 +538,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
       $this->standardFieldFormats();
 
       // before save callback
-      $this->beforeSave();
+      $this->callback('beforeSave');
       /*
       // relations
       $relations = array();
@@ -596,7 +590,7 @@ class Madeam_ActiveRecord2 extends Madeam_Model {
       }
       */
       // after save callback
-      $this->afterSave();
+      $this->callback('afterSave');
 
       // reset all sql values and data
       $this->reset();
