@@ -15,26 +15,82 @@
  */
 class Madeam_Model {
 
-  protected $resourceName = null; // name of the database table or file resource that holds the records for this model
+  /**
+   * name of the database table or file resource that holds the records for this model
+   *
+   * @var unknown_type
+   */
+  public $resourceName = null;
+  
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
+  public $primaryKey = 'id';
 
-  protected $depth = 2; // does the depth really need to be 2 by default? why not 1? We can save a lot of processing time by making it 1 if that doesn't confuse people and it works as it should.
+  /**
+   * does the depth really need to be 2 by default? why not 1? We can save a lot of 
+   * processing time by making it 1 if that doesn't confuse people and it works as it should.
+   *
+   * @var unknown_type
+   */
+  protected $depth = 2;
 
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
   protected $reflection;
 
-  protected $name = null; // -- this needs to be re-named to _name and made protected
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
+  protected $name = null;
 
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
   protected $unbound = array();
 
-  protected $primaryKey = 'id';
-
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
   protected $parent = false; // this is used when initiating a sub model within a model.
 
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
   protected $fields = array(); // list of arrays to be included when returning result
 
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
   protected $cacheName = 'madeam.model.';
 
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
   protected $setup = array();
 
+  /**
+   * Enter description here...
+   *
+   * @param unknown_type $depth
+   */
   public function __construct($depth = false) {
     // set depth
     if ($depth !== false) {

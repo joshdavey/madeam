@@ -120,6 +120,14 @@ class Madeam_Controller {
    */
   private $reflection;
 
+  /**
+   * Enter description here...
+   *
+   * @param unknown_type $requestGet
+   * @param unknown_type $requestPost
+   * @param unknown_type $requestCookie
+   * @param unknown_type $requestMethod
+   */
   public function __construct($requestGet = array(), $requestPost = array(), $requestCookie = array(), $requestMethod = 'GET') {
     // load represented model
     if (is_string($this->represent)) {
@@ -288,12 +296,24 @@ class Madeam_Controller {
     return $this->output;
   }
   
+  /**
+   * Enter description here...
+   *
+   * @param string $name
+   */
   final protected function callback($name) {
     foreach ($this->setup[$name] as $callback) {
       $this->{$callback['name']}();
     }
   }
 
+  /**
+   * Enter description here...
+   *
+   * @param string $uri
+   * @param array $params
+   * @return string
+   */
   final public function request($uri, $params) {
     if (!isset($params['get']))     { $params['get']    = $this->requestGet; }
     if (!isset($params['post']))    { $params['post']   = $this->requestPost; }
@@ -302,6 +322,15 @@ class Madeam_Controller {
     return Madeam::makeRequest($uri, $params['get'], $params['post'], $params['cookie']);
   }
 
+  /**
+   * Enter description here...
+   *
+   * @param string $path
+   * @param array $data
+   * @param integer $start
+   * @param integer $limit
+   * @return string
+   */
   final public function partial($path, $data = array(), $start = 0, $limit = false) {
     // internal counter can be accessed in the view
     $_num = $start;
@@ -332,10 +361,20 @@ class Madeam_Controller {
     return false;
   }
 
+  /**
+   * Enter description here...
+   *
+   * @param string $view
+   */
   final public function view($view) {
     $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->requestGet['format'];
   }
 
+  /**
+   * Enter description here...
+   *
+   * @param string/array $layouts
+   */
   final public function layout($layouts) {
     $this->layout = array();
     if (func_num_args() < 2) {
@@ -355,6 +394,12 @@ class Madeam_Controller {
     }
   }
 
+  /**
+   * Enter description here...
+   *
+   * @param text/boolean $data
+   * @return unknown
+   */
   final public function render($data = true) {
     if ($data !== false) {
 
@@ -394,6 +439,11 @@ class Madeam_Controller {
     return true;
   }
 
+  /**
+   * Enter description here...
+   *
+   * @param string $action
+   */
   final public function scaffold($action) {
     require (SCAFFOLD_PATH . $this->scaffold . '/action/' . $action . '.php');
   }
