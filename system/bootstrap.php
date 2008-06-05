@@ -86,6 +86,7 @@ define('PATH_TO_TMP', PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
 $includePaths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_LIB, ini_get('include_path'));
 ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
 
+
 // define user errors variable name for $_SESSION
 // example: $_SESSION[MADEAM_USER_ERROR_NAME];
 define('MADEAM_USER_ERROR_NAME', 'muerrors');
@@ -103,6 +104,7 @@ define('MADEAM_FLASH_POST_NAME', 'mfpost');
 // Used for joining models and other associations
 // example use: "user.name"
 define('MADEAM_ASSOCIATION_JOINT', '.');
+
 
 // autoload function
 function Madeam_Autoload($class) {
@@ -142,14 +144,6 @@ function file_lives($file) {
   return false;
 }
 
-/*
-Madeam_Config::set('association_join', '.');
-Madeam_Config::set('flash_post_name', 'mfpost');
-Madeam_Config::set('flash_data_name', 'mflash');
-Madeam_Config::set('flash_life_name', 'mflife');
-Madeam_Config::set('user_error_name', 'muerrors');
-*/
-
 // include routes
 // check cache for routes
 if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1)) {
@@ -162,7 +156,24 @@ if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1)) {
   }
 }
 
-// save configuration to registry
+/*
+// set core configuration
+$config['association_join']     = '.';
+$config['flash_post_name']      = 'mfpost';
+$config['flash_data_name']      = 'mflash';
+$config['flash_life_name']      = 'mflife';
+$config['user_error_name']      = 'muerrors';
+$config['path_to_controller']   = PATH_TO_APP . 'Controller' . DS;
+$config['path_to_model']        = PATH_TO_APP . 'Model' . DS;
+$config['path_to_view']         = PATH_TO_APP . 'View' . DS;
+$config['path_to_layout']       = $config['path_to_view'];
+$config['path_to_etc']          = PATH_TO_PROJECT . 'etc' . DS;
+$config['path_to_tmp']          = $config['path_to_etc'] . 'tmp' . DS;
+$config['path_to_log']          = $config['path_to_etc'] . 'log' . DS;
+$config['path_to_cache']        = $config['path_to_tmp'] . 'cache' . DS;
+*/
+
+// save configuration
 Madeam_Config::set($config);
 unset($config);
 
@@ -175,6 +186,7 @@ function Madeam_UncaughtException($e) {
   Madeam_Exception::catchException($e, array('message' => "Uncaught Exception: \n" . $e->getMessage()));
   return true;
 }
+
 /**
  * Set exception handler
  */
@@ -198,6 +210,7 @@ function Madeam_ErrorHandler($code, $string, $file, $line) {
   throw $exception;
   return true;
 }
+
 /**
  * Set error handler
  */
