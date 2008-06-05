@@ -98,6 +98,13 @@ class Madeam_Controller {
    * @var unknown_type
    */
   public $requestCookie;
+  
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
+  public $requestFiles;
 
   /**
    * Enter description here...
@@ -139,6 +146,7 @@ class Madeam_Controller {
     $this->requestPost      = $requestPost;
     $this->requestCookie    = $requestCookie;
     $this->requestMethod    = $requestMethod;
+    //$this->requestFiles     = $requestFiles;
 
     // for consideration...
     // combine all request information into a single variable
@@ -191,7 +199,7 @@ class Madeam_Controller {
     }
   }
   
-  /*
+  /**
   public function __destruct() {
     if (!headers_sent()) {
 
@@ -334,29 +342,34 @@ class Madeam_Controller {
   final public function partial($path, $data = array(), $start = 0, $limit = false) {
     // internal counter can be accessed in the view
     $_num = $start;
+    
     /**
      * IMPORTANT! We should have our render logic in here!
      * I want to be able to use partials as templates!!!!!!!!!
      */
+    
     // get partial name
     $partial = explode('/', $partialPath);
     $partialName = array_pop($partial);
+    $partialFile = PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->requestGet['format'];
+    
     // splice array so that it is within the range defined by $start and $limit
     if ($limit !== false) {
       $data = array_splice($data, $start, $limit);
     } else {
       $data = array_splice($data, $start);
     }
+    
     // set variables
     if (is_list($data)) {
       foreach ($data as $key => $$partialName) {
         $_num ++;
-        include (PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->requestGet['format']);
+        include ($partialFile);
       }
     } else {
       $$partialName = $data;
       $_num ++;
-      include (PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->requestGet['format']);
+      include ($partialFile);
     }
     return false;
   }
