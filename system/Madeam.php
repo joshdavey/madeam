@@ -14,7 +14,7 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam {
-  
+
   public static $version = '0.0.6';
 
   /**
@@ -26,14 +26,11 @@ class Madeam {
     // call user front controller?
     // include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
 
-    if (!isset($_GET['useLayout'])) {
-      $useLayout = 'useLayout=1';
-    } else {
-      $useLayout = null;
-    }
+    // set layout if it hasn't already been set
+    if (!isset($_GET['useLayout'])) { $_GET['useLayout'] = 1;  }
 
     // call controller action
-    $output = Madeam::makeRequest(Madeam_Router::getCurrentURI() . $useLayout, $_GET, $_POST, $_COOKIE);
+    $output = Madeam::request(Madeam_Router::getCurrentURI(), $_GET, $_POST, $_COOKIE);
 
     // destroy user error notices
     if (isset($_SESSION[MADEAM_USER_ERROR_NAME])) {
@@ -78,13 +75,13 @@ class Madeam {
    * @param string $url -- example: controller/action/32?foo=bar
    * @return string
    */
-  public static function makeRequest($uri, $requestGet = array(), $requestPost = array(), $requestCookie = array()) {
+  public static function request($uri, $requestGet = array(), $requestPost = array(), $requestCookie = array()) {
     // get request parameters from uri
     // example input: 'posts/show/32'
     $params = Madeam_Router::parseURI($uri);
 
     // combine GETs
-    $params = array_merge($requestGet, $params);
+    $params = array_merge($params, $requestGet);
 
     // pass uri as a _GET variable
     $params['uri'] = $uri;
@@ -129,22 +126,25 @@ class Madeam {
         $controller->view($view);
       } else {
         // no controller found = critical error.
+        header("HTTP/1.1 404 Not Found");
         Madeam_Exception::catchException($e, array('message' => 'Missing Controller <b>' . $controllerClass . '</b>'));
       }
     }
 
     try {
       // process request
-      $output = $controller->process();
+      $response = $controller->process();
 
       // delete controller
       unset($controller);
 
-      // return output
-      return $output;
+      // return response
+      return $response;
     } catch (Madeam_Exception_MissingAction $e) {
+      header("HTTP/1.1 404 Not Found");
       Madeam_Exception::catchException($e);
     } catch (Madeam_Exception_MissingView $e) {
+      header("HTTP/1.1 404 Not Found");
       Madeam_Exception::catchException($e);
     }
   }

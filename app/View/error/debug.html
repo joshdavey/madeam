@@ -2,12 +2,12 @@
 <div id="madeam-error">
   <h1>Error:</h1>
   <p>
-  <?php echo stripslashes($params['error']); ?>
+  <?php echo $params['error']; ?>
   <br />
-  <?php echo stripslashes($params['file']); ?> on line <?php echo $params['line']; ?>
+  <?php echo $params['file']; ?> on line <?php echo $params['line']; ?>
   </p>
 
   <br />
   <h1>Backtrace:</h1>
-  <pre class="backtrace"><?php echo stripslashes($params['backtrace']); ?></pre>
+  <pre class="backtrace"><?php echo $params['backtrace']; ?></pre>
 </div>

@@ -98,7 +98,7 @@ class Madeam_Controller {
    * @var unknown_type
    */
   public $requestCookie;
-  
+
   /**
    * Enter description here...
    *
@@ -175,21 +175,21 @@ class Madeam_Controller {
     $this->parser = new $parserClassName($this);
 
     // reflection
-    $this->reflection = new ReflectionClass($this);    
-    
+    $this->reflection = new ReflectionClass($this);
+
     // check methods for callbacks
     $methods = $this->reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
     foreach ($methods as $method) {
       // callback properties (name, include, exclude)
       $callback = array();
-      
+
       // set callback method name
       $callback['name'] = $method->getName();
-      
+
       $matches = array();
-      if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {        
-        
-        $parameters = $method->getParameters();        
+      if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {
+
+        $parameters = $method->getParameters();
         foreach ($parameters as $parameter) {
           // set parameters of callback (parameters in methods act as meta data for callbacks)
           $callback[$parameter->getName()] = $parameter->getDefaultValue();
@@ -198,7 +198,7 @@ class Madeam_Controller {
       }
     }
   }
-  
+
   /**
   public function __destruct() {
     if (!headers_sent()) {
@@ -247,7 +247,7 @@ class Madeam_Controller {
       // this isn't working because the class is eval()ed in the autoload function
       if (!class_exists($modelClassName)) {
         eval("class $modelClassName extends Madeam_ActiveRecord2 {}");
-      } 
+      }
       */
 
       // create model instance
@@ -303,7 +303,7 @@ class Madeam_Controller {
     // return response
     return $this->output;
   }
-  
+
   /**
    * Enter description here...
    *
@@ -327,7 +327,7 @@ class Madeam_Controller {
     if (!isset($params['post']))    { $params['post']   = $this->requestPost; }
     if (!isset($params['cookie']))  { $params['cookie'] = $this->requestCookie; }
 
-    return Madeam::makeRequest($uri, $params['get'], $params['post'], $params['cookie']);
+    return Madeam::request($uri, $params['get'], $params['post'], $params['cookie']);
   }
 
   /**
@@ -342,24 +342,24 @@ class Madeam_Controller {
   final public function partial($path, $data = array(), $start = 0, $limit = false) {
     // internal counter can be accessed in the view
     $_num = $start;
-    
+
     /**
      * IMPORTANT! We should have our render logic in here!
      * I want to be able to use partials as templates!!!!!!!!!
      */
-    
+
     // get partial name
     $partial = explode('/', $partialPath);
     $partialName = array_pop($partial);
     $partialFile = PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->requestGet['format'];
-    
+
     // splice array so that it is within the range defined by $start and $limit
     if ($limit !== false) {
       $data = array_splice($data, $start, $limit);
     } else {
       $data = array_splice($data, $start);
     }
-    
+
     // set variables
     if (is_list($data)) {
       foreach ($data as $key => $$partialName) {

@@ -2,11 +2,14 @@
 class Controller_Error extends Madeam_Controller {
 
   public $layout = 'error';
-  
-  public $beforeFilter_prepare;
-  
-  public function prepare() {
-    $this->pageTitle = 'Oops.';
+
+  public function debugAction() {
+     $this->pageTitle = 'Debugging';
+  }
+
+  public function http404Action() {
+    $this->pageTitle = 'Debugging';
+    $this->layout(false);
   }
 
 }

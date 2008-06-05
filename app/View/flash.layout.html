@@ -1,10 +1,10 @@
 <html>
 <head>
-  <title><?php echo $page_title; ?></title>
-  <meta http-equiv="refresh" content="<?php echo $pause; ?>;url=<?php echo madeam_url($uri); ?>">
+  <title><?php echo $pageTitle; ?></title>
+  <meta http-equiv="refresh" content="<?php echo $pause; ?>;url=<?php echo Madeam::url($uri); ?>">
 
   <?php echo Help_Html::css('/css/madeam'); ?>
-  <?php echo Help_Html::css('css/flash'); ?>
+  <?php echo Help_Html::css('/css/flash'); ?>
 
   <script type="text/javascript">
     function reload_timer(time, id) {
