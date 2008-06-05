@@ -8,7 +8,6 @@ class Controller_Error extends Madeam_Controller {
   }
 
   public function http404Action() {
-    $this->pageTitle = 'Debugging';
     $this->layout(false);
   }
 
