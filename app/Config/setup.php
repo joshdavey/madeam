@@ -1,12 +1,6 @@
 <?php
 
 /**
- * Change this to select the environment settings you'd like to run with.
- */
-$cfg['environment'] = 'development';
-
-
-/**
  * Setup Environments
  *
  * The following variables are specific to the environment setup. For example you wouldn't
@@ -17,22 +11,27 @@ $cfg['environment'] = 'development';
  * You can add as many data servers as you'd like to distribute load.
  *  driver://username:password@host?name=application&port=0000
  *
+ * [cache_controllers]
+ *   true: controller setup data is cached
+ *   false controller setup data isn't cached
+ *
  * [cache_models]
- *   true: models are cached
- *   false: models aren't cached
+ *   true: model setup data is cached
+ *   false:  model setup data isn't cached
  *
  * [cache_routes]
  *   true: routes are cached
  *   false: routes aren't cached
  *
  * [cache_inline]
+ * This is normally used for cacheing parts of a view.
  *   true: inline text is cached
  *   false: inline text isn't cached
  *
  * [clear_cache]
  * This is a feature for developers that clears the cache whenever changes are made to any of the
  * application files.
- *   true: clear cache
+ *   true: clear cache when application files are changed
  *   false: do not clear cache
  *
  * [enable_debug]
@@ -50,26 +49,30 @@ $cfg['environment'] = 'development';
  *   true: all errors are displayed inline
  *   false: errors will be displayed by Madeam's error handling controller
  */
+$cfg['environment'] = 'development';
+
 
 // development
-  $env['development']['data_servers'][] = 'mysql://root:dev@localhost?name=madeam';
-  $env['development']['cache_models']   = false;
-  $env['development']['cache_routes']   = false;
-  $env['development']['cache_inline']   = false; // views
-  $env['development']['clear_cache']    = true;
-  $env['development']['enable_debug']   = true;
-  $env['development']['enable_logger']  = true;
-  $env['development']['inline_errors']  = false;
+  $env['development']['data_servers'][]     = 'mysql://username:password@localhost?name=madeam';
+  $env['development']['cache_controllers']  = false;
+  $env['development']['cache_models']       = false;
+  $env['development']['cache_routes']       = false;
+  $env['development']['cache_inline']       = false;
+  $env['development']['clear_cache']        = true;
+  $env['development']['enable_debug']       = true;
+  $env['development']['enable_logger']      = true;
+  $env['development']['inline_errors']      = false;
 
 // production
-  $env['production']['data_servers'][]  = 'mysql://username:password@localhost?name=madeam';
-  $env['production']['cache_models']    = true;
-  $env['production']['cache_routes']    = true;
-  $env['production']['cache_inline']    = true; // views
-  $env['production']['clear_cache']     = false;
-  $env['production']['enable_debug']    = false;
-  $env['production']['enable_logger']   = true;
-  $env['production']['inline_errors']   = false;
+  $env['production']['data_servers'][]      = 'mysql://username:password@localhost?name=madeam';
+  $env['production']['cache_controllers']   = true;
+  $env['production']['cache_models']        = true;
+  $env['production']['cache_routes']        = true;
+  $env['production']['cache_inline']        = true;
+  $env['production']['clear_cache']         = false;
+  $env['production']['enable_debug']        = false;
+  $env['production']['enable_logger']       = true;
+  $env['production']['inline_errors']       = false;
 
 
 /**

@@ -21,7 +21,7 @@ class Madeam_Model {
    * @var unknown_type
    */
   public $resourceName = null;
-  
+
   /**
    * Enter description here...
    *
@@ -30,7 +30,7 @@ class Madeam_Model {
   public $primaryKey = 'id';
 
   /**
-   * does the depth really need to be 2 by default? why not 1? We can save a lot of 
+   * does the depth really need to be 2 by default? why not 1? We can save a lot of
    * processing time by making it 1 if that doesn't confuse people and it works as it should.
    *
    * @var unknown_type
@@ -109,10 +109,10 @@ class Madeam_Model {
     // set name
     $this->name = Madeam_Inflector::modelNameize(substr($modelname, 6)); // safely remove "Model_" from the name
 
-    // check cache for schema
-    // if schema not cached get it from the database using describe()
-    // the cache should be infinite if cache is enabled
-    $this->cacheName .= $modelname . '.setup';
+    // set cache name
+    $this->cacheName .= low($modelname) . '.setup';
+
+    // check cache for setup. if cache doesn't exist define it and then save it
     if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1)) {
       $this->setup['hasMany'] = array();
       $this->setup['hasOne'] = array();
@@ -163,6 +163,7 @@ class Madeam_Model {
       // load callbacks
       $this->loadCallbacks();
 
+      // save cache
       if (Madeam_Config::get('cache_models') === true) {
         Madeam_Cache::save($this->cacheName, $this->setup, true);
       }
@@ -300,13 +301,13 @@ class Madeam_Model {
     foreach ($methods as $method) {
       // callback properties (name, include, exclude)
       $callback = array();
-      
+
       // set callback method name
       $callback['name'] = $method->getName();
-      
+
       $matches = array();
-      if (preg_match('/^((?:before|after)(?:Save|Validate|Update|Delete|Create|Find))(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {        
-               
+      if (preg_match('/^((?:before|after)(?:Save|Validate|Update|Delete|Create|Find))(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {
+
         $parameters = $method->getParameters();
         foreach ($parameters as $parameter) {
           // set parameters of callback (parameters in methods act as meta data for callbacks)
@@ -476,7 +477,7 @@ class Madeam_Model {
       $this->{$callback['name']}();
     }
   }
-  
+
   protected function describe() {
     return array();
   }

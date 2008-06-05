@@ -130,6 +130,13 @@ class Madeam_Controller {
   /**
    * Enter description here...
    *
+   * @var unknown_type
+   */
+  private $cacheName = 'madeam.controller.';
+
+  /**
+   * Enter description here...
+   *
    * @param unknown_type $requestGet
    * @param unknown_type $requestPost
    * @param unknown_type $requestCookie
@@ -153,9 +160,6 @@ class Madeam_Controller {
     $this->params = array_merge($requestGet, $requestPost, $requestCookie);
     $this->params['method'] = $requestMethod;
 
-    // define setup
-    $this->setup['beforeFilter'] = $this->setup['beforeRender'] = $this->setup['afterRender'] = array();
-
     // scaffold config
     $this->scaffoldController = $this->requestGet['controller'];
 
@@ -174,27 +178,42 @@ class Madeam_Controller {
     $parserClassName = 'Parser_' . ucfirst($this->requestGet['format']);
     $this->parser = new $parserClassName($this);
 
-    // reflection
-    $this->reflection = new ReflectionClass($this);
+    // set cache name
+    $this->cacheName .= low(get_class($this)) . '.setup';
 
-    // check methods for callbacks
-    $methods = $this->reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
-    foreach ($methods as $method) {
-      // callback properties (name, include, exclude)
-      $callback = array();
+    // check cache for setup. if cache doesn't exist define it and then save it
+    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1)) {
 
-      // set callback method name
-      $callback['name'] = $method->getName();
+      // define callbacks
+      $this->setup['beforeFilter'] = $this->setup['beforeRender'] = $this->setup['afterRender'] = array();
 
-      $matches = array();
-      if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {
+      // reflection
+      $this->reflection = new ReflectionClass($this);
 
-        $parameters = $method->getParameters();
-        foreach ($parameters as $parameter) {
-          // set parameters of callback (parameters in methods act as meta data for callbacks)
-          $callback[$parameter->getName()] = $parameter->getDefaultValue();
+      // check methods for callbacks
+      $methods = $this->reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
+      foreach ($methods as $method) {
+        // callback properties (name, include, exclude)
+        $callback = array();
+
+        // set callback method name
+        $callback['name'] = $method->getName();
+
+        $matches = array();
+        if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {
+
+          $parameters = $method->getParameters();
+          foreach ($parameters as $parameter) {
+            // set parameters of callback (parameters in methods act as meta data for callbacks)
+            $callback[$parameter->getName()] = $parameter->getDefaultValue();
+          }
+          $this->setup[$matches[1]][] = $callback;
         }
-        $this->setup[$matches[1]][] = $callback;
+      }
+
+      // save cache
+      if (Madeam_Config::get('cache_controllers') === true) {
+        Madeam_Cache::save($this->cacheName, $this->setup, true);
       }
     }
   }
