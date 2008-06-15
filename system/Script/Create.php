@@ -21,17 +21,23 @@ class Script_Create extends Madeam_Console_Script {
     } else {
       $scaffold = 'standard';
     }
+
     // set controller name and class name
     $controllerName = Madeam_Inflector::underscorize(low($params['name']));
     $controllerClassName = 'Controller_' . $controllerName;
+
     // Send message to user that we are creating the controller
     Madeam_Console_CLI::outCreate('Controller ' . $controllerName);
+
     // define controller class in controller file contents
     $controllerContents = "<?php\nclass $controllerClassName extends Controller_App {";
+
     // close class definition
     $controllerContents .= "\n\n}\n?>";
+
     // save file contents to file
     $this->createFile($controllerClassName . '.php', PATH_TO_CONTROLLER, $controllerContents);
+
     // completed with no errors
     return true;
   }

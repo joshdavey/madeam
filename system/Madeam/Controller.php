@@ -174,9 +174,13 @@ class Madeam_Controller {
       $this->layout($this->layout);
     }
 
-    // create parser instance
-    $parserClassName = 'Parser_' . ucfirst($this->requestGet['format']);
-    $this->parser = new $parserClassName($this);
+    try {
+      // create parser instance
+      $parserClassName = 'Parser_' . ucfirst($this->requestGet['format']);
+      $this->parser = new $parserClassName($this);
+    } catch (Madeam_Exception_AutoloadFail $e) {
+      Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->requestGet['format'] . '". Missing class <strong>' . $parserClassName . '</strong>'));
+    }
 
     // set cache name
     $this->cacheName .= low(get_class($this)) . '.setup';
@@ -207,6 +211,7 @@ class Madeam_Controller {
             // set parameters of callback (parameters in methods act as meta data for callbacks)
             $callback[$parameter->getName()] = $parameter->getDefaultValue();
           }
+
           $this->setup[$matches[1]][] = $callback;
         }
       }
@@ -254,6 +259,9 @@ class Madeam_Controller {
   */
 
   public function __get($name) {
+    // check if it is a set variable
+    if (isset($this->data[$name])) { return $this->data[$name]; }
+
     $match = array();
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
       // set model class name

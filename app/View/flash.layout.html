@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title><?php echo $pageTitle; ?></title>
+  <title><?php echo $page_title; ?></title>
   <meta http-equiv="refresh" content="<?php echo $pause; ?>;url=<?php echo Madeam::url($uri); ?>">
 
   <?php echo Help_Html::css('/css/madeam'); ?>
@@ -22,7 +22,7 @@
   <!-- =flash -->
   <div id="flash">
     <!-- content for layout placeholder -->
-    <?php echo $content_for_layout; ?>
+    <?php echo $controller->content; ?>
     <div id="reload_time"></div><?php echo Help_Html::link('Click here to continue.', $uri); ?>
   </div>
 

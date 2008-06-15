@@ -2,52 +2,20 @@
 
 class Script_Make extends Madeam_Console_Script {
 
-  public $command_requirements = array('app' => array('name'));
-
-  public function app($params) {
-    //--------------------
-    // this code is key and needs to be extracted for use in all commands
-    $required_params = array('name');
-    asort($required_params);
-    $param_names = array_keys($params);
-    asort($param_names);
-    do {
-      $still_required = array_diff_assoc($required_params, $param_names);
-      foreach ($still_required as $param) {
-        $params[$param] = $this->get_command($param);
-        $param_names = array_keys($params);
-        asort($param_names);
-      }
-    } while($required_params != $param_names);
-    //--------------------
-    // set app name
-    $app_name = $params['name'];
-    if ($app_name != null) {
-      // make controller directory if it does not already exist
-      if (! file_exists(CURRENT_DIR . DS . $app_name)) {
-        // notify user of progress
-        $this->out_create("application $app_name in " . CURRENT_DIR);
-        $this->out_create($app_name);
-        mkdir(CURRENT_DIR . $app_name);
-      } else {
-        if (! $this->get_yesno("Overwrite $app_name application?")) {
-          return false;
-        }
-        // notify user of progress
-        out();
-        $this->out_create("application $app_name in " . CURRENT_DIR);
-      }
-      if ($this->full_copy(dirname(PATH_TO_MADEAM), CURRENT_DIR . $app_name)) {
+  public function app($options = array('db_name', 'db_user', 'db_pass', 'db_host'), $defaults = array('db_name' => 'madeam', 'db_user' => 'root', 'db_pass' => '', 'db_host' => 'localhost')) {
+    if (Madeam_Console_CLI::getYN('Create a Madeam application in "' . CURRENT_DIR . '"?')) {
+      Madeam_Console_CLI::outCreate('Application in ' . CURRENT_DIR);
+      if ($this->fullCopy(PATH_TO_MADEAM, CURRENT_DIR)) {
         return true;
       } else {
         return false;
       }
     } else {
-      $this->out_error("Requires name");
+     return false;
     }
   }
 
-  private function full_copy($source, $target) {
+  private function fullCopy($source, $target) {
     if (is_dir($source)) {
       @mkdir($target);
       $d = dir($source);
@@ -57,18 +25,18 @@ class Script_Make extends Madeam_Console_Script {
         }
         $Entry = $source . '/' . $entry;
         if (is_dir($Entry)) {
-          $this->full_copy($Entry, $target . '/' . $entry);
-          $this->out_create(basename($Entry));
+          $this->fullCopy($Entry, $target . '/' . $entry);
+          Madeam_Console_CLI::outCreate($Entry);
           continue;
         }
-        $this->out_create(basename($Entry));
+        Madeam_Console_CLI::outCreate($Entry);
         if (! copy($Entry, $target . '/' . $entry)) {
           return false;
         }
       }
       $d->close();
     } else {
-      $this->out_create(basename($source));
+      Madeam_Console_CLI::outCreate($source);
       if (! copy($source, $target)) {
         return false;
       }
@@ -76,4 +44,3 @@ class Script_Make extends Madeam_Console_Script {
     return true;
   }
 }
-?>

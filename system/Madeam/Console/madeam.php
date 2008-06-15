@@ -26,12 +26,13 @@ if (file_exists('system/Madeam/Console/' . basename(__FILE__))) {
   // project specific scripts cannot be used
   define('IS_RELATIVE_TO_PROJECT', 0);
 
+  // ask the user if they want to create a madeam project here
+  $_SERVER['argv'][1] = 'make';
+  $_SERVER['argv'][2] = 'app';
+
   require PATH_TO_MADEAM . 'system/bootstrap.php';
 }
-
-Madeam_Console_CLI::out(IS_RELATIVE_TO_PROJECT);
 
 // initiated console
 $console = new Madeam_Console();
 $console->initialize();
-?>

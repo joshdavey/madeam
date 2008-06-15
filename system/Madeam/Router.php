@@ -36,6 +36,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     if (! is_array(self::$routes)) {
       self::$routes = array();
     }
+
     // root route - doesn't require parsing
     if ($route == '' || $route == '/') {
       self::$routes[] = array('/^\/*$/', array(), $params);
@@ -46,15 +47,18 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
       $bits = explode('/', $route);
       $mini_exp = $names = array();
       $bitkey = 0; // key for named bits
+
       // parse each bit into it's regular expression form
       foreach ($bits as $bit) {
-        if (preg_match('/^:(.+)$/', $bit, $match)) {
+        if (preg_match('/^:([a-zA-Z_]+)$/', $bit, $match)) {
           // named parameter
           $bitkey ++;
           $name = $match[1];
           if (isset($params[$name])) {
+            //$mini_exp[] = '(?:\\/(?P<' . $name . '>' . $params[$name] . '){1})';
             $mini_exp[] = '(?:\\/(' . $params[$name] . '){1})';
           } else {
+            //$mini_exp[] = '(?:\\/(?P<' . $name . '>' . '[^\/]+))?';
             $mini_exp[] = '(?:\\/([^\/]+))?';
           }
           $names[$bitkey] = $name;
@@ -63,8 +67,10 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
           $mini_exp[] = '\\/' . $bit;
         }
       }
+
       // build route's regexp
       $regexp = '/^' . implode('', $mini_exp) . '\/?(.*)$/';
+
       // add to routes list
       self::$routes[] = array($regexp, $names, $params);
     }
@@ -139,7 +145,9 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
         $params = $route[2]; // default values
         // set derived params
         foreach ($route[1] as $key => $name) {
-          $params[$name] = $match[$key];
+          if ($match[$key] != null) {
+            $params[$name] = $match[$key];
+          }
         }
         // flag as matched
         $matchs ++;
@@ -147,17 +155,16 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
         break;
       }
     }
+
     if ($matchs == 0) {
       // this is lame and needs to be done better
-      //header("HTTP/1.0 404 Not Found");
+      header("HTTP/1.1 404 Not Found");
       //ob_clean();
-      //readfile(ERROR_DIR . '404.html');
-      //test($uri);
-      //exit();
       throw new Madeam_Exception('Unable to find page');
       // but what about returning the params if we throw an error?
       return $params;
     }
+
     // get params from uri
     $params = array_merge($params, $gets);
     // automagically disable the layout when making an AJAX call
@@ -165,9 +172,14 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
       $params['useLayout'] = '0';
     }
 
+    // set request method in case it hasn't been set (command line environment)
+    if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
+
+    // set default values for required params
     ! isset($params['controller']) || $params['controller'] == null ? $params['controller'] = Madeam_Config::get('default_controller') : false;
     ! isset($params['action']) || $params['action'] == null ? $params['action'] = Madeam_Config::get('default_action') : false;
     ! isset($params['useLayout']) || $params['useLayout'] == null ? $params['useLayout'] = '0' : false;
+    ! isset($params['method']) || $params['method'] == null ? $params['method'] = $_SERVER['REQUEST_METHOD'] : false;
     ! isset($format) || $format == null ? $params['format'] = Madeam_Config::get('default_format') : $params['format'] = $format;
 
     return $params;

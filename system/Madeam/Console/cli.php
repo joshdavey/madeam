@@ -17,12 +17,8 @@ class Madeam_Console_CLI {
 
   static public function outMenu($label, $options = array()) {
     self::out();
-    self::out($label);
-    self::out('---------------');
-    foreach ($options as $opt) {
-      self::out('| ' . $opt);
-    }
-    self::out('---------------');
+    asort($options);
+    self::out($label . ': ' . implode(' | ', $options));
   }
 
   static public function outError($msg) {

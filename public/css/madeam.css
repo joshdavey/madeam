@@ -7,17 +7,16 @@ code.madeam { margin-bottom: 14px; margin-left: 10px; letter-spacing: 0.03em; fo
 #madeam-error { font-family: Courier New; font-size: 0.8em; margin: 10px; border: solid 3px #b43838; background: #fff; padding: 10px; }
 #madeam-error pre { overflow: auto; }
 
-/* =universal
+/* =universal prep
 -------------------------------------- */
-:link,:visited {text-decoration:none} ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,body,html,p,blockquote,fieldset,input {margin:0;padding:0} a img,:link img,:visited img {border:none}
+* { margin: 0; padding: 0; }
+:link,:visited { text-decoration: none; }
+a img,:link img,:visited img { border: none; }
 
 
 /* =body
 -------------------------------------- */
-body { line-height: 1.6em; font-family: Arial, "Lucida Grande", arial, helvetica, sans-serif; font-size: 16px; 
-background: #0c1531; 
-background: #ccc; 
-}
+body { line-height: 1.6em; font-family: Arial, "Lucida Grande", arial, helvetica, sans-serif; font-size: 16px; background: #0c1531; }
 
 
 /* =prep

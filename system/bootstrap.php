@@ -71,8 +71,9 @@ define('PATH_TO_REL', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($
 unset($_GET['madeamURI']);
 
 // remove it fromt he query string as well
-$_SERVER['QUERY_STRING'] = preg_replace('/&?madeamURI=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
-
+if (isset($_SERVER['QUERY_STRING'])) {
+  $_SERVER['QUERY_STRING'] = preg_replace('/&?madeamURI=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
+}
 
 // application files
 define('PATH_TO_VIEW', PATH_TO_APP . 'View' . DS);
@@ -86,6 +87,16 @@ define('PATH_TO_TMP', PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
 $includePaths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_LIB, ini_get('include_path'));
 ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
 
+
+// include core files
+require PATH_TO_SYSTEM . 'Madeam.php';
+require PATH_TO_SYSTEM . 'Madeam/Controller.php';
+require PATH_TO_SYSTEM . 'Madeam/Inflector.php';
+require PATH_TO_SYSTEM . 'Madeam/Router.php';
+require PATH_TO_SYSTEM . 'Madeam/Config.php';
+require PATH_TO_SYSTEM . 'Madeam/Parser.php';
+require PATH_TO_SYSTEM . 'Madeam/Cache.php';
+require PATH_TO_SYSTEM . 'Madeam/Registry.php';
 
 // define user errors variable name for $_SESSION
 // example: $_SESSION[MADEAM_USER_ERROR_NAME];
@@ -127,6 +138,18 @@ function Madeam_Autoload($class) {
 // have this one throw an exception or make a last resort to check every path for the file.
 spl_autoload_register('Madeam_Autoload');
 
+// include routes
+// check cache for routes
+if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1)) {
+  // include routes configuration
+  require PATH_TO_APP . 'Config' . DS . 'routes.php';
+
+  // save routes to cache
+  if ($config['cache_routes']) {
+    Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
+  }
+}
+
 /**
  * Checks to see if a relative file exists by checking each include path.
  * Special thanks to Ahmad Nassri from PHP-Infinity for the proof of concept.
@@ -143,35 +166,6 @@ function file_lives($file) {
   }
   return false;
 }
-
-// include routes
-// check cache for routes
-if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1)) {
-  // include routes configuration
-  require PATH_TO_APP . 'Config' . DS . 'routes.php';
-
-  // save routes to cache
-  if ($config['cache_routes']) {
-    Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
-  }
-}
-
-/*
-// set core configuration
-$config['association_join']     = '.';
-$config['flash_post_name']      = 'mfpost';
-$config['flash_data_name']      = 'mflash';
-$config['flash_life_name']      = 'mflife';
-$config['user_error_name']      = 'muerrors';
-$config['path_to_controller']   = PATH_TO_APP . 'Controller' . DS;
-$config['path_to_model']        = PATH_TO_APP . 'Model' . DS;
-$config['path_to_view']         = PATH_TO_APP . 'View' . DS;
-$config['path_to_layout']       = $config['path_to_view'];
-$config['path_to_etc']          = PATH_TO_PROJECT . 'etc' . DS;
-$config['path_to_tmp']          = $config['path_to_etc'] . 'tmp' . DS;
-$config['path_to_log']          = $config['path_to_etc'] . 'log' . DS;
-$config['path_to_cache']        = $config['path_to_tmp'] . 'cache' . DS;
-*/
 
 // save configuration
 Madeam_Config::set($config);
@@ -205,8 +199,6 @@ function Madeam_ErrorHandler($code, $string, $file, $line) {
   if ($code == 2 || $code == 4 || $code == 8) { return false; }
 
   $exception = new Madeam_Exception($string, $code);
-  //$exception->setLine($line);
-  //$exception->setFile($file);
   throw $exception;
   return true;
 }
