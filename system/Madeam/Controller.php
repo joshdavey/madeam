@@ -161,10 +161,10 @@ class Madeam_Controller {
     $this->params['method'] = $requestMethod;
 
     // scaffold config
-    $this->scaffoldController = $this->requestGet['controller'];
+    $this->scaffoldController = $this->params['controller'];
 
     // set view
-    $this->view($this->requestGet['controller'] . '/' . $this->requestGet['action']);
+    $this->view($this->params['controller'] . '/' . $this->requestGet['action']);
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
@@ -259,9 +259,6 @@ class Madeam_Controller {
   */
 
   public function __get($name) {
-    // check if it is a set variable
-    if (isset($this->data[$name])) { return $this->data[$name]; }
-
     $match = array();
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
       // set model class name
@@ -302,7 +299,8 @@ class Madeam_Controller {
 
   public function __set($name, $value) {
     if (!preg_match('/^(?:_[A-Z]|[A-Z]){1}/', $name)) {
-      $this->data[$name] = $value;
+      $this->data[] = $name;
+      $this->$name = $value;
     }
   }
 
@@ -316,7 +314,8 @@ class Madeam_Controller {
     $this->callback('beforeFilter');
 
     // action
-    $this->{$this->params['action'].'Action'}();
+    $action = Madeam_Inflector::camelize($this->params['action']) . 'Action';
+    $this->$action();
 
     // beforeRender callbacks
     $this->callback('beforeRender');
@@ -336,7 +335,7 @@ class Madeam_Controller {
    *
    * @param string $name
    */
-  final protected function callback($name) {
+  final public function callback($name) {
     foreach ($this->setup[$name] as $callback) {
       $this->{$callback['name']}();
     }
@@ -443,19 +442,26 @@ class Madeam_Controller {
   final public function render($data = true) {
     if ($data !== false) {
 
-      // pass params to view
-      $this->data['params'] = $this->params;
+      if (!is_string($data)) {
+        if (file_exists($this->view)) {
+          // pass params to view -- but only if the view exists
+          $this->data[] = 'params';
 
-      if (file_exists($this->view)) {
-        $this->parser->renderView();
-      } else {
-        if (isset($this->{Madeam_Inflector::singalize($this->requestGet['controller'])})) {
-          $this->data[Madeam_Inflector::singalize($this->requestGet['controller'])] = $this->{Madeam_Inflector::singalize($this->requestGet['controller'])};
-        } elseif (isset($this->{Madeam_Inflector::pluralize($this->requestGet['controller'])})) {
-          $this->data[Madeam_Inflector::pluralize($this->requestGet['controller'])] = $this->{Madeam_Inflector::pluralize($this->requestGet['controller'])};
+          // render the view
+          $this->parser->renderView();
+        } else {
+          if (isset($this->{Madeam_Inflector::singalize($this->params['controller'])})) {
+            $this->data[Madeam_Inflector::singalize($this->params['controller'])] = $this->{Madeam_Inflector::singalize($this->params['controller'])};
+          } elseif (isset($this->{Madeam_Inflector::pluralize($this->params['controller'])})) {
+            $this->data[Madeam_Inflector::pluralize($this->params['controller'])] = $this->{Madeam_Inflector::pluralize($this->params['controller'])};
+          }
+
+          $this->parser->missingView();
         }
 
-        $this->parser->missingView();
+      } else {
+        // render a regular text string
+        $this->parser->output = $data;
       }
 
       foreach ($this->layout as $layoutFile) {
@@ -469,8 +475,9 @@ class Madeam_Controller {
         }
       }
 
+
       // set final output
-      $this->output = $this->parser->getOutput();
+      $this->output = $this->parser->output;
     } else {
       // set final output as null
       $this->output = null;

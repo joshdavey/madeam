@@ -3,7 +3,7 @@
 class Parser_Phps extends Madeam_Parser {
 
   public function renderView() {
-    $data = $this->controller->data;
+    $data = $this->getData();
     $this->output = serialize($data);
     return $this->output;
   }

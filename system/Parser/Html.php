@@ -4,7 +4,7 @@ class Parser_Html extends Madeam_Parser {
 
   public function renderView() {
     ob_start();
-    extract($this->controller->data);
+    extract($this->getData());
     $controller = $this->controller;
     include ($this->controller->view);
     $this->output = ob_get_contents();
@@ -18,7 +18,7 @@ class Parser_Html extends Madeam_Parser {
 
   public function renderLayout($layoutFile) {
     ob_start();
-    extract($this->controller->data);
+    extract($this->getData());
     $controller = $this->controller;
     $controller->content = $this->output;
     include ($layoutFile);

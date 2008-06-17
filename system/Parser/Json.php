@@ -3,7 +3,7 @@
 class Parser_Json extends Madeam_Parser {
 
   public function renderView() {
-    $data = $this->controller->data;
+    $data = $this->getData();
     $this->output = json_encode($data);
     return $this->output;
   }

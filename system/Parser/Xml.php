@@ -3,7 +3,7 @@
 class Parser_Xml extends Madeam_Parser {
 
   public function renderView() {
-    $data = $this->controller->data;
+    $data = $this->getData();
 
     $xml = new XmlWriter();
     $xml->openMemory();
