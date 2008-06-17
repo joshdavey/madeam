@@ -400,4 +400,3 @@ class Help_Form extends Help_Html {
     return stripslashes($value);
   }
 }
-?>

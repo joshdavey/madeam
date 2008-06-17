@@ -102,4 +102,3 @@ class Help_Format {
     return number_format((int) $number, $decimals, $decimalPoint, $thousands);
   }
 }
-?>

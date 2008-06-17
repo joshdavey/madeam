@@ -1,6 +1,6 @@
 <?php
 
-class help_table extends help_html {
+class Help_Table extends Help_Html {
 
   /**
    * Create a table from a model's plural data
@@ -66,4 +66,3 @@ class help_table extends help_html {
     }
   }
 }
-?>

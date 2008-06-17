@@ -117,4 +117,3 @@ class Help_Html {
     return implode(' ', $html);
   }
 }
-?>

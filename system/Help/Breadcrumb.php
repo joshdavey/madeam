@@ -1,5 +1,4 @@
 <?php
-
 class Help_Breadcrumb extends Help_Html {
 
   static $breadcrumbs = array();
@@ -20,14 +19,4 @@ class Help_Breadcrumb extends Help_Html {
     return $breadcrumb;
   }
 
-  public static function add($label, $url = null) {
-    self::$breadcrumbs[$label] = $url;
-    return true;
-  }
-
-  public static function reset() {
-    self::$breadcrumbs = array();
-    return true;
-  }
 }
-?>

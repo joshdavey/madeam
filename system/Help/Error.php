@@ -60,4 +60,3 @@ class Help_Error extends help_html {
     return $error_tag;
   }
 }
-?>
