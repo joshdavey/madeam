@@ -127,7 +127,7 @@ class Madeam {
       } else {
         // no controller found = critical error.
         header("HTTP/1.1 404 Not Found");
-        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <b>' . $controllerClass . '</b>'));
+        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . '</strong>'));
       }
     }
 
