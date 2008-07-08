@@ -8,7 +8,7 @@ class Parser_Xml extends Madeam_Parser {
     $xml = new XmlWriter();
     $xml->openMemory();
     $xml->startDocument('1.0', 'UTF-8');
-    $xml->startElement('page');
+    $xml->startElement('response');
 
     $this->array2Xml($data, $xml);
 

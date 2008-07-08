@@ -22,14 +22,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   protected $label = null;
 
-
-  /**
-   * Connection Resource
-   *
-   * @var resource/boolean
-   */
-  protected $conn = false;
-
   /**
    * Enter description here...
    *
@@ -85,6 +77,13 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @var string/integer
    */
   protected $server = 0;
+
+  /**
+   * pdo instance
+   *
+   * @var resource/boolean
+   */
+  private static $_pdo = array();
 
   /**
    * Enter description here...
@@ -164,10 +163,14 @@ class Madeam_ActiveRecord extends Madeam_Model {
       if (method_exists($this, $function)) {
         return $this->$function();
       }
-    } /*elseif (preg_match("/^deleteBy_(.*)/", $name, $match)) {
+    } elseif (preg_match("/^deleteBy_(.*)/", $name, $match)) {
       $this->where($match[2] . " = '$args[0]'");
       $this->delete();
-    }*/
+    } else {
+      $backtrace = debug_backtrace();
+      throw new Madeam_Exception_MissingMethod("See line <strong>" . $backtrace[1]['line'] . "</strong> in <strong>" . $backtrace[1]['file'] . "</strong> \n Unknown method " . $name . ' in ' . get_class($this) . " model.");
+    }
+
     return false;
   }
 
@@ -182,69 +185,53 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @return resource
    */
   final public function execute($sql, $returnAs = 'array') {
-
+test($sql);
       try {
 
         // if we connect here we don't need to connect to the database until we execute a query
         // therefore if all we're doing is loading a cached page we won't need a database connection
-        if (!isset($_GLOBAL['databaseConnection']) || !is_resource($_GLOBAL['databasConnection'])) {
+        if (!isset(self::$_pdo[$this->server])) {
           // parse DB information
           $servers = Madeam_Config::get('data_servers');
           $serverConnectionString = $servers[$this->server];
           $server = $this->parseDbConnection($serverConnectionString);
 
-          // create database connection
-          if (isset($server['port']) && $server['port'] != false) {
-            $_GLOBAL['databaseConnection'] = mysql_connect($server['host'] . ':' . $server['port'], $server['user'], $server['pass']);
-            if ($_GLOBAL['databaseConnection'] === false) {
-              throw new Madeam_Exception_ConnectionFail(mysql_error());
-            }
-          } else {
-            $_GLOBAL['databaseConnection'] = mysql_connect($server['host'], $server['user'], $server['pass']);
-            if ($_GLOBAL['databaseConnection'] === false) {
-              throw new Madeam_Exception_ConnectionFail(mysql_error());
-            }
-          }
-        }
+          // set PDO string
+          $pdoString = "$server[driver]:dbname=$server[name];host=$server[host]";
 
-        // select database
-        if (! mysql_select_db($server['name'], $_GLOBAL['databaseConnection'])) {
-          // failed to find selected database
-          throw new Madeam_Exception_MissingResource(mysql_error());
+          // create database connection
+          self::$_pdo[$this->server] = new PDO($pdoString, $server['user'], $server['pass']);
+
+          // set exception error handling
+          self::$_pdo[$this->server]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
 
         // for debugging only
         $this->sql = $sql;
 
-        // log
+        // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
         Madeam_Logger::getInstance()->log($sql);
 
-        // execute mysql query
-        $this->link = mysql_query($sql, $_GLOBAL['databaseConnection']);
+        // link
+        $result = self::$_pdo[$this->server]->query($sql);
 
-        // check for errors
-        if (mysql_error()) {
-          throw new Madeam_Exception_QueryFail(null, 2);
+      } catch (PDOException $e) {
+        if (!isset(self::$_pdo[$this->server]) || !is_object(self::$_pdo[$this->server])) {
+          // if the _pdo variable isn't an object it means it failed to connected
+          Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
+        } else {
+          $trace = $e->getTrace();
+          $error = self::$_pdo[$this->server]->errorInfo();
+          Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
         }
-
-      } catch (Madeam_Exception_ConnectionFail $e) {
-        $e->setMessage(mysql_error() . '. Check connection string in setup file.');
-        Madeam_Error::catchException($e);
-      } catch (Madeam_Exception_MissingResource $e) {
-        $e->setMessage(mysql_error() . '. Check connection string in setup file.');
-        Madeam_Error::catchException($e);
-      } catch (Madeam_Exception_QueryFail $e) {
-        $trace = $e->getTrace();
-        $e->setMessage('See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[3]['class'] . "</strong> \n" . mysql_error() . "\n" . $sql);
-        Madeam_Error::catchException($e);
       }
 
-    return $this->link;
+    return $result;
   }
 
   final public function query($sql, $returnAs = 'array') {
     // execute query
-    $this->link = $this->execute($sql);
+    $link = $this->execute($sql);
 
     // fetch method
     if ($returnAs == 'object') {
@@ -257,28 +244,26 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $matchs = array();
     preg_match('/^DESCRIBE|SELECT/', $sql, $matchs);
     if (count($matchs) > 0) {
-      if ($this->numRows() > 0) {
-        while($this->entry = $fetchMethod($this->link)) {
-          // don't prepare results of describe queries
-          if ($matchs[0] != "DESCRIBE" && $matchs[0] != 'describe') {
-            $this->prepareResult(); // should this be done?
-          }
-
-          $this->data[] = $this->entry;
+      $results = $link->fetchAll(PDO::FETCH_ASSOC);
+      foreach ($results as $result) {
+        $this->entry = $result;
+        // don't prepare results of describe queries
+        if ($matchs[0] != "DESCRIBE" && $matchs[0] != 'describe') {
+          $this->prepareResult(); // should this be done?
         }
 
-        return $this->data;
-      } else {
-        return array(); // return empty data
+        $this->data[] = $this->entry;
       }
+
+      return $this->data;
     } else {
-      return $this->link;
+      return $result;
     }
   }
 
   final public function describe() {
     $table = $this->setup['resourceName'];
-    return $this->query("DESCRIBE $table", 'array');
+    return $this->query("DESCRIBE $table");
   }
 
   /**
@@ -290,7 +275,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @return array/boolean
    */
-  final public function find() {
+  final public function find2($fetch = 'all') {
     $this->data = array();
 
     // find callback
@@ -306,88 +291,190 @@ class Madeam_ActiveRecord extends Madeam_Model {
     }
 
     // build select query and set resource link
-    $this->link = $this->execute($this->buildQuerySelect());
-    if (is_resource($this->link)) {
-      // get data
-      //while ($this->entry = mysql_fetch_object($this->link)) {
-      while($this->entry = mysql_fetch_assoc($this->link)) {
-        // adds custom fields
-        $this->prepareResults();
+    $link = $this->execute($this->buildQuerySelect());
 
-        // find related content
-        if ($this->depth > 0) {
-          // find has_ones
-          foreach ($this->setup['hasOne'] as $model => $params) {
-            $fkey = $params['foreignKey'];
-            if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
-              // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
-              // clone object so we don't interupt it's state with reset()
-              $tempmodel = clone $this->{$params['model']};
-              $tempmodel->name = $model;
-              $this->entry[$model] = $tempmodel->findOne($this->entry[$fkey]);
-              unset($tempmodel);
-            }
-          }
+    $results = $link->fetchAll(PDO::FETCH_ASSOC);
 
-          // find belongsTos
-          foreach ($this->setup['belongsTo'] as $model => $params) {
-            $fkey = $params['foreignKey'];
-            if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
-              // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
-              // clone object so we don't interupt it's state with reset()
-              $tempmodel = clone $this->{$params['model']};
-              // change the model name because we can't always assume that the name will be the same.
-              // An example of this is when you create a self-refrencing relationship in a table and name the relationship "sub_model" or "parent_model"
-              $tempmodel->name = $model;
-              $this->entry[$model] = $tempmodel->findOne($this->entry[$fkey]);
-              unset($tempmodel);
-            }
-          }
+    foreach ($results as $result) {
+      $this->entry = $result;
 
-          // find hasManies
-          foreach ($this->setup['hasMany'] as $model => $params) {
-            // do not call if the user has not specified to call this data
-            if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
-              // clone object so we don't interupt it's state with reset()
-              $tempmodel = clone $this->{$params['model']};
-              $tempmodel->name = $model;
-              $this->entry[Madeam_Inflector::pluralize($model)] = $tempmodel->findAll();
-              unset($tempmodel);
-            }
-          }
+      // adds custom fields
+      $this->prepareResults();
 
-          // find has and belongs to manies
-          foreach ($this->setup['hasAndBelongsToMany'] as $model => $params) {
-            if ((in_array($model, $this->fields) || empty($this->fields)) && ! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
-              $tempmodel = clone $this->{$params['model']};
-              $tempmodel->name = $model;
-              $this->entry[Madeam_Inflector::pluralize($params['model'])] = $tempmodel->join($this->name)->findAll();
-              unset($tempmodel);
-            }
+      // find related content
+      if ($this->depth > 0) {
+        // find has_ones
+        foreach ($this->setup['hasOne'] as $model => $params) {
+          $fkey = $params['foreignKey'];
+          if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+            // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
+            // clone object so we don't interupt it's state with reset()
+            $tempmodel = clone $this->{$params['model']};
+            $tempmodel->name = $model;
+            $this->entry[$model] = $tempmodel->findOne($this->entry[$fkey]);
+            unset($tempmodel);
           }
         }
-        $this->data[] = $this->entry;
+
+        // find belongsTos
+        foreach ($this->setup['belongsTo'] as $model => $params) {
+          $fkey = $params['foreignKey'];
+          if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+            // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
+            // clone object so we don't interupt it's state with reset()
+            $tempmodel = clone $this->{$params['model']};
+            // change the model name because we can't always assume that the name will be the same.
+            // An example of this is when you create a self-refrencing relationship in a table and name the relationship "sub_model" or "parent_model"
+            $tempmodel->name = $model;
+            $this->entry[$model] = $tempmodel->findOne($this->entry[$fkey]);
+            unset($tempmodel);
+          }
+        }
+
+        // find hasManies
+        foreach ($this->setup['hasMany'] as $model => $params) {
+          // do not call if the user has not specified to call this data
+          if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+            // clone object so we don't interupt it's state with reset()
+            $tempmodel = clone $this->{$params['model']};
+            $tempmodel->name = $model;
+            $this->entry[Madeam_Inflector::pluralize($model)] = $tempmodel->findAll();
+            unset($tempmodel);
+          }
+        }
+
+        // find has and belongs to manies
+        foreach ($this->setup['hasAndBelongsToMany'] as $model => $params) {
+          if ((in_array($model, $this->fields) || empty($this->fields)) && ! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+            $tempmodel = clone $this->{$params['model']};
+            $tempmodel->name = $model;
+            $this->entry[Madeam_Inflector::pluralize($params['model'])] = $tempmodel->join($this->name)->findAll();
+            unset($tempmodel);
+          }
+        }
       }
+      $this->data[] = $this->entry;
     }
 
     // find callback
     $this->callback('afterFind');
 
-    // return data
-    if ($this->numRows() > 0) {
-      // grab data before it's reset
+    // grab data before it's reset
+    if ($fetch == 'all') {
       $data = $this->data;
-
-      // reset all sql values and data
-      $this->reset();
-      return $data;
+    } else {
+      $data = $this->entry;
     }
 
     // reset all sql values and data
     $this->reset();
 
-    // failed to return any rows
-    return false;
+    // return data
+    return $data;
+  }
+
+  final public function find($fetch = 'all') {
+    $this->data = array();
+
+    // find callback
+    $this->callback('beforeFind');
+
+    // if this is a child model then filter the results to make sure they are related to this model's parent
+    // this stuff is for when chaining models like:
+    // $this->article->findOne(32, true)->comment->findAll();
+    // where article is the parent of comment
+    if ($this->parent && $this->_sqlWhere == '1') {
+      //$this->where($this->parent->setup['hasModels'][$this->name]['foreignKey'] . " = '" . $this->parent->entry[$this->parent->setup['hasModels'][$this->name]['primaryKey']] . "'");
+    }
+
+
+    $foreignKeyValues = array();
+
+    // build select query and set resource link
+    $link = $this->execute($this->buildQuerySelect());
+
+    $results = $link->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($results as $result) {
+      $this->entry = $result;
+
+      // adds custom fields
+      $this->prepareResults();
+
+      $this->data[] = $this->entry;
+      $foreignKeyValues[] = $this->entry[$this->primaryKey];
+    }
+
+    $hasOnes = $hasManies = $belongsTos = $habtms = array();
+
+    // find related content
+    if ($this->depth > 0) {
+      // find hasOnes
+      foreach ($this->setup['hasOne'] as $model => $params) {
+        if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+          // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
+          // clone object so we don't interupt it's state with reset()
+          $tempmodel = clone $this->{$params['model']};
+          $tempmodel->name = $params['model'];
+          $hasOnes[$model] = $tempmodel->in($params['foreignKey'], $foreignKeyValues)->findAll();
+          unset($tempmodel);
+        }
+      }
+
+      // find belongsTos
+      foreach ($this->setup['belongsTo'] as $model => $params) {
+        if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+          // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
+          // clone object so we don't interupt it's state with reset()
+          $tempmodel = clone $this->{$params['model']};
+          // change the model name because we can't always assume that the name will be the same.
+          // An example of this is when you create a self-refrencing relationship in a table and name the relationship "sub_model" or "parent_model"
+          $tempmodel->name = $params['model'];
+          $belongTos[$model] = $tempmodel->in($params['foreignKey'], $foreignKeyValues)->findAll();
+          unset($tempmodel);
+        }
+      }
+
+      // find hasManies
+      foreach ($this->setup['hasMany'] as $model => $params) {
+        // do not call if the user has not specified to call this data
+        if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+          // clone object so we don't interupt it's state with reset()
+          $tempmodel = clone $this->{$params['model']};
+          $tempmodel->name = $params['model'];
+test($params);
+          $hasManies[Madeam_Inflector::pluralize($model)] = $tempmodel->in($params['model'] . '.' . $params['foreignKey'], $foreignKeyValues)->findAll();
+          unset($tempmodel);
+        }
+      }
+
+      // find has and belongs to manies
+      foreach ($this->setup['hasAndBelongsToMany'] as $model => $params) {
+        if ((in_array($model, $this->fields) || empty($this->fields)) && ! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+          $tempmodel = clone $this->{$model};
+          $fields = $tempmodel->setup['standardFields'];
+          $habtms[$model] = $tempmodel->join($this->name)->in($params['joinModel'] . '.' . $params['foreignKey'], $foreignKeyValues)->findAll();
+          unset($tempmodel);
+        }
+      }
+
+    }
+
+    // find callback
+    $this->callback('afterFind');
+
+    // grab data before it's reset
+    if ($fetch == 'all') {
+      $data = $this->data;
+    } else {
+      $data = $this->entry;
+    }
+
+    // reset all sql values and data
+    $this->reset();
+
+    // return data
+    return $data;
   }
 
   /**
@@ -396,7 +483,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @return array/boolean
    */
   final public function findAll() {
-    return $this->find();
+    return $this->find('all');
   }
 
   /**
@@ -464,14 +551,13 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->limit(1);
 
     // find stuff!
-    $this->data = $this->find();
-    $this->entry = $this->data[0];
+    $data = $this->find('one');
 
     if ($chain) {
       // return object because this entry is being chained
       return $this;
     } else {
-      return $this->entry;
+      return $data;
     }
   }
 
@@ -643,16 +729,16 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resourceName = Madeam_Inflector::model_habtm($model, $this->name);
+    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->name);
     $class->primaryKey = false;
     $this_key = Madeam_Inflector::model_foreign_key($this->name);
-    $relation_key = Madeam_Inflector::model_foreign_key($model);
+    $relation_key = Madeam_Inflector::modelForeignKey($model);
 
     //$this->ItemStore->findOne(1,2);
     foreach ($assoc as $val) {
       // check for duplicate
-      $class->where("$this_key = '$id' AND $relation_key = '$val'")->unbindAll()->findOne();
-      if ($class->numRows() < 1) {
+      $results = $class->where("$this_key = '$id' AND $relation_key = '$val'")->unbindAll()->findOne();
+      if (!empty($results)) {
         $class->data = array($this_key => $id, $relation_key => $val);
         $class->execute($class->buildQueryInsert());
       }
@@ -669,10 +755,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resourceName = Madeam_Inflector::model_habtm($model, $this->name);
+    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->name);
     $class->primaryKey = false;
-    $this_key = Madeam_Inflector::model_foreign_key($this->name);
-    $relation_key = Madeam_Inflector::model_foreign_key($model);
+    $this_key = Madeam_Inflector::modelForeignKey($this->name);
+    $relation_key = Madeam_Inflector::modelForeignKey($model);
 
     foreach ($assoc as $val) {
       $class->data = array($this_key => $id, $relation_key => $val);
@@ -704,74 +790,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
   }
 
   /**
-   * Creates table
-   * Soon this method will have migration abilities but for now it just creates tables...
-   */
-  final public function migrate($drop = false) {
-    $sql = array(); // our query in array form -- soon to be imploded
-    $uniques = array(); // list of fields that have unique values
-    // drop table -- this doesn't work yet
-    if ($drop == true) {
-      $sql[] = 'DROP TABLE IF EXISTS `' . $this->setup['resourceName'] . "`; \n";
-    }
-    // initial query decleration
-    $sql[] = 'CREATE TABLE IF NOT EXISTS `' . $this->setup['resourceName'] . '` (';
-    // add fields
-    $fields = array();
-    foreach ($this->schema as $name => $opts) {
-      $field = array();
-      // Field type
-      if (! empty($opts['values'])) {
-        // values (enum and set)
-        $field[] = "`$name` $opts[type]('" . implode("','", $opts['values']) . "')";
-      } elseif ($opts['size'] != null) {
-        // size
-        $field[] = "`$name` $opts[type]($opts[size])";
-      } else {
-        // neither
-        $field[] = "`$name` $opts[type]";
-      }
-      // NULL?
-      if ($opts['null'] == false) {
-        $field[] = 'NOT NULL';
-      } else {
-        $field[] = 'NULL';
-      }
-      // default value
-      if ($opts['default'] != null) {
-        $field[] = "DEFAULT '$opts[default]'";
-      }
-      // auto increment
-      if (in_array('auto_increment', $opts)) {
-        $field[] = 'AUTO_INCREMENT';
-      }
-      // primary key
-      if (in_array('primaryKey', $opts)) {
-        $field[] = 'PRIMARY KEY';
-      }
-      // unique
-      if (in_array('unique', $opts)) {
-        $uniques[] = $name;
-      }
-      // add to list of fields
-      $fields[] = implode(' ', $field);
-    }
-    // add fields
-    $sql[] = implode(", ", $fields);
-    // add uniques
-    if (! empty($uniques)) {
-      $sql[] = 'UNIQUE (`' . implode('`,`', $uniques) . '`)';
-    }
-    // close
-    $sql[] = ')';
-    // create query string
-    $sql = implode(' ', $sql);
-    // create table
-    $this->execute($sql);
-    return true;
-  }
-
-  /**
    * Query Builders
    * =======================================================================
    */
@@ -785,24 +803,31 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $table = $this->setup['resourceName'];
     if (empty($this->fields)) {
       if ($this->primaryKey != false) {
-        // why should we have to re-state the id? This is a hack! (only for JOINS)
-        $sql[] = "SELECT *, $table.$this->primaryKey as $this->primaryKey FROM $table";
+
+        $fields = $this->name . '.' . implode(", " . $this->name . '.', $this->setup['standardFields']) . ' ';
+        $tables = $table . ' as ' . $this->name . ' ';
+
+        foreach ($this->_sqlJoins as $model => $join) {
+          $fields .= implode(", " . $model . '.', $this->$model->setup['standardFields']);
+          $tables .= $join['table'] . ' as ' . $model;
+        }
+
+
+        $sql[] = 'SELECT ' . $fields . ' FROM ' . $tables;
       } else {
-        $sql[] = "SELECT * FROM $table";
+        $sql[] = "FROM $table as " . $this->name;
       }
     } else {
       // select only sepcified fields
       $sql[] = "SELECT";
-      // determine sql fields versus custom fields
-      $fields = $this->_sqlFields;
-      $sql[] = implode(",", $fields);
-      $sql[] = "FROM $table";
+      $sql[] = implode(", ", $this->_sqlFields);
+      $sql[] = "FROM $table as " . $this->name;
     }
     // joins
     if (! empty($this->_sqlJoins)) {
-      foreach ($this->_sqlJoins as $join) {
+      foreach ($this->_sqlJoins as $model => $join) {
         $sql[] = "LEFT JOIN";
-        $sql[] = $join['table'];
+        $sql[] = $join['table'] . ' as ' . $model;
         $sql[] = 'ON ' . $join['on'];
       }
     }
@@ -843,7 +868,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // add values
     $sql[] = "('" . @implode("','", array_values($this->data)) . "')";
     // build query
-    //test(implode(' ', $sql));
 
     return implode(' ', $sql) . ';';
   }
@@ -891,8 +915,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
     } else {
       $sql[] = 'LIMIT 1';
     }
+
     // build query
-    //test(implode(' ', $sql));
     return implode(' ', $sql) . ';';
   }
 
@@ -925,7 +949,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     } else {
       $sql[] = 'LIMIT 1';
     }
-    //test(implode(' ', $sql));
+
     return implode(' ', $sql) . ';';
   }
 
@@ -946,7 +970,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       // otherwise a new condition is added and replaces the default of "1"
       $this->_sqlWhere = '(' . $conditions . ')';
     }
-    // idea -- method chaining is crazy cool
+
     return $this;
   }
 
@@ -965,7 +989,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   final public function order($order) {
     $this->_sqlOrder = $order;
-    // idea -- method chaining is crazy cool
     return $this;
   }
 
@@ -978,7 +1001,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
   final public function limit($start, $range = false) {
     $this->_sqlStart = $start;
     $this->_sqlRange = $range;
-    // idea -- method chaining is crazy cool
     return $this;
   }
 
@@ -987,15 +1009,20 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @param list $fields
    */
-  final public function fields() {
-    foreach (func_get_args() as $field) {
-      if (in_array($field, $this->setup['standardFields'])) {
+  final public function fields($fields) {
+    if (!is_array($fields)) {
+      $fields = func_get_args();
+    }
+
+    foreach ($fields as $field) {
+      if (!in_array($field, $this->setup['customFields'])) {
         $this->_sqlFields[] = $field;
       }
       $this->fields[] = $field;
     }
+
     // make sure there are no dupes
-    $this->fields = array_unique($this->fields);
+    $this->fields = $this->_sqlFields = array_unique($fields);
     return $this;
   }
 
@@ -1022,18 +1049,23 @@ class Madeam_ActiveRecord extends Madeam_Model {
   final public function join($model, $on = false) {
     $model = Madeam_Inflector::modelNameize($model);
     $table = $this->setup['resourceName'];
-    if ($on == false) {
+    if ($on === false) {
       if (in_array($model, array_keys($this->setup['hasAndBelongsToMany']))) {
+        // get relation config
         $relation = $this->setup['hasAndBelongsToMany'][$model];
-        $on = "$table.$this->primaryKey = $relation[joinModel].$relation[foreignKey]";
+
+        // set on condition
+        $on = "$this->name.$this->primaryKey = $relation[joinModel].$relation[foreignKey]";
+
+        // add join
         $this->_sqlJoins[$model] = array('table' => $relation['joinModel'], 'on' => $on);
       } elseif (in_array($model, array_keys(array_merge($this->setup['hasOne'], $this->setup['hasMany'], $this->setup['belongsTo'])))) {
         $fk = $this->setup['hasModels'][$model]['foreignKey'];
         // I wish there was a better way to do this...
         // make the user type in more info?
-        $foreign_table = $this->$model->resourceName;
-        $foreign_pk = $this->$model->primaryKey;
-        $on = "$table.$fk = $foreign_table.$foreign_pk";
+        $foreignTable = $this->$model->resourceName;
+        $foreignPk = $this->$model->primaryKey;
+        $on = "$table.$fk = $foreignTable.$foreignPk";
         $this->_sqlJoins[$model] = array('table' => $this->$model->resourceName, 'on' => $on);
       } else {
         test('this feature needs to be fixed - activeRecord join');
@@ -1065,7 +1097,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->isInsert = false;
     $this->isUpdate = false;
     //$this->sql = null;
-    //$this->link           = false;
     // reset child models
     // this is so we can do stuff like...
     // $this->article->comment->depth(2)->fields('id', 'title');
@@ -1093,7 +1124,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if ($this->entryId != - 1) {
       return $this->entryId;
     } else {
-      return mysql_insert_id();
+      return self::$_pdo[$this->server]->lastInsertId();
     }
   }
 
@@ -1103,20 +1134,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @return int
    */
   final public function affectedRows() {
-    return mysql_affectedRows();
-  }
-
-  /**
-   * Returns number of rows returned
-   *
-   * @return int
-   */
-  final public function numRows() {
-    if (is_resource($this->link)) {
-      return mysql_numRows($this->link);
-    } else {
-      return 0;
-    }
+    return self::$_pdo[$this->server]->rowCount();
   }
 
   /**

@@ -149,7 +149,7 @@ class Madeam_Inflector {
 
   public static function modelForeignKey($string) {
     $string[0] = low($string[0]);
-    return self::singalize(self::underscorize($string));
+    return self::singalize(self::underscorize($string)) . '_id';
   }
 
   public static function specialize($char, $word) {

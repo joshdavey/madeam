@@ -27,7 +27,21 @@ class Madeam_Model {
    *
    * @var unknown_type
    */
-  public $primaryKey = 'id';
+  public $primaryKey = false;
+
+  /**
+   * Enter description here...
+   *
+   * @var string
+   */
+  protected $fieldPrefix = null;
+
+  /**
+   * Enter description here...
+   *
+   * @var string
+   */
+  protected $resourcePrefix = null;
 
   /**
    * does the depth really need to be 2 by default? why not 1? We can save a lot of
@@ -70,7 +84,7 @@ class Madeam_Model {
    *
    * @var unknown_type
    */
-  protected $fields = array(); // list of arrays to be included when returning result
+  protected $fields = array(); // list of fields to be included when returning result
 
   /**
    * Enter description here...
@@ -91,10 +105,10 @@ class Madeam_Model {
    *
    * @param unknown_type $depth
    */
-  public function __construct($depth = false) {
+  public function __construct($params = array()) {
     // set depth
-    if ($depth !== false) {
-      $this->depth = $depth;
+    if (isset($params['depth'])) {
+      $this->depth = $params['depth'];
     }
 
     // adjust depth
@@ -103,14 +117,19 @@ class Madeam_Model {
       $this->depth --;
     }
 
-    // get class name
-    $modelname = get_class($this);
+    if (isset($params['name'])) {
+      $this->name = $params['name'];
+    } else {
+      // set name
+      $this->name = Madeam_Inflector::modelNameize(substr(get_class($this), 6)); // safely remove "Model_" from the name
+    }
 
-    // set name
-    $this->name = Madeam_Inflector::modelNameize(substr($modelname, 6)); // safely remove "Model_" from the name
+    if (isset($params['resourceName'])) {
+      $this->resourceName = $params['resourceName'];
+    }
 
     // set cache name
-    $this->cacheName .= low($modelname) . '.setup';
+    $this->cacheName .= low($this->name) . '.setup';
 
     // check cache for setup. if cache doesn't exist define it and then save it
     if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1)) {
@@ -145,17 +164,17 @@ class Madeam_Model {
       // pre-load a reflection of this class for use in parseing the meta data and methods
       $this->loadReflection();
 
-      // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
-      $this->loadRelations();
-
-      // pre-load custom fields
-      $this->loadCustomFields();
-
       // load schema
       $this->loadSchema();
 
       // load standard fields
       $this->loadStandardFields();
+
+      // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
+      $this->loadRelations();
+
+      // pre-load custom fields
+      $this->loadCustomFields();
 
       // load validators
       $this->loadValidators();
@@ -185,9 +204,15 @@ class Madeam_Model {
     if (preg_match("/^[A-Z]{1}/", $name, $match) && in_array($name, array_keys($this->setup['hasModels']))) {
       $model = $this->setup['hasModels'][$name]['model'];
       // set model class name
-      $model_class = Madeam_Inflector::modelClassize($model);
+      $modelClass = Madeam_Inflector::modelClassize($model);
+
+      $modelSetup = array(array('depth' => $this->depth, 'name' => $name));
+      if (isset($this->setup['hasModels'][$name]['joinModel'])) {
+        $modelSetup['resourceName'] = $this->setup['hasModels'][$name]['joinModel'];
+      }
+
       // create model instance
-      $inst = new $model_class($this->depth);
+      $inst = new $modelClass($modelSetup);
       $this->$name = $inst;
       // here we pass a reference of this class to the child model
       $this->$name->parent = $this;
@@ -202,6 +227,10 @@ class Madeam_Model {
   final public function loadStandardFields() {
     foreach ($this->setup['schema'] as $field) {
       $this->setup['standardFields'][] = $field['Field'];
+      // set primary key
+      if ($this->primaryKey === false && $field['Key'] == 'PRI') {
+        $this->primaryKey = $field['Field'];
+      }
     }
   }
 
@@ -331,7 +360,11 @@ class Madeam_Model {
     ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
     // set uniqueness
     isset($params['unique']) ? true : $params['unique'] = true;
-    $this->setup['hasAndBelongsToMany'][Madeam_Inflector::modelNameize($model)] = $params;
+    // set relationship name
+    $modelName = array($model, $this->name);
+    asort($modelName);
+    test(implode('', $modelName));
+    $this->setup['hasAndBelongsToMany'][Madeam_Inflector::modelNameize(implode('', $modelName))] = $params;
   }
 
   final protected function addHasOne($model, $params) {
@@ -430,16 +463,9 @@ class Madeam_Model {
    */
   final protected function prepareResults() {
     foreach ($this->setup['customFields'] as $field) {
-      // include all fields if $this->fields is empty
-      if (empty($this->fields)) {
-        //$this->entry[$field] = $this->$field(@$this->entry[$field]);
+      // excludes any fields that aren't in $this->fields
+      if (in_array($field, $this->fields) || empty($this->fields)) {
         $this->entry[$field] = $this->$field();
-      } else {
-        // include only fields that have been listed in the fields list if the list is not empty
-        if (in_array($field, $this->fields)) {
-          //$this->entry[$field] = $this->$field(@$this->entry[$field]); // cool idea to differentiate between custom fields and existing fields -- and handy
-          $this->entry[$field] = $this->$field();
-        }
       }
     }
   }
@@ -457,11 +483,11 @@ class Madeam_Model {
     $parentReflection = new ReflectionClass($parent);
     // check each method to find out whethere it's a new field or not
     // I wish there was a faster way of doing this...
-    $methods = $this->reflection->getMethods(ReflectionMethod::IS_PROTECTED || !ReflectionMethod::IS_FINAL);
+    $methods = $this->reflection->getMethods(ReflectionMethod::IS_PROTECTED);
     foreach ($methods as $method) {
       // get method name
       $methodName = $method->getName();
-      if (substr($methodName, 0, 1) != '_' && $parentReflection->hasMethod($methodName) == false) {
+      if ($parentReflection->hasMethod($methodName) == false) {
         $this->setup['customFields'][] = $methodName;
       }
     }
