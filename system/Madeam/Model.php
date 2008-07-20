@@ -86,6 +86,13 @@ class Madeam_Model {
    */
   protected $fields = array(); // list of fields to be included when returning result
 
+	/**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
+  protected $label = null; // list of fields to be included when returning result
+
   /**
    * Enter description here...
    *
@@ -115,6 +122,10 @@ class Madeam_Model {
     // the depth measures how deep you want the relationships to go.
     if ($this->depth > 0) {
       $this->depth --;
+    }
+    
+    if (isset($params['primaryKey'])) {
+    	$this->primaryKey = $params['primaryKey'];
     }
 
     if (isset($params['name'])) {
@@ -188,6 +199,10 @@ class Madeam_Model {
       }
     }
   }
+  
+  public function __clone() {
+  	$this->depth--;
+  }
 
   /**
    * Handle variable gets.
@@ -208,7 +223,11 @@ class Madeam_Model {
 
       $modelSetup = array(array('depth' => $this->depth, 'name' => $name));
       if (isset($this->setup['hasModels'][$name]['joinModel'])) {
-        $modelSetup['resourceName'] = $this->setup['hasModels'][$name]['joinModel'];
+        //$modelSetup['resourceName'] = $this->setup['hasModels'][$name]['joinModel'];
+      }
+      
+      if (isset($this->setup['hasModels'][$name]['primaryKey'])) {
+        //$modelSetup['primaryKey'] = $this->setup['hasModels'][$name]['primaryKey'];
       }
 
       // create model instance
@@ -355,16 +374,17 @@ class Madeam_Model {
     // set associate's foreign key
     ! isset($params['associateForeignKey']) ? $params['associateForeignKey'] = Madeam_Inflector::modelForeignKey($model) : false;
     // set join model (table in the database that houses both foreign keys)
-    ! isset($params['joinModel']) ? $params['joinModel'] = Madeam_Inflector::modelHabtm($model, $this->name) : false;
+    $joinModels = array($params['model'], $this->name);
+    asort($joinModels);
+    $joinModel = implode($joinModels);
+    ! isset($params['joinModel']) ? $params['joinModel'] = $joinModel : false;
+    // set join resource name
+    $params['joinResourceName'] = Madeam_Inflector::modelHabtm($this->name, $params['model']);    
     // set primary key
     ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
     // set uniqueness
-    isset($params['unique']) ? true : $params['unique'] = true;
-    // set relationship name
-    $modelName = array($model, $this->name);
-    asort($modelName);
-    test(implode('', $modelName));
-    $this->setup['hasAndBelongsToMany'][Madeam_Inflector::modelNameize(implode('', $modelName))] = $params;
+    isset($params['unique']) ? true : $params['unique'] = true;    
+    $this->setup['hasAndBelongsToMany'][$params['model']] = $params;
   }
 
   final protected function addHasOne($model, $params) {
@@ -376,7 +396,7 @@ class Madeam_Model {
     ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
-    $this->setup['hasOne'][Madeam_Inflector::modelNameize($model)] = $params;
+    $this->setup['hasOne'][$params['model']] = $params;
   }
 
   final protected function addHasMany($model, $params) {
@@ -389,7 +409,7 @@ class Madeam_Model {
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     //t($params);
-    $this->setup['hasMany'][Madeam_Inflector::modelNameize($model)] = $params;
+    $this->setup['hasMany'][$params['model']] = $params;
   }
 
   final protected function addBelongsTo($model, $params) {
@@ -401,7 +421,7 @@ class Madeam_Model {
     ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
-    $this->setup['belongsTo'][Madeam_Inflector::modelNameize($model)] = $params;
+    $this->setup['belongsTo'][$params['model']] = $params;
   }
 
   /**
@@ -461,13 +481,15 @@ class Madeam_Model {
    * This is probably a very costly method when calling lots of data. Need to find a way of turning it off when not needed.
    * Or atleast find a faster way of doing it.
    */
-  final protected function prepareResults() {
+  final protected function prepareEntry($entry) {
+  	$this->entry = $entry;
     foreach ($this->setup['customFields'] as $field) {
       // excludes any fields that aren't in $this->fields
       if (in_array($field, $this->fields) || empty($this->fields)) {
-        $this->entry[$field] = $this->$field();
+        $entry[$field] = $this->$field();
       }
     }
+    return $entry;
   }
 
   /**
@@ -547,5 +569,13 @@ class Madeam_Model {
 
   public function getSetup() {
     return $this->setup;
+  }
+  
+  public function getFields() {
+  	return $this->fields;
+  }
+  
+  public function getLabel() {
+  	return $this->label;
   }
 }

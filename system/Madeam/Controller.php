@@ -137,7 +137,7 @@ class Madeam_Controller {
   /**
    * Enter description here...
    *
-   * @param unknown_type $requestGet
+   * @param unknown_type $params
    * @param unknown_type $requestPost
    * @param unknown_type $requestCookie
    * @param unknown_type $requestMethod
@@ -148,13 +148,6 @@ class Madeam_Controller {
       $this->represent = Madeam_Inflector::modelNameize($this->represent);
     }
 
-    // set request information
-    $this->requestGet       = $requestGet;
-    $this->requestPost      = $requestPost;
-    $this->requestCookie    = $requestCookie;
-    $this->requestMethod    = $requestMethod;
-    //$this->requestFiles     = $requestFiles;
-
     // for consideration...
     // combine all request information into a single variable
     $this->params = array_merge($requestGet, $requestPost, $requestCookie);
@@ -164,11 +157,11 @@ class Madeam_Controller {
     $this->scaffoldController = $this->params['controller'];
 
     // set view
-    $this->view($this->params['controller'] . '/' . $this->requestGet['action']);
+    $this->view($this->params['controller'] . '/' . $this->params['action']);
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
-    if (isset($this->requestGet['useLayout']) && ($this->requestGet['useLayout'] == '0' || $this->requestGet['useLayout'] == 'false')) {
+    if (isset($this->params['useLayout']) && ($this->params['useLayout'] == '0' || $this->params['useLayout'] == 'false')) {
       $this->layout(false);
     } else {
       $this->layout($this->layout);
@@ -176,10 +169,10 @@ class Madeam_Controller {
 
     try {
       // create parser instance
-      $parserClassName = 'Parser_' . ucfirst($this->requestGet['format']);
+      $parserClassName = 'Parser_' . ucfirst($this->params['format']);
       $this->parser = new $parserClassName($this);
     } catch (Madeam_Exception_AutoloadFail $e) {
-      Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->requestGet['format'] . '". Missing class <strong>' . $parserClassName . '</strong>'));
+      Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->params['format'] . '". Missing class <strong>' . $parserClassName . '</strong>'));
     }
 
     // set cache name
@@ -220,6 +213,9 @@ class Madeam_Controller {
       if (Madeam_Config::get('cache_controllers') === true) {
         Madeam_Cache::save($this->cacheName, $this->setup, true);
       }
+      
+      // we should be done with the reflection at this point so let's kill it to save memory
+      unset($this->reflection);
     }
   }
 
@@ -300,10 +296,12 @@ class Madeam_Controller {
 
   public function __set($name, $value) {
     if (!preg_match('/^(?:_[A-Z]|[A-Z]){1}/', $name)) {
-      $this->data[] = $name;
-      $this->$name = $value;
-    }
+      $this->data[] = $name;      
+    } 
+    
+    $this->$name = $value;
   }
+  
 
   public function __unset($name) {
     unset($this->data[$name]);
@@ -350,11 +348,11 @@ class Madeam_Controller {
    * @return string
    */
   final public function request($uri, $params) {
-    if (!isset($params['get']))     { $params['get']    = $this->requestGet; }
-    if (!isset($params['post']))    { $params['post']   = $this->requestPost; }
-    if (!isset($params['cookie']))  { $params['cookie'] = $this->requestCookie; }
+    //if (!isset($params['get']))     { $params['get']    = $this->params; }
+    //if (!isset($params['post']))    { $params['post']   = $this->requestPost; }
+    //if (!isset($params['cookie']))  { $params['cookie'] = $this->requestCookie; }
 
-    return Madeam::request($uri, $params['get'], $params['post'], $params['cookie']);
+    return Madeam::request($uri, $params);
   }
 
   /**
@@ -378,7 +376,7 @@ class Madeam_Controller {
     // get partial name
     $partial = explode('/', $partialPath);
     $partialName = array_pop($partial);
-    $partialFile = PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->requestGet['format'];
+    $partialFile = PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->params['format'];
 
     // splice array so that it is within the range defined by $start and $limit
     if ($limit !== false) {
@@ -407,7 +405,7 @@ class Madeam_Controller {
    * @param string $view
    */
   final public function view($view) {
-    $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->requestGet['format'];
+    $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->params['format'];
   }
 
   /**
@@ -419,17 +417,17 @@ class Madeam_Controller {
     $this->layout = array();
     if (func_num_args() < 2) {
       if (is_string($layouts)) {
-        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->requestGet['format'];
+        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->params['format'];
       } elseif (is_array($layouts)) {
         foreach ($layouts as $layout) {
-          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->requestGet['format'];
+          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['format'];
         }
       } else {
         $this->layout = array(false);
       }
     } else {
       foreach (funcget_args() as $layout) {
-        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->requestGet['format'];
+        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['format'];
       }
     }
   }
