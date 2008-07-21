@@ -10,10 +10,11 @@ class Madeam_Parser {
 
   public function getData() {
     $data = array();
+    
     foreach ($this->controller->data as $name) {
       $data[$name] = $this->controller->$name;
     }
-
+    
     return $data;
   }
 

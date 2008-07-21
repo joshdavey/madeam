@@ -20,7 +20,7 @@ class Help_Form extends Help_Html {
   public static function openPost($action = null, $_params = array()) {
     $params = array();
     $params['action'] = Madeam::url($action);
-    $params['id'] = 'form_' . Madeam_Inflector::underscorize($params['action']);
+    $params['id'] = 'form_' . Madeam_Inflector::underscorize($action);
     $params['method'] = 'post';
     $params = array_merge($params, $_params);
     return self::openTag('form', $params);

@@ -20,7 +20,7 @@ class Madeam_Controller {
    *
    * @var unknown_type
    */
-  private $output = null;
+  private $output = false;
 
   /**
    * Enter description here...
@@ -143,15 +143,18 @@ class Madeam_Controller {
    * @param unknown_type $requestMethod
    */
   public function __construct($requestGet = array(), $requestPost = array(), $requestCookie = array(), $requestMethod = 'GET') {
-    // load represented model
-    if (is_string($this->represent)) {
-      $this->represent = Madeam_Inflector::modelNameize($this->represent);
-    }
-
     // for consideration...
     // combine all request information into a single variable
     $this->params = array_merge($requestGet, $requestPost, $requestCookie);
     $this->params['method'] = $requestMethod;
+    
+    // set resource the controller represents
+    if (is_string($this->represent)) {
+      $this->represent = Madeam_Inflector::modelNameize($this->represent);
+    } else {
+    	$represent = explode('/', $this->params['controller']);
+    	$this->represent = Madeam_Inflector::modelNameize(array_pop($represent));
+    }
 
     // scaffold config
     $this->scaffoldController = $this->params['controller'];
@@ -284,7 +287,7 @@ class Madeam_Controller {
       return $component;
     }
 
-    return false;
+		return false;
   }
 
   public function __call($name, $args) {
@@ -348,10 +351,6 @@ class Madeam_Controller {
    * @return string
    */
   final public function request($uri, $params) {
-    //if (!isset($params['get']))     { $params['get']    = $this->params; }
-    //if (!isset($params['post']))    { $params['post']   = $this->requestPost; }
-    //if (!isset($params['cookie']))  { $params['cookie'] = $this->requestCookie; }
-
     return Madeam::request($uri, $params);
   }
 
@@ -439,47 +438,49 @@ class Madeam_Controller {
    * @return unknown
    */
   final public function render($data = true) {
-    if ($data !== false) {
-
-      if (!is_string($data)) {
-        if (file_exists($this->view)) {
-          // pass params to view -- but only if the view exists
-          $this->data[] = 'params';
-
-          // render the view
-          $this->parser->renderView();
-        } else {
-          if (isset($this->{Madeam_Inflector::singalize($this->params['controller'])})) {
-            $this->data[Madeam_Inflector::singalize($this->params['controller'])] = $this->{Madeam_Inflector::singalize($this->params['controller'])};
-          } elseif (isset($this->{Madeam_Inflector::pluralize($this->params['controller'])})) {
-            $this->data[Madeam_Inflector::pluralize($this->params['controller'])] = $this->{Madeam_Inflector::pluralize($this->params['controller'])};
-          }
-
-          $this->parser->missingView();
-        }
-
-      } else {
-        // render a regular text string
-        $this->parser->output = $data;
-      }
-
-      foreach ($this->layout as $layoutFile) {
-        if ($layoutFile) {
-          if (file_exists($layoutFile)) {
-            // include layout if it exists
-            $this->parser->renderLayout($layoutFile);
-          } else {
-            $this->parser->missingLayout($layoutFile);
-          }
-        }
-      }
-
-
-      // set final output
-      $this->output = $this->parser->output;
-    } else {
-      // set final output as null
-      $this->output = null;
+  	if ($this->output === false) {
+	    if ($data !== false) {
+	    	
+	      if (!is_string($data)) {
+	      	
+	        if (file_exists($this->view)) {
+	          // pass params to view -- but only if the view exists
+	          $this->data[] = 'params';
+	          
+	          // render the view
+	          $this->parser->renderView();
+	        } else {	        	
+	        	if (in_array(Madeam_Inflector::pluralize(low($this->represent)), $this->data)) {
+	        		$this->data = array(Madeam_Inflector::pluralize(low($this->represent)));
+	        	} elseif (in_array(Madeam_Inflector::singalize(low($this->represent)), $this->data)) {
+	        		$this->data = array(Madeam_Inflector::singalize(low($this->represent)));
+	        	}
+	        	
+	          $this->parser->missingView();
+	        }
+	
+	      } else {
+	        // render a regular text string
+	        $this->parser->output = $data;
+	      }
+	
+	      foreach ($this->layout as $layoutFile) {
+	        if ($layoutFile) {
+	          if (file_exists($layoutFile)) {
+	            // include layout if it exists
+	            $this->parser->renderLayout($layoutFile);
+	          } else {
+	            $this->parser->missingLayout($layoutFile);
+	          }
+	        }
+	      }
+	
+	      // set final output
+	      $this->output = $this->parser->output;
+	    } else {
+	      // set final output as null
+	      $this->output = null;
+	    }
     }
 
     return true;

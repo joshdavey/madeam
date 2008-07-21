@@ -450,9 +450,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // reset all sql values and data
     $this->reset();
 
-    // validation callbacks
-    $this->callback('beforeValidation');
-    $this->callback('afterValidation');
+    // Validate callbacks
+    $this->callback('beforeValidate');
+    $this->callback('afterValidate');
 
     // before delete callback
     $this->callback('beforeDelete');
@@ -504,15 +504,15 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // unset duplicate of this model to save on sweet sweet memory
     unset($inst);
 
-    // before validation callback
-    $this->callback('beforeValidation');
+    // before Validate callback
+    $this->callback('beforeValidate');
 
     // validate data
     ////$this->load_validators();
     $this->validateEntry($update);
 
-    // after validation callback
-    $this->callback('afterValidation');
+    // after Validate callback
+    $this->callback('afterValidate');
     // now that all the callbacks prior to updating/adding the new row have been called
     // we must check for any errors that may have been envoked.
     // if there aren't any then continue as usual.

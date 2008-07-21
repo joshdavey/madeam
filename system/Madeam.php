@@ -111,7 +111,7 @@ class Madeam {
 
     try {
       // create controller instance
-      $controller = new $controllerClass($params, $requestPost, $requestCookie, $_SERVER['REQUEST_METHOD']);
+      $controller = new $controllerClass($params, $requestPost, $requestCookie, $params['method']);
     } catch(Madeam_Exception_AutoloadFail $e) {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
         $view = $params['controller'] . '/' . $params['action'];

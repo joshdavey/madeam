@@ -438,14 +438,13 @@ class Madeam_Model {
   final protected function validateEntry($check_non_existent_fields = false) {
     foreach ($this->setup['validators'] as $validator) {
       $field = $validator['args']['field'];
-      $method = 'validate' . ucfirst($validator['method']);
+      $method = $validator['method'];
       $error_key = $this->name . MADEAM_ASSOCIATION_JOINT . $field;
-      // testing new Validation class
-      //test('Valid? ' . Madeam_Validate::$method($this->entry[$field], $args));
+      
       // validate to make sure the validating method doesn't return false. If it does then save the error
       if ($check_non_existent_fields === false || isset($this->entry[$field])) {
-        if ($this->$method(@$this->entry[$field], $validator['args']) === false) {
-          $this->session->error($error_key, $this->parseValidateMessage($validator['args']));
+        if (Madeam_Validate::$method(@$this->entry[$field], $validator['args']) === false) {
+          Madeam_Session::error($error_key, $this->parseValidateMessage($validator['args']));
           //$_SESSION[MADEAM_MADEAM_USER_ERROR_NAME][$error_key][] = $this->parseValidateMessage($validator['args']);
         }
       }
