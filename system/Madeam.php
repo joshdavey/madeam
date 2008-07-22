@@ -27,7 +27,7 @@ class Madeam {
     // include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
 
     // set layout if it hasn't already been set
-    if (!isset($_GET['useLayout'])) { $_GET['useLayout'] = 1;  }
+    if (!isset($_GET['useLayout'])) { $_GET['useLayout'] = 1; }
 
     // call controller action
     $output = Madeam::request(Madeam_Router::getCurrentURI(), $_GET, $_POST, $_COOKIE);
