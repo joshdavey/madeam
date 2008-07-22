@@ -294,6 +294,15 @@ class Madeam_Controller {
     if (! file_exists($this->view)) {
       throw new Madeam_Exception_MissingAction('Missing Action <strong>' . substr($name, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
       . "\n Create a view called <strong>" . substr($name, 0, -6) . ".html</strong> OR Create a method called <strong>$name</strong>");
+    } else {
+    	// =============================================
+    	// testing idea!
+    	// set param values as variables when accessing views that don't have actions
+    	// means you can do $name instead of $params['name']
+    	// =============================================
+    	foreach ($this->params as $param => $value) {
+    		$this->$param = $value;
+    	}
     }
   }
 
