@@ -56,7 +56,8 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
           $name = $match[1];
           if (isset($params[$name])) {
             //$mini_exp[] = '(?:\\/(?P<' . $name . '>' . $params[$name] . '){1})';
-            $mini_exp[] = '(?:\\/(' . $params[$name] . '){1})';
+            //$mini_exp[] = '(?:\\/(' . $params[$name] . '){1})';
+            $mini_exp[] = '(?:\\/(' . $params[$name] . '))';
           } else {
             //$mini_exp[] = '(?:\\/(?P<' . $name . '>' . '[^\/]+))?';
             $mini_exp[] = '(?:\\/([^\/]+))?';
@@ -168,7 +169,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     // get params from uri
     $params = array_merge($params, $gets);
     // automagically disable the layout when making an AJAX call
-    if (! Madeam_Config::get('enable_ajax_layout') && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+    if (!isset($params['useLayout']) && !Madeam_Config::get('enable_ajax_layout') && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
       $params['useLayout'] = '0';
     }
 
@@ -179,7 +180,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     ! isset($params['controller']) || $params['controller'] == null ? $params['controller'] = Madeam_Config::get('default_controller') : false;
     ! isset($params['action']) || $params['action'] == null ? $params['action'] = Madeam_Config::get('default_action') : false;
     ! isset($params['useLayout']) || $params['useLayout'] == null ? $params['useLayout'] = '0' : false;
-    ! isset($params['method']) || $params['method'] == null ? $params['method'] = $_SERVER['REQUEST_METHOD'] : false;
+    ! isset($params['method']) || $params['method'] == null ? $params['method'] = low($_SERVER['REQUEST_METHOD']) : false;
     ! isset($format) || $format == null ? $params['format'] = Madeam_Config::get('default_format') : $params['format'] = $format;
 
     return $params;

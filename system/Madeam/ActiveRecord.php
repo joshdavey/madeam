@@ -263,11 +263,19 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $results = $link->fetchAll(PDO::FETCH_ASSOC);
 		
 		$foreignKeyValues = array();
+		$belongsToForeignKeys = array();
     foreach ($results as $result) {
-      $this->data[] = $this->entry = $this->prepareEntry($result);
-      $foreignKeyValues[] = $this->entry[$this->primaryKey];
+    	$this->entry = $this->prepareEntry($result);
+      $this->data[] = $this->entry;
+      $foreignKeyValues[] = $this->entry[$this->primaryKey];      
+      
+      foreach ($this->setup['belongsTo'] as $model => $params) {
+      	if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+      		$belongsToForeignKeys[$params['model']][] = $result[$params['foreignKey']];
+    		}
+    	}
     }
-
+    
     // find related content
     if ($this->depth > 0) {
       // find hasOnes
@@ -280,7 +288,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
           $hasOne = $tempmodel->in($params['foreignKey'], $foreignKeyValues)->findAll();
           unset($tempmodel);
           
-          $this->combineDataOnKeys($this->data, $this->primaryKey, $hasOne, $params['foreignKey'], Madeam_Inflector::pluralize($model)); 
+          $this->combineSingleDataOnKeys($this->data, $this->primaryKey, $hasOne, $params['foreignKey'], Madeam_Inflector::singalize($model));
         }
       }
 
@@ -293,10 +301,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
           // change the model name because we can't always assume that the name will be the same.
           // An example of this is when you create a self-refrencing relationship in a table and name the relationship "sub_model" or "parent_model"
           $tempmodel->name = $params['model'];
-          $belongTo = $tempmodel->in($params['foreignKey'], $foreignKeyValues)->findAll();
+          $belongTo = $tempmodel->in($params['primaryKey'], array_unique($belongsToForeignKeys[$params['model']]))->findAll();
           unset($tempmodel);
           
-          $this->combineDataOnKeys($this->data, $this->primaryKey, $belongTo, $params['foreignKey'], Madeam_Inflector::pluralize($model)); 
+          $this->combineSingleDataOnKeys($this->data, $params['foreignKey'], $belongTo, $params['primaryKey'], Madeam_Inflector::singalize($model)); 
         }
       }
 
@@ -343,6 +351,17 @@ class Madeam_ActiveRecord extends Madeam_Model {
     return $data;
   }
   
+  
+  private function combineSingleDataOnKeys(&$result1Data, $result1Key, &$result2Data, $result2Key, $combineKey) {
+  	foreach ($result1Data as &$entry) {
+    	foreach ($result2Data as $key => &$result) {
+    		if ($entry[$result1Key] === $result[$result2Key]) {
+    			$entry[$combineKey] = $result;
+    		}
+  		}
+    }        
+    unset($entry);
+	}
   
   private function combineDataOnKeys(&$result1Data, $result1Key, &$result2Data, $result2Key, $combineKey) {
   	foreach ($result1Data as &$entry) {
@@ -423,8 +442,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // set where
     if ($this->entryId != - 1 && $this->primaryKey != false) {
-      $table = $this->setup['resourceName'];
-      $this->where("$table.$this->primaryKey = '$id'");
+      $this->where("$this->name.$this->primaryKey = '$id'");
     }
 
     // set limit
