@@ -928,7 +928,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @param string $conditions
    */
-  final public function where($conditions) {
+  final public function where2($conditions) {
     if ($this->_sqlWhere != 1) {
       // if a WHERE statement already exists then the new statement is appended to the old with an AND operator
       $this->_sqlWhere .= ' AND (' . $conditions . ')';
@@ -938,6 +938,35 @@ class Madeam_ActiveRecord extends Madeam_Model {
     }
 
     return $this;
+  }
+  
+  final public function where() {
+  	$conditions = func_get_args();
+  	
+  	$this->_sqlWhere = null;
+  	
+  	test($conditions);
+  	
+  	foreach ($conditions as $field => $value) {
+  		test($value);  		
+  		if (is_array($value) && is_integer($field)) {
+  			$this->_sqlWhere .= ' (';
+  			test();
+  			foreach ($value as $fields => $values) {
+  				$this->_sqlWhere .= $fields . ' = ' . $values;
+  			}
+  			
+  			$this->_sqlWhere .= ') ';
+			} elseif (is_array($value)) {
+				$this->_sqlWhere .= $field . ' in ' . implode(',', $value);
+			} elseif (is_integer($field) && in_array($value, array('or', 'and'))) {
+				$this->_sqlWhere .= ' ' . $value . ' ';
+  		} else {
+  			$this->_sqlWhere .= $field . ' = ' . $value;
+  		}
+  	}
+  	
+  	return $this;
   }
 
   final public function in($field, $values) {

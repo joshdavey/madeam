@@ -193,14 +193,13 @@ class Madeam_Controller {
       // check methods for callbacks
       $methods = $this->reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
       foreach ($methods as $method) {
-        // callback properties (name, include, exclude)
-        $callback = array();
-
-        // set callback method name
-        $callback['name'] = $method->getName();
-
         $matches = array();
         if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {
+					// callback properties (name, include, exclude)
+	        $callback = array();
+	
+	        // set callback method name
+	        $callback['name'] = $method->getName();
 
           $parameters = $method->getParameters();
           foreach ($parameters as $parameter) {
@@ -209,9 +208,23 @@ class Madeam_Controller {
           }
 
           $this->setup[$matches[1]][] = $callback;
+        } elseif (preg_match('/^[a-zA-Z0-9]*Action?/', $method->getName(), $matches)) {
+        	$action = array();
+        	
+          $parameters = $method->getParameters();
+          foreach ($parameters as $parameter) {
+            // set parameters of callback (parameters in methods act as meta data for callbacks)
+            if ($parameter->isDefaultValueAvailable()) {
+            	$action[$parameter->getName()] = $parameter->getDefaultValue();
+          	} else {
+          		$action[$parameter->getName()] = null;
+          	}
+          }
+          
+          $this->setup[$matches[0]] = $action;
         }
       }
-
+      
       // save cache
       if (Madeam_Config::get('cache_controllers') === true) {
         Madeam_Cache::save($this->cacheName, $this->setup, true);
@@ -326,7 +339,20 @@ class Madeam_Controller {
 
     // action
     $action = Madeam_Inflector::camelize($this->params['action']) . 'Action';
-    $this->$action();
+    //$this->$action();
+    
+    $params = array();
+    foreach ($this->setup[$action] as $param => $value) {
+    	if (isset($this->params[$param])) {
+    		$params[] = "\$this->params['$param']";
+    	} else {
+    		$params[] = "\$this->setup['$action']['$param']";
+    	}
+    }
+    
+    if (preg_match('/[a-zA-Z_]*/', $action)) {
+    	eval('$this->' . $action . "(" . implode(',', $params) . ");");
+  	}
 
     // beforeRender callbacks
     $this->callback('beforeRender');
