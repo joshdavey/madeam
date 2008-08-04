@@ -342,12 +342,14 @@ class Madeam_Controller {
     //$this->$action();
     
     $params = array();
-    foreach ($this->setup[$action] as $param => $value) {
-    	if (isset($this->params[$param])) {
-    		$params[] = "\$this->params['$param']";
-    	} else {
-    		$params[] = "\$this->setup['$action']['$param']";
-    	}
+    if (isset($this->setup[$action])) {      
+      foreach ($this->setup[$action] as $param => $value) {
+      	if (isset($this->params[$param])) {
+      		$params[] = "\$this->params['$param']";
+      	} else {
+      		$params[] = "\$this->setup['$action']['$param']";
+      	}
+      }
     }
     
     if (preg_match('/[a-zA-Z_]*/', $action)) {
