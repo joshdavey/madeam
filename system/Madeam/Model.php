@@ -166,10 +166,19 @@ class Madeam_Model {
       $this->setup['afterDelete'] = array();
 
       // set resourceName
+      // the resourceName parameter is available for the developer to change the resource name in
+      // the model definition but $this->setup['resourceName'] is used through this class because it is cached
       if ($this->resourceName == null) {
         $this->setup['resourceName'] = Madeam_Inflector::modelTableize($this->name);
       } else {
         $this->setup['resourceName'] = $this->resourceName;
+      }
+      
+      // set primaryKey
+      // the primaryKey parameter is available for the developer to change the primary key in
+      // the model definition but $this->setup['primaryKey'] is used through this class because it is cached
+      if ($this->primaryKey !== false) {
+      	$this->setup['primaryKey'] = $this->primaryKey;
       }
 
       // pre-load a reflection of this class for use in parseing the meta data and methods
@@ -247,8 +256,8 @@ class Madeam_Model {
     foreach ($this->setup['schema'] as $field) {
       $this->setup['standardFields'][] = $field['Field'];
       // set primary key
-      if ($this->primaryKey === false && $field['Key'] == 'PRI') {
-        $this->primaryKey = $field['Field'];
+      if ($field['Key'] == 'PRI' && $this->setup['primaryKey'] === false) {
+        $this->setup['primaryKey'] = $field['Field'];
       }
     }
   }
@@ -381,7 +390,7 @@ class Madeam_Model {
     // set join resource name
     $params['joinResourceName'] = Madeam_Inflector::modelHabtm($this->name, $params['model']);    
     // set primary key
-    ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
+    ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->setup['primaryKey'] : false;
     // set uniqueness
     isset($params['unique']) ? true : $params['unique'] = true;    
     $this->setup['hasAndBelongsToMany'][$params['model']] = $params;
@@ -393,7 +402,7 @@ class Madeam_Model {
     // set the model name
     ! isset($params['model']) ? $params['model'] = Madeam_Inflector::modelNameize($model) : $params['model'] = Madeam_Inflector::modelNameize($params['model']);
     // set primary key
-    ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
+    ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->setup['primaryKey'] : false;
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     $this->setup['hasOne'][$params['model']] = $params;
@@ -405,7 +414,7 @@ class Madeam_Model {
     // set the model name
     ! isset($params['model']) ? $params['model'] = Madeam_Inflector::modelNameize($model) : $params['model'] = Madeam_Inflector::modelNameize($params['model']);
     // set primary key
-    ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
+    ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->setup['primaryKey'] : false;
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     //t($params);
@@ -418,7 +427,7 @@ class Madeam_Model {
     // set the model name
     ! isset($params['model']) ? $params['model'] = Madeam_Inflector::modelNameize($model) : $params['model'] = Madeam_Inflector::modelNameize($params['model']);
     // set primary key
-    ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->primaryKey : false;
+    ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->setup['primaryKey'] : false;
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     $this->setup['belongsTo'][$params['model']] = $params;
@@ -563,7 +572,7 @@ class Madeam_Model {
    * =======================================================================
    */
   public function getPrimaryKey() {
-    return $this->primaryKey;
+    return $this->setup['primaryKey'];
   }
 
   public function getSetup() {

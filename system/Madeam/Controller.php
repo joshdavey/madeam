@@ -208,7 +208,10 @@ class Madeam_Controller {
           }
 
           $this->setup[$matches[1]][] = $callback;
+          
         } elseif (preg_match('/^[a-zA-Z0-9]*Action?/', $method->getName(), $matches)) {
+        	// for each action we save it's arguments and map them to http params
+        	
         	$action = array();
         	
           $parameters = $method->getParameters();
