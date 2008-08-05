@@ -898,7 +898,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 			} elseif (is_integer($field)) {
 				// when the field is an integer and none of the above conditions are met we assume
 				// that this condition is written by the user and doesn't need madeam's help
-				$condition .= ' (' . $field . ') ';
+				$condition .= ' (' . $value . ') ';
   		} else {
   			$x = strstr($field, ' ');
   			if ($x == null && !is_array($value)) {
