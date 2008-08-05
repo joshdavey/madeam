@@ -285,7 +285,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
           // clone object so we don't interupt it's state with reset()
           $tempmodel = clone $this->{$params['model']};
           $tempmodel->name = $params['model'];
-          //$hasOne = $tempmodel->in($params['foreignKey'], $foreignKeyValues)->findAll();
           $hasOne = $tempmodel->where(array($params['model'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
           unset($tempmodel);
           
@@ -302,7 +301,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
           // change the model name because we can't always assume that the name will be the same.
           // An example of this is when you create a self-refrencing relationship in a table and name the relationship "sub_model" or "parent_model"
           $tempmodel->name = $params['model'];
-          //$belongTo = $tempmodel->in($params['primaryKey'], array_unique($belongsToForeignKeys[$params['model']]))->findAll();
           $belongTo = $tempmodel->where(array($params['model'] . '.' . $params['primaryKey'] => array_unique($belongsToForeignKeys[$params['model']])))->findAll();
           unset($tempmodel);
           
@@ -317,7 +315,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
           // clone object so we don't interupt it's state with reset()
           $tempmodel = clone $this->{$params['model']};
           $tempmodel->name = $params['model'];
-          //$hasMany = $tempmodel->in($params['model'] . '.' . $params['foreignKey'], $foreignKeyValues)->findAll();
           $hasMany = $tempmodel->where(array($params['model'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
           unset($tempmodel);
             
@@ -329,7 +326,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
       foreach ($this->setup['hasAndBelongsToMany'] as $model => $params) {
         if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
           $tempmodel = clone $this->{$params['model']}; // user model
-          //$habtm = $tempmodel->join($this->name)->in($params['joinModel'] . '.' . $params['foreignKey'], $foreignKeyValues)->findAll();
           $habtm = $tempmodel->join($this->name)->where(array($params['joinModel'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
           unset($tempmodel);
           
@@ -869,29 +865,26 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * Query Modifiers
    * =======================================================================
    */
+   
   /**
-   * Appends WHERE clauses to the WHERE statement
+   * Creates WHERE statement
    *
-   * @param string $conditions
+   * @param array $conditions
    */
-  final public function where2($conditions) {
-    if ($this->_sqlWhere != 1) {
-      // if a WHERE statement already exists then the new statement is appended to the old with an AND operator
-      $this->_sqlWhere .= ' AND (' . $conditions . ')';
-    } else {
-      // otherwise a new condition is added and replaces the default of "1"
-      $this->_sqlWhere = '(' . $conditions . ')';
-    }
-
-    return $this;
-  }
-  
   final public function where() {
   	$conditions = func_get_args();  	
   	$this->_sqlWhere = $this->_conditions($conditions);
   	return $this;
   }
   
+  
+  /**
+	 * Generates sql conditions
+	 * Note - should try using pdo's prepared statements instead of escaping input 
+	 * with the quote method
+	 * 
+	 * @return string
+	 */
   private function _conditions($conditions) {
   	$condition = null;
   	
@@ -908,34 +901,23 @@ class Madeam_ActiveRecord extends Madeam_Model {
   		} else {
   			$x = strstr($field, ' ');
   			if ($x == null && !is_array($value)) {
-  				$condition .= $field . ' = ';  				
+  				$condition .= $field . ' = ';
 				} else {
 					$condition .= $field . ' ';
 				}
 				
-				if (is_integer($value)) {
-					// if the value is an integer it doesn't need quotes
-					$condition .= $value;
-				} elseif (is_array($value)) {
-					// when the value is an array we assume the user is trying to 
+				if (is_array($value)) {
+					// when the value is an array we assume the user is trying to do an "IN" comparison
 					$condition .= ' in (' . implode(',', $value) . ')';
 				} else {
 					// if the value didn't match any of the above conditions then it must be a string
 					// and therefore needs quotes
-					$condition .= "'" . $value . "'";
+					$condition .= self::$_pdo[$this->server]->quote($value);
 				}
   		}
   	}
   	
   	return $condition;
-  }
-
-  final public function in($field, $values) {
-    if (! empty($values)) {
-      $sql = "$field IN ('" . implode("','", $values) . "')";
-      $this->where($sql);
-    }
-    return $this;
   }
 
   /**
