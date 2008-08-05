@@ -20,7 +20,7 @@ class Madeam_Model {
    *
    * @var unknown_type
    */
-  public $resourceName = null;
+  public $resourceName = false;
 
   /**
    * Enter description here...
@@ -231,13 +231,6 @@ class Madeam_Model {
       $modelClass = Madeam_Inflector::modelClassize($model);
 
       $modelSetup = array(array('depth' => $this->depth, 'name' => $name));
-      if (isset($this->setup['hasModels'][$name]['joinModel'])) {
-        //$modelSetup['resourceName'] = $this->setup['hasModels'][$name]['joinModel'];
-      }
-      
-      if (isset($this->setup['hasModels'][$name]['primaryKey'])) {
-        //$modelSetup['primaryKey'] = $this->setup['hasModels'][$name]['primaryKey'];
-      }
 
       // create model instance
       $inst = new $modelClass($modelSetup);
@@ -256,7 +249,7 @@ class Madeam_Model {
     foreach ($this->setup['schema'] as $field) {
       $this->setup['standardFields'][] = $field['Field'];
       // set primary key
-      if ($field['Key'] == 'PRI' && $this->setup['primaryKey'] === false) {
+      if ($field['Key'] == 'PRI' && !isset($this->setup['primaryKey'])) {
         $this->setup['primaryKey'] = $field['Field'];
       }
     }

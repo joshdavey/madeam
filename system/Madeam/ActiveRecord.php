@@ -442,7 +442,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // set where
     if ($this->entryId != - 1 && $this->setup['primaryKey'] != false) {
-      $this->where("$this->name.$this->setup['primaryKey'] = '$id'");
+      $this->where(array($this->name . '.' . $this->setup['primaryKey'] => $id));
     }
 
     // set limit
