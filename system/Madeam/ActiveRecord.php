@@ -794,11 +794,12 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if (empty($this->fields)) {
       $sets = array();
       foreach ($this->data as $field => $value) {
-        $sets[] = "$field = '$value'"; // hack! what about SQL functions and Integers?
+        $sets[] = "$field = " . self::$_pdo[$this->server]->quote($value);
       }
     } else {
       foreach ($this->fields as $field) {
-        $sets[] = "$field = '$this->data[$field]"; // hack! what about SQL functions and Integers?
+        $sets[] = "$field = " . self::$_pdo[$this->server]->quote($this->data[$field]);
+        
       }
     }
     // add fields
