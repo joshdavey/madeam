@@ -15,7 +15,40 @@
  */
 class Madeam {
 
-  public static $version = '0.0.6';
+	/**
+	 * version of madeam
+	 */
+  const version = '0.0.6';  
+  
+  /**
+	 * define user errors variable name for $_SESSION
+	 * example: $_SESSION[MADEAM_USER_ERROR_NAME];
+	 */
+  const user_error_name = 'muerrors';  
+  
+  /**
+	 * this is used for passing misc data from one page to the other
+	 */
+  const flash_data_name	= 'mflash';
+  
+  // this sets how many pages the flash has to live (ptl: pages to live)
+  /**
+	 * this sets how many pages the flash has to live (ptl: pages to live)
+	 */
+  const flash_life_name	= 'mflife';
+  
+	/**
+	 * this is used for passing post data from one page to the next
+	 * the post data is merged with the flash post data on the next page
+	 */
+  const flash_post_name	= 'mfpost';
+  
+	/**
+	 * Used for joining models and other associations
+	 * example use: "user.name"
+	 */
+  const association_joint	= '.';
+  
 
   /**
    * dispatches all operations to controller specified by uri
@@ -25,6 +58,19 @@ class Madeam {
   public static function dispatch() {
     // call user front controller?
     // include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
+    
+    
+		// include routes
+		// check cache for routes
+		if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1) && Madeam_Config::get('cache_routes')) {
+		  // include routes configuration
+		  require PATH_TO_APP . 'Config' . DS . 'routes.php';
+		
+		  // save routes to cache
+		  if (Madeam_Config::get('cache_routes')) {
+		    Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
+		  }
+		}
 
     // set layout if it hasn't already been set
     if (!isset($_GET['useLayout'])) { $_GET['useLayout'] = 1; }
@@ -33,20 +79,20 @@ class Madeam {
     $output = Madeam::request(Madeam_Router::getCurrentURI(), $_GET, $_POST, $_COOKIE);
 
     // destroy user error notices
-    if (isset($_SESSION[MADEAM_USER_ERROR_NAME])) {
-      unset($_SESSION[MADEAM_USER_ERROR_NAME]);
+    if (isset($_SESSION[self::user_error_name])) {
+      unset($_SESSION[self::user_error_name]);
     }
 
     // destroy flash data when it's life runs out
-    if (isset($_SESSION[MADEAM_FLASH_LIFE_NAME])) {
-      if (-- $_SESSION[MADEAM_FLASH_LIFE_NAME] < 1) {
-        unset($_SESSION[MADEAM_FLASH_LIFE_NAME]);
-        if (isset($_SESSION[MADEAM_FLASH_DATA_NAME])) {
-          unset($_SESSION[MADEAM_FLASH_DATA_NAME]);
+    if (isset($_SESSION[self::flash_life_name])) {
+      if (-- $_SESSION[self::flash_life_name] < 1) {
+        unset($_SESSION[self::flash_life_name]);
+        if (isset($_SESSION[self::flash_data_name])) {
+          unset($_SESSION[self::flash_data_name]);
         }
       } else {
-        if (isset($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME])) {
-          $_POST = array_merge($_SESSION[MADEAM_FLASH_DATA_NAME][MADEAM_FLASH_POST_NAME], $_POST);
+        if (isset($_SESSION[self::flash_data_name][self::flash_data_name])) {
+          $_POST = array_merge($_SESSION[self::flash_data_name][self::flash_post_name], $_POST);
           $_SERVER['REQUEST_METHOD'] = 'POST';
         }
       }
@@ -185,6 +231,21 @@ class Madeam {
       }
     }
     return $url;
+  }
+  
+  public static function autoload($class) {
+  	// set class file name
+	  $file = str_replace('_', DS, $class) . '.php';
+	  // include class file
+	  if (file_lives($file)) {
+	    require $file;
+	  }
+	
+	  if (! class_exists($class, false) && ! interface_exists($class, false)) {
+	    $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
+	    eval("class $class {}");
+	    throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
+	  }
   }
 
   /**

@@ -144,13 +144,13 @@ class Madeam_ActiveRecord extends Madeam_Model {
   public function __call($name, $args) {
     $match = array();
     if (preg_match("/^find([a-zA-Z]+)By_(.*)/", $name, $match)) {
-      $this->where($match[2] . " = '$args[0]'");
+      $this->where(array($this->name . '.' . $match[2] => $args[0]));
       $function = 'find' . $match[1];
       if (method_exists($this, $function)) {
         return $this->$function();
       }
     } elseif (preg_match("/^deleteBy_(.*)/", $name, $match)) {
-      $this->where($match[2] . " = '$args[0]'");
+      $this->where(array($this->name . '.' . $match[2] => $args[0]));
       $this->delete();
     } else {
       $backtrace = debug_backtrace();
@@ -170,7 +170,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @param string $sql
    * @return resource
    */
-  final public function execute($sql, $returnAs = 'array') {
+  final public function execute($sql) {
       try {
         // if we connect here we don't need to connect to the database until we execute a query
         // therefore if all we're doing is loading a cached page we won't need a database connection
@@ -182,7 +182,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
           // set PDO string
           $pdoString = "$server[driver]:dbname=$server[name];host=$server[host]";
-
+          
           // create database connection
           self::$_pdo[$this->server] = new PDO($pdoString, $server['user'], $server['pass']);
 
@@ -251,10 +251,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // if this is a child model then filter the results to make sure they are related to this model's parent
     // this stuff is for when chaining models like:
-    // $this->article->findOne(32, true)->comment->findAll();
-    // where article is the parent of comment
+    // $this->Srticle->findOne(32, true)->Comment->findAll();
+    // where Article is the parent of Comment
     if ($this->parent && $this->_sqlWhere == '1') {
-      $this->where($this->parent->setup['hasModels'][$this->name]['foreignKey'] . " = '" . $this->parent->entry[$this->parent->setup['hasModels'][$this->name]['primaryKey']] . "'");
+      $this->where(array($this->name . '.' . $this->parent->setup['hasModels'][$this->name]['foreignKey'] => $this->parent->entry[$this->parent->setup['hasModels'][$this->name]['primaryKey']]));
     }
 		
     // build select query and set resource link
@@ -535,7 +535,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // we must check for any errors that may have been envoked.
     // if there aren't any then continue as usual.
     // if not then skip adding/updating
-    if (! isset($_SESSION[MADEAM_USER_ERROR_NAME]) || count($_SESSION[MADEAM_USER_ERROR_NAME]) < 1) {
+    if (! isset($_SESSION[Madeam::user_error_name]) || count($_SESSION[Madeam::user_error_name]) < 1) {
       // do standard field formats
       $this->standardFieldFormats();
 
@@ -794,11 +794,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if (empty($this->fields)) {
       $sets = array();
       foreach ($this->data as $field => $value) {
-        $sets[] = "$field = " . self::$_pdo[$this->server]->quote($value);
+        $sets[] = "$field = " . Madeam_Sanitize::escape($value);
       }
     } else {
       foreach ($this->fields as $field) {
-        $sets[] = "$field = " . self::$_pdo[$this->server]->quote($this->data[$field]);
+        $sets[] = "$field = " . Madeam_Sanitize::escape($this->data[$field]);
         
       }
     }
@@ -908,12 +908,14 @@ class Madeam_ActiveRecord extends Madeam_Model {
 				}
 				
 				if (is_array($value)) {
-					// when the value is an array we assume the user is trying to do an "IN" comparison
-					$condition .= ' in (' . implode(',', $value) . ')';
+					if (!empty($value)) {
+						// when the value is an array we assume the user is trying to do an "IN" comparison
+						$condition .= ' in (' . implode(',', $value) . ')';
+					}
 				} else {
 					// if the value didn't match any of the above conditions then it must be a string
 					// and therefore needs quotes
-					$condition .= self::$_pdo[$this->server]->quote($value);
+					$condition .= "'" . Madeam_Sanitize::escape($value) . "'";
 				}
   		}
   	}
@@ -992,15 +994,15 @@ class Madeam_ActiveRecord extends Madeam_Model {
         $fk = $this->setup['hasModels'][$model]['foreignKey'];
         // I wish there was a better way to do this...
         // make the user type in more info?
-        $foreignTable = $this->$model->resourceName;
-        $foreignPk = $this->$model->primaryKey;
+        $foreignTable = $this->$model->setup['resourceName'];
+        $foreignPk = $this->$model->setup['primaryKey'];
         $on = "$table.$fk = $foreignTable.$foreignPk";
-        $this->_sqlJoins[$model] = array('table' => $this->$model->resourceName, 'on' => $on);
+        $this->_sqlJoins[$model] = array('table' => $this->$model->setup['resourceName'], 'on' => $on);
       } else {
         $this->_sqlJoins[$model] = array('table' => $table, 'on' => $on);
       }
     } else {
-      $this->_sqlJoins[$model] = array('table' => $this->$model->resourceName, 'on' => $on);
+      $this->_sqlJoins[$model] = array('table' => $this->$model->setup['resourceName'], 'on' => $on);
     }
     return $this;
   }

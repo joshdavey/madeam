@@ -182,7 +182,7 @@ class Madeam_Controller {
     $this->cacheName .= low(get_class($this)) . '.setup';
 
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1)) {
+    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1) && Madeam_Config::get('cache_controllers')) {
 
       // define callbacks
       $this->setup['beforeFilter'] = $this->setup['beforeRender'] = $this->setup['afterRender'] = array();
@@ -338,7 +338,7 @@ class Madeam_Controller {
   final public function process() {
 
     // beforeFilter callbacks
-    $this->callback('beforeFilter');
+    $this->_callback('beforeFilter');
 
     // action
     $action = Madeam_Inflector::camelize($this->params['action']) . 'Action';
@@ -360,13 +360,13 @@ class Madeam_Controller {
   	}
 
     // beforeRender callbacks
-    $this->callback('beforeRender');
+    $this->_callback('beforeRender');
 
     // render
     $this->render();
 
     // afterRender callbacks
-    $this->callback('afterRender');
+    $this->_callback('afterRender');
 
     // return response
     return $this->output;
@@ -377,9 +377,14 @@ class Madeam_Controller {
    *
    * @param string $name
    */
-  final public function callback($name) {
+  final private function _callback($name) {
     foreach ($this->setup[$name] as $callback) {
-      $this->{$callback['name']}();
+    	// there has to be a better algorithm for this....
+    	if (empty($callback['include']) || (in_array($this->params['controller'] . '/' . $this->params['action'], $callback['include']) || in_array($this->params['controller'], $callback['include']))) {
+    		if (empty($callback['exclude']) || (!in_array($this->params['controller'] . '/' . $this->params['action'], $callback['exclude']) && !in_array($this->params['controller'], $callback['exclude']))) {
+      		$this->{$callback['name']}();
+    		}
+    	}
     }
   }
 

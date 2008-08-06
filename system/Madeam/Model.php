@@ -143,7 +143,7 @@ class Madeam_Model {
     $this->cacheName .= low($this->name) . '.setup';
 
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1)) {
+    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1) && Madeam_Config::get('cache_models')) {
       $this->setup['hasMany'] = array();
       $this->setup['hasOne'] = array();
       $this->setup['belongsTo'] = array();
@@ -447,7 +447,7 @@ class Madeam_Model {
       if ($check_non_existent_fields === false || isset($this->entry[$field])) {
         if (Madeam_Validate::$method(@$this->entry[$field], $validator['args']) === false) {
           Madeam_Session::error($error_key, $this->parseValidateMessage($validator['args']));
-          //$_SESSION[MADEAM_MADEAM_USER_ERROR_NAME][$error_key][] = $this->parseValidateMessage($validator['args']);
+          //$_SESSION[Madeam::user_error_name][$error_key][] = $this->parseValidateMessage($validator['args']);
         }
       }
     }

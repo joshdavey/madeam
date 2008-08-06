@@ -98,57 +98,11 @@ require PATH_TO_SYSTEM . 'Madeam/Parser.php';
 require PATH_TO_SYSTEM . 'Madeam/Cache.php';
 require PATH_TO_SYSTEM . 'Madeam/Registry.php';
 
-// define user errors variable name for $_SESSION
-// example: $_SESSION[MADEAM_USER_ERROR_NAME];
-define('MADEAM_USER_ERROR_NAME', 'muerrors');
-
-// this is used for passing misc data from one page to the other
-define('MADEAM_FLASH_DATA_NAME', 'mflash');
-
-// this sets how many pages the flash has to live (ptl: pages to live)
-define('MADEAM_FLASH_LIFE_NAME', 'mflife');
-
-// this is used for passing post data from one page to the next
-// the post data is merged with the flash post data on the next page
-define('MADEAM_FLASH_POST_NAME', 'mfpost');
-
-// Used for joining models and other associations
-// example use: "user.name"
-define('MADEAM_ASSOCIATION_JOINT', '.');
-
-
-// autoload function
-function Madeam_Autoload($class) {
-  // set class file name
-  $file = str_replace('_', DS, $class) . '.php';
-  // include class file
-  if (file_lives($file)) {
-    require $file;
-  }
-
-  if (! class_exists($class, false) && ! interface_exists($class, false)) {
-    $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
-    eval("class $class {}");
-    throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
-  }
-}
-
 
 // idea... use this as a last resort when all autoloads fail.
 // have this one throw an exception or make a last resort to check every path for the file.
-spl_autoload_register('Madeam_Autoload');
+spl_autoload_register('Madeam::autoload');
 
-// include routes
-// check cache for routes
-if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1)) {
-  // include routes configuration
-  require PATH_TO_APP . 'Config' . DS . 'routes.php';
-
-  // save routes to cache
-  if ($config['cache_routes']) {
-    Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
-  }
-}
 
 /**
  * Checks to see if a relative file exists by checking each include path.
@@ -207,6 +161,7 @@ function Madeam_ErrorHandler($code, $string, $file, $line) {
  * Set error handler
  */
 set_error_handler('Madeam_ErrorHandler');
+
 
 // function library
 // ========================================================

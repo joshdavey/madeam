@@ -6,7 +6,7 @@ class Madeam_Sanitize {
 	}
 	
 	public static function escape($string) {
-		
+		return addslashes($string);
 	}
 	
 }
