@@ -15,9 +15,9 @@
  */
 class Madeam_Cache {
 
-  static $dir = 'cache';
+  public static $dir = 'cache';
 
-  static $openCaches = array();
+  public static $openCaches = array();
 
   /**
    * Enter description here...

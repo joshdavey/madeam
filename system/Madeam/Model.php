@@ -142,8 +142,13 @@ class Madeam_Model {
     // set cache name
     $this->cacheName .= low($this->name) . '.setup';
 
+		// clear model cache if it cache is disabled for routes
+		if (!Madeam_Config::get('cache_models')) { 
+			Madeam_Cache::clear($this->cacheName);	
+		}
+
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1) && Madeam_Config::get('cache_models')) {
+    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1)) {
       $this->setup['hasMany'] = array();
       $this->setup['hasOne'] = array();
       $this->setup['belongsTo'] = array();
@@ -521,7 +526,7 @@ class Madeam_Model {
    *
    * @param unknown_type $name
    */
-  final protected function callback($name) {
+  final protected function _callback($name) {
     foreach ($this->setup[$name] as $callback) {
       $this->{$callback['name']}();
     }

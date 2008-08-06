@@ -246,8 +246,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
   final public function find($fetch = 'all') {
     $this->data = array();
 
-    // find callback
-    $this->callback('beforeFind');
+    // find _callback
+    $this->_callback('beforeFind');
 
     // if this is a child model then filter the results to make sure they are related to this model's parent
     // this stuff is for when chaining models like:
@@ -334,14 +334,14 @@ class Madeam_ActiveRecord extends Madeam_Model {
       }
     }
 
-    // find callback
-    $this->callback('afterFind');
+    // find _callback
+    $this->_callback('afterFind');
 
     // grab data before it's reset
     if ($fetch == 'all') {
       $data = $this->data;
     } else {
-      $data = $this->entry;
+      $data = $this->entry = $this->data[0];
     }
 
     // reset all sql values and data
@@ -441,7 +441,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     }
 
     // set where
-    if ($this->entryId != - 1 && $this->setup['primaryKey'] != false) {
+    if ($this->entryId != - 1 && $this->setup['primaryKey'] !== false) {
       $this->where(array($this->name . '.' . $this->setup['primaryKey'] => $id));
     }
 
@@ -468,20 +468,20 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // reset all sql values and data
     $this->reset();
 
-    // Validate callbacks
-    $this->callback('beforeValidate');
-    $this->callback('afterValidate');
+    // Validate _callbacks
+    $this->_callback('beforeValidate');
+    $this->_callback('afterValidate');
 
-    // before delete callback
-    $this->callback('beforeDelete');
+    // before delete _callback
+    $this->_callback('beforeDelete');
     if ($id != - 1) {
       $this->entryId = $id;
     }
 
     $this->execute($this->buildQueryDelete());
 
-    // after delete callback
-    $this->callback('afterDelete');
+    // after delete _callback
+    $this->_callback('afterDelete');
 
     // check success
     if ($this->affectedRows() > 0) {
@@ -502,7 +502,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // true/false
     $update = false;
 
-    // set $this->entry so it is accessible in callbacks
+    // set $this->entry so it is accessible in _callbacks
     $this->entry = $data;
 
     // set entryId
@@ -522,16 +522,16 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // unset duplicate of this model to save on sweet sweet memory
     unset($inst);
 
-    // before Validate callback
-    $this->callback('beforeValidate');
+    // before Validate _callback
+    $this->_callback('beforeValidate');
 
     // validate data
     ////$this->load_validators();
     $this->validateEntry($update);
 
-    // after Validate callback
-    $this->callback('afterValidate');
-    // now that all the callbacks prior to updating/adding the new row have been called
+    // after Validate _callback
+    $this->_callback('afterValidate');
+    // now that all the _callbacks prior to updating/adding the new row have been called
     // we must check for any errors that may have been envoked.
     // if there aren't any then continue as usual.
     // if not then skip adding/updating
@@ -539,8 +539,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
       // do standard field formats
       $this->standardFieldFormats();
 
-      // before save callback
-      $this->callback('beforeSave');
+      // before save _callback
+      $this->_callback('beforeSave');
       /*
       // relations
       $relations = array();
@@ -555,7 +555,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
         }
       }
       */
-      // set data as row after callbacks have altered $this->entry
+      // set data as row after _callbacks have altered $this->entry
       $this->data = $this->entry;
 
       // filter out fields that don't exist in the model
@@ -563,10 +563,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
       // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
       if ($update === true) {
-        $this->isUpdate = true; // can be used by the dev to figure out if it's an insert or update when using callbacks
+        $this->isUpdate = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
         $this->execute($this->buildQueryUpdate());
       } else {
-        $this->isInsert = true; // can be used by the dev to figure out if it's an insert or update when using callbacks
+        $this->isInsert = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
         $this->execute($this->buildQueryInsert());
       }
 
@@ -576,7 +576,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       // set this so it can be used in afterSave
       $this->entry[$this->setup['primaryKey']] = $entryId;
 
-      // grab entry after it's been modified by callbacks
+      // grab entry after it's been modified by _callbacks
       $entry = $this->entry;
       /*
       if ($entryId) {
@@ -591,8 +591,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
         }
       }
       */
-      // after save callback
-      $this->callback('afterSave');
+      // after save _callback
+      $this->_callback('afterSave');
 
       // reset all sql values and data
       $this->reset();
@@ -623,7 +623,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // clone current class just because...
     // this is not cool though because this means shit is going to be validated when it shouldn't be.
-    // do we need to call beforeSave and all the other callbacks or just not worry about it?
+    // do we need to call beforeSave and all the other _callbacks or just not worry about it?
     $class = clone $this;
 
     // set table name
@@ -649,7 +649,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // clone current class just because...
     // this is not cool though because this means shit is going to be validated when it shouldn't be.
-    // do we need to call beforeSave and all the other callbacks or just not worry about it?
+    // do we need to call beforeSave and all the other _callbacks or just not worry about it?
     $class = clone $this;
 
     // set table name
@@ -873,8 +873,15 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @param array $conditions
    */
   final public function where() {
-  	$conditions = func_get_args();  	
-  	$this->_sqlWhere = $this->_conditions($conditions);
+  	$conditions = func_get_args();
+  	$condition = $this->_conditions($conditions);
+  	
+  	if ($this->_sqlWhere != 1) {
+  		$this->_sqlWhere .= ' and ' . $condition;
+		} else {
+			$this->_sqlWhere = $condition;
+		}
+		
   	return $this;
   }
   
@@ -1022,9 +1029,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->data = array();
     $this->entry = array();
     $this->entryId = - 1;
-    $this->depth = 2;
+    $this->depth = 1;
     $this->isInsert = false;
     $this->isUpdate = false;
+    $this->unbound = array();
     //$this->sql = null;
     
     // reset child models

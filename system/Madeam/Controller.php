@@ -181,8 +181,13 @@ class Madeam_Controller {
     // set cache name
     $this->cacheName .= low(get_class($this)) . '.setup';
 
+		// clear controller cache if it cache is disabled for routes
+		if (!Madeam_Config::get('cache_controllers')) { 
+			Madeam_Cache::clear($this->cacheName);
+		}
+
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1) && Madeam_Config::get('cache_controllers')) {
+    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1)) {
 
       // define callbacks
       $this->setup['beforeFilter'] = $this->setup['beforeRender'] = $this->setup['afterRender'] = array();

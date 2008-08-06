@@ -60,9 +60,14 @@ class Madeam {
     // include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
     
     
+		// clear routes cache if it cache is disabled for routes
+		if (!Madeam_Config::get('cache_routes')) { 
+			Madeam_Cache::clear('madeam.routes');
+		}
+		
 		// include routes
 		// check cache for routes
-		if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1) && Madeam_Config::get('cache_routes')) {
+		if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1)) {
 		  // include routes configuration
 		  require PATH_TO_APP . 'Config' . DS . 'routes.php';
 		
