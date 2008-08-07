@@ -84,7 +84,7 @@ define('PATH_TO_LOG', PATH_TO_PROJECT . 'etc' . DS . 'log' . DS);
 define('PATH_TO_TMP', PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
 
 // set include paths
-$includePaths = array(PATH_TO_SYSTEM, PATH_TO_APP, PATH_TO_LIB, ini_get('include_path'));
+$includePaths = array(PATH_TO_APP, PATH_TO_LIB, PATH_TO_SYSTEM,ini_get('include_path'));
 ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
 
 
