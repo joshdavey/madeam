@@ -49,7 +49,7 @@
  *   true: all errors are displayed inline
  *   false: errors will be displayed by Madeam's error handling controller
  */
-$cfg['environment'] = 'production';
+$cfg['environment'] = 'development';
 
 
 // development
