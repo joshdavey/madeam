@@ -168,7 +168,7 @@ class Madeam {
         $view = $params['controller'] . '/' . $params['action'];
         $params['controller'] = 'app';
         $controller = new Controller_App($params);
-        $this->view($view);
+        $controller->view($view);
       } elseif (is_file(PATH_TO_VIEW . $params['controller'] . '.' . $params['format'])) {
         $view = $params['controller'];
         $params['action'] = $params['controller'];

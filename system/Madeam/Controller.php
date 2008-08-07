@@ -423,7 +423,7 @@ class Madeam_Controller {
      */
 
     // get partial name
-    $partial = explode('/', $partialPath);
+    $partial = explode('/', $path);
     $partialName = array_pop($partial);
     $partialFile = PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->params['format'];
 
