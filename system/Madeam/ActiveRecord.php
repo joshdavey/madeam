@@ -922,7 +922,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 				} else {
 					// if the value didn't match any of the above conditions then it must be a string
 					// and therefore needs quotes
-					$condition .= "'" . Madeam_Sanitize::escape($value) . "'";
+					$condition .= Madeam_Sanitize::escape($value);
 				}
   		}
   	}
