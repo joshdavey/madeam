@@ -6,7 +6,11 @@ class Madeam_Sanitize {
 	}
 	
 	public static function escape($string) {
-		return addslashes($string);
+	  if (is_integer($string)) {
+		  return $string;
+	  } else {
+	    return "'" . addslashes($string) . "'";
+	  }
 	}
 	
 }
