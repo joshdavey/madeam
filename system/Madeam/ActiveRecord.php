@@ -813,7 +813,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     }
     // add limit
     if ($this->_sqlStart && $this->_sqlRange) {
-      $sql[] = "LIMIT $this->start, $this->_sqlRange";
+      $sql[] = "LIMIT $this->_sqlStart, $this->_sqlRange";
     } elseif ($this->_sqlStart && ! $this->_sqlRange) {
       $sql[] = "LIMIT $this->_sqlStart";
     } else {
