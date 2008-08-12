@@ -198,12 +198,12 @@ function is_list($data) {
   $keys_string = null;
   // lists must be represented as arrays
   if (is_array($data)) {
-    foreach ($data as $entry) {
+    foreach ($data as $key => $value) {
       // each entry must be an array
-      if (is_array($entry)) {
+      if (is_array($value)) {
         $entries_checked ++; // record that an entry has been checked
         // get keys
-        $keys = array_keys($entry);
+        $keys = array_keys($value);
         // sort the keys so that they are always in alphabetical order and therefore always comparable
         asort($keys);
         // compare keys string -- do not need to compare the first one.
@@ -217,7 +217,7 @@ function is_list($data) {
         // set keys_string for entry so that it can be compared to the next one
         $keys_string = implode($keys);
       } else {
-        break;
+        return false;
       }
     }
   }

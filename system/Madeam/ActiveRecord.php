@@ -798,8 +798,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       }
     } else {
       foreach ($this->fields as $field) {
-        $sets[] = "$field = " . Madeam_Sanitize::escape($this->data[$field]);
-        
+        $sets[] = "$field = " . Madeam_Sanitize::escape($this->data[$field]);        
       }
     }
     // add fields
@@ -808,11 +807,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if ($this->_sqlWhere != 1) {
       $sql[] = 'WHERE ' . $this->_sqlWhere;
     } elseif ($this->entryId != - 1) {
-      if (is_int($this->entryId)) {
-        $sql[] = 'WHERE ' . $this->setup['primaryKey'] . ' = ' . $this->entryId;
-      } else {
-        $sql[] = 'WHERE ' . $this->setup['primaryKey'] . ' = \'' . $this->entryId . '\'';
-      }
+      $sql[] = 'WHERE ' . $this->setup['primaryKey'] . ' = ' . Madeam_Sanitize::escape($this->entryId);
     } else {
       return false;
     }
@@ -842,11 +837,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if ($this->_sqlWhere != 1) {
       $sql[] = 'WHERE ' . $this->_sqlWhere;
     } elseif ($this->entryId != - 1) {
-      if (is_int($this->entryId)) {
-        $sql[] = 'WHERE ' . $this->setup['primaryKey'] . ' = ' . $this->entryId;
-      } else {
-        $sql[] = 'WHERE ' . $this->setup['primaryKey'] . ' = \'' . $this->entryId . '\'';
-      }
+      $sql[] = 'WHERE ' . $this->setup['primaryKey'] . ' = ' . Madeam_Sanitize::escape($this->entryId);
     } else {
       return false;
     }

@@ -123,11 +123,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
       // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
       parse_str($query, $get); // assigns $get array of query params
     }
-
-    // merge manual $_GETs with http $_GETs
-    //$gets = array_merge($get, $_GET); // http $_GETs overide manual $_GETs
-    $gets = $get;
-
+    
     // makes sure the first character is "/"
     if (substr($uri, 0, 1) != '/') {
       $uri = '/' . $uri;
@@ -165,24 +161,49 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
       // but what about returning the params if we throw an error?
       return $params;
     }
-
+    
     // get params from uri
-    $params = array_merge($params, $gets);
-    // automagically disable the layout when making an AJAX call
-    if (!isset($params['useLayout']) && !Madeam_Config::get('enable_ajax_layout') && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
-      $params['useLayout'] = '0';
+    $params = array_merge($params, $get);    
+    
+    // add uri to params
+    $params['uri'] = $uri;
+    
+    // add query to params
+    if (isset($query)) {
+    	$params['query'] = $query;
+  	}
+    
+    // check if this is an ajax call
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+      $params['ajax'] = 1;
+    } else {
+    	$params['ajax']	= 0;
+    }    
+  	
+  	// automagically disable the layout when making an AJAX call
+    if (!isset($params['layout']) && !Madeam_Config::get('enable_ajax_layout') && $params['ajax'] == 1) {
+      $params['layout'] = 0;
+    } elseif (!isset($params['layout'])) {
+    	$params['layout'] = 1;
     }
-
-    // set request method in case it hasn't been set (command line environment)
-    if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
-
-    // set default values for required params
-    ! isset($params['controller']) || $params['controller'] == null ? $params['controller'] = Madeam_Config::get('default_controller') : false;
-    ! isset($params['action']) || $params['action'] == null ? $params['action'] = Madeam_Config::get('default_action') : false;
-    ! isset($params['useLayout']) || $params['useLayout'] == null ? $params['useLayout'] = '0' : false;
-    ! isset($params['method']) || $params['method'] == null ? $params['method'] = low($_SERVER['REQUEST_METHOD']) : false;
-    ! isset($format) || $format == null ? $params['format'] = Madeam_Config::get('default_format') : $params['format'] = $format;
-
+    
+    // set default controller
+    if (!isset($params['controller']) || $params['controller'] == null) {
+    	$params['controller'] = Madeam_Config::get('default_controller');
+    }
+    
+    // set default action
+    if (!isset($params['action']) || $params['action'] == null) {
+    	$params['action'] = Madeam_Config::get('default_action');
+    }
+    
+    // set default format
+    if (!isset($format) || $format == null) {
+    	$params['format'] = Madeam_Config::get('default_format');
+    } else {
+    	$params['format'] = $format;
+    }
+    
     return $params;
   }
 

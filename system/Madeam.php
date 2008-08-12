@@ -31,7 +31,6 @@ class Madeam {
 	 */
   const flash_data_name	= 'mflash';
   
-  // this sets how many pages the flash has to live (ptl: pages to live)
   /**
 	 * this sets how many pages the flash has to live (ptl: pages to live)
 	 */
@@ -78,8 +77,8 @@ class Madeam {
 		}
 
     // set layout if it hasn't already been set
-    if (!isset($_GET['useLayout'])) { $_GET['useLayout'] = 1; }
-
+    if (!isset($_GET['layout'])) { $_GET['layout'] = 1; }
+    
     // call controller action
     $output = Madeam::request(Madeam_Router::getCurrentURI(), $_GET, $_POST, $_COOKIE);
 
@@ -132,10 +131,19 @@ class Madeam {
     $params = Madeam_Router::parseURI($uri);
 
     // combine GETs
-    $params = array_merge($params, $requestGet);
-
-    // pass uri as a _GET variable
-    $params['uri'] = $uri;
+    $params = array_merge($params, $requestGet);    
+    
+    // set request method in case it hasn't been set (command line environment)
+    if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
+    
+    // set overriding request method
+    if (!isset($params['method']) && isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
+    	$params['method'] = low($_SERVER['X_HTTP_METHOD_OVERRIDE']);
+    } elseif (!isset($params['method']) && isset($_SERVER['REQUEST_METHOD'])) {
+    	$params['method'] = low($_SERVER['REQUEST_METHOD']);
+    } else {
+    	$params['method'] = 'get';
+    }
 
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller

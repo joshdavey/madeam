@@ -18,42 +18,42 @@ class Madeam_Inflector {
   public static $irregulars = array('amoyese' => 'amoyese', 'atlas' => 'atlases', 'beef' => 'beefs', 'bison' => 'bison', 'brother' => 'brothers', 'child' => 'children', 'corpus' => 'corpuses', 'cow' => 'cows', 'deer' => 'deer', 'fish' => 'fish', 'ganglion' => 'ganglions', 'genie' => 'genies', 'genus' => 'genera', 'graffito' => 'graffiti', 'hoof' => 'hoofs', 'loaf' => 'loaves', 'man' => 'men', 'measles' => 'measles', 'money' => 'monies', 'mongoose' => 'mongooses', 'move' => 'moves', 'mythos' => 'mythoi', 'numen' => 'numina', 'occiput' => 'occiputs', 'octopus' => 'octopuses', 'opus' => 'opuses', 'ox' => 'oxen', 'penis' => 'penises', 'person' => 'people', 'rice' => 'rice', 'sex' => 'sexes', 'sheep' => 'sheep', 'soliloquy' => 'soliloquies', 'testis' => 'testes', 'trilby' => 'trilbys', 'turf' => 'turfs');
 
   /**
-   * Pluralizes a word
+   * Pluralizes a string
    *
-   * @param string $word
+   * @param string $string
    * @return string
    */
-  public static function pluralize($word) {
-    if (array_key_exists(low($word), self::$irregulars)) {
-      return self::$irregulars[$word];
-    } elseif (low($word[strlen($word) - 1]) == 's') {
-      return $word;
-    } elseif (low($word[strlen($word) - 1]) == 'y') {
-      $word = preg_replace('/y/i', 'sei', strrev($word), 1); // add ies backwards so it gets set back later
-      return strrev($word);
+  public static function pluralize($string) {
+    if (array_key_exists(low($string), self::$irregulars)) {
+      return self::$irregulars[$string];
+    } elseif (low($string[strlen($string) - 1]) == 's') {
+      return $string;
+    } elseif (low($string[strlen($string) - 1]) == 'y') {
+      $string = preg_replace('/y/i', 'sei', strrev($string), 1); // add ies backwards so it gets set back later
+      return strrev($string);
     } else {
-      return $word .= 's';
+      return $string .= 's';
     }
   }
 
   /**
-   * Singalizes a word
+   * Singalizes a string
    *
-   * @param string $word
+   * @param string $string
    * @return string
    */
-  public static function singalize($word) {
+  public static function singalize($string) {
     $plural_irregulars = array_flip(self::$irregulars);
-    if (array_key_exists(low($word), $plural_irregulars)) {
-      return $plural_irregulars[$word];
-    } elseif (low($word[strlen($word) - 1]) != 's') {
-      return $word;
-    } elseif (substr(low($word), - 3, 3) == 'ies') {
-      $word = preg_replace('/sei/i', 'y', strrev($word), 1);
-      return strrev($word);
+    if (array_key_exists(low($string), $plural_irregulars)) {
+      return $plural_irregulars[$string];
+    } elseif (low($string[strlen($string) - 1]) != 's') {
+      return $string;
+    } elseif (substr(low($string), - 3, 3) == 'ies') {
+      $string = preg_replace('/sei/i', 'y', strrev($string), 1);
+      return strrev($string);
     } else {
-      $word = preg_replace('/s/i', '', strrev($word), 1);
-      return strrev($word);
+      $string = preg_replace('/s/i', '', strrev($string), 1);
+      return strrev($string);
     }
   }
 
@@ -66,16 +66,16 @@ class Madeam_Inflector {
    * "foo/bar" => "fooBar"
    * "foo\bar" => "fooBar"
    *
-   * @param string $word
+   * @param string $string
    */
-  public static function camelize($word) {
+  public static function camelize($string) {
     $matchs = array();
-    preg_match_all('/([\/\-\_\s\\\]{1}.{1})/', $word, $matchs);
+    preg_match_all('/([\/\-\_\s\\\]{1}.{1})/', $string, $matchs);
     foreach ($matchs[0] as $match) {
       $replacement = up(substr($match, 1, 1));
-      $word = str_replace($match, $replacement, $word);
+      $string = str_replace($match, $replacement, $string);
     }
-    return $word;
+    return $string;
   }
 
   /**
@@ -87,10 +87,10 @@ class Madeam_Inflector {
    * "foo/bar" => "foo_bar"
    * "foo\bar" => "foo_bar"
    *
-   * @param string $word
+   * @param string $string
    */
-  public static function underscorize($word) {
-    return self::specialize('_', $word);
+  public static function underscorize($string) {
+    return self::specialize('_', $string);
   }
 
   /**
@@ -101,18 +101,18 @@ class Madeam_Inflector {
    * "foo_bar" => "foo-bar"
    * "foo bar" => "foo-bar"
    *
-   * @param string $word
+   * @param string $string
    */
-  public static function dashize($word) {
-    return self::specialize('-', $word);
+  public static function dashize($string) {
+    return self::specialize('-', $string);
   }
 
-  public static function forwardSlashize($word) {
-    return self::specialize('/', $word);
+  public static function forwardSlashize($string) {
+    return self::specialize('/', $string);
   }
 
-  public static function backwordSlashize($word) {
-    return self::specialize('\\', $word);
+  public static function backstringSlashize($string) {
+    return self::specialize('\\', $string);
   }
 
   public static function humanize($string) {
@@ -152,23 +152,30 @@ class Madeam_Inflector {
     return self::singalize(self::underscorize($string)) . '_id';
   }
 
-  public static function specialize($char, $word) {
+  public static function specialize($char, $string) {
     $matchs = array();
-    preg_match_all('/([\/\-\_\s\\\\.]{1}.{1})||([A-Z])/', $word, $matchs);
+    preg_match_all('/([\/\-\_\s\\\\.]{1}.{1})||([A-Z])/', $string, $matchs);
     foreach ($matchs[0] as $match) {
       if (strlen($match) == 1) {
         $replacement = $char . low($match);
-        $word = str_replace($match, $replacement, $word);
+        $string = str_replace($match, $replacement, $string);
       }
       $replacement = $char . low(substr($match, 1, 1));
-      $word = str_replace($match, $replacement, $word);
+      $string = str_replace($match, $replacement, $string);
     }
-    return $word;
+    return $string;
   }
 
   public static function slug($string, $seperator = '-') {
     $string = low(str_replace(' ', $seperator, trim($string)));
     $string = preg_replace('/[\$,!\/\\\\&\.]/', '', $string);
     return $string;
+  }
+  
+  public static function map($string, $maps = array()) {
+  	foreach ($maps as $pattern => $replacement) {
+  		$string = preg_replace('/' . $pattern . '/', $replacement, $string); 
+  	}
+  	return $string;
   }
 }

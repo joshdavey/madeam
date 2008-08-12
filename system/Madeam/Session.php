@@ -17,7 +17,9 @@
  */
 class Madeam_Session {
 
-  static public function start($sess_id = false) {
+	public static $driver;
+
+  public static function start($sess_id = false) {
     // load session by ID
     if ($sess_id) {
       session_id($sess_id);
@@ -28,15 +30,15 @@ class Madeam_Session {
     }
   }
 
-  static public function destroy() {
+  public static function destroy() {
     session_destroy();
   }
 
-  static public function flashSet($name, $data) {
+  public static function flashSet($name, $data) {
     $_SESSION[Madeam::flash_data_name][$name] = $data;
   }
 
-  static public function flashGet($name) {
+  public static function flashGet($name) {
     if (isset($_SESSION[Madeam::flash_data_name][$name])) {
       return $_SESSION[Madeam::flash_data_name][$name];
     } else {
@@ -44,7 +46,7 @@ class Madeam_Session {
     }
   }
 
-  static public function flashPost($postData = false) {
+  public static function flashPost($postData = false) {
     if ($postData !== false) {
       $_SESSION[Madeam::flash_data_name][Madeam::flash_post_name] = $postData;
     } else {
@@ -54,7 +56,7 @@ class Madeam_Session {
     }
   }
 
-  static public function flashDestroy($name = false) {
+  public static function flashDestroy($name = false) {
     if ($name === false) {
       unset($_SESSION[Madeam::flash_data_name]);
     } else {
@@ -62,19 +64,19 @@ class Madeam_Session {
     }
   }
 
-  static public function flashLife($pagesToLive = 1) {
+  public static function flashLife($pagesToLive = 1) {
     $_SESSION[Madeam::flash_life_name] = $pagesToLive;
   }
 
-  static public function error($name, $msg) {
+  public static function error($name, $msg) {
     $_SESSION[Madeam::user_error_name][$name][] = $msg;
   }
 
-  static public function set($name, $value) {
+  public static function set($name, $value) {
     $_SESSION[$name] = $value;
   }
 
-  static public function get($name) {
+  public static function get($name) {
     if (isset($_SESSION[$name])) {
       return $_SESSION[$name];
     } else {
@@ -82,4 +84,3 @@ class Madeam_Session {
     }
   }
 }
-

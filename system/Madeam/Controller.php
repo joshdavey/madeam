@@ -164,7 +164,7 @@ class Madeam_Controller {
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
-    if (isset($this->params['useLayout']) && ($this->params['useLayout'] == '0' || $this->params['useLayout'] == 'false')) {
+    if (isset($this->params['layout']) && ($this->params['layout'] == 0)) {
       $this->layout(false);
     } else {
       $this->layout($this->layout);
@@ -347,7 +347,6 @@ class Madeam_Controller {
 
     // action
     $action = Madeam_Inflector::camelize($this->params['action']) . 'Action';
-    //$this->$action();
     
     $params = array();
     if (isset($this->setup[$action])) {      
@@ -368,6 +367,7 @@ class Madeam_Controller {
     $this->_callback('beforeRender');
 
     // render
+    // $this->output = $this->render(array('view' => $this->view, 'layout' => $this->layout, 'data' => $this->data));
     $this->render();
 
     // afterRender callbacks
@@ -413,7 +413,7 @@ class Madeam_Controller {
    * @param integer $limit
    * @return string
    */
-  final public function partial($path, $data = array(), $start = 0, $limit = false) {
+  final public function partial($path, $params) {
     // internal counter can be accessed in the view
     $_num = $start;
 
@@ -436,6 +436,7 @@ class Madeam_Controller {
 
     // set variables
     if (is_list($data)) {
+    	test($data);
       foreach ($data as $key => $$partialName) {
         $_num ++;
         include ($partialFile);
@@ -443,6 +444,8 @@ class Madeam_Controller {
     } else {
       $$partialName = $data;
       $_num ++;
+      test($data);
+      extract($data);
       include ($partialFile);
     }
     return false;
