@@ -226,7 +226,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
         $this->entry = $result;
         // don't prepare results of describe queries
         if ($prepResults === true) {
-          $this->prepareResult(); // should this be done?
+          $this->prepareEntry(); // should this be done?
         }
 
         $this->data[] = $this->entry;
