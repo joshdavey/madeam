@@ -142,12 +142,11 @@ class Madeam_Controller {
    * @param unknown_type $requestCookie
    * @param unknown_type $requestMethod
    */
-  public function __construct($requestGet = array(), $requestPost = array(), $requestCookie = array(), $requestMethod = 'GET') {
-    // for consideration...
-    // combine all request information into a single variable
-    $this->params = array_merge($requestGet, $requestPost, $requestCookie);
-    $this->params['method'] = $requestMethod;
-    
+  public function __construct($params) {
+  	
+  	// set params
+  	$this->params = $params;
+  	
     // set resource the controller represents
     if (is_string($this->represent)) {
       $this->represent = Madeam_Inflector::modelNameize($this->represent);

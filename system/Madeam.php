@@ -54,11 +54,7 @@ class Madeam {
    *
    * @return boolean
    */
-  public static function dispatch() {
-    // call user front controller?
-    // include app/app.php // -- includes stuff that executes before dispatching -- config stuff?
-    
-    
+  public static function dispatch() {    
 		// clear routes cache if it cache is disabled for routes
 		if (!Madeam_Config::get('cache_routes')) { 
 			Madeam_Cache::clear('madeam.routes');
@@ -79,8 +75,21 @@ class Madeam {
     // set layout if it hasn't already been set
     if (!isset($_GET['layout'])) { $_GET['layout'] = 1; }
     
+    // get current url
+    $url = null;
+    if (MADEAM_REWRITE_URI !== false) {
+      $url = MADEAM_REWRITE_URI . '?' . $_SERVER['QUERY_STRING'];
+    } else {
+      $url = explode(SCRIPT_FILENAME, $_SERVER['REQUEST_URI']);
+      // check if it split it into 2 peices.
+      // If it didn't then there is ending "index.php" so we assume there is no URI on the end either
+      if (isset($url[1])) {
+        $url = $url[1];
+      }
+    }
+    
     // call controller action
-    $output = Madeam::request(Madeam_Router::getCurrentURI(), $_GET, $_POST, $_COOKIE);
+    $output = Madeam::request($url, array_merge($_GET, $_POST, $_COOKIE));
 
     // destroy user error notices
     if (isset($_SESSION[self::user_error_name])) {
@@ -125,26 +134,11 @@ class Madeam {
    * @param string $url -- example: controller/action/32?foo=bar
    * @return string
    */
-  public static function request($uri, $requestGet = array(), $requestPost = array(), $requestCookie = array()) {
-    // get request parameters from uri
+  public static function request($uri, $params) {
+    // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
-    $params = Madeam_Router::parseURI($uri);
-
-    // combine GETs
-    $params = array_merge($params, $requestGet);    
-    
-    // set request method in case it hasn't been set (command line environment)
-    if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
-    
-    // set overriding request method
-    if (!isset($params['method']) && isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
-    	$params['method'] = low($_SERVER['X_HTTP_METHOD_OVERRIDE']);
-    } elseif (!isset($params['method']) && isset($_SERVER['REQUEST_METHOD'])) {
-    	$params['method'] = low($_SERVER['REQUEST_METHOD']);
-    } else {
-    	$params['method'] = 'get';
-    }
-
+    $params = array_merge($params, Madeam_Router::parseURI($uri));
+        
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
     // they should be able to just type in 'admin' because 'index' is the default controller in that
@@ -170,7 +164,7 @@ class Madeam {
 
     try {
       // create controller instance
-      $controller = new $controllerClass($params, $requestPost, $requestCookie, $params['method']);
+      $controller = new $controllerClass($params);
     } catch(Madeam_Exception_AutoloadFail $e) {
       if (is_dir(PATH_TO_VIEW . $params['controller'])) {
         $view = $params['controller'] . '/' . $params['action'];

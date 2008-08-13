@@ -68,10 +68,10 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
           $mini_exp[] = '\\/' . $bit;
         }
       }
-
+      
       // build route's regexp
       $regexp = '/^' . implode('', $mini_exp) . '\/?(.*)$/';
-
+      
       // add to routes list
       self::$routes[] = array($regexp, $names, $params);
     }
@@ -97,7 +97,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
   public static function parseURI($uri = false) {
     // parse uri
     $parsedURI = parse_url($uri);
-
+        
     // set uri
     if (isset($parsedURI['path'])) {
       $extracted_path = explode(PATH_TO_URI, $parsedURI['path'], 2);
@@ -137,17 +137,20 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
 
     // match uri to route map
     foreach (self::$routes as $route) {
-      if (preg_match($route[0], $uri, $match) /*&& count($route[1]) >= (count($match) - 1) && $_SERVER['REQUEST_METHOD'] == $route[3]*/) {
+      if (preg_match($route[0], $uri, $match)) {
         // set default params
         $params = $route[2]; // default values
+        
         // set derived params
         foreach ($route[1] as $key => $name) {
           if ($match[$key] != null) {
             $params[$name] = $match[$key];
           }
         }
+        
         // flag as matched
-        $matchs ++;
+        $matchs++;
+        
         // we've found our match and now we're done here
         break;
       }
@@ -165,14 +168,18 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     // get params from uri
     $params = array_merge($params, $get);    
     
-    // add uri to params
-    $params['uri'] = $uri;
+    // set request method in case it hasn't been set (command line environment)
+    if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
     
-    // add query to params
-    if (isset($query)) {
-    	$params['query'] = $query;
-  	}
-    
+    // set overriding request method
+    if (!isset($params['method']) && isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
+    	$params['method'] = low($_SERVER['X_HTTP_METHOD_OVERRIDE']);
+    } elseif (isset($params['method']) && $_SERVER['REQUEST_METHOD'] != 'POST') {
+    	$params['method'] = 'get';
+    } else {
+    	$params['method'] = low($_SERVER['REQUEST_METHOD']);
+    }
+        
     // check if this is an ajax call
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
       $params['ajax'] = 1;
@@ -187,6 +194,14 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     	$params['layout'] = 1;
     }
     
+    // add uri to params
+    $params['uri'] = $uri;
+    
+    // add query to params
+    if (isset($query)) {
+    	$params['query'] = $query;
+  	}
+        
     // set default controller
     if (!isset($params['controller']) || $params['controller'] == null) {
     	$params['controller'] = Madeam_Config::get('default_controller');
@@ -205,24 +220,5 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     }
     
     return $params;
-  }
-
-  /**
-   * returns the current uri
-   * @return string
-   */
-  public static function getCurrentURI() {
-    if (MADEAM_REWRITE_URI !== false) {
-      return MADEAM_REWRITE_URI . '?' . $_SERVER['QUERY_STRING'];
-    } else {
-      $url = explode(SCRIPT_FILENAME, $_SERVER['REQUEST_URI']);
-      // check if it split it into 2 peices.
-      // If it didn't then there is ending "index.php" so we assume there is no URI on the end either
-      if (isset($url[1])) {
-        return $url[1];
-      } else {
-        return null;
-      }
-    }
   }
 }
