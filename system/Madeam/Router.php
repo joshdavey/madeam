@@ -166,7 +166,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     }
     
     // get params from uri
-    $params = array_merge($params, $get);    
+    $params = array_merge($params, $get);
     
     // set request method in case it hasn't been set (command line environment)
     if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }

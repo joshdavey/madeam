@@ -134,7 +134,7 @@ class Madeam {
    * @param string $url -- example: controller/action/32?foo=bar
    * @return string
    */
-  public static function request($uri, $params) {
+  public static function request($uri, $params = array()) {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
     $params = array_merge($params, Madeam_Router::parseURI($uri));

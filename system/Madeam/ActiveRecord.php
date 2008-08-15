@@ -197,7 +197,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
         Madeam_Logger::getInstance()->log($sql);
 
         // link
-        $result = self::$_pdo[$this->server]->query($sql, true);
+        $link = self::$_pdo[$this->server]->query($sql, true);
 
       } catch (PDOException $e) {
         if (!isset(self::$_pdo[$this->server]) || !is_object(self::$_pdo[$this->server])) {
@@ -210,37 +210,34 @@ class Madeam_ActiveRecord extends Madeam_Model {
         }
       }
 
-    return $result;
+    return $link;
   }
 
-  final public function query($sql, $prepResults = false) {
+  final public function fetch($sql, $prepResults = false) {
     // execute query
     $link = $this->execute($sql);
     
-    // check to see if this query returns a resource -- why not just check to see if it's a resource instead?
-    $matchs = array();
-    preg_match('/^DESCRIBE|SELECT/', $sql, $matchs);
-    if (count($matchs) > 0) {
-      $results = $link->fetchAll(PDO::FETCH_ASSOC);
-      foreach ($results as $result) {
-        $this->entry = $result;
-        // don't prepare results of describe queries
-        if ($prepResults === true) {
-          $this->prepareEntry(); // should this be done?
-        }
-
-        $this->data[] = $this->entry;
+    $results = $link->fetchAll(PDO::FETCH_ASSOC);
+    $link->closeCursor();
+    
+    $this->data = false;
+    
+    foreach ($results as $result) {
+      $this->entry = $result;
+      // don't prepare results of describe queries
+      if ($prepResults === true) {
+        $this->prepareEntry(); // should this be done?
       }
 
-      return $this->data;
-    } else {
-      return $result;
+      $this->data[] = $this->entry;
     }
+
+    return $this->data;
   }
 
   final public function describe() {
     $table = $this->setup['resourceName'];
-    return $this->query("DESCRIBE $table");
+    return $this->fetch("DESCRIBE $table");
   }
 
   final public function find($fetch = 'all') {
@@ -261,6 +258,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $link = $this->execute($this->buildQuerySelect());
 		
     $results = $link->fetchAll(PDO::FETCH_ASSOC);
+    $link->closeCursor();
 		
 		$foreignKeyValues = array();
 		$belongsToForeignKeys = array();
