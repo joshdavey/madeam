@@ -16,33 +16,24 @@
  * @author      Joshua Davey
  */
 class Help_Form extends Help_Html {
-
-  public static function openPost($action = null, $_params = array()) {
-    $params = array();
-    $params['action'] = Madeam::url($action);
-    $params['id'] = 'form_' . Madeam_Inflector::underscorize($action);
-    $params['method'] = 'post';
-    $params = array_merge($params, $_params);
-    return self::openTag('form', $params);
-  }
-
-  public static function openGet($action = null, $_params = array()) {
-    $params = array();
+  
+  public static function open($action = null, $_params = array()) {
+    
+    if (isset($_params['file'])) {
+      $params['enctype'] = 'multipart/form-data';
+    }
+    
     $params['action'] = Madeam::url($action);
     $params['id'] = 'form_' . Madeam_Inflector::underscorize($params['action']);
-    $params['method'] = 'get';
+    
     $params = array_merge($params, $_params);
-    return self::openTag('form', $params);
-  }
-
-  public static function openFile($action = null, $_params = array()) {
-    $params = array();
-    $params['action'] = Madeam::url($action);
-    $params['id'] = 'form_' . Madeam_Inflector::underscorize($params['action']);
-    $params['method'] = 'post';
-    $params['enctype'] = 'multipart/form-data';
-    $params = array_merge($params, $_params);
-    return self::openTag('form', $params);
+    
+    if ($_params['method'] == 'put' || $_params['method'] == 'delete') {
+      $params['method'] = 'post';
+      return self::openTag('form', $params) . "\n" . self::hidden('_method', $_params['method']);
+    } else {
+      return self::openTag('form', $params);
+    }
   }
 
   public static function close() {
@@ -108,6 +99,14 @@ class Help_Form extends Help_Html {
     return self::tag('input', $params);
   }
 
+  public static function label($name, $value = null, $_params = array()) {
+    $params = array();
+    $params['for'] = self::fieldName($name);
+    $params['value'] = $value;
+    $params = array_merge($params, $_params);
+    return self::wrappingTag('label', $value, $params);
+  }
+  
   public static function text($name, $value = null, $params = array()) {
     return self::input($name, $value, $params);
   }
@@ -262,27 +261,21 @@ class Help_Form extends Help_Html {
   }
 
   public static function dropdown($name, $selected, $values = array(), $_params = array()) {
-    $params = array();
+    $params         = array();
     $params['name'] = self::fieldName($name);
-    $params['id'] = self::nameToId($name);
+    $params['id']   = self::nameToId($name);
     $contents = array();
     $selected = self::fieldValue($name, $selected);
+    
     if (! empty($values)) {
-      foreach ($values as $value) {
+      foreach ($values as $key => $label) {
         $o_params = array();
-        if (is_array($value)) {
-          if ($selected == @$value[1]) {
-            $o_params['selected'] = true;
-          }
-          $o_params['value'] = @$value[1];
-          $contents[] = self::wrappingTag('option', $value[0], $o_params);
-        } else {
-          if ($selected == $value)
-            $o_params['selected'] = true;
-          $contents[] = self::wrappingTag('option', $value, $o_params);
-        }
+        if ($selected == $key) { $o_params['selected'] = true; }
+        $o_params['value'] = $key;
+        $contents[] = self::wrappingTag('option', $label, $o_params);
       }
     }
+    
     $params = array_merge($params, $_params);
     return self::wrappingTag('select', implode($contents), $params);
   }
@@ -350,7 +343,7 @@ class Help_Form extends Help_Html {
           }
         }
         // add an error tag
-        $output .= help_error::single($field_name);
+        $output .= Help_Error::single($field_name);
         $output .= '</p>' . "\n";
       }
     }

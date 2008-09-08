@@ -20,14 +20,7 @@ class Madeam_Controller {
    *
    * @var unknown_type
    */
-  private $output = false;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  public $scaffold = false;
+  private $_output = false;
 
   /**
    * Enter description here...
@@ -41,98 +34,35 @@ class Madeam_Controller {
    *
    * @var unknown_type
    */
-  public $view = null;
+  private $_view = null;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  public $data = array();
+  private $_data = array();
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  public $represent = false;
+  private $_represent = false;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  private $parser;
+  private $_setup = array();
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  private $scaffoldController;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  public $requestMethod;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  public $requestGet;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  public $requestPost;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  public $requestCookie;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  public $requestFiles;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  public $params;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  private $setup = array();
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  private $reflection;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  private $cacheName = 'madeam.controller.';
+  private $_reflection;
 
   /**
    * Enter description here...
@@ -148,16 +78,13 @@ class Madeam_Controller {
   	$this->params = $params;
   	
     // set resource the controller represents
-    if (is_string($this->represent)) {
-      $this->represent = Madeam_Inflector::modelNameize($this->represent);
+    if (is_string($this->_represent)) {
+      $this->_represent = Madeam_Inflector::modelNameize($this->_represent);
     } else {
     	$represent = explode('/', $this->params['controller']);
-    	$this->represent = Madeam_Inflector::modelNameize(array_pop($represent));
+    	$this->_represent = Madeam_Inflector::modelNameize(array_pop($represent));
     }
-
-    // scaffold config
-    $this->scaffoldController = $this->params['controller'];
-
+    
     // set view
     $this->view($this->params['controller'] . '/' . $this->params['action']);
 
@@ -169,33 +96,25 @@ class Madeam_Controller {
       $this->layout($this->layout);
     }
 
-    try {
-      // create parser instance
-      $parserClassName = 'Parser_' . ucfirst($this->params['format']);
-      $this->parser = new $parserClassName($this);
-    } catch (Madeam_Exception_AutoloadFail $e) {
-      Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->params['format'] . '". Missing class <strong>' . $parserClassName . '</strong>'));
-    }
-
     // set cache name
-    $this->cacheName .= low(get_class($this)) . '.setup';
+    $cacheName = 'madeam.controller.' . low(get_class($this)) . '.setup';
 
 		// clear controller cache if it cache is disabled for routes
 		if (!Madeam_Config::get('cache_controllers')) { 
-			Madeam_Cache::clear($this->cacheName);
+			Madeam_Cache::clear($cacheName);
 		}
 
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1)) {
+    if (! $this->_setup = Madeam_Cache::read($cacheName, - 1)) {
 
       // define callbacks
-      $this->setup['beforeFilter'] = $this->setup['beforeRender'] = $this->setup['afterRender'] = array();
+      $this->_setup['beforeFilter'] = $this->_setup['beforeRender'] = $this->_setup['afterRender'] = array();
 
       // reflection
-      $this->reflection = new ReflectionClass($this);
+      $this->_reflection = new ReflectionClass($this);
 
       // check methods for callbacks
-      $methods = $this->reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
+      $methods = $this->_reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
       foreach ($methods as $method) {
         $matches = array();
         if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {
@@ -211,7 +130,7 @@ class Madeam_Controller {
             $callback[$parameter->getName()] = $parameter->getDefaultValue();
           }
 
-          $this->setup[$matches[1]][] = $callback;
+          $this->_setup[$matches[1]][] = $callback;
           
         } elseif (preg_match('/^[a-zA-Z0-9]*Action?/', $method->getName(), $matches)) {
         	// for each action we save it's arguments and map them to http params
@@ -228,17 +147,17 @@ class Madeam_Controller {
           	}
           }
           
-          $this->setup[$matches[0]] = $action;
+          $this->_setup[$matches[0]] = $action;
         }
       }
       
       // save cache
       if (Madeam_Config::get('cache_controllers') === true) {
-        Madeam_Cache::save($this->cacheName, $this->setup, true);
+        Madeam_Cache::save($cacheName, $this->_setup, true);
       }
       
       // we should be done with the reflection at this point so let's kill it to save memory
-      unset($this->reflection);
+      unset($this->_reflection);
     }
   }
 
@@ -277,94 +196,100 @@ class Madeam_Controller {
   }
   */
 
-  public function __get($name) {
+  public function &__get($name) {
     $match = array();
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
       // set model class name
       $modelClassName = 'Model_' . $name;
 
-      // testing idea of not needing to create models in protoptype stage of site
-      // this should still check to see if a table exists...
-      // or maybe we can just let it throw a SQL error which works just as well
-      /*
-      // this isn't working because the class is eval()ed in the autoload function
-      if (!class_exists($modelClassName)) {
-        eval("class $modelClassName extends Madeam_ActiveRecord2 {}");
-      }
-      */
-
       // create model instance
       $model = new $modelClassName();
-      $this->$name = $model;
-      return $model;
+      $this->_data[$name] = $model;
     } elseif (preg_match('/^_[A-Z]{1}/', $name, $match)) {
       // set component class name
       $componentClassName = 'Component_' . $name;
 
       // create component instance
       $component = new $componentClassName($this);
-      $component->$name = $component;
+      $this->$name = $component;
       return $component;
     }
-
-		return false;
+    
+    if (array_key_exists($name, $this->_data)) {
+      return $this->_data[$name];
+    } else {
+     $this->_data[$name] = null;
+     return $this->_data[$name]; 
+    }
   }
 
   public function __call($name, $args) {
-    if (! file_exists($this->view)) {
+    if (! file_exists($this->_view)) {
       throw new Madeam_Exception_MissingAction('Missing Action <strong>' . substr($name, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
       . "\n Create a view called <strong>" . substr($name, 0, -6) . ".html</strong> OR Create a method called <strong>$name</strong>");
     }
   }
 
   public function __set($name, $value) {
-    if (!preg_match('/^(?:_[A-Z]|[A-Z]){1}/', $name)) {
-      $this->data[] = $name;      
-    } 
-    
-    $this->$name = $value;
+    if (!preg_match('/^(?:_[A-Z])/', $name)) {
+      $this->_data[$name] = $value;
+    }
+  }
+  
+  public function __iseet($name) {
+    if (isset($this->_data[$name])) {
+      return true;
+    } else {
+      return false;
+    }
   }
   
 
   public function __unset($name) {
-    unset($this->data[$name]);
+    unset($this->_data[$name]);
   }
 
   final public function process() {
 
+    $output = null;
+    
     // beforeFilter callbacks
     $this->_callback('beforeFilter');
-
+    
     // action
     $action = Madeam_Inflector::camelize($this->params['action']) . 'Action';
     
     $params = array();
-    if (isset($this->setup[$action])) {      
-      foreach ($this->setup[$action] as $param => $value) {
+    if (isset($this->_setup[$action])) {      
+      foreach ($this->_setup[$action] as $param => $value) {
       	if (isset($this->params[$param])) {
       		$params[] = "\$this->params['$param']";
       	} else {
-      		$params[] = "\$this->setup['$action']['$param']";
+      		$params[] = "\$this->_setup['$action']['$param']";
       	}
       }
     }
     
     if (preg_match('/[a-zA-Z_]*/', $action)) {
-    	eval('$this->' . $action . "(" . implode(',', $params) . ");");
+    	$output = eval('$this->' . $action . "(" . implode(',', $params) . ");");
+  	} else {
+  	  exit('Invalid Action Characters');
   	}
-
-    // beforeRender callbacks
-    $this->_callback('beforeRender');
-
+  	
+  	
     // render
-    // $this->output = $this->render(array('view' => $this->view, 'layout' => $this->layout, 'data' => $this->data));
-    $this->render();
-
+    if ($output == null) {
+    	// beforeRender callbacks
+      $this->_callback('beforeRender');
+    	
+      $output = $this->render(array('view' => $this->_view, 'layout' => $this->layout, 'data' => $this->_data));
+    }
+    
     // afterRender callbacks
     $this->_callback('afterRender');
 
     // return response
-    return $this->output;
+    return $output;
   }
 
   /**
@@ -373,7 +298,7 @@ class Madeam_Controller {
    * @param string $name
    */
   final private function _callback($name) {
-    foreach ($this->setup[$name] as $callback) {
+    foreach ($this->_setup[$name] as $callback) {
     	// there has to be a better algorithm for this....
     	if (empty($callback['include']) || (in_array($this->params['controller'] . '/' . $this->params['action'], $callback['include']) || in_array($this->params['controller'], $callback['include']))) {
     		if (empty($callback['exclude']) || (!in_array($this->params['controller'] . '/' . $this->params['action'], $callback['exclude']) && !in_array($this->params['controller'], $callback['exclude']))) {
@@ -397,57 +322,10 @@ class Madeam_Controller {
   /**
    * Enter description here...
    *
-   * @param string $path
-   * @param array $data
-   * @param integer $start
-   * @param integer $limit
-   * @return string
-   */
-  final public function partial($path, $params) {
-    // internal counter can be accessed in the view
-    $_num = $start;
-
-    /**
-     * IMPORTANT! We should have our render logic in here!
-     * I want to be able to use partials as templates!!!!!!!!!
-     */
-
-    // get partial name
-    $partial = explode('/', $path);
-    $partialName = array_pop($partial);
-    $partialFile = PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . $partialName . '.' . $this->params['format'];
-
-    // splice array so that it is within the range defined by $start and $limit
-    if ($limit !== false) {
-      $data = array_splice($data, $start, $limit);
-    } else {
-      $data = array_splice($data, $start);
-    }
-
-    // set variables
-    if (is_list($data)) {
-    	test($data);
-      foreach ($data as $key => $$partialName) {
-        $_num ++;
-        include ($partialFile);
-      }
-    } else {
-      $$partialName = $data;
-      $_num ++;
-      test($data);
-      extract($data);
-      include ($partialFile);
-    }
-    return false;
-  }
-
-  /**
-   * Enter description here...
-   *
    * @param string $view
    */
   final public function view($view) {
-    $this->view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->params['format'];
+    $this->_view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->params['format'];
   }
 
   /**
@@ -480,62 +358,63 @@ class Madeam_Controller {
    * @param text/boolean $data
    * @return unknown
    */
-  final public function render($data = true) {
-  	if ($this->output === false) {
-	    if ($data !== false) {
-	    	
-	      if (!is_string($data)) {
-	      	
-	        if (file_exists($this->view)) {
-	          // pass params to view -- but only if the view exists
-	          $this->data[] = 'params';
-	          
-	          // render the view
-	          $this->parser->renderView();
-	        } else {	        	
-	        	if (in_array(Madeam_Inflector::pluralize(low($this->represent)), $this->data)) {
-	        		$this->data = array(Madeam_Inflector::pluralize(low($this->represent)));
-	        	} elseif (in_array(Madeam_Inflector::singalize(low($this->represent)), $this->data)) {
-	        		$this->data = array(Madeam_Inflector::singalize(low($this->represent)));
-	        	}
-	        	
-	          $this->parser->missingView();
-	        }
-	
-	      } else {
-	        // render a regular text string
-	        $this->parser->output = $data;
-	      }
-	
-	      foreach ($this->layout as $layoutFile) {
-	        if ($layoutFile) {
-	          if (file_exists($layoutFile)) {
-	            // include layout if it exists
-	            $this->parser->renderLayout($layoutFile);
-	          } else {
-	            $this->parser->missingLayout($layoutFile);
-	          }
-	        }
-	      }
-	
-	      // set final output
-	      $this->output = $this->parser->output;
-	    } else {
-	      // set final output as null
-	      $this->output = null;
-	    }
+  final public function render($settings) {
+    	      
+    // create builder instance
+    try {      
+      $builderClassName = 'Builder_' . ucfirst($this->params['format']);
+      $builder = new $builderClassName($this);
+    } catch (Madeam_Exception_AutoloadFail $e) {
+      Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->params['format'] . '". Missing class <strong>' . $builderClassName . '</strong>'));
+    }
+          
+    if (isset($settings['data'])) {
+      $builder->data = $settings['data'];
+    } elseif (isset($settings['collection'])) {
+      $builder->data = $settings['collection'];
+    }
+  
+    if ($builder->data !== false) {
+     
+      if (isset($settings['view'])) {
+        $builder->view = $settings['view'];
+      } elseif (isset($settings['partial'])) {
+        $partial = explode('/', $settings['partial']);
+        $partialName = array_pop($partial);
+        $builder->view = PATH_TO_VIEW . implode(DS, $partial) . DS . '' . $partialName . '.' . $this->params['format'];
+      }
+  	 
+      if (file_exists($builder->view)) {
+        // render the view
+        $builder->buildView();
+      } else {
+      	if (in_array(Madeam_Inflector::pluralize(low($this->_represent)), $builder->data)) {
+      		$builder->data = array(Madeam_Inflector::pluralize(low($this->_represent)));
+      	} elseif (in_array(Madeam_Inflector::singalize(low($this->_represent)), $builder->data)) {
+      		$builder->data = array(Madeam_Inflector::singalize(low($this->_represent)));
+      	}
+      	
+        $builder->missingView();
+      }
+
+      // set builder layout
+      if (isset($settings['layout'])) {
+        $builder->layout = $settings['layout'];
+      } elseif (isset($settings['partial'])) {
+        $builder->layout = array();
+      }
+      
+      // render layouts with builder
+      $builder->buildLayouts();
+
+      // set final output
+      $output = $builder->output;
+    } else {
+      // set final output as null
+      $output = null;
     }
 
-    return true;
-  }
-
-  /**
-   * Enter description here...
-   *
-   * @param string $action
-   */
-  final public function scaffold($action) {
-    require (SCAFFOLD_PATH . $this->scaffold . '/action/' . $action . '.php');
+    return $output;
   }
 
 }

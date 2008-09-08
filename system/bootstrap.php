@@ -84,7 +84,7 @@ define('PATH_TO_LOG', PATH_TO_PROJECT . 'etc' . DS . 'log' . DS);
 define('PATH_TO_TMP', PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
 
 // set include paths
-$includePaths = array(PATH_TO_APP, PATH_TO_LIB, PATH_TO_SYSTEM,ini_get('include_path'));
+$includePaths = array(PATH_TO_APP, PATH_TO_LIB, PATH_TO_SYSTEM, ini_get('include_path'));
 ini_set('include_path', implode(PATH_SEPARATOR, $includePaths));
 
 
@@ -94,7 +94,7 @@ require PATH_TO_SYSTEM . 'Madeam/Controller.php';
 require PATH_TO_SYSTEM . 'Madeam/Inflector.php';
 require PATH_TO_SYSTEM . 'Madeam/Router.php';
 require PATH_TO_SYSTEM . 'Madeam/Config.php';
-require PATH_TO_SYSTEM . 'Madeam/Parser.php';
+require PATH_TO_SYSTEM . 'Madeam/Builder.php';
 require PATH_TO_SYSTEM . 'Madeam/Cache.php';
 require PATH_TO_SYSTEM . 'Madeam/Registry.php';
 
@@ -113,11 +113,13 @@ spl_autoload_register('Madeam::autoload');
  */
 function file_lives($file) {
   $paths = explode(PATH_SEPARATOR, get_include_path());
+  
   foreach ($paths as $path) {
     if (is_file($path . $file)) {
       return true;
     }
   }
+  
   return false;
 }
 
@@ -175,57 +177,13 @@ function test($var = null) {
   for ($i = 0; $i < (6 - strlen($tests)); $i ++) {
     $tests = '0' . $tests;
   }
+  
   if (is_array($var) || is_object($var)) {
     echo '<br /><pre>[TEST::' . $tests . '] &nbsp;&nbsp;' . "\n";
     print_r($var);
     echo ' &nbsp;&nbsp;</pre>' . "\n";
   } else {
     echo "<br /> [TEST::" . $tests . "] &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
-  }
-}
-
-/**
- * A list is an array where there are multiple entries and the structure of the entries are identical.
- * We measure whether the entries are identical by taking the name of each of the entry's keys and turning them into a string.
- * If the strings match for every entry then it is a list
- *
- * @param array $data
- * @return boolean
- */
-function is_list($data) {
-  $matching_entries = 1;
-  $entries_checked = 0;
-  $keys_string = null;
-  // lists must be represented as arrays
-  if (is_array($data)) {
-    foreach ($data as $key => $value) {
-      // each entry must be an array
-      if (is_array($value)) {
-        $entries_checked ++; // record that an entry has been checked
-        // get keys
-        $keys = array_keys($value);
-        // sort the keys so that they are always in alphabetical order and therefore always comparable
-        asort($keys);
-        // compare keys string -- do not need to compare the first one.
-        if ($entries_checked != 1) {
-          if ($keys_string == implode($keys)) {
-            $matching_entries ++;
-          } else {
-            break;
-          }
-        }
-        // set keys_string for entry so that it can be compared to the next one
-        $keys_string = implode($keys);
-      } else {
-        return false;
-      }
-    }
-  }
-  // the data is in list format if all the entries match
-  if ($entries_checked == $matching_entries) {
-    return true;
-  } else {
-    return false;
   }
 }
 

@@ -391,6 +391,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @return array/boolean
    */
   final public function findList($value, $label = false) {
+    $this->unbindAll();
     if ($results = $this->find()) {
       return $this->generateList($results, $value, $label);
     }
@@ -416,7 +417,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       } else {
         // labeled list
         foreach ($result as $item) {
-          $list[] = array($item[$label], $item[$value]);
+          $list[$item[$label]] = $item[$value];
         }
       }
       return $list;
