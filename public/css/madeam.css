@@ -1,7 +1,7 @@
 /* =madeam defaults
 -------------------------------------- */
 h1.madeam, p.madeam { padding: 4px 8px 0px 8px; }
-h1.madeam { border-bottom: solid 8px #555; padding-top: 60px; padding-bottom: 0px; color: #fef38b; }
+h1.madeam { border-bottom: solid 8px #555; padding-top: 60px; padding-bottom: 7px; color: #fef38b; }
 code.madeam { margin-bottom: 14px; margin-left: 10px; letter-spacing: 0.03em; font-family: "Trebuchet MS", Helvetica; font-weight: bold; font-size: 1.1em; background: #fef38b; padding: 6px; display: block; border-bottom: solid 4px #555; }
 
 #madeam-error { font-family: "Courier New"; font-size: 0.8em; margin: 10px; border: solid 3px #b43838; background: #fff; padding: 10px; }
@@ -12,7 +12,7 @@ code.madeam { margin-bottom: 14px; margin-left: 10px; letter-spacing: 0.03em; fo
 * { margin: 0; padding: 0; }
 a img,:link img,:visited img { border: none; }
 
-body { line-height: 1.6em; font-family: Arial, "Lucida Grande", arial, helvetica, sans-serif; font-size: 16px; background: #000514; color: #fff; }
+body { line-height: 1.6em; font-family: Arial, "Lucida Grande", arial, helvetica, sans-serif; font-size: 14px; background: #151b29; color: #fff; }
 
 :link,:visited { text-decoration: none; }
 a:link, a:visited { color: #000; text-decoration: underline; }
