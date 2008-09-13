@@ -24,7 +24,7 @@ class Help_Form extends Help_Html {
     }
     
     $params['action'] = Madeam::url($action);
-    $params['id'] = 'form_' . Madeam_Inflector::underscorize($params['action']);
+    $params['id'] = 'form_' . Madeam_Inflector::underscorize(Madeam_Inflector::slug($params['action']));
     
     $params = array_merge($params, $_params);
     

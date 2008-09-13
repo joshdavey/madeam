@@ -12,6 +12,19 @@ class Madeam_Builder {
     $this->controller = $controller;
   }
   
+  public function buildPartial() {
+    $output = null;
+    
+    foreach ($this->collection as $data) {
+      $this->data = $data;
+      $output .= $this->buildView();
+    }
+    
+    $this->output = $output;
+    
+    return $this->output;
+  }
+  
   public function buildLayouts() {
     foreach ($this->layout as $layoutFile) {
       if ($layoutFile) {

@@ -271,7 +271,7 @@ class Madeam_Controller {
     }
     
     if (preg_match('/[a-zA-Z_]*/', $action)) {
-    	$output = eval('$this->' . $action . "(" . implode(',', $params) . ");");
+    	eval('$output = $this->' . $action . "(" . implode(',', $params) . ");");
   	} else {
   	  exit('Invalid Action Characters');
   	}
@@ -371,10 +371,10 @@ class Madeam_Controller {
     if (isset($settings['data'])) {
       $builder->data = $settings['data'];
     } elseif (isset($settings['collection'])) {
-      $builder->data = $settings['collection'];
+      $builder->collection = $settings['collection'];
     }
   
-    if ($builder->data !== false) {
+    if ($builder->data !== false || $builder->collection != false) {
      
       if (isset($settings['view'])) {
         $builder->view = $settings['view'];
@@ -385,13 +385,18 @@ class Madeam_Controller {
       }
   	 
       if (file_exists($builder->view)) {
-        // render the view
-        $builder->buildView();
+        if (!empty($builder->collection)) {
+          $builder->buildPartial();
+        } else {
+          // render the view
+          $builder->buildView();
+        }
       } else {
-      	if (in_array(Madeam_Inflector::pluralize(low($this->_represent)), $builder->data)) {
-      		$builder->data = array(Madeam_Inflector::pluralize(low($this->_represent)));
-      	} elseif (in_array(Madeam_Inflector::singalize(low($this->_represent)), $builder->data)) {
-      		$builder->data = array(Madeam_Inflector::singalize(low($this->_represent)));
+        
+      	if (in_array(Madeam_Inflector::pluralize(low($this->_represent)), array_keys($builder->data))) {
+      		$builder->data = $builder->data[Madeam_Inflector::pluralize(low($this->_represent))];
+      	} elseif (in_array(Madeam_Inflector::singalize(low($this->_represent)), array_keys($builder->data))) {
+      		$builder->data = $builder->data[Madeam_Inflector::singalize(low($this->_represent))];
       	}
       	
         $builder->missingView();

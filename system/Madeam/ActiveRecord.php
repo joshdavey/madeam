@@ -171,51 +171,81 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @return resource
    */
   final public function execute($sql) {
-      try {
-        // if we connect here we don't need to connect to the database until we execute a query
-        // therefore if all we're doing is loading a cached page we won't need a database connection
-        if (!isset(self::$_pdo[$this->server])) {
-          // parse DB information
-          $servers = Madeam_Config::get('data_servers');
-          $serverConnectionString = $servers[$this->server];
-          $server = $this->parseDbConnection($serverConnectionString);
+    $servers = Madeam_Config::get('data_servers');
+    $this->connect($servers[$this->server]);
+    
+    try {        
+      // for debugging only
+      $this->sql = $sql;
 
-          // set PDO string
-          $pdoString = "$server[driver]:dbname=$server[name];host=$server[host]";
-          
-          // create database connection
-          self::$_pdo[$this->server] = new PDO($pdoString, $server['user'], $server['pass']);
+      // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
+      Madeam_Logger::getInstance()->log($sql);
 
-          // set exception error handling
-          self::$_pdo[$this->server]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        }
+      // link
+      $count = self::$_pdo[$this->server]->exec($sql);
 
-        // for debugging only
-        $this->sql = $sql;
+    } catch (PDOException $e) {
+      $trace = $e->getTrace();
+      $error = self::$_pdo[$this->server]->errorInfo();
+      Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
+    }
 
-        // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
-        Madeam_Logger::getInstance()->log($sql);
+    return $count;
+  }
+  
+  final public function query($sql) {    
+    $servers = Madeam_Config::get('data_servers');
+    $this->connect($servers[$this->server]);
+    
+    try {        
+      // for debugging only
+      $this->sql = $sql;
 
-        // link
-        $link = self::$_pdo[$this->server]->query($sql, true);
+      // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
+      Madeam_Logger::getInstance()->log($sql);
 
-      } catch (PDOException $e) {
-        if (!isset(self::$_pdo[$this->server]) || !is_object(self::$_pdo[$this->server])) {
-          // if the _pdo variable isn't an object it means it failed to connected
-          Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
-        } else {
-          $trace = $e->getTrace();
-          $error = self::$_pdo[$this->server]->errorInfo();
-          Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
-        }
-      }
+      // link
+      $link = self::$_pdo[$this->server]->query($sql, true);
+
+    } catch (PDOException $e) {
+      $trace = $e->getTrace();
+      $error = self::$_pdo[$this->server]->errorInfo();
+      Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
+    }
 
     return $link;
   }
-
+  
+  final public function connect($connectionString) {
+    try {
+      // if we connect here we don't need to connect to the database until we execute a query   
+      // therefore if all we're doing is loading a cached page we won't need a database connection
+      if (!isset(self::$_pdo[$this->server])) {
+        // parse DB information
+        $server = $this->parseDbConnection($connectionString);
+  
+        // set PDO string
+        $pdoString = "$server[driver]:dbname=$server[name];host=$server[host]";
+        
+        // create database connection
+        self::$_pdo[$this->server] = new PDO($pdoString, $server['user'], $server['pass']);
+  
+        // set exception error handling
+        self::$_pdo[$this->server]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      }
+    } catch (PDOException $e) {
+      if (!isset(self::$_pdo[$this->server]) || !is_object(self::$_pdo[$this->server])) {
+        // if the _pdo variable isn't an object it means it failed to connected
+        Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
+      }
+    }
+    
+    return true;
+  }
+  
   final public function fetch($sql, $prepResults = false) {
     // execute query
-    $link = $this->execute($sql);
+    $link = $this->query($sql);
     
     $results = $link->fetchAll(PDO::FETCH_ASSOC);
     $link->closeCursor();
@@ -255,7 +285,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     }
 		
     // build select query and set resource link
-    $link = $this->execute($this->buildQuerySelect());
+    $link = $this->query($this->buildQuerySelect());
 		
     $results = $link->fetchAll(PDO::FETCH_ASSOC);
     $link->closeCursor();
@@ -477,13 +507,13 @@ class Madeam_ActiveRecord extends Madeam_Model {
       $this->entryId = $id;
     }
 
-    $this->execute($this->buildQueryDelete());
+    $affectedRows = $this->execute($this->buildQueryDelete());
 
     // after delete _callback
     $this->_callback('afterDelete');
 
     // check success
-    if ($this->affectedRows() > 0) {
+    if ($affectedRows > 0) {
       return true;
     } else {
       return false;

@@ -168,7 +168,7 @@ class Madeam_Inflector {
 
   public static function slug($string, $seperator = '-') {
     $string = low(str_replace(' ', $seperator, trim($string)));
-    $string = preg_replace('/[\$,!\/\\\\&\.]/', '', $string);
+    $string = preg_replace('/[\$,!\/\\\\&\.\#]/', '', $string);
     return $string;
   }
   
