@@ -540,6 +540,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
       // before save _callback
       $this->_callback('beforeSave');
+      
+      
       /*
       // relations
       $relations = array();
@@ -554,6 +556,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
         }
       }
       */
+      
       // set data as row after _callbacks have altered $this->entry
       $this->data = $this->entry;
 
