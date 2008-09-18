@@ -1,5 +1,5 @@
 <?php
-// Welcome to your applications bootstrap
+// Welcome to your application's bootstrap
 
 // use unicode
 if (function_exists('mb_internal_encoding')) { mb_internal_encoding("UTF-8"); }

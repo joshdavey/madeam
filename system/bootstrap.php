@@ -255,7 +255,3 @@ function modifedFilesExist() {
   }
 }
 //modifedFilesExist();
-
-
-// include application bootstrap
-require PATH_TO_APP . 'Config' . DS . 'bootstrap.php';
