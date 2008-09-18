@@ -80,8 +80,8 @@ class Madeam {
     if (MADEAM_REWRITE_URI !== false) {
       $url = MADEAM_REWRITE_URI . '?' . $_SERVER['QUERY_STRING'];
     } else {
-      $url = split(SCRIPT_FILENAME, $_SERVER['REQUEST_URI']);
-      // check if it split it into 2 peices.
+      $url = explode(SCRIPT_FILENAME, $_SERVER['REQUEST_URI']);
+      // check if it explode it into 2 peices.
       // If it didn't then there is ending "index.php" so we assume there is no URI on the end either
       if (isset($url[1])) {
         $url = $url[1];
@@ -153,7 +153,7 @@ class Madeam {
 
     // set controller's class
     $params['controller'] = preg_replace("/[^A-Za-z0-9_\-\/]/", null, $params['controller']); // strip off the dirt
-    $controllerClassNodes = split('/', $params['controller']);
+    $controllerClassNodes = explode('/', $params['controller']);
     foreach ($controllerClassNodes as &$node) {
       $node = Madeam_Inflector::camelize($node);
       $node = ucfirst($node);

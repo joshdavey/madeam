@@ -81,7 +81,7 @@ class Madeam_Controller {
     if (is_string($this->_represent)) {
       $this->_represent = Madeam_Inflector::modelNameize($this->_represent);
     } else {
-    	$represent = split('/', $this->params['controller']);
+    	$represent = explode('/', $this->params['controller']);
     	$this->_represent = Madeam_Inflector::modelNameize(array_pop($represent));
     }
     
@@ -378,7 +378,7 @@ class Madeam_Controller {
       if (isset($settings['view'])) {
         $view = $settings['view'];
       } elseif (isset($settings['partial'])) {
-        $partial = split('/', $settings['partial']);
+        $partial = explode('/', $settings['partial']);
         $partialName = array_pop($partial);
         $view = PATH_TO_VIEW . implode(DS, $partial) . DS . '' . $partialName . '.' . $this->params['format'];
       }
