@@ -44,7 +44,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     } else {
       // break into pieces/bits
       //$bits     = preg_split('/[\/\.]/', $route);
-      $bits = explode('/', $route);
+      $bits = split('/', $route);
       $mini_exp = $names = array();
       $bitkey = 0; // key for named bits
 
@@ -100,7 +100,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
         
     // set uri
     if (isset($parsedURI['path'])) {
-      $extracted_path = explode(PATH_TO_URI, $parsedURI['path'], 2);
+      $extracted_path = split(PATH_TO_URI, $parsedURI['path'], 2);
       $uri = array_pop($extracted_path);
     } else {
       $uri = null;
@@ -108,7 +108,7 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
 
     // set format
     $format = false;
-    $URIAnatomy = explode('.', $uri, 2);
+    $URIAnatomy = split('.', $uri, 2);
     if (count($URIAnatomy) > 1) {
       $format = array_pop($URIAnatomy);
       $uri = implode($URIAnatomy);

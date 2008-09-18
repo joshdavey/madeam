@@ -81,7 +81,7 @@ class Madeam_Controller {
     if (is_string($this->_represent)) {
       $this->_represent = Madeam_Inflector::modelNameize($this->_represent);
     } else {
-    	$represent = explode('/', $this->params['controller']);
+    	$represent = split('/', $this->params['controller']);
     	$this->_represent = Madeam_Inflector::modelNameize(array_pop($represent));
     }
     
@@ -236,7 +236,7 @@ class Madeam_Controller {
     }
   }
   
-  public function __iseet($name) {
+  public function __isset($name) {
     if (isset($this->_data[$name])) {
       return true;
     } else {
@@ -244,7 +244,6 @@ class Madeam_Controller {
     }
   }
   
-
   public function __unset($name) {
     unset($this->_data[$name]);
   }
@@ -369,34 +368,34 @@ class Madeam_Controller {
     }
           
     if (isset($settings['data'])) {
-      $builder->data = $settings['data'];
+      $data = $settings['data'];
     } elseif (isset($settings['collection'])) {
-      $builder->collection = $settings['collection'];
+      $collection = $settings['collection'];
     }
   
-    if ($builder->data !== false || $builder->collection != false) {
+    if ($data !== false || $collection != false) {
      
       if (isset($settings['view'])) {
-        $builder->view = $settings['view'];
+        $view = $settings['view'];
       } elseif (isset($settings['partial'])) {
-        $partial = explode('/', $settings['partial']);
+        $partial = split('/', $settings['partial']);
         $partialName = array_pop($partial);
-        $builder->view = PATH_TO_VIEW . implode(DS, $partial) . DS . '' . $partialName . '.' . $this->params['format'];
+        $view = PATH_TO_VIEW . implode(DS, $partial) . DS . '' . $partialName . '.' . $this->params['format'];
       }
   	 
-      if (file_exists($builder->view)) {
-        if (!empty($builder->collection)) {
-          $builder->buildPartial();
+      if (file_exists($view)) {
+        if (!empty($collection)) {
+          $content = $builder->buildPartial($view, $collection);
         } else {
           // render the view
-          $builder->buildView();
+          $content = $builder->buildView($view, $data);
         }
       } else {
         
-      	if (in_array(Madeam_Inflector::pluralize(low($this->_represent)), array_keys($builder->data))) {
-      		$builder->data = $builder->data[Madeam_Inflector::pluralize(low($this->_represent))];
-      	} elseif (in_array(Madeam_Inflector::singalize(low($this->_represent)), array_keys($builder->data))) {
-      		$builder->data = $builder->data[Madeam_Inflector::singalize(low($this->_represent))];
+      	if (in_array(Madeam_Inflector::pluralize(low($this->_represent)), array_keys($data))) {
+      		$data = $data[Madeam_Inflector::pluralize(low($this->_represent))];
+      	} elseif (in_array(Madeam_Inflector::singalize(low($this->_represent)), array_keys($data))) {
+      		$data = $data[Madeam_Inflector::singalize(low($this->_represent))];
       	}
       	
         $builder->missingView();
@@ -404,16 +403,13 @@ class Madeam_Controller {
 
       // set builder layout
       if (isset($settings['layout'])) {
-        $builder->layout = $settings['layout'];
+        $layouts = $settings['layout'];
       } elseif (isset($settings['partial'])) {
-        $builder->layout = array();
+        $layouts = array();
       }
       
       // render layouts with builder
-      $builder->buildLayouts();
-
-      // set final output
-      $output = $builder->output;
+      $output = $builder->buildLayouts($layouts, $data, $content);
     } else {
       // set final output as null
       $output = null;

@@ -103,7 +103,7 @@ class Madeam_Console extends Madeam_Console_CLI {
   protected function parseArguments($commandNames) {
     $params = array();
     foreach ($commandNames as $commandName) {
-      $nodes = explode('=', $commandName);
+      $nodes = split('=', $commandName);
       $name = $nodes[0];
       $value = $nodes[1];
       $params[$name] = $value;

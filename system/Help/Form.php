@@ -368,7 +368,7 @@ class Help_Form extends Help_Html {
    * =======================================================================
    */
   protected static function fieldName($fieldName) {
-    $nodes = explode(Madeam::association_joint, $fieldName);
+    $nodes = split(Madeam::association_joint, $fieldName);
     $name = $nodes[0];
     array_shift($nodes);
     if (! empty($nodes)) {
@@ -379,7 +379,7 @@ class Help_Form extends Help_Html {
 
   protected static function fieldValue($fieldName, $setValue) {
     // get nodes of field name to identify it's value
-    $nodes = explode(Madeam::association_joint, $fieldName);
+    $nodes = split(Madeam::association_joint, $fieldName);
     // get root of value
     $value = $_POST;
     foreach ($nodes as $node) {
