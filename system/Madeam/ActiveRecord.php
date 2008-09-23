@@ -16,39 +16,11 @@
 class Madeam_ActiveRecord extends Madeam_Model {
 
   /**
-   * Enter description here...
-   *
-   * @var array
-   */
-  protected $data = array();
-
-  /**
    * Represents a single row
    *
    * @var array
    */
   protected $entry = array();
-
-  /**
-   * Enter description here...
-   *
-   * @var string
-   */
-  public $sql = null;
-
-  /**
-   * Query resource link
-   *
-   * @var resource
-   */
-  protected $link = null;
-
-  /**
-   * Entry Identifier
-   *
-   * @var mixed
-   */
-  protected $entryId = - 1;
 
   /**
    * Enter description here...
@@ -69,8 +41,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @var string/integer
    */
-  protected $server = 0;
-
+  private $_server = 0;
+  
   /**
    * pdo instance
    *
@@ -144,13 +116,13 @@ class Madeam_ActiveRecord extends Madeam_Model {
   public function __call($name, $args) {
     $match = array();
     if (preg_match("/^find([a-zA-Z]+)By_(.*)/", $name, $match)) {
-      $this->where(array($this->name . '.' . $match[2] => $args[0]));
+      $this->where(array($this->modelName . '.' . $match[2] => $args[0]));
       $function = 'find' . $match[1];
       if (method_exists($this, $function)) {
         return $this->$function();
       }
     } elseif (preg_match("/^deleteBy_(.*)/", $name, $match)) {
-      $this->where(array($this->name . '.' . $match[2] => $args[0]));
+      $this->where(array($this->modelName . '.' . $match[2] => $args[0]));
       $this->delete();
     } else {
       $backtrace = debug_backtrace();
@@ -160,6 +132,26 @@ class Madeam_ActiveRecord extends Madeam_Model {
     return false;
   }
 
+  public function __set($name, $value) {
+    if (!preg_match('/^(?:[A-Z])/', $name)) {
+      $this->data[$name] = $value;
+    } else {
+      $this->$name = $value;
+    }
+  }
+  
+  public function __isset($name) {
+    if (isset($this->data[$name])) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  public function __unset($name) {
+    unset($this->data[$name]);
+  }
+  
   /**
    * Query Methods
    * =======================================================================
@@ -172,21 +164,18 @@ class Madeam_ActiveRecord extends Madeam_Model {
    */
   final public function execute($sql) {
     $servers = Madeam_Config::get('data_servers');
-    $this->connect($servers[$this->server]);
+    $this->connect($servers[$this->_server]);
     
-    try {        
-      // for debugging only
-      $this->sql = $sql;
-
+    try {
       // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
       Madeam_Logger::getInstance()->log($sql);
 
       // link
-      $count = self::$_pdo[$this->server]->exec($sql);
+      $count = self::$_pdo[$this->_server]->exec($sql);
 
     } catch (PDOException $e) {
       $trace = $e->getTrace();
-      $error = self::$_pdo[$this->server]->errorInfo();
+      $error = self::$_pdo[$this->_server]->errorInfo();
       Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
     }
 
@@ -195,21 +184,18 @@ class Madeam_ActiveRecord extends Madeam_Model {
   
   final public function query($sql) {    
     $servers = Madeam_Config::get('data_servers');
-    $this->connect($servers[$this->server]);
+    $this->connect($servers[$this->_server]);
     
-    try {        
-      // for debugging only
-      $this->sql = $sql;
-
+    try {
       // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
       Madeam_Logger::getInstance()->log($sql);
 
       // link
-      $link = self::$_pdo[$this->server]->query($sql, true);
+      $link = self::$_pdo[$this->_server]->query($sql, true);
 
     } catch (PDOException $e) {
       $trace = $e->getTrace();
-      $error = self::$_pdo[$this->server]->errorInfo();
+      $error = self::$_pdo[$this->_server]->errorInfo();
       Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
     }
 
@@ -220,7 +206,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     try {
       // if we connect here we don't need to connect to the database until we execute a query   
       // therefore if all we're doing is loading a cached page we won't need a database connection
-      if (!isset(self::$_pdo[$this->server])) {
+      if (!isset(self::$_pdo[$this->_server])) {
         // parse DB information
         $server = $this->parseDbConnection($connectionString);
   
@@ -228,13 +214,13 @@ class Madeam_ActiveRecord extends Madeam_Model {
         $pdoString = "$server[driver]:dbname=$server[name];host=$server[host]";
         
         // create database connection
-        self::$_pdo[$this->server] = new PDO($pdoString, $server['user'], $server['pass']);
+        self::$_pdo[$this->_server] = new PDO($pdoString, $server['user'], $server['pass']);
   
         // set exception error handling
-        self::$_pdo[$this->server]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        self::$_pdo[$this->_server]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       }
     } catch (PDOException $e) {
-      if (!isset(self::$_pdo[$this->server]) || !is_object(self::$_pdo[$this->server])) {
+      if (!isset(self::$_pdo[$this->_server]) || !is_object(self::$_pdo[$this->_server])) {
         // if the _pdo variable isn't an object it means it failed to connected
         Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
       }
@@ -249,20 +235,15 @@ class Madeam_ActiveRecord extends Madeam_Model {
     
     $results = $link->fetchAll(PDO::FETCH_ASSOC);
     $link->closeCursor();
-    
-    $this->data = false;
-    
-    foreach ($results as $result) {
-      $this->entry = $result;
-      // don't prepare results of describe queries
-      if ($prepResults === true) {
-        $this->prepareEntry(); // should this be done?
+        
+    if ($prepResults === true) {
+      foreach ($results as &$result) {
+        // don't prepare results of describe queries
+        $result = $this->prepareEntry($result);
       }
-
-      $this->data[] = $this->entry;
     }
 
-    return $this->data;
+    return $results;
   }
 
   final public function describe() {
@@ -271,7 +252,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
   }
 
   final public function find($fetch = 'all') {
-    $this->data = array();
+    $data = array();
 
     // find _callback
     $this->_callback('beforeFind');
@@ -281,21 +262,24 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // $this->Srticle->findOne(32, true)->Comment->findAll();
     // where Article is the parent of Comment
     if ($this->parent && $this->_sqlWhere == '1') {
-      $this->where(array($this->name . '.' . $this->parent->setup['hasModels'][$this->name]['foreignKey'] => $this->parent->entry[$this->parent->setup['hasModels'][$this->name]['primaryKey']]));
+      $this->where(array($this->modelName . '.' . $this->parent->setup['hasModels'][$this->modelName]['foreignKey'] => $this->parent->entry[$this->parent->setup['hasModels'][$this->modelName]['primaryKey']]));
     }
-		
+    
     // build select query and set resource link
     $link = $this->query($this->buildQuerySelect());
 		
     $results = $link->fetchAll(PDO::FETCH_ASSOC);
+    //$link->setFetchMode(PDO::FETCH_CLASS, get_class($this));
+    //$link->setFetchMode(PDO::FETCH_OBJ);
+    //$link->execute();
+    //$results = $link->fetchAll();
     $link->closeCursor();
-		
+    		
 		$foreignKeyValues = array();
 		$belongsToForeignKeys = array();
-    foreach ($results as $result) {
-    	$this->entry = $this->prepareEntry($result);
-      $this->data[] = $this->entry;
-      $foreignKeyValues[] = $this->entry[$this->setup['primaryKey']];      
+    foreach ($results as &$result) {
+    	$result = $this->prepareEntry($result);    	
+      $foreignKeyValues[] = $result[$this->setup['primaryKey']];      
       
       foreach ($this->setup['belongsTo'] as $model => $params) {
       	if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
@@ -312,11 +296,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
           // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
           // clone object so we don't interupt it's state with reset()
           $tempmodel = clone $this->{$params['model']};
-          $tempmodel->name = $params['model'];
+          $tempmodel->modelName = $params['model'];
           $hasOne = $tempmodel->where(array($params['model'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
           unset($tempmodel);
           
-          $this->_combineSingleDataOnKeys($this->data, $this->setup['primaryKey'], $hasOne, $params['foreignKey'], Madeam_Inflector::singalize($model));
+          $this->_combineSingleDataOnKeys($results, $this->setup['primaryKey'], $hasOne, $params['foreignKey'], Madeam_Inflector::singalize($model));
         }
       }
 
@@ -328,11 +312,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
           $tempmodel = clone $this->{$params['model']};
           // change the model name because we can't always assume that the name will be the same.
           // An example of this is when you create a self-refrencing relationship in a table and name the relationship "sub_model" or "parent_model"
-          $tempmodel->name = $params['model'];
+          $tempmodel->modelName = $params['model'];
           $belongTo = $tempmodel->where(array($params['model'] . '.' . $params['primaryKey'] => array_unique($belongsToForeignKeys[$params['model']])))->findAll();
           unset($tempmodel);
           
-          $this->_combineSingleDataOnKeys($this->data, $params['foreignKey'], $belongTo, $params['primaryKey'], Madeam_Inflector::singalize($model)); 
+          $this->_combineSingleDataOnKeys($results, $params['foreignKey'], $belongTo, $params['primaryKey'], Madeam_Inflector::singalize($model)); 
         }
       }
 
@@ -342,11 +326,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
         if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
           // clone object so we don't interupt it's state with reset()
           $tempmodel = clone $this->{$params['model']};
-          $tempmodel->name = $params['model'];
+          $tempmodel->modelName = $params['model'];
           $hasMany = $tempmodel->where(array($params['model'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
           unset($tempmodel);
-            
-          $this->_combineDataOnKeys($this->data, $this->setup['primaryKey'], $hasMany, $params['foreignKey'], Madeam_Inflector::pluralize($model)); 
+          
+          $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $hasMany, $params['foreignKey'], Madeam_Inflector::pluralize($model)); 
         }
       }      
       
@@ -354,10 +338,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
       foreach ($this->setup['hasAndBelongsToMany'] as $model => $params) {
         if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
           $tempmodel = clone $this->{$params['model']}; // user model
-          $habtm = $tempmodel->join($this->name)->where(array($params['joinModel'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
+          $habtm = $tempmodel->join($this->modelName)->where(array($params['joinModel'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
           unset($tempmodel);
           
-          $this->_combineDataOnKeys($this->data, $this->setup['primaryKey'], $habtm, $params['foreignKey'], Madeam_Inflector::pluralize($model));
+          $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $habtm, $params['foreignKey'], Madeam_Inflector::pluralize($model));
         }
       }
     }
@@ -366,23 +350,21 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->_callback('afterFind');
 
     // grab data before it's reset
-    if ($fetch == 'all') {
-      $data = $this->data;
-    } else {
-      $data = $this->entry = $this->data[0];
+    if ($fetch != 'all') {
+      $results = $results[0];
     }
 
     // reset all sql values and data
     $this->reset();
 
     // return data
-    return $data;
+    return $results;
   }
   
   
   private function _combineSingleDataOnKeys(&$result1Data, $result1Key, &$result2Data, $result2Key, $combineKey) {
   	foreach ($result1Data as &$entry) {
-    	foreach ($result2Data as $key => &$result) {
+    	foreach ($result2Data as $key => &$result) {    	  
     		if ($entry[$result1Key] === $result[$result2Key]) {
     			$entry[$combineKey] = $result;
     		}
@@ -447,7 +429,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
       } else {
         // labeled list
         foreach ($result as $item) {
-          $list[$item[$label]] = $item[$value];
+          $list[$item[$label]]= $item[$value];
         }
       }
       return $list;
@@ -461,17 +443,10 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @param string/int $id
    * @return array/false
    */
-  final public function findOne($id = -1, $chain = false) {
-    $this->entry = array();
-
-    // set entryId
-    if ($id != - 1) {
-      $this->entryId = $id;
-    }
-
+  final public function findOne($id = false) {
     // set where
-    if ($this->entryId != - 1 && $this->setup['primaryKey'] !== false) {
-      $this->where(array($this->name . '.' . $this->setup['primaryKey'] => $id));
+    if ($id !== false && $this->setup['primaryKey'] !== false) {
+      $this->where(array($this->modelName . '.' . $this->setup['primaryKey'] => $id));
     }
 
     // set limit
@@ -480,12 +455,8 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // find stuff!
     $data = $this->find('one');
 
-    if ($chain) {
-      // return object because this entry is being chained
-      return $this;
-    } else {
-      return $data;
-    }
+    // return data
+    return $data;
   }
 
   /**
@@ -493,7 +464,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @param integer/string $id
    */
-  final public function delete($id = -1) {
+  final public function delete($id = false) {
     // reset all sql values and data
     $this->reset();
 
@@ -503,18 +474,20 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // before delete _callback
     $this->_callback('beforeDelete');
-    if ($id != - 1) {
-      $this->entryId = $id;
+    
+    // set primary key value
+    if ($id != false) {
+      $data[$this->setup['primaryKey']] = $id;
     }
-
-    $affectedRows = $this->execute($this->buildQueryDelete());
+    
+    $affectedRows = $this->execute($this->buildQueryDelete($data));
 
     // after delete _callback
     $this->_callback('afterDelete');
 
     // check success
     if ($affectedRows > 0) {
-      return true;
+      return $affectedRows;
     } else {
       return false;
     }
@@ -531,20 +504,12 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // true/false
     $update = false;
 
-    // set $this->entry so it is accessible in _callbacks
-    $this->entry = $data;
-
-    // set entryId
-    if (isset($this->entry[$this->setup['primaryKey']]) && $this->entry[$this->setup['primaryKey']] != null) {
-      $this->entryId = $this->entry[$this->setup['primaryKey']];
-    }
-
     // check to see whether this is going to be an insert or an update
     $name = get_class($this);
     $inst = new $name();
 
     // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
-    if ($this->entryId != - 1 && $inst->findOne($this->entryId)) {
+    if (isset($data[$this->setup['primaryKey']]) && $data[$this->setup['primaryKey']] != false && $inst->findOne($data[$this->setup['primaryKey']])) {
       $update = true;
     }
 
@@ -560,18 +525,16 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // after Validate _callback
     $this->_callback('afterValidate');
+    
     // now that all the _callbacks prior to updating/adding the new row have been called
     // we must check for any errors that may have been envoked.
     // if there aren't any then continue as usual.
     // if not then skip adding/updating
     if (! isset($_SESSION[Madeam::user_error_name]) || count($_SESSION[Madeam::user_error_name]) < 1) {
-      // do standard field formats
-      $this->standardFieldFormats();
 
       // before save _callback
       $this->_callback('beforeSave');
-      
-      
+            
       /*
       // relations
       $relations = array();
@@ -586,30 +549,28 @@ class Madeam_ActiveRecord extends Madeam_Model {
         }
       }
       */
-      
-      // set data as row after _callbacks have altered $this->entry
-      $this->data = $this->entry;
 
       // filter out fields that don't exist in the model
-      $this->data = array_intersect_key($this->data, array_flip($this->setup['standardFields']));
+      $data = array_intersect_key($data, array_flip($this->setup['standardFields']));
 
       // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
       if ($update === true) {
         $this->isUpdate = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
-        $this->execute($this->buildQueryUpdate());
+        $this->execute($this->buildQueryUpdate($data, $this->setup['resourceName'], $this->_sqlWhere, $this->_sqlStart, $this->_sqlRange, $this->setup['primaryKey']));
       } else {
         $this->isInsert = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
-        $this->execute($this->buildQueryInsert());
+        $this->execute($this->buildQueryInsert($data, $this->setup['resourceName'], $this->setup['primaryKey']));
       }
 
       // grab entry id before it's overwritten by something that happens in afterSave()
       $entryId = $this->insertId();
 
       // set this so it can be used in afterSave
-      $this->entry[$this->setup['primaryKey']] = $entryId;
+      $data[$this->setup['primaryKey']] = $entryId;
 
       // grab entry after it's been modified by _callbacks
-      $entry = $this->entry;
+      $entry = $this->data;
+      
       /*
       if ($entryId) {
         // check for fields that are arrays
@@ -623,6 +584,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
         }
       }
       */
+      
       // after save _callback
       $this->_callback('afterSave');
 
@@ -641,7 +603,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
     // return data
     if ($this->affectedRows() > 0) {
-      return $this->data;
+      return $data;
     }
 
     // failed to return any rows
@@ -659,9 +621,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->name);
+    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->modelName);
     $class->primaryKey = false;
-    $this_key = Madeam_Inflector::modelForeignKey($this->name);
+    $this_key = Madeam_Inflector::modelForeignKey($this->modelName);
     $relation_key = Madeam_Inflector::modelForeignKey($model);
 
     //$this->ItemStore->findOne(1,2);
@@ -685,9 +647,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->name);
+    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->modelName);
     $class->primaryKey = false;
-    $this_key = Madeam_Inflector::modelForeignKey($this->name);
+    $this_key = Madeam_Inflector::modelForeignKey($this->modelName);
     $relation_key = Madeam_Inflector::modelForeignKey($model);
 
     foreach ($assoc as $val) {
@@ -735,7 +697,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
   	$sqlFields = array();
   	
   	// add main table to query
-  	$sqlTables[] = $this->setup['resourceName'] . ' as ' . $this->name;
+  	$sqlTables[] = $this->setup['resourceName'] . ' as ' . $this->modelName;
   	
   	// set main fields
   	if (!empty($this->fields)) {
@@ -745,14 +707,15 @@ class Madeam_ActiveRecord extends Madeam_Model {
 		}
   	
   	// get main fields
-  	$sqlFields[] = $this->name . '.' . implode(", " . $this->name . '.', $mainFields) . ' ';
+  	$sqlFields[] = $this->modelName . '.' . implode(", " . $this->modelName . '.', $mainFields) . ' ';
   	
   	// check joins for tables and fields
   	foreach ($this->_sqlJoins as $model => $join) {
     	if (!isset($this->setup['hasAndBelongsToMany'][$model])) {
     		$sqlTables[] = 'LEFT JOIN ' . $join['table'] . ' as ' . $join['model'] . ' on ' . $join['on'];
     		
-    		$selectFields = $this->$model->getFields();
+    		//$selectFields = $this->$model->getFields();
+    		$selectFields = $this->$model->fields;
     		if (!empty($selectFields)) {
     			$modelFields = array_intersect($selectFields, $this->$model->setup['standardFields']);
 		  	} else {
@@ -792,23 +755,25 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @return string
    */
-  final private function buildQueryInsert() {
-    $sql = array();
-    $table = $this->setup['resourceName'];
+  final private function buildQueryInsert($data, $table = false, $primaryKey = false) {
+    
     // remove primary key insert if it is null
-    if (! isset($this->data[$this->setup['primaryKey']]) || $this->data[$this->setup['primaryKey']] == null) {
-      unset($this->data[$this->setup['primaryKey']]);
+    if (!isset($data[$primaryKey]) || $data[$primaryKey] == null) {
+      unset($data[$primaryKey]);
     }
+    
+    $sql = array();
+    
     // add table name
     $sql[] = 'INSERT INTO ' . $table;
     // add fields
-    $sql[] = '(' . implode(',', array_keys($this->data)) . ')';
+    $sql[] = '(' . implode(',', array_keys($data)) . ')';
     // close fields, open values
     $sql[] = 'VALUES';
     // add values
-    $sql[] = "('" . @implode("','", array_values($this->data)) . "')";
+    $sql[] = "('" . @implode("','", array_values($data)) . "')";
+    
     // build query
-
     return implode(' ', $sql) . ';';
   }
 
@@ -817,37 +782,39 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @return string
    */
-  final private function buildQueryUpdate() {
+  final private function buildQueryUpdate($data, $table = false, $where = false, $start = false, $range = false, $primaryKey = false) {
     $sql = array();
-    $table = $this->setup['resourceName'];
+    
     // add table name
     $sql[] = 'UPDATE ' . $table . ' SET';
+    
     // fields
     if (empty($this->fields)) {
       $sets = array();
-      foreach ($this->data as $field => $value) {
+      foreach ($data as $field => $value) {
         $sets[] = "$field = " . Madeam_Sanitize::escape($value);
       }
     } else {
       foreach ($this->fields as $field) {
-        $sets[] = "$field = " . Madeam_Sanitize::escape($this->data[$field]);        
+        $sets[] = "$field = " . Madeam_Sanitize::escape($data[$field]);        
       }
     }
+    
     // add fields
     $sql[] = implode(", \n", $sets);
+    
     // add where condition
-    if ($this->_sqlWhere != 1) {
-      $sql[] = 'WHERE ' . $this->_sqlWhere;
+    if ($where != false) {
+      $sql[] = 'WHERE ' . $where;
     } elseif ($this->entryId != - 1) {
-      $sql[] = 'WHERE ' . $this->setup['primaryKey'] . ' = ' . Madeam_Sanitize::escape($this->entryId);
-    } else {
-      return false;
+      $sql[] = 'WHERE ' . $primaryKey . ' = ' . Madeam_Sanitize::escape($data[$primaryKey]);
     }
+    
     // add limit
-    if ($this->_sqlStart && $this->_sqlRange) {
-      $sql[] = "LIMIT $this->_sqlStart, $this->_sqlRange";
-    } elseif ($this->_sqlStart && ! $this->_sqlRange) {
-      $sql[] = "LIMIT $this->_sqlStart";
+    if ($start && $range) {
+      $sql[] = "LIMIT $start, $range";
+    } elseif ($start && ! $range) {
+      $sql[] = "LIMIT $start";
     } else {
       $sql[] = 'LIMIT 1';
     }
@@ -861,23 +828,26 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @return string
    */
-  final private function buildQueryDelete() {
+  final private function buildQueryDelete($data, $table = false, $where = false, $start = false, $range = false) {
     $sql = array();
+    
     // add table name
-    $sql[] = 'DELETE FROM ' . $this->setup['resourceName'];
+    $sql[] = 'DELETE FROM ' . $table;
+    
     // add where condition
-    if ($this->_sqlWhere != 1) {
-      $sql[] = 'WHERE ' . $this->_sqlWhere;
+    if ($where != 1) {
+      $sql[] = 'WHERE ' . $where;
     } elseif ($this->entryId != - 1) {
-      $sql[] = 'WHERE ' . $this->setup['primaryKey'] . ' = ' . Madeam_Sanitize::escape($this->entryId);
+      $sql[] = 'WHERE ' . $primaryKey . ' = ' . Madeam_Sanitize::escape($data[$primaryKey]);
     } else {
       return false;
     }
+    
     // add limit
-    if ($this->_sqlStart && $this->_sqlRange) {
-      $sql[] = "LIMIT $this->start, $this->_sqlRange";
-    } elseif ($this->_sqlStart && ! $this->_sqlRange) {
-      $sql[] = "LIMIT $this->_sqlStart";
+    if ($start && $range) {
+      $sql[] = "LIMIT $start, $range";
+    } elseif ($start && ! $range) {
+      $sql[] = "LIMIT $start";
     } else {
       $sql[] = 'LIMIT 1';
     }
@@ -1016,7 +986,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
         $relation = $this->setup['hasAndBelongsToMany'][$model];
 
         // set on condition
-        $on = $this->name . '.' . $this->setup['primaryKey'] . ' = ' . $relation['joinModel'] . '.' . $relation['foreignKey'];
+        $on = $this->modelName . '.' . $this->setup['primaryKey'] . ' = ' . $relation['joinModel'] . '.' . $relation['foreignKey'];
 
         // add join
         $this->_sqlJoins[$model] = array('table' => $relation['joinResourceName'], 'on' => $on);
@@ -1049,14 +1019,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->_sqlFields = array();
     $this->_sqlJoins = array();
     $this->fields = array();
-    $this->data = array();
-    $this->entry = array();
     $this->entryId = - 1;
     $this->depth = 1;
     $this->isInsert = false;
     $this->isUpdate = false;
     $this->unbound = array();
-    //$this->sql = null;
     
     // reset child models
     // this is so we can do stuff like...
@@ -1082,7 +1049,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if ($this->entryId != - 1) {
       return $this->entryId;
     } else {
-      return self::$_pdo[$this->server]->lastInsertId();
+      return self::$_pdo[$this->_server]->lastInsertId();
     }
   }
 
@@ -1092,74 +1059,26 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * @return int
    */
   final public function affectedRows() {
-    return self::$_pdo[$this->server]->rowCount();
+    return self::$_pdo[$this->_server]->rowCount();
   }
 
-  /**
-   * Getters
-   * =======================================================================
-   */
-  final public function getLabel() {
-    return $this->label;
-  }
-
-  /**
-   * Lame functions I want to remove
-   * =======================================================================
-   */
-  /**
-   * This should be a global function some day.
-   *
-   * @param unknown_type $date
-   * @return unknown
-   */
-  final protected function formatDatetime($date = array()) {
-    if (is_array($date)) {
-      //2006-12-26 19:26:19
-      $date['year'] ? true : $date['year'] = '0000';
-      $date['month'] ? true : $date['month'] = '00';
-      $date['day'] ? true : $date['day'] = '00';
-      $date['hour'] ? true : $date['hour'] = '00';
-      $date['minute'] ? true : $date['minute'] = '00';
-      $date['second'] ? true : $date['second'] = '00';
-      return "$date[year]-$date[month]-$date[day] $date[hour]:$date[minute]:$date[second]";
-    } else {
-      return $date;
-    }
-  }
-
-  final protected function formatDatetimeField($field, $default) {
-    if (isset($this->entry[$field])) {
-      if (is_string($this->entry[$field]) && $this->entry[$field] == null) {
-        $this->entry[$field] = date($default);
-      } else {
-        $this->entry[$field] = $this->formatDatetime($this->entry[$field]);
-      }
-    }
-  }
-
-  final protected function standardFieldFormats() {
-    // created_on
-    $this->formatDatetimeField('created_on', 'Y-m-d 00:00:00');
-    // created_at
-    $this->formatDatetimeField('created_at', 'Y-m-d H:i:s');
-    // updated_on
-    $this->formatDatetimeField('updated_on', 'Y-m-d 00:00:00');
-    // updated_at
-    $this->formatDatetimeField('updated_at', 'Y-m-d H:i:s');
-  }
+  
+  
 
   final public function parseDbConnection($string) {
     $details = array();
+    
     // parse connection string as url
     $parsed_string = parse_url($string);
     isset($parsed_string['scheme']) ? $details['driver'] = $parsed_string['scheme'] : $details['driver'] = null;
     isset($parsed_string['host']) ? $details['host'] = $parsed_string['host'] : $details['host'] = null;
     isset($parsed_string['user']) ? $details['user'] = $parsed_string['user'] : $details['user'] = null;
     isset($parsed_string['pass']) ? $details['pass'] = $parsed_string['pass'] : $details['pass'] = null;
+    
     parse_str($parsed_string['query'], $options);
     isset($options['name']) ? $details['name'] = $options['name'] : $details['name'] = null;
     isset($options['port']) ? $details['port'] = $options['port'] : $details['port'] = false;
+    
     return $details;
   }
 }

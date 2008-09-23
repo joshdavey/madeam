@@ -1,6 +1,6 @@
 <?php
 
-class Builder_Xml extends Madeam_Builder {
+class Madeam_Controller_Builder_Xml extends Madeam_Controller_Builder {
 
   public function buildView() {
 

@@ -1,9 +1,9 @@
 <?php
 
-class Builder_Json extends Madeam_Builder {
+class Madeam_Controller_Builder_Phps extends Madeam_Controller_Builder {
 
   public function buildView() {
-    $this->output = json_encode($this->data);
+    $this->output = serialize($this->data);
     return $this->output;
   }
 

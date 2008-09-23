@@ -1,6 +1,6 @@
 <?php
 
-class Builder_Html extends Madeam_Builder {
+class Madeam_Controller_Builder_Html extends Madeam_Controller_Builder {
 
   public function buildView($view = null, $data = array()) {
     ob_start();

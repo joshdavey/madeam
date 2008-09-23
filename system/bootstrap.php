@@ -94,7 +94,7 @@ require PATH_TO_SYSTEM . 'Madeam/Controller.php';
 require PATH_TO_SYSTEM . 'Madeam/Inflector.php';
 require PATH_TO_SYSTEM . 'Madeam/Router.php';
 require PATH_TO_SYSTEM . 'Madeam/Config.php';
-require PATH_TO_SYSTEM . 'Madeam/Builder.php';
+require PATH_TO_SYSTEM . 'Madeam/Controller/Builder.php';
 require PATH_TO_SYSTEM . 'Madeam/Cache.php';
 require PATH_TO_SYSTEM . 'Madeam/Registry.php';
 

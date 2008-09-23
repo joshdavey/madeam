@@ -28,6 +28,13 @@ class Madeam_Model {
    * @var unknown_type
    */
   public $primaryKey = false;
+  
+  /**
+   * Enter description here...
+   *
+   * @var unknown_type
+   */
+  protected $data = array();
 
   /**
    * Enter description here...
@@ -63,7 +70,7 @@ class Madeam_Model {
    *
    * @var unknown_type
    */
-  protected $name = null;
+  protected $modelName = null;
 
   /**
    * Enter description here...
@@ -129,10 +136,10 @@ class Madeam_Model {
     }
 
     if (isset($params['name'])) {
-      $this->name = $params['name'];
+      $this->modelName = $params['name'];
     } else {
       // set name
-      $this->name = Madeam_Inflector::modelNameize(substr(get_class($this), 6)); // safely remove "Model_" from the name
+      $this->modelName = Madeam_Inflector::modelNameize(substr(get_class($this), 6)); // safely remove "Model_" from the name
     }
 
     if (isset($params['resourceName'])) {
@@ -140,7 +147,7 @@ class Madeam_Model {
     }
 
     // set cache name
-    $this->cacheName .= low($this->name) . '.setup';
+    $this->cacheName .= low($this->modelName) . '.setup';
 
 		// clear model cache if it cache is disabled for routes
 		if (!Madeam_Config::get('cache_models')) { 
@@ -174,7 +181,7 @@ class Madeam_Model {
       // the resourceName parameter is available for the developer to change the resource name in
       // the model definition but $this->setup['resourceName'] is used through this class because it is cached
       if ($this->resourceName == null) {
-        $this->setup['resourceName'] = Madeam_Inflector::modelTableize($this->name);
+        $this->setup['resourceName'] = Madeam_Inflector::modelTableize($this->modelName);
       } else {
         $this->setup['resourceName'] = $this->resourceName;
       }
@@ -227,7 +234,7 @@ class Madeam_Model {
    * @param string $name
    * @return object
    */
-  public function __get($name) {
+  public function &__get($name) {
     // catch set_ method call
     $match = array();
     if (preg_match("/^[A-Z]{1}/", $name, $match) && in_array($name, array_keys($this->setup['hasModels']))) {
@@ -240,9 +247,17 @@ class Madeam_Model {
       // create model instance
       $inst = new $modelClass($modelSetup);
       $this->$name = $inst;
+      
       // here we pass a reference of this class to the child model
       $this->$name->parent = $this;
       return $inst;
+    }
+    
+    if (array_key_exists($name, $this->data)) {
+      return $this->data[$name];
+    } else {
+     $this->data[$name] = null;
+     return $this->data[$name]; 
     }
   }
 
@@ -286,7 +301,7 @@ class Madeam_Model {
         // get value of validator property
         $args = $prop->getValue($this);
         // seperate bits of validate call by _
-        $validate = explode('_', $matches[1]);
+        $validate = split('_', $matches[1]);
         // get method name
         $method = $validate[count($validate) - 1];
         // remove method name from the end of validate var
@@ -348,7 +363,7 @@ class Madeam_Model {
     }
     // merge models
     // and add itself to the list of models
-    $this->setup['hasModels'] = array_merge($this->setup['hasOne'], $this->setup['hasMany'], $this->setup['hasAndBelongsToMany'], $this->setup['belongsTo'], array($this->name => array('model' => $this->name)));
+    $this->setup['hasModels'] = array_merge($this->setup['hasOne'], $this->setup['hasMany'], $this->setup['hasAndBelongsToMany'], $this->setup['belongsTo'], array($this->modelName => array('model' => $this->modelName)));
   }
 
   final protected function loadCallbacks() {
@@ -377,16 +392,16 @@ class Madeam_Model {
     // set the model name
     ! isset($params['model']) ? $params['model'] = Madeam_Inflector::modelNameize($model) : $params['model'] = Madeam_Inflector::modelNameize($params['model']);
     // set name of field that identifies the foreign record
-    ! isset($params['foreignKey']) ? $params['foreignKey'] = Madeam_Inflector::modelForeignKey($this->name) : false;
+    ! isset($params['foreignKey']) ? $params['foreignKey'] = Madeam_Inflector::modelForeignKey($this->modelName) : false;
     // set associate's foreign key
     ! isset($params['associateForeignKey']) ? $params['associateForeignKey'] = Madeam_Inflector::modelForeignKey($model) : false;
     // set join model (table in the database that houses both foreign keys)
-    $joinModels = array($params['model'], $this->name);
+    $joinModels = array($params['model'], $this->modelName);
     asort($joinModels);
     $joinModel = implode($joinModels);
     ! isset($params['joinModel']) ? $params['joinModel'] = $joinModel : false;
     // set join resource name
-    $params['joinResourceName'] = Madeam_Inflector::modelHabtm($this->name, $params['model']);    
+    $params['joinResourceName'] = Madeam_Inflector::modelHabtm($this->modelName, $params['model']);    
     // set primary key
     ! isset($params['primaryKey']) ? $params['primaryKey'] = $this->setup['primaryKey'] : false;
     // set uniqueness
@@ -408,7 +423,7 @@ class Madeam_Model {
 
   final protected function addHasMany($model, $params) {
     // set name of field that identifies the foreign record
-    ! isset($params['foreignKey']) ? $params['foreignKey'] = Madeam_Inflector::modelForeignKey($this->name) : false;
+    ! isset($params['foreignKey']) ? $params['foreignKey'] = Madeam_Inflector::modelForeignKey($this->modelName) : false;
     // set the model name
     ! isset($params['model']) ? $params['model'] = Madeam_Inflector::modelNameize($model) : $params['model'] = Madeam_Inflector::modelNameize($params['model']);
     // set primary key
@@ -442,17 +457,16 @@ class Madeam_Model {
   /**
    * This method calls all the validation methods listed in the $validators variable and validates the values of a single entry
    */
-  final protected function validateEntry($check_non_existent_fields = false) {
+  final protected function validateEntry($entry, $check_non_existent_fields = false) {
     foreach ($this->setup['validators'] as $validator) {
       $field = $validator['args']['field'];
       $method = $validator['method'];
-      $error_key = $this->name . MADEAM_ASSOCIATION_JOINT . $field;
+      $errorKey = $this->modelName . MADEAM_ASSOCIATION_JOINT . $field;
       
       // validate to make sure the validating method doesn't return false. If it does then save the error
-      if ($check_non_existent_fields === false || isset($this->entry[$field])) {
-        if (Madeam_Validate::$method(@$this->entry[$field], $validator['args']) === false) {
-          Madeam_Session::error($error_key, $this->parseValidateMessage($validator['args']));
-          //$_SESSION[Madeam::user_error_name][$error_key][] = $this->parseValidateMessage($validator['args']);
+      if ($check_non_existent_fields === false || isset($entry[$field])) {
+        if (Madeam_Validate::$method(@$entry[$field], $validator['args']) === false) {
+          Madeam_Session::error($errorKey, $this->parseValidateMessage($validator['args']));
         }
       }
     }
@@ -488,7 +502,6 @@ class Madeam_Model {
    * Or atleast find a faster way of doing it.
    */
   final protected function prepareEntry($entry) {
-  	$this->entry = $entry;
     foreach ($this->setup['customFields'] as $field) {
       // excludes any fields that aren't in $this->fields
       if (in_array($field, $this->fields) || empty($this->fields)) {
@@ -507,8 +520,10 @@ class Madeam_Model {
     //$reflection = new ReflectionClass(get_class($this));
     // get the name of it's parent (example parents: activeRecord. activeFile, etc...)
     $parent = $this->reflection->getParentClass()->getName();
+    
     // create instance of parent so we can compare the methods
     $parentReflection = new ReflectionClass($parent);
+    
     // check each method to find out whethere it's a new field or not
     // I wish there was a faster way of doing this...
     $methods = $this->reflection->getMethods(ReflectionMethod::IS_PROTECTED);
@@ -563,25 +578,5 @@ class Madeam_Model {
   final public function bind($model, $relation, $params) {
     $this->{'add_' . $relation}($model, $params);
     return $this;
-  }
-
-  /**
-   * Getter functions
-   * =======================================================================
-   */
-  public function getPrimaryKey() {
-    return $this->setup['primaryKey'];
-  }
-
-  public function getSetup() {
-    return $this->setup;
-  }
-  
-  public function getFields() {
-  	return $this->fields;
-  }
-  
-  public function getLabel() {
-  	return $this->label;
   }
 }

@@ -1,5 +1,5 @@
 <?php
-class Madeam_Builder {
+class Madeam_Controller_Builder {
 
   public $controller;
   public $data        = array();

@@ -361,7 +361,7 @@ class Madeam_Controller {
     	      
     // create builder instance
     try {      
-      $builderClassName = 'Builder_' . ucfirst($this->params['format']);
+      $builderClassName = 'Madeam_Controller_Builder_' . ucfirst($this->params['format']);
       $builder = new $builderClassName($this);
     } catch (Madeam_Exception_AutoloadFail $e) {
       Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->params['format'] . '". Missing class <strong>' . $builderClassName . '</strong>'));
