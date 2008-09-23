@@ -530,7 +530,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // we must check for any errors that may have been envoked.
     // if there aren't any then continue as usual.
     // if not then skip adding/updating
-    if (! isset($_SESSION[Madeam::user_error_name]) || count($_SESSION[Madeam::user_error_name]) < 1) {
+    if (! isset($_SESSION[Madeam::userErrorName]) || count($_SESSION[Madeam::userErrorName]) < 1) {
 
       // before save _callback
       $this->_callback('beforeSave');

@@ -35,12 +35,12 @@ class Madeam_Session {
   }
 
   public static function flashSet($name, $data) {
-    $_SESSION[Madeam::flash_data_name][$name] = $data;
+    $_SESSION[Madeam::flashDataName][$name] = $data;
   }
 
   public static function flashGet($name) {
-    if (isset($_SESSION[Madeam::flash_data_name][$name])) {
-      return $_SESSION[Madeam::flash_data_name][$name];
+    if (isset($_SESSION[Madeam::flashDataName][$name])) {
+      return $_SESSION[Madeam::flashDataName][$name];
     } else {
       return false;
     }
@@ -48,28 +48,28 @@ class Madeam_Session {
 
   public static function flashPost($postData = false) {
     if ($postData !== false) {
-      $_SESSION[Madeam::flash_data_name][Madeam::flash_post_name] = $postData;
+      $_SESSION[Madeam::flashDataName][Madeam::flashPostName] = $postData;
     } else {
       if (isset($_POST)) {
-        $_SESSION[Madeam::flash_data_name][Madeam::flash_post_name] = $_POST;
+        $_SESSION[Madeam::flashDataName][Madeam::flashPostName] = $_POST;
       }
     }
   }
 
   public static function flashDestroy($name = false) {
     if ($name === false) {
-      unset($_SESSION[Madeam::flash_data_name]);
+      unset($_SESSION[Madeam::flashDataName]);
     } else {
-      unset($_SESSION[Madeam::flash_data_name][$name]);
+      unset($_SESSION[Madeam::flashDataName][$name]);
     }
   }
 
   public static function flashLife($pagesToLive = 1) {
-    $_SESSION[Madeam::flash_life_name] = $pagesToLive;
+    $_SESSION[Madeam::flashLifeName] = $pagesToLive;
   }
 
   public static function error($name, $msg) {
-    $_SESSION[Madeam::user_error_name][$name][] = $msg;
+    $_SESSION[Madeam::userErrorName][$name][] = $msg;
   }
 
   public static function set($name, $value) {

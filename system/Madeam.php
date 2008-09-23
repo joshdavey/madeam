@@ -22,31 +22,31 @@ class Madeam {
   
   /**
 	 * define user errors variable name for $_SESSION
-	 * example: $_SESSION[MADEAM_USER_ERROR_NAME];
+	 * example: $_SESSION[Madeam::userErrorName];
 	 */
-  const user_error_name = 'muerrors';  
+  const userErrorName = 'muerrors';  
   
   /**
 	 * this is used for passing misc data from one page to the other
 	 */
-  const flash_data_name	= 'mflash';
+  const flashDataName	= 'mflash';
   
   /**
 	 * this sets how many pages the flash has to live (ptl: pages to live)
 	 */
-  const flash_life_name	= 'mflife';
+  const flashLifeName	= 'mflife';
   
 	/**
 	 * this is used for passing post data from one page to the next
 	 * the post data is merged with the flash post data on the next page
 	 */
-  const flash_post_name	= 'mfpost';
+  const flashPostName	= 'mfpost';
   
 	/**
 	 * Used for joining models and other associations
 	 * example use: "user.name"
 	 */
-  const association_joint	= '.';
+  const associationJoint	= '.';
   
 
   /**
@@ -92,20 +92,20 @@ class Madeam {
     $output = Madeam::request($url, array_merge($_GET, $_POST, $_COOKIE));
 
     // destroy user error notices
-    if (isset($_SESSION[self::user_error_name])) {
-      unset($_SESSION[self::user_error_name]);
+    if (isset($_SESSION[self::userErrorName])) {
+      unset($_SESSION[self::userErrorName]);
     }
 
     // destroy flash data when it's life runs out
-    if (isset($_SESSION[self::flash_life_name])) {
-      if (-- $_SESSION[self::flash_life_name] < 1) {
-        unset($_SESSION[self::flash_life_name]);
-        if (isset($_SESSION[self::flash_data_name])) {
-          unset($_SESSION[self::flash_data_name]);
+    if (isset($_SESSION[self::flashLifeName])) {
+      if (-- $_SESSION[self::flashLifeName] < 1) {
+        unset($_SESSION[self::flashLifeName]);
+        if (isset($_SESSION[self::flashDataName])) {
+          unset($_SESSION[self::flashDataName]);
         }
       } else {
-        if (isset($_SESSION[self::flash_data_name][self::flash_data_name])) {
-          $_POST = array_merge($_SESSION[self::flash_data_name][self::flash_post_name], $_POST);
+        if (isset($_SESSION[self::flashDataName][self::flashDataName])) {
+          $_POST = array_merge($_SESSION[self::flashDataName][self::flashPostName], $_POST);
           $_SERVER['REQUEST_METHOD'] = 'POST';
         }
       }

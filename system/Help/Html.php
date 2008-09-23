@@ -107,7 +107,7 @@ class Help_Html {
    * @param string $name
    */
   protected static function nameToId($name) {
-    return str_replace(Madeam::association_joint, '_', low($name));
+    return str_replace(Madeam::associationJoint, '_', low($name));
   }
 
   /**

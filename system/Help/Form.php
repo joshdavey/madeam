@@ -187,37 +187,37 @@ class Help_Form extends Help_Html {
     if (is_string($value)) {
       preg_match_all('/(\d{4})\-(\d{2})\-(\d{2})/', $value, $matchs);
       $value = array();
-      $value[$name . Madeam::association_joint . 'year'] = $matchs[1][0];
-      $value[$name . Madeam::association_joint . 'month'] = $matchs[2][0];
-      $value[$name . Madeam::association_joint . 'day'] = $matchs[3][0];
+      $value[$name . Madeam::associationJoint . 'year'] = $matchs[1][0];
+      $value[$name . Madeam::associationJoint . 'month'] = $matchs[2][0];
+      $value[$name . Madeam::associationJoint . 'day'] = $matchs[3][0];
     }
     //date('Y-m-d H:i:s');
     // month
     $month_params = array();
     $month_params['class'] = 'date_month';
     $month_params['id'] = $idname . '_date_month';
-    if (@$value[$name . Madeam::association_joint . 'month'] == null) {
-      @$value[$name . Madeam::association_joint . 'month'] = date('m');
+    if (@$value[$name . Madeam::associationJoint . 'month'] == null) {
+      @$value[$name . Madeam::associationJoint . 'month'] = date('m');
     }
-    $returned[] = self::dropdown($name . Madeam::association_joint . 'month', $value[$name . Madeam::association_joint . 'month'], array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'), $month_params);
+    $returned[] = self::dropdown($name . Madeam::associationJoint . 'month', $value[$name . Madeam::associationJoint . 'month'], array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'), $month_params);
     // day
     $day_params = array();
     $day_params['class'] = 'date_day';
     $day_params['id'] = $idname . '_date_day';
-    if (@$value[$name . Madeam::association_joint . 'day'] == null) {
-      @$value[$name . Madeam::association_joint . 'day'] = date('d');
+    if (@$value[$name . Madeam::associationJoint . 'day'] == null) {
+      @$value[$name . Madeam::associationJoint . 'day'] = date('d');
     }
-    $returned[] = self::dropdown($name . Madeam::association_joint . 'day', $value[$name . Madeam::association_joint . 'day'], array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'), $day_params);
+    $returned[] = self::dropdown($name . Madeam::associationJoint . 'day', $value[$name . Madeam::associationJoint . 'day'], array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'), $day_params);
     // year
     $year_params = array();
     $year_params['size'] = '4';
     $year_params['maxlength'] = '4';
     $year_params['class'] = 'date_year';
     $year_params['id'] = $idname . '_date_year';
-    if (@$value[$name . Madeam::association_joint . 'year'] == null) {
-      @$value[$name . Madeam::association_joint . 'year'] = date('Y');
+    if (@$value[$name . Madeam::associationJoint . 'year'] == null) {
+      @$value[$name . Madeam::associationJoint . 'year'] = date('Y');
     }
-    $returned[] = self::input($name . Madeam::association_joint . 'year', $value[$name . Madeam::association_joint . 'year'], $year_params);
+    $returned[] = self::input($name . Madeam::associationJoint . 'year', $value[$name . Madeam::associationJoint . 'year'], $year_params);
     return implode($returned);
   }
 
@@ -229,38 +229,38 @@ class Help_Form extends Help_Html {
     if (is_string($value)) {
       preg_match_all('/(\d{2})\:(\d{2})\:(\d{2})/', $value, $matchs);
       $value = array();
-      $value[$name . Madeam::association_joint . 'hour'] = $matchs[1][0];
-      $value[$name . Madeam::association_joint . 'minute'] = $matchs[2][0];
-      $value[$name . Madeam::association_joint . 'second'] = $matchs[3][0];
+      $value[$name . Madeam::associationJoint . 'hour'] = $matchs[1][0];
+      $value[$name . Madeam::associationJoint . 'minute'] = $matchs[2][0];
+      $value[$name . Madeam::associationJoint . 'second'] = $matchs[3][0];
     }
     //date('Y-m-d H:i:s');
     // hour
     $hour_params = array();
     $hour_params['class'] = 'datetime_hour';
     $hour_params['id'] = $idname . '_datetime_hour';
-    if (@$value[$name . Madeam::association_joint . 'hour'] == null) {
-      $value[$name . Madeam::association_joint . 'hour'] = date('H');
+    if (@$value[$name . Madeam::associationJoint . 'hour'] == null) {
+      $value[$name . Madeam::associationJoint . 'hour'] = date('H');
     }
-    //if ($value[$name . Madeam::association_joint . 'hour'] == null) { $value[$name . Madeam::association_joint . 'hour'] = '12'; }
-    $returned[] = self::dropdown($name . Madeam::association_joint . 'hour', $value[$name . Madeam::association_joint . 'hour'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'), $hour_params) . ' : ';
+    //if ($value[$name . Madeam::associationJoint . 'hour'] == null) { $value[$name . Madeam::associationJoint . 'hour'] = '12'; }
+    $returned[] = self::dropdown($name . Madeam::associationJoint . 'hour', $value[$name . Madeam::associationJoint . 'hour'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'), $hour_params) . ' : ';
     // minute
     $min_params = array();
     $min_params['class'] = 'datetime_minute';
     $min_params['id'] = $idname . '_datetime_minute';
-    if (@$value[$name . Madeam::association_joint . 'minute'] == null) {
-      $value[$name . Madeam::association_joint . 'minute'] = date('i');
+    if (@$value[$name . Madeam::associationJoint . 'minute'] == null) {
+      $value[$name . Madeam::associationJoint . 'minute'] = date('i');
     }
-    //if ($value[$name . Madeam::association_joint . 'minute'] == null) { $value[$name . Madeam::association_joint . 'minute'] = '00'; }
-    $returned[] = self::dropdown($name . Madeam::association_joint . 'minute', $value[$name . Madeam::association_joint . 'minute'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'), $min_params) . ' : ';
+    //if ($value[$name . Madeam::associationJoint . 'minute'] == null) { $value[$name . Madeam::associationJoint . 'minute'] = '00'; }
+    $returned[] = self::dropdown($name . Madeam::associationJoint . 'minute', $value[$name . Madeam::associationJoint . 'minute'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'), $min_params) . ' : ';
     // second
     $sec_params = array();
     $sec_params['class'] = 'datetime_second';
     $sec_params['id'] = $idname . '_datetime_second';
-    if (@$value[$name . Madeam::association_joint . 'second'] == null) {
-      $value[$name . Madeam::association_joint . 'second'] = date('s');
+    if (@$value[$name . Madeam::associationJoint . 'second'] == null) {
+      $value[$name . Madeam::associationJoint . 'second'] = date('s');
     }
-    //if ($value[$name . Madeam::association_joint . 'second'] == null) { $value[$name . Madeam::association_joint . 'second'] = '00'; }
-    $returned[] = self::dropdown($name . Madeam::association_joint . 'second', $value[$name . Madeam::association_joint . 'second'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'), $sec_params);
+    //if ($value[$name . Madeam::associationJoint . 'second'] == null) { $value[$name . Madeam::associationJoint . 'second'] = '00'; }
+    $returned[] = self::dropdown($name . Madeam::associationJoint . 'second', $value[$name . Madeam::associationJoint . 'second'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'), $sec_params);
     return implode($returned);
   }
 
@@ -368,7 +368,7 @@ class Help_Form extends Help_Html {
    * =======================================================================
    */
   protected static function fieldName($fieldName) {
-    $nodes = split(Madeam::association_joint, $fieldName);
+    $nodes = split(Madeam::associationJoint, $fieldName);
     $name = $nodes[0];
     array_shift($nodes);
     if (! empty($nodes)) {
@@ -379,7 +379,7 @@ class Help_Form extends Help_Html {
 
   protected static function fieldValue($fieldName, $setValue) {
     // get nodes of field name to identify it's value
-    $nodes = split(Madeam::association_joint, $fieldName);
+    $nodes = split(Madeam::associationJoint, $fieldName);
     // get root of value
     $value = $_POST;
     foreach ($nodes as $node) {

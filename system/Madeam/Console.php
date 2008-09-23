@@ -15,7 +15,7 @@
  */
 class Madeam_Console extends Madeam_Console_CLI {
 
-  public function initialize() {
+  public function initialize() {      
     array_shift($_SERVER['argv']);
     $args         = $_SERVER['argv'];
     $scriptName   = false;

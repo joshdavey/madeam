@@ -461,7 +461,7 @@ class Madeam_Model {
     foreach ($this->setup['validators'] as $validator) {
       $field = $validator['args']['field'];
       $method = $validator['method'];
-      $errorKey = $this->modelName . MADEAM_ASSOCIATION_JOINT . $field;
+      $errorKey = $this->modelName . MADEAM_associationJoint . $field;
       
       // validate to make sure the validating method doesn't return false. If it does then save the error
       if ($check_non_existent_fields === false || isset($entry[$field])) {
