@@ -35,4 +35,3 @@ class Madeam_Console_Script {
     }
   }
 }
-?>

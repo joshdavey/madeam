@@ -20,7 +20,7 @@ class Madeam_Console extends Madeam_Console_CLI {
     $args         = $_SERVER['argv'];
     $scriptName   = false;
     $commandName  = false;
-
+    
     // get list of available consoles
     $scriptNames = array('create', 'delete', 'test', 'migration');
 
@@ -43,7 +43,8 @@ class Madeam_Console extends Madeam_Console_CLI {
       }
 
       try {
-        $scriptClassName = 'Script_' . $scriptName;
+        $scriptClassName = 'Madeam_Console_Script_' . ucfirst($scriptName);
+        test($scriptClassName);
         $script = new $scriptClassName;
         break;
       } catch (Madeam_Exception_AutoloadFail $e) {
