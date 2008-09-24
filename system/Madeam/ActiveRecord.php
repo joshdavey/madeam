@@ -363,7 +363,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
   
   
   private function _combineSingleDataOnKeys(&$result1Data, $result1Key, &$result2Data, $result2Key, $combineKey) {
-  	foreach ($result1Data as &$entry) {
+    foreach ($result1Data as &$entry) {
     	foreach ($result2Data as $key => &$result) {    	  
     		if ($entry[$result1Key] === $result[$result2Key]) {
     			$entry[$combineKey] = $result;
