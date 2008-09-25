@@ -73,7 +73,7 @@ class Madeam {
 		}
 
     // set layout if it hasn't already been set
-    if (!isset($_GET['layout'])) { $_GET['layout'] = 1; }
+    if (!isset($_GET['_layout'])) { $_GET['_layout'] = 1; }
     
     // get current url
     $url = null;
@@ -147,13 +147,13 @@ class Madeam {
     // so 'admin' becomes 'admin/index' if the admin directory exists.
     // note: there is a consequence for this feature which means if you have a directory named 'admin'
     // you can't have a controller named 'Controller_Admin'
-    if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['controller']))) {
-      $params['controller'] .= '/' . Madeam_Config::get('default_controller');
+    if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['_controller']))) {
+      $params['_controller'] .= '/' . Madeam_Config::get('default_controller');
     }
 
     // set controller's class
-    $params['controller'] = preg_replace("/[^A-Za-z0-9_\-\/]/", null, $params['controller']); // strip off the dirt
-    $controllerClassNodes = explode('/', $params['controller']);
+    $params['_controller'] = preg_replace("/[^A-Za-z0-9_\-\/]/", null, $params['_controller']); // strip off the dirt
+    $controllerClassNodes = explode('/', $params['_controller']);
     foreach ($controllerClassNodes as &$node) {
       $node = Madeam_Inflector::camelize($node);
       $node = ucfirst($node);
@@ -166,15 +166,15 @@ class Madeam {
       // create controller instance
       $controller = new $controllerClass($params);
     } catch(Madeam_Exception_AutoloadFail $e) {
-      if (is_dir(PATH_TO_VIEW . $params['controller'])) {
-        $view = $params['controller'] . '/' . $params['action'];
-        $params['controller'] = 'app';
+      if (is_dir(PATH_TO_VIEW . $params['_controller'])) {
+        $view = $params['_controller'] . '/' . $params['_action'];
+        $params['_controller'] = 'app';
         $controller = new Controller_App($params);
         $controller->view($view);
-      } elseif (is_file(PATH_TO_VIEW . $params['controller'] . '.' . $params['format'])) {
-        $view = $params['controller'];
-        $params['action'] = $params['controller'];
-        $params['controller'] = 'app';
+      } elseif (is_file(PATH_TO_VIEW . $params['_controller'] . '.' . $params['format'])) {
+        $view = $params['_controller'];
+        $params['_action'] = $params['_controller'];
+        $params['_controller'] = 'app';
         $controller = new Controller_App($params);
         $controller->view($view);
       } else {

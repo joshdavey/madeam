@@ -20,8 +20,8 @@ class Madeam_Router {
   public static $links = array(); // a place to store the magic smart links
 
   // do we really need this
-  public static $actionRequestMethodMap = array(array('action' => 'index', 'method' => 'get', 'id' => false), array('action' => 'show', 'method' => 'get', 'id' => true), array('action' => 'view', 'method' => 'get', 'id' => true), // same as show
-array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' => 'edit', 'method' => 'put', 'id' => true), array('action' => 'edit', 'method' => 'post', 'id' => false), array('action' => 'add', 'method' => 'post', 'id' => false));
+  public static $actionRequestMethodMap = array(array('_action' => 'index', '_method' => 'get', 'id' => false), array('_action' => 'show', '_method' => 'get', 'id' => true), array('_action' => 'view', '_method' => 'get', 'id' => true), // same as show
+array('_action' => 'delete', '_method' => 'delete', 'id' => true), array('_action' => 'edit', '_method' => 'put', 'id' => true), array('_action' => 'edit', '_method' => 'post', 'id' => false), array('_action' => 'add', '_method' => 'post', 'id' => false));
 
   public static $resourceMap = array();
 
@@ -172,51 +172,51 @@ array('action' => 'delete', 'method' => 'delete', 'id' => true), array('action' 
     if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
     
     // set overriding request method
-    if (!isset($params['method']) && isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
-    	$params['method'] = low($_SERVER['X_HTTP_METHOD_OVERRIDE']);
-    } elseif (isset($params['method']) && $_SERVER['REQUEST_METHOD'] != 'POST') {
-    	$params['method'] = 'get';
+    if (!isset($params['_method']) && isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
+    	$params['_method'] = low($_SERVER['X_HTTP_METHOD_OVERRIDE']);
+    } elseif (isset($params['_method']) && $_SERVER['REQUEST_METHOD'] != 'POST') {
+    	$params['_method'] = 'get';
     } else {
-    	$params['method'] = low($_SERVER['REQUEST_METHOD']);
+    	$params['_method'] = low($_SERVER['REQUEST_METHOD']);
     }
         
     // check if this is an ajax call
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
-      $params['ajax'] = 1;
+      $params['_ajax'] = 1;
     } else {
-    	$params['ajax']	= 0;
+    	$params['_ajax']	= 0;
     }    
   	
   	// automagically disable the layout when making an AJAX call
-    if (!isset($params['layout']) && !Madeam_Config::get('enable_ajax_layout') && $params['ajax'] == 1) {
-      $params['layout'] = 0;
-    } elseif (!isset($params['layout'])) {
-    	$params['layout'] = 1;
+    if (!isset($params['_layout']) && !Madeam_Config::get('enable_ajax_layout') && $params['_ajax'] == 1) {
+      $params['_layout'] = 0;
+    } elseif (!isset($params['_layout'])) {
+    	$params['_layout'] = 1;
     }
     
     // add uri to params
-    $params['uri'] = $uri;
+    $params['_uri'] = $uri;
     
     // add query to params
     if (isset($query)) {
-    	$params['query'] = $query;
+    	$params['_query'] = $query;
   	}
         
     // set default controller
-    if (!isset($params['controller']) || $params['controller'] == null) {
-    	$params['controller'] = Madeam_Config::get('default_controller');
+    if (!isset($params['_controller']) || $params['_controller'] == null) {
+    	$params['_controller'] = Madeam_Config::get('default_controller');
     }
     
     // set default action
-    if (!isset($params['action']) || $params['action'] == null) {
-    	$params['action'] = Madeam_Config::get('default_action');
+    if (!isset($params['_action']) || $params['_action'] == null) {
+    	$params['_action'] = Madeam_Config::get('default_action');
     }
     
     // set default format
     if (!isset($format) || $format == null) {
-    	$params['format'] = Madeam_Config::get('default_format');
+    	$params['_format'] = Madeam_Config::get('default_format');
     } else {
-    	$params['format'] = $format;
+    	$params['_format'] = $format;
     }
     
     return $params;

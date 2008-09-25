@@ -81,16 +81,16 @@ class Madeam_Controller {
     if (is_string($this->_represent)) {
       $this->_represent = Madeam_Inflector::modelNameize($this->_represent);
     } else {
-    	$represent = explode('/', $this->params['controller']);
+    	$represent = explode('/', $this->params['_controller']);
     	$this->_represent = Madeam_Inflector::modelNameize(array_pop($represent));
     }
     
     // set view
-    $this->view($this->params['controller'] . '/' . $this->params['action']);
+    $this->view($this->params['_controller'] . '/' . $this->params['_action']);
 
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
-    if (isset($this->params['layout']) && ($this->params['layout'] == 0)) {
+    if (isset($this->params['_layout']) && ($this->params['_layout'] == 0)) {
       $this->layout(false);
     } else {
       $this->layout($this->layout);
@@ -256,7 +256,7 @@ class Madeam_Controller {
     $this->_callback('beforeFilter');
     
     // action
-    $action = Madeam_Inflector::camelize($this->params['action']) . 'Action';
+    $action = Madeam_Inflector::camelize($this->params['_action']) . 'Action';
     
     $params = array();
     if (isset($this->_setup[$action])) {      
@@ -299,8 +299,8 @@ class Madeam_Controller {
   final private function _callback($name) {
     foreach ($this->_setup[$name] as $callback) {
     	// there has to be a better algorithm for this....
-    	if (empty($callback['include']) || (in_array($this->params['controller'] . '/' . $this->params['action'], $callback['include']) || in_array($this->params['controller'], $callback['include']))) {
-    		if (empty($callback['exclude']) || (!in_array($this->params['controller'] . '/' . $this->params['action'], $callback['exclude']) && !in_array($this->params['controller'], $callback['exclude']))) {
+    	if (empty($callback['include']) || (in_array($this->params['_controller'] . '/' . $this->params['_action'], $callback['include']) || in_array($this->params['_controller'], $callback['include']))) {
+    		if (empty($callback['exclude']) || (!in_array($this->params['_controller'] . '/' . $this->params['_action'], $callback['exclude']) && !in_array($this->params['_controller'], $callback['exclude']))) {
       		$this->{$callback['name']}();
     		}
     	}
@@ -324,7 +324,7 @@ class Madeam_Controller {
    * @param string $view
    */
   final public function view($view) {
-    $this->_view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->params['format'];
+    $this->_view = PATH_TO_VIEW . str_replace('/', DS, low($view)) . '.' . $this->params['_format'];
   }
 
   /**
@@ -336,17 +336,17 @@ class Madeam_Controller {
     $this->layout = array();
     if (func_num_args() < 2) {
       if (is_string($layouts)) {
-        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->params['format'];
+        $this->layout[] = PATH_TO_LAYOUT . $layouts . '.layout.' . $this->params['_format'];
       } elseif (is_array($layouts)) {
         foreach ($layouts as $layout) {
-          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['format'];
+          $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['_format'];
         }
       } else {
         $this->layout = array(false);
       }
     } else {
       foreach (funcget_args() as $layout) {
-        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['format'];
+        $this->layout[] = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['_format'];
       }
     }
   }
@@ -361,10 +361,10 @@ class Madeam_Controller {
     	      
     // create builder instance
     try {      
-      $builderClassName = 'Madeam_Controller_Builder_' . ucfirst($this->params['format']);
+      $builderClassName = 'Madeam_Controller_Builder_' . ucfirst($this->params['_format']);
       $builder = new $builderClassName($this);
     } catch (Madeam_Exception_AutoloadFail $e) {
-      Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->params['format'] . '". Missing class <strong>' . $builderClassName . '</strong>'));
+      Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->params['_format'] . '". Missing class <strong>' . $builderClassName . '</strong>'));
     }
           
     if (isset($settings['data'])) {
@@ -380,7 +380,7 @@ class Madeam_Controller {
       } elseif (isset($settings['partial'])) {
         $partial = explode('/', $settings['partial']);
         $partialName = array_pop($partial);
-        $view = PATH_TO_VIEW . implode(DS, $partial) . DS . '' . $partialName . '.' . $this->params['format'];
+        $view = PATH_TO_VIEW . implode(DS, $partial) . DS . '' . $partialName . '.' . $this->params['_format'];
       }
   	 
       if (file_exists($view)) {

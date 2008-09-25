@@ -51,11 +51,11 @@ define('SCRIPT_FILENAME', 'index.php');
 define('MADEAM_ENVIRONMENT',    $config['environment']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
-// mod_rewrite is on when $_GET['madeamURI'] exists. You can see it defined in the public .htaccess file
-if (isset($_GET['madeamURI'])) {
+// mod_rewrite is on when $_GET['_uri'] exists. You can see it defined in the public .htaccess file
+if (isset($_GET['_uri'])) {
   $publicDir = basename(PATH_TO_PUBLIC);
   define('PATH_TO_URI', '/' . substr(str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']), - strlen($publicDir))), 0, - 1));
-  define('MADEAM_REWRITE_URI', '/' . $_GET['madeamURI']);
+  define('MADEAM_REWRITE_URI', '/' . $_GET['_uri']);
 } else {
   define('PATH_TO_URI', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))) . SCRIPT_FILENAME . '/');
   define('MADEAM_REWRITE_URI', false);
@@ -64,15 +64,15 @@ if (isset($_GET['madeamURI'])) {
 // determine the relative path to the public directory
 define('PATH_TO_REL', '/' . str_replace(DS, '/', substr(PATH_TO_PUBLIC, strlen($_SERVER['DOCUMENT_ROOT']))));
 
-// madeamURI is defined in the public .htaccess file. Many developers may not notice it because of
+// _uri is defined in the public .htaccess file. Many developers may not notice it because of
 // it's transparency during development. We unset it here incase developers are using the $_GET query string
 // for any reason. An example of where it might be an unexpected problem is when taking the has of the query
 // string to identify the page. This problem was first noticed in some OpenID libraries
-unset($_GET['madeamURI']);
+unset($_GET['_uri']);
 
 // remove it fromt he query string as well
 if (isset($_SERVER['QUERY_STRING'])) {
-  $_SERVER['QUERY_STRING'] = preg_replace('/&?madeamURI=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
+  $_SERVER['QUERY_STRING'] = preg_replace('/&?_uri=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
 }
 
 // application files
