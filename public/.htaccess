@@ -4,9 +4,9 @@
 
     RewriteCond %{REQUEST_FILENAME} public/$ [OR]
     RewriteCond %{REQUEST_FILENAME} public$
-    RewriteRule ^(.*)$ index.php?madeamURI=$1 [QSA,L]
+    RewriteRule ^(.*)$ index.php?_uri=$1 [QSA,L]
 
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^(.*)$ index.php?madeamURI=$1 [QSA,L]
+    RewriteRule ^(.*)$ index.php?_uri=$1 [QSA,L]
 </IfModule>
