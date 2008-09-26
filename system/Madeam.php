@@ -88,14 +88,6 @@ class Madeam {
       }
     }
     
-    // call controller action
-    $output = Madeam::request($url, array_merge($_GET, $_POST, $_COOKIE));
-
-    // destroy user error notices
-    if (isset($_SESSION[self::userErrorName])) {
-      unset($_SESSION[self::userErrorName]);
-    }
-
     // destroy flash data when it's life runs out
     if (isset($_SESSION[self::flashLifeName])) {
       if (-- $_SESSION[self::flashLifeName] < 1) {
@@ -109,6 +101,14 @@ class Madeam {
           $_SERVER['REQUEST_METHOD'] = 'POST';
         }
       }
+    }
+    
+    // call controller action
+    $output = Madeam::request($url, array_merge($_GET, $_POST, $_COOKIE));
+
+    // destroy user error notices after request has been processed
+    if (isset($_SESSION[self::userErrorName])) {
+      unset($_SESSION[self::userErrorName]);
     }
 
     // return output
@@ -243,6 +243,7 @@ class Madeam {
   public static function autoload($class) {
   	// set class file name
 	  $file = str_replace('_', DS, $class) . '.php';
+	  
 	  // include class file
 	  if (file_lives($file)) {
 	    require $file;
@@ -254,11 +255,5 @@ class Madeam {
 	    throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
 	  }
   }
-
-  /**
-   * When any file is modified in the application directory this method clears
-   * the cache.
-   *
-   */
-  public static function clearCacheOnUpdate() {}
+  
 }

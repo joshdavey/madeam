@@ -48,7 +48,7 @@ if (! defined('PATH_TO_PUBLIC')) {
 define('SCRIPT_FILENAME', 'index.php');
 
 // turn configs into constants for speed?
-define('MADEAM_ENVIRONMENT',    $config['environment']);
+define('MADEAM_ENVIRONMENT', $config['environment']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
 // mod_rewrite is on when $_GET['_uri'] exists. You can see it defined in the public .htaccess file
