@@ -83,7 +83,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    *
    * @var string
    */
-  private $_sqlWhere = '1';
+  private $_sqlWhere = false;
 
   /**
    * Enter description here...
@@ -261,7 +261,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // this stuff is for when chaining models like:
     // $this->Srticle->findOne(32, true)->Comment->findAll();
     // where Article is the parent of Comment
-    if ($this->parent && $this->_sqlWhere == '1') {
+    if ($this->parent && $this->_sqlWhere === false) {
       $this->where(array($this->modelName . '.' . $this->parent->setup['hasModels'][$this->modelName]['foreignKey'] => $this->parent->entry[$this->parent->setup['hasModels'][$this->modelName]['primaryKey']]));
     }
     
@@ -292,7 +292,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
     if ($this->depth > 0) {
       // find hasOnes
       foreach ($this->setup['hasOne'] as $model => $params) {
-        if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+        if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins)) && count($foreignKeyValues) > 0) {
           // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
           // clone object so we don't interupt it's state with reset()
           $tempmodel = clone $this->{$params['model']};
@@ -306,7 +306,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
       // find belongsTos
       foreach ($this->setup['belongsTo'] as $model => $params) {
-        if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+        if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins)) && count($belongsToForeignKeys) > 0) {
           // we need to solve for the foreign key name some where here instead of assuming it'll always be named after the table
           // clone object so we don't interupt it's state with reset()
           $tempmodel = clone $this->{$params['model']};
@@ -732,7 +732,11 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $sql[] = 'SELECT ' . implode(', ', $sqlFields) . ' FROM ' . implode(' ', $sqlTables);    
     
     // add where
-    $sql[] = 'WHERE ' . $this->_sqlWhere;
+    if ($this->_sqlWhere === false) {
+      $sql[] = 'WHERE 1';
+    } else {
+      $sql[] = 'WHERE ' . $this->_sqlWhere;
+    }
     
     // add order
     if ($this->_sqlOrder) {
@@ -869,7 +873,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
   	$conditions = func_get_args();
   	$condition = $this->_conditions($conditions);
   	
-  	if ($this->_sqlWhere != 1) {
+  	if ($this->_sqlWhere != false) {
   		$this->_sqlWhere .= ' and ' . $condition;
 		} else {
 			$this->_sqlWhere = $condition;
@@ -1011,7 +1015,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
    * Resets all the sql values and data
    */
   final public function reset() {
-    $this->_sqlWhere = '1';
+    $this->_sqlWhere = false;
     $this->_sqlOrder = false;
     $this->_sqlStart = false;
     $this->_sqlRange = false;
