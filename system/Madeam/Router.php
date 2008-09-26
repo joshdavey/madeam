@@ -100,7 +100,7 @@ array('_action' => 'delete', '_method' => 'delete', 'id' => true), array('_actio
         
     // set uri
     if (isset($parsedURI['path'])) {
-      $extracted_path = split(PATH_TO_URI, $parsedURI['path'], 2);
+      $extracted_path = explode(PATH_TO_URI, $parsedURI['path'], 2);
       $uri = array_pop($extracted_path);
     } else {
       $uri = null;

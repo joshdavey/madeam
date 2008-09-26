@@ -112,7 +112,7 @@ spl_autoload_register('Madeam::autoload');
  * @return boolean
  */
 function file_lives($file) {
-  $paths = split(PATH_SEPARATOR, get_include_path());
+  $paths = explode(PATH_SEPARATOR, get_include_path());
   
   foreach ($paths as $path) {
     if (is_file($path . $file)) {

@@ -301,7 +301,7 @@ class Madeam_Model {
         // get value of validator property
         $args = $prop->getValue($this);
         // seperate bits of validate call by _
-        $validate = split('_', $matches[1]);
+        $validate = explode('_', $matches[1]);
         // get method name
         $method = $validate[count($validate) - 1];
         // remove method name from the end of validate var
