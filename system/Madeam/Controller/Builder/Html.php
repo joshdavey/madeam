@@ -29,7 +29,7 @@ class Madeam_Controller_Builder_Html extends Madeam_Controller_Builder {
   }
 
   public function missingLayout($layoutFile) {
-    throw new Madeam_Exception_MissingView('Missing View <strong>' . substr($layoutFile, strlen(PATH_TO_VIEW)) . '</strong>');
+    throw new Madeam_Exception_MissingView('Missing Layout <strong>' . substr($layoutFile, strlen(PATH_TO_VIEW)) . '</strong>');
   }
 
 }

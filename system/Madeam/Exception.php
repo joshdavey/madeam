@@ -82,6 +82,7 @@ class Madeam_Exception extends Exception {
       echo '<br />' . $file . ' on line ' . $line;
       return;
     }
+    
 
     // clean output buffer
     if (ob_get_level() > 0) { ob_clean(); }

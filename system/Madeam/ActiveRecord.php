@@ -350,8 +350,12 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->_callback('afterFind');
 
     // grab data before it's reset
-    if ($fetch != 'all') {
-      $results = $results[0];
+    if (!empty($results)) {
+      if ($fetch != 'all') {
+        $results = $results[0];
+      }
+    } else {
+      $results = false;
     }
 
     // reset all sql values and data
