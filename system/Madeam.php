@@ -71,6 +71,21 @@ class Madeam {
 		    Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
 		  }
 		}
+		
+		// destroy flash data when it's life runs out
+    if (isset($_SESSION[self::flashLifeName])) {
+      if (-- $_SESSION[self::flashLifeName] < 1) {
+        unset($_SESSION[self::flashLifeName]);
+        if (isset($_SESSION[self::flashDataName])) {
+          unset($_SESSION[self::flashDataName]);
+        }
+      } else {
+        if (isset($_SESSION[self::flashDataName][self::flashDataName])) {
+          $_POST = array_merge($_SESSION[self::flashDataName][self::flashPostName], $_POST);
+          $_SERVER['REQUEST_METHOD'] = 'POST';
+        }
+      }
+    }
 
     // set layout if it hasn't already been set
     if (!isset($_GET['_layout'])) { $_GET['_layout'] = 1; }
@@ -85,21 +100,6 @@ class Madeam {
       // If it didn't then there is ending "index.php" so we assume there is no URI on the end either
       if (isset($url[1])) {
         $url = $url[1];
-      }
-    }
-    
-    // destroy flash data when it's life runs out
-    if (isset($_SESSION[self::flashLifeName])) {
-      if (-- $_SESSION[self::flashLifeName] < 1) {
-        unset($_SESSION[self::flashLifeName]);
-        if (isset($_SESSION[self::flashDataName])) {
-          unset($_SESSION[self::flashDataName]);
-        }
-      } else {
-        if (isset($_SESSION[self::flashDataName][self::flashDataName])) {
-          $_POST = array_merge($_SESSION[self::flashDataName][self::flashPostName], $_POST);
-          $_SERVER['REQUEST_METHOD'] = 'POST';
-        }
       }
     }
     
@@ -138,6 +138,18 @@ class Madeam {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
     $params = array_merge($params, Madeam_Router::parseURI($uri));
+    
+    // set request method in case it hasn't been set (command line environment)
+    if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
+    
+    // set overriding request method
+    if (isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
+      $params['_method'] = low($_SERVER['X_HTTP_METHOD_OVERRIDE']);
+    } elseif (isset($params['_method']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
+      $params['_method'] = low($params['_method']);
+    } else {
+      $params['_method'] = low($_SERVER['REQUEST_METHOD']);
+    }
         
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller

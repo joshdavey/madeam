@@ -2,11 +2,6 @@
 class Madeam_Controller_Builder {
 
   public $controller;
-  public $data        = array();
-  public $collection  = array();
-  public $output      = null;
-  public $layout      = array();
-  public $view        = null;
 
   public function __construct(&$controller) {
     $this->controller = $controller;

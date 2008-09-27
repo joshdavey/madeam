@@ -90,11 +90,11 @@ class Madeam_Exception extends Exception {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
       // call error controller and pass information
-      echo Madeam::request(Madeam_Config::get('error_controller') . '/debug?error=' . urlencode(nl2br($message)) . '&backtrace=' . urlencode($e->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($line) . '&code=' . urlencode($code) . '&file=' . urlencode($file) . '&documentation=' . 'comingsoong&layout=1');
+      echo Madeam::request(Madeam_Config::get('error_controller') . '/debug?error=' . urlencode(nl2br($message)) . '&backtrace=' . urlencode($e->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($line) . '&code=' . urlencode($code) . '&file=' . urlencode($file) . '&documentation=' . 'comingsoong&_layout=1');
       exit();
     } else {
       // return 404 error page
-      echo Madeam::request(Madeam_Config::get('error_controller') . '/http404?layout=1');
+      echo Madeam::request(Madeam_Config::get('error_controller') . '/http404?_layout=1');
       exit();
     }
   }
