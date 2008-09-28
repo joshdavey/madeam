@@ -300,7 +300,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
           $hasOne = $tempmodel->where(array($params['model'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
           unset($tempmodel);
           
-          $this->_combineSingleDataOnKeys($results, $this->setup['primaryKey'], $hasOne, $params['foreignKey'], Madeam_Inflector::singalize($model));
+          if ($hasOne !== false) {
+            $this->_combineSingleDataOnKeys($results, $this->setup['primaryKey'], $hasOne, $params['foreignKey'], Madeam_Inflector::singalize($model));
+          }
         }
       }
 
@@ -316,7 +318,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
           $belongTo = $tempmodel->where(array($params['model'] . '.' . $params['primaryKey'] => array_unique($belongsToForeignKeys[$params['model']])))->findAll();
           unset($tempmodel);
           
-          $this->_combineSingleDataOnKeys($results, $params['foreignKey'], $belongTo, $params['primaryKey'], Madeam_Inflector::singalize($model)); 
+          if ($belongTo !== false) {
+            $this->_combineSingleDataOnKeys($results, $params['foreignKey'], $belongTo, $params['primaryKey'], Madeam_Inflector::singalize($model)); 
+          }
         }
       }
 
@@ -330,7 +334,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
           $hasMany = $tempmodel->where(array($params['model'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
           unset($tempmodel);
           
-          $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $hasMany, $params['foreignKey'], Madeam_Inflector::pluralize($model)); 
+          if ($hasMany !== false) {
+            $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $hasMany, $params['foreignKey'], Madeam_Inflector::pluralize($model)); 
+          }
         }
       }      
       
@@ -341,7 +347,9 @@ class Madeam_ActiveRecord extends Madeam_Model {
           $habtm = $tempmodel->join($this->modelName)->where(array($params['joinModel'] . '.' . $params['foreignKey'] => $foreignKeyValues))->findAll();
           unset($tempmodel);
           
-          $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $habtm, $params['foreignKey'], Madeam_Inflector::pluralize($model));
+          if ($habtm !== false) {
+            $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $habtm, $params['foreignKey'], Madeam_Inflector::pluralize($model));
+          }
         }
       }
     }

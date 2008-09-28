@@ -86,7 +86,7 @@ class Madeam_Controller {
     if (isset($this->params['_layout']) && ($this->params['_layout'] == 0)) {
       $this->layout(false);
     } else {
-      $this->layout($this->layout);
+      $this->layout($this->_layout);
     }
 
     // set cache name
@@ -217,7 +217,7 @@ class Madeam_Controller {
   }
 
   public function __call($name, $args) {
-    if (! file_exists($this->view)) {
+    if (! file_exists($this->_view)) {
       throw new Madeam_Exception_MissingAction('Missing Action <strong>' . substr($name, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
       . "\n Create a view called <strong>" . substr($name, 0, -6) . ".html</strong> OR Create a method called <strong>$name</strong>");
     }
@@ -252,6 +252,7 @@ class Madeam_Controller {
     $action = Madeam_Inflector::camelize($this->params['_action']) . 'Action';
     
     $params = array();
+    // check to see if method/action exists
     if (isset($this->_setup[$action])) {      
       foreach ($this->_setup[$action] as $param => $value) {
       	if (isset($this->params[$param])) {
@@ -260,14 +261,14 @@ class Madeam_Controller {
       		$params[] = "\$this->_setup['$action']['$param']";
       	}
       }
+      
+      if (preg_match('/[a-zA-Z_]*/', $action)) {
+      	eval('$output = $this->' . $action . "(" . implode(',', $params) . ");");
+    	} else {
+    	  exit('Invalid Action Characters');
+    	}
     }
     
-    if (preg_match('/[a-zA-Z_]*/', $action)) {
-    	eval('$output = $this->' . $action . "(" . implode(',', $params) . ");");
-  	} else {
-  	  exit('Invalid Action Characters');
-  	}
-  	
     // render
     if ($output == null) {
     	// beforeRender callbacks
@@ -336,7 +337,7 @@ class Madeam_Controller {
         $this->_layout = array(false);
       }
     } else {
-      $this->_layout = funcget_args();
+      $this->_layout = func_get_args();
     }
     return $this->_layout;
   }
@@ -407,10 +408,6 @@ class Madeam_Controller {
         $layout = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['_format'];
       }
     }
-    
-    test($layouts);
-    test($data);
-    test($content);
     
     // render layouts with builder
     $output = $builder->buildLayouts($layouts, $data, $content);
