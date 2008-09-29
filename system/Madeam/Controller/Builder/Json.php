@@ -2,18 +2,18 @@
 
 class Madeam_Controller_Builder_Json extends Madeam_Controller_Builder {
 
-  public function buildView() {
-    $this->output = json_encode($this->data);
+  public function buildView($view = null, $data = array()) {
+    $this->output = json_encode($data);
     return $this->output;
   }
 
-  public function missingView() {
-    $this->buildView();
+  public function missingView($view, $data) {
+    $this->buildView($view, $data);
     return;
   }
 
-  public function buildLayout() {
-    return $this->output;
+  public function buildLayout($layouts, $data, $content) {
+    return $content;
   }
 
   public function missingLayout() {

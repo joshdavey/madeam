@@ -334,7 +334,7 @@ class Madeam_Controller {
       } elseif (is_array($layouts)) {
         $this->_layout = $layouts;
       } else {
-        $this->_layout = array(false);
+        $this->_layout = array(); // no layout
       }
     } else {
       $this->_layout = func_get_args();
@@ -348,70 +348,76 @@ class Madeam_Controller {
    * @param text/boolean $data
    * @return unknown
    */
-  final public function render($settings) {
+  final public function render($settings) {    
     
-    // create builder instance
-    try {
-      $builderClassName = 'Madeam_Controller_Builder_' . ucfirst($this->params['_format']);
-      $builder = new $builderClassName($this);
-    } catch (Madeam_Exception_AutoloadFail $e) {
-      Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->params['_format'] . '". Missing class <strong>' . $builderClassName . '</strong>'));
-    }
-          
+    if (isset($settings['view'])) {
+      $this->view($settings['view']);
+    }     
+    
+    if (isset($settings['layout'])) {
+      $this->layout($settings['layout']);
+    } 
+    
     if (isset($settings['data'])) {
       $data = $settings['data'];
     } elseif (isset($settings['collection'])) {
       $collection = $settings['collection'];
     } else {
       $data = $this->_data;
+    } 
+    
+    // create builder instance
+    try {
+      $builderClassName = 'Madeam_Controller_Builder_' . ucfirst($this->params['_format']);
+      $builder = new $builderClassName($this);
+    } catch (Madeam_Exception_AutoloadFail $e) {
+      try {
+        $builderClassName = 'Madeam_Controller_Builder';
+        $builder = new $builderClassName($this);
+      } catch (Madeam_Exception_AutoloadFail $e) {
+        Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->params['_format'] . '". Missing class <strong>' . $builderClassName . '</strong>'));
+      }
     }
     
-    if (isset($settings['view'])) {
-      $view = PATH_TO_VIEW . str_replace('/', DS, low($settings['view'])) . '.' . $this->params['_format'];
-    } elseif (isset($settings['partial'])) {
+    // set view
+    if (isset($settings['partial'])) {      
       $partial = explode('/', $settings['partial']);
       $partialName = array_pop($partial);
-      $view = PATH_TO_VIEW . implode(DS, low($partial)) . DS . '' . low($partialName) . '.' . $this->params['_format'];
+      $view = PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . low($partialName) . '.' . $this->params['_format'];
     } else {
       $view = PATH_TO_VIEW . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'];
     }
 	 
     if (file_exists($view)) {
       if (!empty($collection)) {
-        $content = $builder->buildPartial($view, $collection);
+        $output = $builder->buildPartial($view, $collection);
       } else {
         // render the view
-        $content = $builder->buildView($view, $data);
+        $output = $builder->buildView($view, $data);
       }
-    } else {
-      
+    } else {      
     	if (in_array(Madeam_Inflector::pluralize(low($this->_represent)), array_keys($data))) {
     		$data = $data[Madeam_Inflector::pluralize(low($this->_represent))];
     	} elseif (in_array(Madeam_Inflector::singalize(low($this->_represent)), array_keys($data))) {
     		$data = $data[Madeam_Inflector::singalize(low($this->_represent))];
     	}
     	
-      $builder->missingView($view);
+      $output = $builder->missingView($view, $data);
     }
 
-    // set builder layout
-    if (isset($settings['layout'])) {
-      $layouts = $settings['layout'];
-      foreach ($layouts as &$layout) {
-        $layout = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['_format'];
-      }
-    } elseif (isset($settings['partial'])) {
+    // set layout    
+    if (isset($settings['partial'])) {
       $layouts = array();
     } else {
       $layouts = $this->_layout;
       foreach ($layouts as &$layout) {
         $layout = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['_format'];
       }
+      
+      // render layouts with builder
+      $output = $builder->buildLayouts($layouts, $data, $output);
     }
     
-    // render layouts with builder
-    $output = $builder->buildLayouts($layouts, $data, $content);
-
     return $output;
   }
 
