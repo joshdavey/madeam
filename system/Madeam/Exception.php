@@ -24,7 +24,8 @@ class Madeam_Exception extends Exception {
   	"oh @%&#!",
   	"the tech bubble burst! Run, save yourself!",
   	"is this your idea of web 3.0?",
-  	"the Quality Assurance team is unimpressed."
+  	"the Quality Assurance team is unimpressed.",
+  	"maybe you should consider a new profession?"
   );
 
   /**
