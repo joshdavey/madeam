@@ -44,6 +44,11 @@
  * Sometimes you may want to disable this to improve speed.
  *  true:   logging is turned on
  *  false:  logging is turned off
+ * 
+ * [enable_toolbar]
+ * The Madeam debug toolbar allows you to see useful information about the page
+ *  true:  toolbar is displayed
+ *  false: tool bar is hidden
  *
  * [inline_errors]
  *   true: all errors are displayed inline
@@ -61,6 +66,7 @@ $cfg['environment'] = 'development';
   $env['development']['clear_cache']        = true;
   $env['development']['enable_debug']       = true;
   $env['development']['enable_logger']      = true;
+  $env['development']['enable_toolbar']     = true;
   $env['development']['inline_errors']      = false;
 
 // production
@@ -72,6 +78,7 @@ $cfg['environment'] = 'development';
   $env['production']['clear_cache']         = false;
   $env['production']['enable_debug']        = false;
   $env['production']['enable_logger']       = true;
+  $env['production']['enable_toolbar']      = false;
   $env['production']['inline_errors']       = false;
 
 

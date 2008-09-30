@@ -56,7 +56,7 @@ class Madeam {
    */
   public static function dispatch() {    
 		// clear routes cache if it cache is disabled for routes
-		if (!Madeam_Config::get('cache_routes')) { 
+		if (!Madeam_Config::get('cache_routes')) {
 			Madeam_Cache::clear('madeam.routes');
 		}
 		
@@ -96,7 +96,7 @@ class Madeam {
       $url = MADEAM_REWRITE_URI . '?' . $_SERVER['QUERY_STRING'];
     } else {
       $url = explode(SCRIPT_FILENAME, $_SERVER['REQUEST_URI']);
-      // check if it explode it into 2 peices.
+      // check if it exploded it into 2 peices.
       // If it didn't then there is ending "index.php" so we assume there is no URI on the end either
       if (isset($url[1])) {
         $url = $url[1];
@@ -138,7 +138,7 @@ class Madeam {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
     $params = array_merge($params, Madeam_Router::parseURI($uri));
-    
+        
     // set request method in case it hasn't been set (command line environment)
     if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
     
@@ -162,7 +162,7 @@ class Madeam {
     if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['_controller']))) {
       $params['_controller'] .= '/' . Madeam_Config::get('default_controller');
     }
-
+    
     // set controller's class
     $params['_controller'] = preg_replace("/[^A-Za-z0-9_\-\/]/", null, $params['_controller']); // strip off the dirt
     $controllerClassNodes = explode('/', $params['_controller']);
@@ -173,7 +173,7 @@ class Madeam {
 
     // set controller class
     $controllerClass = 'Controller_' . implode('_', $controllerClassNodes);
-
+    
     try {
       // create controller instance
       $controller = new $controllerClass($params);
@@ -190,7 +190,7 @@ class Madeam {
         $controller = new Controller_App($params);
         $controller->view($view);
       } else {
-        // no controller found = critical error.
+        // no controller or view found = critical error.
         header("HTTP/1.1 404 Not Found");
         Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . '</strong>'));
       }

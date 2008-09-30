@@ -120,7 +120,6 @@ array('_action' => 'delete', '_method' => 'delete', 'id' => true), array('_actio
     $get = array();
     if (isset($parsedURI['query'])) {
       $query = $parsedURI['query'];
-      test($query);
       // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
       parse_str($query, $get); // assigns $get array of query params
       unset($query);
