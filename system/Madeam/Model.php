@@ -194,7 +194,7 @@ class Madeam_Model {
       }
 
       // pre-load a reflection of this class for use in parseing the meta data and methods
-      $this->loadReflection();
+      $this->reflection = new ReflectionClass(get_class($this));
 
       // load schema
       $this->loadSchema();
@@ -444,14 +444,6 @@ class Madeam_Model {
     // set dependency
     isset($params['dependent']) ? true : $params['dependent'] = true;
     $this->setup['belongsTo'][$params['model']] = $params;
-  }
-
-  /**
-   * Because we have so many methods that require the reflection instance of this class we have this method that
-   * pre-loads it when the object is constructed
-   */
-  final protected function loadReflection() {
-    $this->reflection = new ReflectionClass(get_class($this));
   }
 
   /**

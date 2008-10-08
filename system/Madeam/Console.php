@@ -44,7 +44,6 @@ class Madeam_Console extends Madeam_Console_CLI {
 
       try {
         $scriptClassName = 'Madeam_Console_Script_' . ucfirst($scriptName);
-        test($scriptClassName);
         $script = new $scriptClassName;
         break;
       } catch (Madeam_Exception_AutoloadFail $e) {

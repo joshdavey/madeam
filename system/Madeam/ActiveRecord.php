@@ -480,10 +480,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
     // reset all sql values and data
     $this->reset();
 
-    // Validate _callbacks
-    $this->_callback('beforeValidate');
-    $this->_callback('afterValidate');
-
     // before delete _callback
     $this->_callback('beforeDelete');
     
@@ -532,7 +528,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->_callback('beforeValidate');
 
     // validate data
-    ////$this->load_validators();
     $this->validateEntry($update);
 
     // after Validate _callback
@@ -547,21 +542,6 @@ class Madeam_ActiveRecord extends Madeam_Model {
       // before save _callback
       $this->_callback('beforeSave');
             
-      /*
-      // relations
-      $relations = array();
-
-      // determine if any of the fields represents any of this model's relationships
-      foreach ($this->entry as $field => $value) {
-        if (is_array($value)) {
-          $relations[$field] = $value;
-
-          // instead of just unsetting it, it should get it's primaryKey value!
-          $this->entry[$field] = $value[$this->{Madeam_Inflector::modelNameize($field)}->primaryKey];
-        }
-      }
-      */
-
       // filter out fields that don't exist in the model
       $data = array_intersect_key($data, array_flip($this->setup['standardFields']));
 
@@ -582,21 +562,7 @@ class Madeam_ActiveRecord extends Madeam_Model {
 
       // grab entry after it's been modified by _callbacks
       $entry = $this->data;
-      
-      /*
-      if ($entryId) {
-        // check for fields that are arrays
-        foreach ($relations as $model => $value) {
-          $model = Madeam_Inflector::modelNameize($model);
-          if (in_array($model, array_keys($this->setup['hasAndBelongsToMany']))) {
-            $this->habtmAdd($model, $entryId, $value);
-          } else {
-            $this->$model->save($value);
-          }
-        }
-      }
-      */
-      
+            
       // after save _callback
       $this->_callback('afterSave');
 

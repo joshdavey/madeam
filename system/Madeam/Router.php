@@ -17,13 +17,14 @@ class Madeam_Router {
 
   public static $routes = array(); // regex, names, params
 
-  public static $links = array(); // a place to store the magic smart links
-
   // do we really need this
-  public static $actionRequestMethodMap = array(array('_action' => 'index', '_method' => 'get', 'id' => false), array('_action' => 'show', '_method' => 'get', 'id' => true), array('_action' => 'view', '_method' => 'get', 'id' => true), // same as show
-array('_action' => 'delete', '_method' => 'delete', 'id' => true), array('_action' => 'edit', '_method' => 'put', 'id' => true), array('_action' => 'edit', '_method' => 'post', 'id' => false), array('_action' => 'add', '_method' => 'post', 'id' => false));
-
-  public static $resourceMap = array();
+  public static $actionRequestMethodMap = array(
+  array('_action' => 'index', '_method' => 'get', 'id' => false), 
+  array('_action' => 'read', '_method' => 'get', 'id' => true), 
+  array('_action' => 'delete', '_method' => 'delete', 'id' => true), 
+  array('_action' => 'edit', '_method' => 'put', 'id' => true), 
+  array('_action' => 'edit', '_method' => 'post', 'id' => false), 
+  array('_action' => 'add', '_method' => 'post', 'id' => false));
 
   /**
    * This cool method adds paths by formatting the string the user has entered and turning it into a regular expression
@@ -94,7 +95,7 @@ array('_action' => 'delete', '_method' => 'delete', 'id' => true), array('_actio
    * @param string $uri
    * @return array
    */
-  public static function parseURI($uri = false) {
+  public static function parse($uri = false) {
     // parse uri
     $parsedURI = parse_url($uri);
         

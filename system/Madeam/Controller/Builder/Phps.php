@@ -2,22 +2,12 @@
 
 class Madeam_Controller_Builder_Phps extends Madeam_Controller_Builder {
 
-  public function buildView() {
-    $this->output = serialize($this->data);
-    return $this->output;
+  public function missingView($view, $data) {
+    return serialize($data);
   }
 
-  public function missingView() {
-    $this->buildView();
-    return;
-  }
-
-  public function buildLayout() {
-    return $this->output;
-  }
-
-  public function missingLayout() {
-    return;
+  public function buildLayouts($layouts, $data, $content) {
+    return $content;
   }
 
 }

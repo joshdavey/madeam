@@ -53,19 +53,9 @@ class Madeam_Controller {
   /**
    * Enter description here...
    *
-   * @var unknown_type
-   */
-  private $_reflection;
-
-  /**
-   * Enter description here...
-   *
    * @param unknown_type $params
-   * @param unknown_type $requestPost
-   * @param unknown_type $requestCookie
-   * @param unknown_type $requestMethod
    */
-  public function __construct($params) {
+  final public function __construct($params) {
   	
   	// set params
   	$this->params = $params;
@@ -104,10 +94,10 @@ class Madeam_Controller {
       $this->_setup['beforeFilter'] = $this->_setup['beforeRender'] = $this->_setup['afterRender'] = array();
 
       // reflection
-      $this->reflection = new ReflectionClass($this);
+      $reflection = new ReflectionObject($this);
 
       // check methods for callbacks
-      $methods = $this->reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
+      $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
       foreach ($methods as $method) {
         $matches = array();
         if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {
@@ -144,52 +134,25 @@ class Madeam_Controller {
         }
       }
       
+      /*
+      // idea -- all protected properties load controller components by name.
+      $properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
+      foreach ($properties as $property) {
+        
+      }
+      */
+      
       // save cache
       if (Madeam_Config::get('cache_controllers') === true) {
         Madeam_Cache::save($cacheName, $this->_setup, true);
       }
       
       // we should be done with the reflection at this point so let's kill it to save memory
-      unset($this->reflection);
+      unset($reflection);
     }
   }
 
-  /**
-  public function __destruct() {
-    if (!headers_sent()) {
-
-      // we need to destroy cookies that are unset
-      // compare $_COOKIE and $this->requestCookie
-      // delete unset cookies
-
-      foreach ($this->requestCookie as $cookieName => $cookieValue) {
-        if (isset($_COOKIE[$cookieName])) { continue; }
-
-        $cExpire    = (60 * 60 * 24);
-        $cPath      = dirname(PATH_TO_REL);
-        $cDomain    = $_SERVER['SERVER_NAME'];
-        $cSecure    = false;
-        $cHttpOnly  = false;
-        $cValue     = null;
-
-        if (is_array($cookieValue)) {
-          if (isset($cookieValue['expire']))    { $cExpire    = $cookieValue['expire']; }
-          if (isset($cookieValue['path']))      { $cPath      = $cookieValue['path']; }
-          if (isset($cookieValue['domain']))    { $cDomain    = $cookieValue['domain']; }
-          if (isset($cookieValue['secure']))    { $cSecure    = $cookieValue['secure']; }
-          if (isset($cookieValue['httponly']))  { $cHttpOnly  = $cookieValue['httponly']; }
-          if (isset($cookieValue['value']))     { $cValue     = $cookieValue['value']; }
-        } else {
-          $cValue = $cookieValue;
-        }
-
-        setcookie($cookieName, $cValue, $cExpire, $cPath, $cDomain, $cSecure, $cHttpOnly);
-      }
-    }
-  }
-  */
-
-  public function &__get($name) {
+  final public function &__get($name) {
     $match = array();
     if (preg_match("/^[A-Z]{1}/", $name, $match)) {
       // set model class name
@@ -197,8 +160,10 @@ class Madeam_Controller {
 
       // create model instance
       $model = new $modelClassName();
-      $this->_data[$name] = $model;
-    } elseif (preg_match('/^_[A-Z]{1}/', $name, $match)) {
+      $this->_data[$name] = $model;    
+    } 
+    /*
+    elseif (preg_match('/^_[A-Z]{1}/', $name, $match)) {
       // set component class name
       $componentClassName = 'Component_' . $name;
 
@@ -207,6 +172,7 @@ class Madeam_Controller {
       $this->$name = $component;
       return $component;
     }
+    */
     
     if (array_key_exists($name, $this->_data)) {
       return $this->_data[$name];
@@ -216,20 +182,20 @@ class Madeam_Controller {
     }
   }
 
-  public function __call($name, $args) {
+  final public function __call($name, $args) {
     if (! file_exists($this->_view)) {
       throw new Madeam_Exception_MissingAction('Missing Action <strong>' . substr($name, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
       . "\n Create a view called <strong>" . substr($name, 0, -6) . ".html</strong> OR Create a method called <strong>$name</strong>");
     }
   }
 
-  public function __set($name, $value) {
+  final public function __set($name, $value) {
     if (!preg_match('/^(?:_[A-Z])/', $name)) {
       $this->_data[$name] = $value;
     }
   }
   
-  public function __isset($name) {
+  final public function __isset($name) {
     if (isset($this->_data[$name])) {
       return true;
     } else {
@@ -237,10 +203,11 @@ class Madeam_Controller {
     }
   }
   
-  public function __unset($name) {
+  final public function __unset($name) {
     unset($this->_data[$name]);
   }
-
+  
+  
   final public function process() {
 
     $output = null;
@@ -298,17 +265,6 @@ class Madeam_Controller {
     		}
     	}
     }
-  }
-
-  /**
-   * Enter description here...
-   *
-   * @param string $uri
-   * @param array $params
-   * @return string
-   */
-  final public function request($uri, $params) {
-    return Madeam::request($uri, $params);
   }
 
   /**
@@ -380,7 +336,7 @@ class Madeam_Controller {
     }
     
     // set view
-    if (isset($settings['partial'])) {      
+    if (isset($settings['partial'])) {
       $partial = explode('/', $settings['partial']);
       $partialName = array_pop($partial);
       $view = PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . low($partialName) . '.' . $this->params['_format'];
@@ -395,7 +351,7 @@ class Madeam_Controller {
         // render the view
         $output = $builder->buildView($view, $data);
       }
-    } else {      
+    } else {
     	if (in_array(Madeam_Inflector::pluralize(low($this->_represent)), array_keys($data))) {
     		$data = $data[Madeam_Inflector::pluralize(low($this->_represent))];
     	} elseif (in_array(Madeam_Inflector::singalize(low($this->_represent)), array_keys($data))) {
@@ -411,7 +367,7 @@ class Madeam_Controller {
     } else {
       $layouts = $this->_layout;
       foreach ($layouts as &$layout) {
-        $layout = PATH_TO_LAYOUT . $layout . '.layout.' . $this->params['_format'];
+        $layout = PATH_TO_VIEW . $layout . '.layout.' . $this->params['_format'];
       }
       
       // render layouts with builder

@@ -137,7 +137,7 @@ class Madeam {
   public static function request($uri, $params = array()) {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
-    $params = array_merge($params, Madeam_Router::parseURI($uri));
+    $params = array_merge($params, Madeam_Router::parse($uri));
         
     // set request method in case it hasn't been set (command line environment)
     if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
@@ -257,7 +257,7 @@ class Madeam {
 	  $file = str_replace('_', DS, $class) . '.php';
 	  
 	  // include class file
-	  if (file_lives($file)) {
+	  if (fileLives($file)) {
 	    require $file;
 	  }
 	

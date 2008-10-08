@@ -66,7 +66,6 @@ $cfg['environment'] = 'development';
   $env['development']['clear_cache']        = true;
   $env['development']['enable_debug']       = true;
   $env['development']['enable_logger']      = true;
-  $env['development']['enable_toolbar']     = true;
   $env['development']['inline_errors']      = false;
 
 // production
@@ -78,7 +77,6 @@ $cfg['environment'] = 'development';
   $env['production']['clear_cache']         = false;
   $env['production']['enable_debug']        = false;
   $env['production']['enable_logger']       = true;
-  $env['production']['enable_toolbar']      = false;
   $env['production']['inline_errors']       = false;
 
 
@@ -130,6 +128,4 @@ $cfg['enable_ajax_layout']      = false;
  * select which controller handles the errors by name.
  */
 $cfg['error_controller']        = 'error';
-
-
 
