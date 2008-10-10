@@ -96,6 +96,11 @@ class Madeam_Router {
    * @return array
    */
   public static function parse($uri = false) {
+    // makes sure the first character is "/"
+    if (substr($uri, 0, 1) != '/') {
+      $uri = '/' . $uri;
+    }
+    
     // parse uri
     $parsedURI = parse_url($uri);
         
@@ -124,11 +129,6 @@ class Madeam_Router {
       // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
       parse_str($query, $get); // assigns $get array of query params
       unset($query);
-    }
-    
-    // makes sure the first character is "/"
-    if (substr($uri, 0, 1) != '/') {
-      $uri = '/' . $uri;
     }
 
     // define params as array

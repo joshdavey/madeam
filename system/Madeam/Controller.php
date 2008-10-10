@@ -339,7 +339,7 @@ class Madeam_Controller {
     if (isset($settings['partial'])) {
       $partial = explode('/', $settings['partial']);
       $partialName = array_pop($partial);
-      $view = PATH_TO_VIEW . implode(DS, $partial) . DS . '_' . low($partialName) . '.' . $this->params['_format'];
+      $view = PATH_TO_VIEW . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
     } else {
       $view = PATH_TO_VIEW . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'];
     }
