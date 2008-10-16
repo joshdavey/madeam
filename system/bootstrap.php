@@ -121,7 +121,7 @@ set_error_handler('Madeam_ErrorHandler');
 // ========================================================
 /**
  * This function exists as a quick tool for developers to test
- * if a funciton executes and how many times.
+ * if a function executes and how many times.
  */
 function test($var = null) {
   static $tests;
