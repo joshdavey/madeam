@@ -103,15 +103,22 @@ class Madeam_Router {
     
     // parse uri
     $parsedURI = parse_url($uri);
-        
+            
     // set uri
-    if (isset($parsedURI['path'])) {
+    if (isset($parsedURI['path']) && PATH_TO_URI == '/') {
+      $uri = $parsedURI['path'];
+    } elseif (isset($parsedURI['path'])) {
+      // we do an explode because we can't always expect the uri path to be included
+      // it's normally only inlcuded during the original request and all sub calls
+      // consist of just the uri without the path to the uri
+      // for example on request: /madeam/posts/view/32
+      // and during the request in a controller: /posts/view/32
       $extracted_path = explode(PATH_TO_URI, $parsedURI['path'], 2);
       $uri = array_pop($extracted_path);
     } else {
       $uri = null;
     }
-
+    
     // set format
     $format = false;
     $URIAnatomy = explode('.', $uri, 2);
