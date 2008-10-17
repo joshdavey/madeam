@@ -18,7 +18,7 @@ class Madeam {
 	/**
 	 * version of madeam
 	 */
-  const version = '0.1';  
+  const version = '1.0';
   
   /**
 	 * define user errors variable name for $_SESSION
