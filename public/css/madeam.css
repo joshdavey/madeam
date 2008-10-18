@@ -7,6 +7,7 @@ code.madeam { margin-bottom: 14px; margin-left: 10px; letter-spacing: 0.03em; fo
 #madeam-error { font-family: "Lucida Console", "Courier New"; font-size: 0.8em; margin: 10px; background: #fff; padding: 10px; }
 	#madeam-error pre { overflow: auto; }
 	#madeam-error h1 { font-family: "Trebuchet MS", Helvetica; }
+	#madeam-error code { background: #ddd; }
 
 /* =universal prep
 -------------------------------------- */

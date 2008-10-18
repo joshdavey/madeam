@@ -13,7 +13,7 @@
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_ActiveRecord extends Madeam_Model {
+class Madeam_Model_ActiveRecord extends Madeam_Model {
 
   /**
    * Represents a single row
@@ -528,53 +528,40 @@ class Madeam_ActiveRecord extends Madeam_Model {
     $this->_callback('beforeValidate');
 
     // validate data
-    $this->validateEntry($update);
+    $errors = $this->validateEntry($update);
+    if (!empty($errors)) {
+      throw Madeam_ActiveRecord_Exception($errors);
+    }
 
     // after Validate _callback
     $this->_callback('afterValidate');
     
-    // now that all the _callbacks prior to updating/adding the new row have been called
-    // we must check for any errors that may have been envoked.
-    // if there aren't any then continue as usual.
-    // if not then skip adding/updating
-    if (! isset($_SESSION[Madeam::userErrorName]) || count($_SESSION[Madeam::userErrorName]) < 1) {
+    // before save _callback
+    $this->_callback('beforeSave');
+          
+    // filter out fields that don't exist in the model
+    $data = array_intersect_key($data, array_flip($this->setup['standardFields']));
 
-      // before save _callback
-      $this->_callback('beforeSave');
-            
-      // filter out fields that don't exist in the model
-      $data = array_intersect_key($data, array_flip($this->setup['standardFields']));
-
-      // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
-      if ($update === true) {
-        $this->isUpdate = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
-        $this->execute($this->buildQueryUpdate($data, $this->setup['resourceName'], $this->_sqlWhere, $this->_sqlStart, $this->_sqlRange, $this->setup['primaryKey']));
-      } else {
-        $this->isInsert = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
-        $this->execute($this->buildQueryInsert($data, $this->setup['resourceName'], $this->setup['primaryKey']));
-      }
-
-      // grab entry id before it's overwritten by something that happens in afterSave()
-      $entryId = $this->insertId();
-
-      // set this so it can be used in afterSave
-      $data[$this->setup['primaryKey']] = $entryId;
-
-      // grab entry after it's been modified by _callbacks
-      $entry = $this->data;
-            
-      // after save _callback
-      $this->_callback('afterSave');
-
-      // reset all sql values and data
-      $this->reset();
-
-      return $entry;
+    // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
+    if ($update === true) {
+      $this->isUpdate = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
+      $this->execute($this->buildQueryUpdate($data, $this->setup['resourceName'], $this->_sqlWhere, $this->_sqlStart, $this->_sqlRange, $this->setup['primaryKey']));
     } else {
-      // reset all sql values and data
-      $this->reset();
-      return false;
+      $this->isInsert = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
+      $this->execute($this->buildQueryInsert($data, $this->setup['resourceName'], $this->setup['primaryKey']));
     }
+
+    // grab entry id before it's overwritten by something that happens in afterSave()
+    $entryId = $this->insertId();
+
+    // set this so it can be used in afterSave
+    $data[$this->setup['primaryKey']] = $entryId;
+
+    // grab entry after it's been modified by _callbacks
+    $entry = $this->data;
+          
+    // after save _callback
+    $this->_callback('afterSave');
 
     // reset all sql values and data
     $this->reset();

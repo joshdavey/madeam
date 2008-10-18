@@ -44,7 +44,7 @@ class Madeam_Controller_Builder {
   }
 
   public function missingView($view) {
-    throw new Madeam_Exception_MissingView('Missing View <strong>' . substr($view, strlen(PATH_TO_VIEW)) . '</strong>');
+    throw new Madeam_Controller_Exception_MissingView('Missing View <strong>' . substr($view, strlen(PATH_TO_VIEW)) . "</strong> \n Create File: <strong>$view</strong>");
   }
 
   public function buildLayout($layoutFile, $data, $content) {
@@ -59,7 +59,7 @@ class Madeam_Controller_Builder {
   }
 
   public function missingLayout($layoutFile) {
-    throw new Madeam_Exception_MissingView('Missing Layout <strong>' . substr($layoutFile, strlen(PATH_TO_VIEW)) . '</strong>');
+    throw new Madeam_Controller_Exception_MissingView('Missing Layout <strong>' . substr($layoutFile, strlen(PATH_TO_VIEW)) . '</strong>');
   }
 
 }

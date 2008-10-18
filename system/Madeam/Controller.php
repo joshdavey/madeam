@@ -184,8 +184,8 @@ class Madeam_Controller {
 
   final public function __call($name, $args) {
     if (! file_exists($this->_view)) {
-      throw new Madeam_Exception_MissingAction('Missing Action <strong>' . substr($name, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
-      . "\n Create a view called <strong>" . substr($name, 0, -6) . ".html</strong> OR Create a method called <strong>$name</strong>");
+      throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($name, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
+      . "\n Create a view called <strong>" . substr($name, 0, -6) . ".html</strong> OR Create a method called <strong>$name" . "Action</strong>");
     }
   }
 
@@ -248,6 +248,41 @@ class Madeam_Controller {
     $this->_callback('afterRender');
 
     // return response
+    return $output;
+  }
+  
+  final public function action($action) {
+    $output = null;
+    
+    // action
+    $action = Madeam_Inflector::camelize($action) . 'Action';
+    
+    $params = array();
+    // check to see if method/action exists
+    if (isset($this->_setup[$action])) {      
+      foreach ($this->_setup[$action] as $param => $value) {
+      	if (isset($this->params[$param])) {
+      		$params[] = "\$this->params['$param']";
+      	} else {
+      		$params[] = "\$this->_setup['$action']['$param']";
+      	}
+      }
+      
+      if (preg_match('/[a-zA-Z_]*/', $action)) {
+      	eval('$output = $this->' . $action . "(" . implode(',', $params) . ");");
+    	} else {
+    	  exit('Invalid Action Characters');
+    	}
+    }
+    
+    // render
+    if ($output == null) {
+    	// beforeRender callbacks
+      $this->_callback('beforeRender');
+    	
+      $output = $this->render(array('view' => $this->_view, 'layout' => $this->_layout, 'data' => $this->_data));
+    }
+    
     return $output;
   }
 

@@ -450,6 +450,7 @@ class Madeam_Model {
    * This method calls all the validation methods listed in the $validators variable and validates the values of a single entry
    */
   final protected function validateEntry($entry, $check_non_existent_fields = false) {
+    $errors = array();
     foreach ($this->setup['validators'] as $validator) {
       $field = $validator['args']['field'];
       $method = $validator['method'];
@@ -458,10 +459,13 @@ class Madeam_Model {
       // validate to make sure the validating method doesn't return false. If it does then save the error
       if ($check_non_existent_fields === false || isset($entry[$field])) {
         if (Madeam_Validate::$method(@$entry[$field], $validator['args']) === false) {
-          Madeam_Session::error($errorKey, $this->parseValidateMessage($validator['args']));
+          //Madeam_Session::error($errorKey, $this->parseValidateMessage($validator['args']));
+          $errors[$errorKey] = $this->parseValidateMessage($validator['args']);
         }
       }
     }
+    
+    return $errors;
   }
 
   /**

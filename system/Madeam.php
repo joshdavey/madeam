@@ -192,7 +192,7 @@ class Madeam {
       } else {
         // no controller or view found = critical error.
         header("HTTP/1.1 404 Not Found");
-        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . '</strong>'));
+        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>" . PATH_TO_APP . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>class $controllerClass extends Controller_App {\n}</code>"));
       }
     }
 
@@ -205,10 +205,10 @@ class Madeam {
 
       // return response
       return $response;
-    } catch (Madeam_Exception_MissingAction $e) {
+    } catch (Madeam_Controller_Exception_MissingAction $e) {
       header("HTTP/1.1 404 Not Found");
       Madeam_Exception::catchException($e);
-    } catch (Madeam_Exception_MissingView $e) {
+    } catch (Madeam_Controller_Exception_MissingView $e) {
       header("HTTP/1.1 404 Not Found");
       Madeam_Exception::catchException($e);
     }
