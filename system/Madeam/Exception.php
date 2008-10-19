@@ -78,7 +78,7 @@ class Madeam_Exception extends Exception {
     }
 
     // check if inline errors are enabled and the error is not fatal
-    if (Madeam_Config::get('inline_errors') === true && !in_array($code, array(1, 16, 64, 256, 6143))) {
+    if (Madeam_Config::get('inline_errors') === true && in_array($code, array(2, 4, 8, 32, 128, 256, 1024, 2048, 4096, 8192, 16384))) {
       echo nl2br($message);
       echo '<br />' . $file . ' on line ' . $line;
       return;

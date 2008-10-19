@@ -32,9 +32,9 @@ class Madeam_Model {
   /**
    * Enter description here...
    *
-   * @var unknown_type
+   * @var array
    */
-  protected $data = array();
+  protected $_data = array();
 
   /**
    * Enter description here...
@@ -57,13 +57,6 @@ class Madeam_Model {
    * @var unknown_type
    */
   protected $depth = 2;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
-   */
-  protected $reflection;
 
   /**
    * Enter description here...
@@ -194,7 +187,7 @@ class Madeam_Model {
       }
 
       // pre-load a reflection of this class for use in parseing the meta data and methods
-      $this->reflection = new ReflectionClass(get_class($this));
+      $reflection = new ReflectionClass(get_class($this));
 
       // load schema
       $this->loadSchema();
@@ -203,16 +196,16 @@ class Madeam_Model {
       $this->loadStandardFields();
 
       // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
-      $this->loadRelations();
+      $this->loadRelations($reflection);
 
       // pre-load custom fields
-      $this->loadCustomFields();
+      $this->loadCustomFields($reflection);
 
       // load validators
-      $this->loadValidators();
+      $this->loadValidators($reflection);
 
       // load callbacks
-      $this->loadCallbacks();
+      $this->loadCallbacks($reflection);
 
       // save cache
       if (Madeam_Config::get('cache_models') === true) {
@@ -253,14 +246,14 @@ class Madeam_Model {
       return $inst;
     }
     
-    if (array_key_exists($name, $this->data)) {
-      return $this->data[$name];
+    if (array_key_exists($name, $this->_data)) {
+      return $this->_data[$name];
     } else {
-     $this->data[$name] = null;
-     return $this->data[$name]; 
+     $this->_data[$name] = null;
+     return $this->_data[$name]; 
     }
   }
-
+    
   /**
    * load the standard fields from a schema
    *
@@ -291,8 +284,8 @@ class Madeam_Model {
    *
    * You can also set arguments in the array. For example: "array('message' => 'Oops', 'max' => 255)".
    */
-  final protected function loadValidators() {
-    $props = $this->reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+  final protected function loadValidators($reflection) {
+    $props = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
     $matches = array();
     foreach ($props as $prop) {
       // get property name
@@ -327,31 +320,10 @@ class Madeam_Model {
   }
 
   /**
-   * Just an idea... How do you feel about setting up models all in the class?
-   * It'd be better if we didn't always have to load fields for every model that's related to this model.
-   * Can we make it so it only does it for the root model or do we need the other fields when creating forms?
-   */
-  final protected function loadFields() {
-    $fields = array();
-    $props = $this->reflection->getProperties();
-    $matches = array();
-    foreach ($props as $prop) {
-      $propertyName = $prop->name;
-      if (preg_match("/field_(.+)/", $propertyName, $matches)) {
-        $fieldName = $matches[1];
-        $fields[$fieldName] = $this->{'field_' . $fieldName};
-      }
-    }
-    // it's called skeleton because $this->setup['schema'] is already being used for something else and this data set
-    // represents the structure or skeleton of the model
-    $this->setup['schema'] = $fields;
-  }
-
-  /**
    * This method parses all the class properties to find relationships
    */
-  final protected function loadRelations() {
-    $props = $this->reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+  final protected function loadRelations($reflection) {
+    $props = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
     $matches = array();
     foreach ($props as $prop) {
       if (preg_match("/^(hasMany|hasOne|belongsTo|hasAndBelongsToMany)_(.+)/", $prop->name, $matches)) {
@@ -366,8 +338,8 @@ class Madeam_Model {
     $this->setup['hasModels'] = array_merge($this->setup['hasOne'], $this->setup['hasMany'], $this->setup['hasAndBelongsToMany'], $this->setup['belongsTo'], array($this->modelName => array('model' => $this->modelName)));
   }
 
-  final protected function loadCallbacks() {
-    $methods = $this->reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
+  final protected function loadCallbacks($reflection) {
+    $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
     foreach ($methods as $method) {
       // callback properties (name, include, exclude)
       $callback = array();
@@ -511,18 +483,18 @@ class Madeam_Model {
    * New methods defined in models are actually custom fields. This method derives them by comparing the new methods to the old
    * methods to determine which ones are actually new
    */
-  final protected function loadCustomFields() {
+  final protected function loadCustomFields($reflection) {
     // get the name of the model's instance.
     //$reflection = new ReflectionClass(get_class($this));
     // get the name of it's parent (example parents: activeRecord. activeFile, etc...)
-    $parent = $this->reflection->getParentClass()->getName();
+    $parent = $reflection->getParentClass()->getName();
     
     // create instance of parent so we can compare the methods
     $parentReflection = new ReflectionClass($parent);
     
     // check each method to find out whethere it's a new field or not
     // I wish there was a faster way of doing this...
-    $methods = $this->reflection->getMethods(ReflectionMethod::IS_PROTECTED);
+    $methods = $reflection->getMethods(ReflectionMethod::IS_PROTECTED);
     foreach ($methods as $method) {
       // get method name
       $methodName = $method->getName();

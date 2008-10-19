@@ -160,8 +160,9 @@ class Madeam_Controller {
 
       // create model instance
       $model = new $modelClassName();
-      $this->_data[$name] = $model;    
+      $this->$name = $model;   
     } 
+    
     /*
     elseif (preg_match('/^_[A-Z]{1}/', $name, $match)) {
       // set component class name
@@ -177,8 +178,8 @@ class Madeam_Controller {
     if (array_key_exists($name, $this->_data)) {
       return $this->_data[$name];
     } else {
-     $this->_data[$name] = null;
-     return $this->_data[$name]; 
+      $this->_data[$name] = null;
+      return $this->_data[$name]; 
     }
   }
 
