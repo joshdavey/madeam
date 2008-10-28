@@ -173,7 +173,7 @@ class Madeam_Router {
       // but what about returning the params if we throw an error?
       return $params;
     }
-    
+
     // get params from uri
     $params = array_merge($params, $get);
             

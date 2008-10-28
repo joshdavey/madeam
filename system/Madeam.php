@@ -100,6 +100,8 @@ class Madeam {
       // If it didn't then there is ending "index.php" so we assume there is no URI on the end either
       if (isset($url[1])) {
         $url = $url[1];
+      } else {
+        $url = '/';
       }
     }
     
