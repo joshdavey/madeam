@@ -1,1 +1,5 @@
 .DS_Store
+etc/cache/*
+etc/log/*
+etc/sessions/*
+etc/locale/*
