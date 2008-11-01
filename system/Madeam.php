@@ -161,7 +161,7 @@ class Madeam {
     // so 'admin' becomes 'admin/index' if the admin directory exists.
     // note: there is a consequence for this feature which means if you have a directory named 'admin'
     // you can't have a controller named 'Controller_Admin'
-    if (is_dir(PATH_TO_CONTROLLER . ucfirst($params['_controller']))) {
+    if (is_dir(PATH_TO_APP . 'Controller' . DS . ucfirst($params['_controller']))) {
       $params['_controller'] .= '/' . Madeam_Config::get('default_controller');
     }
     
@@ -180,12 +180,12 @@ class Madeam {
       // create controller instance
       $controller = new $controllerClass($params);
     } catch(Madeam_Exception_AutoloadFail $e) {
-      if (is_dir(PATH_TO_VIEW . $params['_controller'])) {
+      if (is_dir(PATH_TO_APP . 'View' . DS . $params['_controller'])) {
         $view = $params['_controller'] . '/' . $params['_action'];
         $params['_controller'] = 'app';
         $controller = new Controller_App($params);
         $controller->view($view);
-      } elseif (is_file(PATH_TO_VIEW . $params['_controller'] . '.' . $params['format'])) {
+      } elseif (is_file(PATH_TO_APP . 'View' . DS . $params['_controller'] . '.' . $params['format'])) {
         $view = $params['_controller'];
         $params['_action'] = $params['_controller'];
         $params['_controller'] = 'app';

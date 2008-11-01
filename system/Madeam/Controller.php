@@ -49,6 +49,12 @@ class Madeam_Controller {
    * @var unknown_type
    */
   private $_setup = array();
+  
+  /**
+   * This holds the view's final output's content so that it can be included into a layout
+   * for example: <?php echo $this->_content; ?>
+   */
+  private $_content = null;
 
   /**
    * Enter description here...
@@ -340,7 +346,7 @@ class Madeam_Controller {
    * @param text/boolean $data
    * @return unknown
    */
-  final public function render($settings) {    
+  final public function renderOld($settings) {    
     
     if (isset($settings['view'])) {
       $this->view($settings['view']);
@@ -375,9 +381,9 @@ class Madeam_Controller {
     if (isset($settings['partial'])) {
       $partial = explode('/', $settings['partial']);
       $partialName = array_pop($partial);
-      $view = PATH_TO_VIEW . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
+      $view = PATH_TO_APP . 'View' . DS . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
     } else {
-      $view = PATH_TO_VIEW . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'];
+      $view = PATH_TO_APP . 'View' . DS . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'];
     }
 	 
     if (file_exists($view)) {
@@ -411,6 +417,60 @@ class Madeam_Controller {
     }
     
     return $output;
+  }
+
+  final public function render($settings) {    
+    // set output. the underscore in the name helps avoid people overwritting it by setting
+    // a view variable called $output and over-writting it.
+    $_output = null;
+    
+    // set the view file path
+    if (isset($settings['partial'])) {
+      $partial = explode('/', $settings['partial']);
+      $partialName = array_pop($partial);
+      $view = PATH_TO_APP . 'View' . DS . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
+    } else {
+      $view = PATH_TO_APP . 'View' . DS . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'];
+    }
+    
+    // check if the view exists
+    // if the view doesn't exist we need to serialize it.
+    if (file_exists($view)) {
+      // extract data to view and layout
+      extract($this->_data);
+      
+      // legacy -- we used to do echo $controller->content; when we were using builders
+      // now we can just do echo $this->content;
+      // needs to be removed in the future
+      $controller =& $this;
+      
+      // render view's content
+      ob_start();
+        include($view);
+        $this->_content = $controller->content = ob_get_contents();
+      ob_end_clean();
+      
+      // apply layout to view's content
+      if (isset($settings['partial'])) {
+        $layouts = array();
+      } else {
+        foreach ($this->_layout as $_layout) {
+          $_layout = PATH_TO_APP . 'View' . DS . $_layout . '.layout.' . $this->params['_format'];
+          
+          // render layouts with builder
+          ob_start();
+            include($_layout);
+            $this->_content = $controller->content = ob_get_contents();
+          ob_clean();
+        }
+      }
+    } else {
+      // serialize output
+      $_serializeMethod = 'encode' . ucfirst($this->params['_format']);
+      $this->_content = Madeam_Serialize::$_serializeMethod($this->_data);
+    }
+    
+    return $this->_content;
   }
 
 }

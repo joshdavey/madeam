@@ -15,7 +15,9 @@
  */
 class Madeam_Cache {
 
-  public static $dir = 'cache';
+  public static $path = false;
+
+  public static $prefix = 'cache.';
 
   public static $openCaches = array();
 
@@ -29,14 +31,14 @@ class Madeam_Cache {
   public static function read($id, $life_time = 0) {
     // prefix id with environment name
     // the id is prefixed so that caches for one environment don't overlap another
-    $id = MADEAM_ENVIRONMENT . '.' . $id;
+    $id = self::$prefix . $id;
     // check registry first
     if (Madeam_Registry::exists($id)) {
       return Madeam_Registry::get($id);
     }
 
     // set file name
-    $file = PATH_TO_TMP . self::$dir . DS . $id;
+    $file = self::$path . $id;
     if (file_exists($file)) {
       if ((time() - filemtime($file)) <= $life_time || $life_time == - 1) {
         // get cache from file and unserialize
@@ -60,7 +62,7 @@ class Madeam_Cache {
   public static function save($id, $value, $store_in_registry = false) {
     // prefix id with environment name
     // the id is prefixed so that caches for one environment don't overlap another
-    $id = MADEAM_ENVIRONMENT . '.' . $id;
+    $id = self::$prefix . $id;
 
     // store in registry
     if ($store_in_registry === true) {
@@ -68,7 +70,7 @@ class Madeam_Cache {
     }
 
     // set file name
-    $file = PATH_TO_TMP . self::$dir . DS . $id;
+    $file = self::$path . $id;
 
     // save serialization to file
     file_put_contents($file, serialize($value));
@@ -84,7 +86,7 @@ class Madeam_Cache {
   public static function start($id, $life_time = 0) {
     // prefix id with environment name
     // the id is prefixed so that caches for one environment don't overlap another
-    $id = MADEAM_ENVIRONMENT . '.' . $id;
+    $id = self::$prefix . $id;
 
     // check if inline cache is enabled
     if (Madeam_Config::get('cache_inline') === false) {
@@ -128,10 +130,10 @@ class Madeam_Cache {
   public static function clear($id) {
     // prefix id with environment name
     // the id is prefixed so that caches for one environment don't overlap another
-    $id = MADEAM_ENVIRONMENT . '.' . $id;
+    $id = self::$prefix . $id;
 
     // set file name
-    $file = PATH_TO_TMP . self::$dir . DS . $id;
+    $file = self::$path . $id;
 
     // save serialization to file
     file_put_contents($file, null);
@@ -146,7 +148,7 @@ class Madeam_Cache {
   public static function check($id) {
     // prefix id with environment name
     // the id is prefixed so that caches for one environment don't overlap another
-    $id = MADEAM_ENVIRONMENT . '.' . $id;
+    $id = self::$prefix . $id;
 
     // check registry first
     if (Madeam_Registry::get($id)) {
@@ -154,7 +156,7 @@ class Madeam_Cache {
     }
 
     // check file system cache
-    $file = PATH_TO_TMP . self::$dir . DS . $id;
+    $file = self::$path . $id;
     if (file_exists($file)) {
       return true;
     }

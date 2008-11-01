@@ -9,11 +9,11 @@ class Madeam_Serialize {
     return json_decode($json);
   }
   
-  public static function encodePhp($data) {
+  public static function encodeSphp($data) {
     return serialize($data);
   }
   
-  public static function decodePhp($php) {
+  public static function decodeSphp($php) {
     return unserialize($php);
   }
   

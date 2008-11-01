@@ -74,11 +74,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
 }
 
 // application files
-define('PATH_TO_VIEW', PATH_TO_APP . 'View' . DS);
-define('PATH_TO_CONTROLLER', PATH_TO_APP . 'Controller' . DS);
-define('PATH_TO_MODEL', PATH_TO_APP . 'Model' . DS);
-define('PATH_TO_LOG', PATH_TO_PROJECT . 'etc' . DS . 'log' . DS);
-define('PATH_TO_TMP', PATH_TO_PROJECT . 'etc' . DS . 'tmp' . DS);
+define('PATH_TO_ETC', PATH_TO_PROJECT . 'etc' . DS);
 
 // set include paths
 $includePaths = array(PATH_TO_APP, PATH_TO_LIB, PATH_TO_SYSTEM, PATH_TO_SYSTEM . DS . 'Madeam' . DS . 'Helper' . DS, ini_get('include_path'));
@@ -91,9 +87,14 @@ require PATH_TO_SYSTEM . 'Madeam/Controller.php';
 require PATH_TO_SYSTEM . 'Madeam/Inflector.php';
 require PATH_TO_SYSTEM . 'Madeam/Router.php';
 require PATH_TO_SYSTEM . 'Madeam/Config.php';
-require PATH_TO_SYSTEM . 'Madeam/Controller/Builder.php';
 require PATH_TO_SYSTEM . 'Madeam/Cache.php';
 require PATH_TO_SYSTEM . 'Madeam/Registry.php';
+require PATH_TO_SYSTEM . 'Madeam/Logger.php';
+
+
+// configure core classes
+Madeam_Cache::$path   = PATH_TO_ETC . 'cache' . DS;
+Madeam_Logger::$path  = PATH_TO_ETC . 'log' . DS;
 
 
 // save configuration

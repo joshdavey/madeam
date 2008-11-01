@@ -15,7 +15,10 @@
  */
 class Madeam_Logger {
 
-  private $logs = array();
+  private static $logs = array();
+
+  public static $path = false;
+
 
   /**
    * Stores this registry's instance
@@ -64,7 +67,7 @@ class Madeam_Logger {
 
     if (Madeam_Config::get('enable_logger') == true && $requestLog != null) {
       $requestLog .= '------------------' . "\n";
-      file_put_contents(PATH_TO_LOG . date(Madeam_Config::get('log_file_name')) . '.txt',  $requestLog, FILE_APPEND | LOCK_EX);
+      file_put_contents(self::$path . date(Madeam_Config::get('log_file_name')) . '.txt',  $requestLog, FILE_APPEND | LOCK_EX);
     }
   }
 

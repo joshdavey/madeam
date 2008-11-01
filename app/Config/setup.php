@@ -65,7 +65,7 @@ $cfg['environment'] = 'development';
   $env['development']['cache_inline']       = false;
   $env['development']['clear_cache']        = true;
   $env['development']['enable_debug']       = true;
-  $env['development']['enable_logger']      = true;
+  $env['development']['enable_logger']      = false;
   $env['development']['inline_errors']      = false;
 
 // production
