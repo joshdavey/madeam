@@ -339,91 +339,11 @@ class Madeam_Controller {
     }
     return $this->_layout;
   }
-  
+
   /**
-   * Enter description here...
-   *
-   * @param text/boolean $data
-   * @return unknown
+   * 
    */
-  final public function renderOld($settings) {    
-    
-    if (isset($settings['view'])) {
-      $this->view($settings['view']);
-    }     
-    
-    if (isset($settings['layout'])) {
-      $this->layout($settings['layout']);
-    } 
-    
-    if (isset($settings['data'])) {
-      $data = $settings['data'];
-    } elseif (isset($settings['collection'])) {
-      $collection = $settings['collection'];
-    } else {
-      $data = $this->_data;
-    } 
-    
-    // create builder instance
-    try {
-      $builderClassName = 'Madeam_Controller_Builder_' . ucfirst($this->params['_format']);
-      $builder = new $builderClassName($this);
-    } catch (Madeam_Exception_AutoloadFail $e) {
-      try {
-        $builderClassName = 'Madeam_Controller_Builder';
-        $builder = new $builderClassName($this);
-      } catch (Madeam_Exception_AutoloadFail $e) {
-        Madeam_Exception::catchException($e, array('message' => 'Unknown format "' . $this->params['_format'] . '". Missing class <strong>' . $builderClassName . '</strong>'));
-      }
-    }
-    
-    // set view
-    if (isset($settings['partial'])) {
-      $partial = explode('/', $settings['partial']);
-      $partialName = array_pop($partial);
-      $view = PATH_TO_APP . 'View' . DS . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
-    } else {
-      $view = PATH_TO_APP . 'View' . DS . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'];
-    }
-	 
-    if (file_exists($view)) {
-      if (!empty($collection)) {
-        $output = $builder->buildPartial($view, $collection);
-      } else {
-        // render the view
-        $output = $builder->buildView($view, $data);
-      }
-    } else {
-    	if (in_array(Madeam_Inflector::pluralize(low($this->_represent)), array_keys($data))) {
-    		$data = $data[Madeam_Inflector::pluralize(low($this->_represent))];
-    	} elseif (in_array(Madeam_Inflector::singalize(low($this->_represent)), array_keys($data))) {
-    		$data = $data[Madeam_Inflector::singalize(low($this->_represent))];
-    	}
-    	
-      $output = $builder->missingView($view, $data);
-    }
-
-    // set layout    
-    if (isset($settings['partial'])) {
-      $layouts = array();
-    } else {
-      $layouts = $this->_layout;
-      foreach ($layouts as &$layout) {
-        $layout = PATH_TO_VIEW . $layout . '.layout.' . $this->params['_format'];
-      }
-      
-      // render layouts with builder
-      $output = $builder->buildLayouts($layouts, $data, $output);
-    }
-    
-    return $output;
-  }
-
-  final public function render($settings) {    
-    // set output. the underscore in the name helps avoid people overwritting it by setting
-    // a view variable called $output and over-writting it.
-    $_output = null;
-    
+  final public function render($settings) {
     // set the view file path
     if (isset($settings['partial'])) {
       $partial = explode('/', $settings['partial']);
