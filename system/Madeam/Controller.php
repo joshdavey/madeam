@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -20,41 +19,43 @@ class Madeam_Controller {
    *
    * @var string/array
    */
-  private $_layout = 'master';
+  public $_layout = 'master';
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  private $_view = null;
+  public $_view = null;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  private $_data = array();
+  public $_data = array();
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  private $_represent = false;
+  public $_represent = false;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  private $_setup = array();
+  public $_setup = array();
   
   /**
    * This holds the view's final output's content so that it can be included into a layout
    * for example: <?php echo $this->_content; ?>
    */
-  private $_content = null;
+  public $_content = null;
+  
+  protected $name;
 
   /**
    * Enter description here...
@@ -140,11 +141,19 @@ class Madeam_Controller {
         }
       }
       
-      /*
       // idea -- all protected properties load controller components by name.
+      /*
       $properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
       foreach ($properties as $property) {
+        test($property->getName());
         
+        // set component class name
+        $componentClassName = 'Madeam_Controller_Component_' . $name;
+
+        // create component instance
+        $component = new $componentClassName($this);
+        $this->$name = $component;
+        return $component;
       }
       */
       
@@ -168,18 +177,6 @@ class Madeam_Controller {
       $model = new $modelClassName();
       $this->$name = $model;   
     } 
-    
-    /*
-    elseif (preg_match('/^_[A-Z]{1}/', $name, $match)) {
-      // set component class name
-      $componentClassName = 'Component_' . $name;
-
-      // create component instance
-      $component = new $componentClassName($this);
-      $this->$name = $component;
-      return $component;
-    }
-    */
     
     if (array_key_exists($name, $this->_data)) {
       return $this->_data[$name];

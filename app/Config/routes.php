@@ -7,7 +7,7 @@
  */
 
 // admin routes
-  //Madeam_Router::connect(':controller/:action/:id', array('controller' => 'admin\/[^\/]+'));
+  //Madeam_Router::connect(':_controller/:_action/:id', array('_controller' => 'admin\/[^\/]+'));
 
 // default routes
   Madeam_Router::connect(':_controller/:_action/:id');
