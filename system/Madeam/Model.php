@@ -106,6 +106,11 @@ class Madeam_Model {
    * @var unknown_type
    */
   protected $setup = array();
+  
+  /**
+   * 
+   */
+  protected $_reflection = false;
 
   /**
    * Enter description here...
@@ -142,76 +147,80 @@ class Madeam_Model {
     // set cache name
     $this->cacheName .= low($this->modelName) . '.setup';
 
-		// clear model cache if it cache is disabled for routes
-		if (!Madeam_Config::get('cache_models')) { 
-			Madeam_Cache::clear($this->cacheName);	
-		}
+    // clear model cache if it cache is disabled for routes
+    if (!Madeam_Config::get('cache_models')) { 
+      Madeam_Cache::clear($this->cacheName);	
+    }
 
     // check cache for setup. if cache doesn't exist define it and then save it
     if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1)) {
-      $this->setup['hasMany'] = array();
-      $this->setup['hasOne'] = array();
-      $this->setup['belongsTo'] = array();
-      $this->setup['hasAndBelongsToMany'] = array();
-      $this->setup['hasModels'] = array(); // why is it called has_models? Change this please. Relationships maybe?
-      $this->setup['customFields'] = array(); // custom fields defined in model
-      $this->setup['standardFields'] = array(); // default fields in the database or file system
-      $this->setup['validators'] = array();
-      $this->setup['beforeSave'] = array();
-      $this->setup['afterSave'] = array();
-      $this->setup['beforeCreate'] = array();
-      $this->setup['afterCreate'] = array();
-      $this->setup['beforeUpdate'] = array();
-      $this->setup['afterUpdate'] = array();
-      $this->setup['beforeFind'] = array();
-      $this->setup['afterFind'] = array();
-      $this->setup['beforeValidate'] = array();
-      $this->setup['afterValidate'] = array();
-      $this->setup['beforeDelete'] = array();
-      $this->setup['afterDelete'] = array();
-
-      // set resourceName
-      // the resourceName parameter is available for the developer to change the resource name in
-      // the model definition but $this->setup['resourceName'] is used through this class because it is cached
-      if ($this->resourceName == null) {
-        $this->setup['resourceName'] = Madeam_Inflector::modelTableize($this->modelName);
-      } else {
-        $this->setup['resourceName'] = $this->resourceName;
-      }
       
-      // set primaryKey
-      // the primaryKey parameter is available for the developer to change the primary key in
-      // the model definition but $this->setup['primaryKey'] is used through this class because it is cached
-      if ($this->primaryKey !== false) {
-      	$this->setup['primaryKey'] = $this->primaryKey;
-      }
-
       // pre-load a reflection of this class for use in parseing the meta data and methods
       $reflection = new ReflectionClass(get_class($this));
-
-      // load schema
-      $this->loadSchema();
-
-      // load standard fields
-      $this->loadStandardFields();
-
-      // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
-      $this->loadRelations($reflection);
-
-      // pre-load custom fields
-      $this->loadCustomFields($reflection);
-
-      // load validators
-      $this->loadValidators($reflection);
-
-      // load callbacks
-      $this->loadCallbacks($reflection);
+      
+      $this->loadSetup($reflection);
+      
+      unset($reflection);
 
       // save cache
       if (Madeam_Config::get('cache_models') === true) {
         Madeam_Cache::save($this->cacheName, $this->setup, true);
       }
     }
+  }
+  
+  public function loadSetup($reflection) {
+    $this->setup['hasMany'] = array();
+    $this->setup['hasOne'] = array();
+    $this->setup['belongsTo'] = array();
+    $this->setup['hasAndBelongsToMany'] = array();
+    $this->setup['hasModels'] = array(); // why is it called has_models? Change this please. Relationships maybe?
+    $this->setup['customFields'] = array(); // custom fields defined in model
+    $this->setup['standardFields'] = array(); // default fields in the database or file system
+    $this->setup['validators'] = array();
+    $this->setup['beforeSave'] = array();
+    $this->setup['afterSave'] = array();
+    $this->setup['beforeCreate'] = array();
+    $this->setup['afterCreate'] = array();
+    $this->setup['beforeUpdate'] = array();
+    $this->setup['afterUpdate'] = array();
+    $this->setup['beforeFind'] = array();
+    $this->setup['afterFind'] = array();
+    $this->setup['beforeValidate'] = array();
+    $this->setup['afterValidate'] = array();
+    $this->setup['beforeDelete'] = array();
+    $this->setup['afterDelete'] = array();
+    
+    // set resourceName
+    // the resourceName parameter is available for the developer to change the resource name in
+    // the model definition but $this->setup['resourceName'] is used through this class because it is cached
+    if ($this->resourceName == null) {
+      $this->setup['resourceName'] = Madeam_Inflector::modelTableize($this->modelName);
+    } else {
+      $this->setup['resourceName'] = $this->resourceName;
+    }
+
+    // set primaryKey
+    // the primaryKey parameter is available for the developer to change the primary key in
+    // the model definition but $this->setup['primaryKey'] is used through this class because it is cached
+    if ($this->primaryKey !== false) {
+      $this->setup['primaryKey'] = $this->primaryKey;
+    }
+
+    // load schema
+    $this->loadSchema();
+    
+    // load standard fields
+    $this->loadStandardFields();
+
+    // pre-load custom fields
+    $this->loadCustomFields($reflection);
+
+    // load validators
+    $this->loadValidators($reflection);
+
+    // load callbacks
+    $this->loadCallbacks($reflection);
   }
   
   public function __clone() {
@@ -250,7 +259,7 @@ class Madeam_Model {
       return $this->_data[$name];
     } else {
      $this->_data[$name] = null;
-     return $this->_data[$name]; 
+     return $this->_data[$name];
     }
   }
     
@@ -258,15 +267,17 @@ class Madeam_Model {
    * load the standard fields from a schema
    *
    */
-  final public function loadStandardFields() {
+  final protected function loadStandardFields() {
     foreach ($this->setup['schema'] as $field) {
       $this->setup['standardFields'][] = $field['Field'];
+      
       // set primary key
       if ($field['Key'] == 'PRI' && !isset($this->setup['primaryKey'])) {
         $this->setup['primaryKey'] = $field['Field'];
       }
     }
   }
+  
 
   /**
    * load a schema
@@ -274,6 +285,26 @@ class Madeam_Model {
    */
   final public function loadSchema() {
     $this->setup['schema'] = $this->describe();
+  }
+  
+  /**
+   * This method parses all the class properties to find relationships
+   */
+  final protected function loadRelations($reflection) {
+    $props = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+    $matches = array();
+    foreach ($props as $prop) {
+      if (preg_match("/^(hasMany|hasOne|belongsTo|hasAndBelongsToMany)_(.+)/", $prop->name, $matches)) {
+        $relationship = $matches[1];
+        $model = $matches[2];
+        $params = (array) $prop->getValue($this);
+        $relationMethod = 'add' . ucfirst($relationship);
+        $this->$relationMethod($model, $params);
+      }
+    }
+    // merge models
+    // and add itself to the list of models
+    $this->setup['hasModels'] = array_merge($this->setup['hasOne'], $this->setup['hasMany'], $this->setup['hasAndBelongsToMany'], $this->setup['belongsTo'], array($this->modelName => array('model' => $this->modelName)));
   }
 
   /**
@@ -293,14 +324,19 @@ class Madeam_Model {
       if (preg_match("/validate_(.+)/", $propertyName, $matches)) {
         // get value of validator property
         $args = $prop->getValue($this);
+        
         // seperate bits of validate call by _
         $validate = explode('_', $matches[1]);
+        
         // get method name
         $method = $validate[count($validate) - 1];
+        
         // remove method name from the end of validate var
         array_pop($validate);
+        
         // implode remains of $validate to get field name
         $field = implode('_', $validate);
+        
         // add to validator list
         $this->validator($field, $method, $args);
       }
@@ -319,24 +355,6 @@ class Madeam_Model {
     $this->setup['validators'][] = array('method' => $method, 'args' => $args);
   }
 
-  /**
-   * This method parses all the class properties to find relationships
-   */
-  final protected function loadRelations($reflection) {
-    $props = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
-    $matches = array();
-    foreach ($props as $prop) {
-      if (preg_match("/^(hasMany|hasOne|belongsTo|hasAndBelongsToMany)_(.+)/", $prop->name, $matches)) {
-        $relationship = $matches[1];
-        $model = $matches[2];
-        $params = (array) $prop->getValue($this);
-        $this->{'add' . ucfirst($relationship)}($model, $params);
-      }
-    }
-    // merge models
-    // and add itself to the list of models
-    $this->setup['hasModels'] = array_merge($this->setup['hasOne'], $this->setup['hasMany'], $this->setup['hasAndBelongsToMany'], $this->setup['belongsTo'], array($this->modelName => array('model' => $this->modelName)));
-  }
 
   final protected function loadCallbacks($reflection) {
     $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
@@ -449,7 +467,7 @@ class Madeam_Model {
    */
   final protected function parseValidateMessage($args = array()) {
     // set new message
-    $new_message = $args['message'];
+    $newMessage = $args['message'];
     // find message variables
     preg_match_all('/\#([a-zA-Z_]+)/', $args['message'], $matchs);
     $vars = $matchs[1];
@@ -457,9 +475,9 @@ class Madeam_Model {
     unset($args['message']);
     // replace each variable found in the message
     foreach ($vars as $var) {
-      $new_message = str_replace("#$var", $args[$var], $new_message);
+      $newMessage = str_replace("#$var", $args[$var], $newMessage);
     }
-    return $new_message;
+    return $newMessage;
   }
 
   /**
@@ -484,8 +502,6 @@ class Madeam_Model {
    * methods to determine which ones are actually new
    */
   final protected function loadCustomFields($reflection) {
-    // get the name of the model's instance.
-    //$reflection = new ReflectionClass(get_class($this));
     // get the name of it's parent (example parents: activeRecord. activeFile, etc...)
     $parent = $reflection->getParentClass()->getName();
     

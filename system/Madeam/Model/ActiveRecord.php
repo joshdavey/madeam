@@ -106,6 +106,13 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
    */
   private $_sqlHaving = false;
 
+  public function loadSetup($reflection) {
+    parent::loadSetup($reflection);
+    
+    // this parses the class properties to find relationships to other models, eventually populating has_many, has_one, has_and_belongs_to_many, etc...
+    $this->loadRelations($reflection);
+  }
+
   /**
    * Magic method allows for special query functions like findAll_by_name('Joshua');
    *
@@ -156,6 +163,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
    * Query Methods
    * =======================================================================
    */
+   
   /**
    * Enter description here...
    *
@@ -661,43 +669,43 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
    * @return string
    */  
   final private function buildQuerySelect() {
-  	
-  	$sqlTables = array();
-  	$sqlFields = array();
-  	
-  	// add main table to query
-  	$sqlTables[] = $this->setup['resourceName'] . ' as ' . $this->modelName;
-  	
-  	// set main fields
-  	if (!empty($this->fields)) {
-  		$mainFields = array_intersect($this->fields, $this->setup['standardFields']);
-		} else {
-			$mainFields = $this->setup['standardFields'];
-		}
-  	
-  	// get main fields
-  	$sqlFields[] = $this->modelName . '.' . implode(", " . $this->modelName . '.', $mainFields) . ' ';
-  	
-  	// check joins for tables and fields
-  	foreach ($this->_sqlJoins as $model => $join) {
-    	if (!isset($this->setup['hasAndBelongsToMany'][$model])) {
-    		$sqlTables[] = 'LEFT JOIN ' . $join['table'] . ' as ' . $join['model'] . ' on ' . $join['on'];
-    		
-    		//$selectFields = $this->$model->getFields();
-    		$selectFields = $this->$model->fields;
-    		if (!empty($selectFields)) {
-    			$modelFields = array_intersect($selectFields, $this->$model->setup['standardFields']);
-		  	} else {
-		  		$modelFields = $this->$model->setup['standardFields'];
-		  	}
-    		
+    
+    $sqlTables = array();
+    $sqlFields = array();
+    
+    // add main table to query
+    $sqlTables[] = $this->setup['resourceName'] . ' as ' . $this->modelName;
+    
+    // set main fields
+    if (!empty($this->fields)) {
+      $mainFields = array_intersect($this->fields, $this->setup['standardFields']);
+    } else {
+      $mainFields = $this->setup['standardFields'];
+    }
+    
+    // get main fields
+    $sqlFields[] = $this->modelName . '.' . implode(", " . $this->modelName . '.', $mainFields) . ' ';
+    
+    // check joins for tables and fields
+    foreach ($this->_sqlJoins as $model => $join) {
+      if (!isset($this->setup['hasAndBelongsToMany'][$model])) {
+        $sqlTables[] = 'LEFT JOIN ' . $join['table'] . ' as ' . $join['model'] . ' on ' . $join['on'];
+        
+        //$selectFields = $this->$model->getFields();
+        $selectFields = $this->$model->fields;
+        if (!empty($selectFields)) {
+          $modelFields = array_intersect($selectFields, $this->$model->setup['standardFields']);
+        } else {
+          $modelFields = $this->$model->setup['standardFields'];
+        }
+      
         $sqlFields[] = $model . '.' . implode(", " . $model . '.', $this->$model->setup['standardFields']);
       } else {
-      	$sqlTables[] = 'LEFT JOIN ' . $join['table'] . ' as ' . $this->setup['hasAndBelongsToMany'][$model]['joinModel'] . ' on ' . $join['on'];
-      	$sqlFields[] = $this->setup['hasAndBelongsToMany'][$model]['joinModel'] . '.' . $this->setup['hasAndBelongsToMany'][$model]['foreignKey'] . ', ' . $this->setup['hasAndBelongsToMany'][$model]['joinModel'] . '.' . $this->setup['hasAndBelongsToMany'][$model]['associateForeignKey'];
+        $sqlTables[] = 'LEFT JOIN ' . $join['table'] . ' as ' . $this->setup['hasAndBelongsToMany'][$model]['joinModel'] . ' on ' . $join['on'];
+        $sqlFields[] = $this->setup['hasAndBelongsToMany'][$model]['joinModel'] . '.' . $this->setup['hasAndBelongsToMany'][$model]['foreignKey'] . ', ' . $this->setup['hasAndBelongsToMany'][$model]['joinModel'] . '.' . $this->setup['hasAndBelongsToMany'][$model]['associateForeignKey'];
       }
     }
-  	
+    
     $sql[] = 'SELECT ' . implode(', ', $sqlFields) . ' FROM ' . implode(' ', $sqlTables);    
     
     // add where
@@ -1054,4 +1062,5 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     
     return $details;
   }
+
 }

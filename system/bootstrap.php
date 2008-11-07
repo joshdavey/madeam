@@ -33,7 +33,11 @@ define('PATH_TO_LIB', PATH_TO_PROJECT . 'library' . DS);
 define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS);
 
 // include base setup configuration
-require PATH_TO_APP . 'Config' . DS . 'setup.php';
+if (file_exists(PATH_TO_APP . 'Config' . DS . 'setup.local.php')) {
+  require PATH_TO_APP . 'Config' . DS . 'setup.local.php';
+} else {
+  require PATH_TO_APP . 'Config' . DS . 'setup.php';
+}
 
 // set configuration
 $config = array_merge($env[$cfg['environment']], $cfg);

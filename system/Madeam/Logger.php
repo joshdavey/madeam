@@ -14,7 +14,7 @@
  */
 class Madeam_Logger {
 
-  private static $logs = array();
+  public $logs = array();
 
   public static $path = false;
 
