@@ -69,7 +69,7 @@ $cfg['environment'] = 'testing';
   $env['development']['inline_errors']      = false;
   
 // testing
-  $env['testing']['data_servers'][]         = 'mysql://root:@localhost?name=madeam_testing';
+  $env['testing']['data_servers'][]         = 'mysql://username:password@localhost?name=madeam_testing';
   $env['testing']['cache_controllers']      = false;
   $env['testing']['cache_models']           = false;
   $env['testing']['cache_routes']           = false;
