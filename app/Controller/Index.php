@@ -2,7 +2,7 @@
 class Controller_Index extends Controller_App {
 
   public function indexAction() {
-    $this->posts = $this->Post->findAll();
+    // welcome to the Index Controller's index action
   }
   
 }
