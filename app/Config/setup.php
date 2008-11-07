@@ -70,25 +70,14 @@ $cfg['environment'] = 'testing';
   
 // testing
   $env['testing']['data_servers'][]         = 'mysql://username:password@localhost?name=madeam_testing';
-  $env['testing']['cache_controllers']      = false;
-  $env['testing']['cache_models']           = false;
-  $env['testing']['cache_routes']           = false;
-  $env['testing']['cache_inline']           = false;
+  $env['testing']['cache_controllers']      = true;
+  $env['testing']['cache_models']           = true;
+  $env['testing']['cache_routes']           = true;
+  $env['testing']['cache_inline']           = true;
   $env['testing']['clear_cache']            = false;
-  $env['testing']['enable_debug']           = false;
+  $env['testing']['enable_debug']           = true;
   $env['testing']['enable_logger']          = true;
   $env['testing']['inline_errors']          = false;
-
-// testing
-  $env['testing']['data_servers'][]     = 'mysql://root:@localhost?name=madeam_testing';
-  $env['testing']['cache_controllers']  = true;
-  $env['testing']['cache_models']       = true;
-  $env['testing']['cache_routes']       = true;
-  $env['testing']['cache_inline']       = true;
-  $env['testing']['clear_cache']        = true;
-  $env['testing']['enable_debug']       = true;
-  $env['testing']['enable_logger']      = false;
-  $env['testing']['inline_errors']      = false;
 
 // production
   $env['production']['data_servers'][]      = 'mysql://username:password@localhost?name=madeam_production';
