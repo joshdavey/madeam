@@ -54,7 +54,7 @@
  *   true: all errors are displayed inline
  *   false: errors will be displayed by Madeam's error handling controller
  */
-$cfg['environment'] = 'development';
+$cfg['environment'] = 'testing';
 
 
 // development
@@ -69,7 +69,7 @@ $cfg['environment'] = 'development';
   $env['development']['inline_errors']      = false;
 
 // testing
-  $env['testing']['data_servers'][]     = 'mysql://username:password@localhost?name=madeam_testing';
+  $env['testing']['data_servers'][]     = 'mysql://root:@localhost?name=madeam_testing';
   $env['testing']['cache_controllers']  = true;
   $env['testing']['cache_models']       = true;
   $env['testing']['cache_routes']       = true;
