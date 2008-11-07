@@ -58,7 +58,7 @@ $cfg['environment'] = 'development';
 
 
 // development
-  $env['development']['data_servers'][]     = 'mysql://username:password@localhost?name=madeam';
+  $env['development']['data_servers'][]     = 'mysql://username:password@localhost?name=madeam_development';
   $env['development']['cache_controllers']  = false;
   $env['development']['cache_models']       = false;
   $env['development']['cache_routes']       = false;
@@ -68,8 +68,19 @@ $cfg['environment'] = 'development';
   $env['development']['enable_logger']      = false;
   $env['development']['inline_errors']      = false;
 
+// testing
+  $env['testing']['data_servers'][]     = 'mysql://username:password@localhost?name=madeam_testing';
+  $env['testing']['cache_controllers']  = true;
+  $env['testing']['cache_models']       = true;
+  $env['testing']['cache_routes']       = true;
+  $env['testing']['cache_inline']       = true;
+  $env['testing']['clear_cache']        = true;
+  $env['testing']['enable_debug']       = true;
+  $env['testing']['enable_logger']      = false;
+  $env['testing']['inline_errors']      = false;
+
 // production
-  $env['production']['data_servers'][]      = 'mysql://username:password@localhost?name=madeam';
+  $env['production']['data_servers'][]      = 'mysql://username:password@localhost?name=madeam_production';
   $env['production']['cache_controllers']   = true;
   $env['production']['cache_models']        = true;
   $env['production']['cache_routes']        = true;
