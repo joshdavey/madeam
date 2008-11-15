@@ -186,13 +186,6 @@ class Madeam_Controller {
     }
   }
 
-  final public function __call($name, $args) {
-    if (! file_exists($this->_view)) {
-      throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($name, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
-      . "\n Create a view called <strong>" . substr($name, 0, -6) . ".html</strong> OR Create a method called <strong>$name" . "Action</strong>");
-    }
-  }
-
   final public function __set($name, $value) {
     if (!preg_match('/^(?:_[A-Z])/', $name)) {
       $this->_data[$name] = $value;
@@ -238,6 +231,10 @@ class Madeam_Controller {
     	} else {
     	  exit('Invalid Action Characters');
     	}
+    } else {
+      throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
+      . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . substr($action, 0, -6) . ".html</strong> OR Create a method called <strong>$action</strong> in <strong>" . get_class($this) . "</strong> class."
+      . " \n <code>public function $action() {\n}</code>");
     }
     
     // render
@@ -384,7 +381,12 @@ class Madeam_Controller {
     } else {
       // serialize output
       $_serializeMethod = 'encode' . ucfirst($this->params['_format']);
-      $this->_content = Madeam_Serialize::$_serializeMethod($this->_data);
+      if (method_exists('Madeam_Serialize', $_serializeMethod)) {
+        $this->_content = Madeam_Serialize::$_serializeMethod($this->_data);
+      } else {
+        //throw new Madeam_Controller_Exception();
+        exit('missing method ' . $_serializeMethod);
+      }
     }
     
     return $this->_content;

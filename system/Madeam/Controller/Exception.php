@@ -1,4 +1,4 @@
 <?php
-class Madeam_Controller_Exception extends Madeam_Controller {
+class Madeam_Controller_Exception extends Madeam_Exception {
   
 }
