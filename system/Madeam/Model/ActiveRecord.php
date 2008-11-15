@@ -172,7 +172,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
    */
   final public function execute($sql) {
     $count = 0;
-    $servers = Madeam_Config::get('data_servers');
+    $servers = Madeam_Config::get('connections');
     $this->connect($servers[$this->_server]);
     
     try {
