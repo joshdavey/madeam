@@ -29,7 +29,7 @@ if (substr($_SERVER['DOCUMENT_ROOT'], - 1) != '/') {
 
 // set key paths
 define('PATH_TO_APP', PATH_TO_PROJECT . 'app' . DS);
-define('PATH_TO_LIB', PATH_TO_PROJECT . 'library' . DS);
+define('PATH_TO_LIB', PATH_TO_PROJECT . 'lib' . DS);
 define('PATH_TO_SYSTEM', PATH_TO_PROJECT . 'system' . DS);
 
 // include base setup configuration
@@ -39,18 +39,14 @@ if (file_exists(PATH_TO_APP . 'Config' . DS . 'setup.local.php')) {
   require PATH_TO_APP . 'Config' . DS . 'setup.php';
 }
 
-// set configuration
-$config = array_merge($env[$cfg['environment']], $cfg);
-unset($cfg, $env);
-
 // define path to public directory
-define('PATH_TO_PUBLIC', dirname(dirname(__FILE__)) . DS . $config['public_directory_name'] . DS);
+define('PATH_TO_PUBLIC', dirname(dirname(__FILE__)) . DS . $cfg['public_directory_name'] . DS);
 
 // this is the name of the script that executes in the public directory
 define('SCRIPT_FILENAME', 'index.php');
 
 // turn configs into constants for speed?
-define('MADEAM_ENVIRONMENT', $config['environment']);
+define('MADEAM_ENVIRONMENT', $cfg['environment']);
 
 // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
 // mod_rewrite is on when $_GET['_uri'] exists. You can see it defined in the public .htaccess file
@@ -102,8 +98,8 @@ Madeam_Logger::$path  = PATH_TO_ETC . 'log' . DS;
 
 
 // save configuration
-Madeam_Config::set($config);
-unset($config);
+Madeam_Config::set($cfg);
+unset($cfg);
 
 
 // idea... use this as a last resort when all autoloads fail.
@@ -139,6 +135,14 @@ function test($var = null) {
     echo '<br /><pre>[TEST::' . $tests . '] &nbsp;&nbsp;' . "\n";
     print_r($var);
     echo ' &nbsp;&nbsp;</pre>' . "\n";
+  } elseif (is_bool($var)) {
+    if ($var === true) {
+      $var = 'TRUE';
+    } else {
+      $var = 'FALSE';
+    }
+    
+    echo "<br /> [TEST::" . $tests . "] &nbsp;&nbsp;" . (string) $var . "&nbsp;&nbsp;  \n";
   } else {
     echo "<br /> [TEST::" . $tests . "] &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
   }
