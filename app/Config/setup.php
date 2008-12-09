@@ -28,12 +28,6 @@ $cfg = array();
  *   true: inline text is cached
  *   false: inline text isn't cached
  *
- * [clear_cache]
- * This is a feature for developers that clears the cache whenever changes are made to any of the
- * application files.
- *   true: clear cache when application files are changed
- *   false: do not clear cache
- *
  * [enable_debug]
  * When debugging is enabled debug messages will be displayed. For a development setup this is
  * perfect but you'll want to turn this off for production.
@@ -44,11 +38,6 @@ $cfg = array();
  * Sometimes you may want to disable this to improve speed.
  *  true:   logging is turned on
  *  false:  logging is turned off
- * 
- * [enable_toolbar]
- * The Madeam debug toolbar allows you to see useful information about the page
- *  true:  toolbar is displayed
- *  false: tool bar is hidden
  *
  * [inline_errors]
  *   true: all errors are displayed inline
@@ -59,44 +48,36 @@ $cfg['environment'] = 'development';
 
 switch ($cfg['environment']) {
   case 'development' :
-    $cfg['connections'][]         = 'mysql://username:password@localhost?name=madeam_development';
-    $cfg['cache_controllers']     = false;
-    $cfg['cache_models']          = false;
-    $cfg['cache_routes']          = false;
-    $cfg['cache_inline']          = false;
-    $cfg['clear_cache']           = false;
-    $cfg['enable_debug']          = true;
-    $cfg['enable_logger']         = true;
-    $cfg['inline_errors']         = false;
+    $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_development';
+    $cfg['ignore_controllers_cache']  = true;
+    $cfg['ignore_models_cache']       = true;
+    $cfg['ignore_routes_cache']       = true;
+    $cfg['ignore_inline_cache']       = true;
+    $cfg['enable_debug']              = true;
+    $cfg['enable_logger']             = true;
+    $cfg['inline_errors']             = false;
     break;
   case 'testing' :
-    $cfg['connections'][]         = 'mysql://username:password@localhost?name=madeam_testing';
-    $cfg['cache_controllers']     = false;
-    $cfg['cache_models']          = false;
-    $cfg['cache_routes']          = false;
-    $cfg['cache_inline']          = false;
-    $cfg['clear_cache']           = false;
-    $cfg['enable_debug']          = false;
-    $cfg['enable_logger']         = true;
-    $cfg['inline_errors']         = false;
+    $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_testing';
+    $cfg['ignore_controllers_cache']  = true;
+    $cfg['ignore_models_cache']       = true;
+    $cfg['ignore_routes_cache']       = true;
+    $cfg['ignore_inline_cache']       = true;
+    $cfg['enable_debug']              = false;
+    $cfg['enable_logger']             = true;
+    $cfg['inline_errors']             = false;
     break;
   case 'production' :
-    $cfg['connections'][]         = 'mysql://username:password@localhost?name=madeam_production';
-    $cfg['cache_controllers']     = true;
-    $cfg['cache_models']          = true;
-    $cfg['cache_routes']          = true;
-    $cfg['cache_inline']          = true;
-    $cfg['clear_cache']           = false;
-    $cfg['enable_debug']          = false;
-    $cfg['enable_logger']         = true;
-    $cfg['inline_errors']         = false;
+    $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_production';
+    $cfg['ignore_controllers_cache']  = false;
+    $cfg['ignore_models_cache']       = false;
+    $cfg['ignore_routes_cache']       = false;
+    $cfg['ignore_inline_cache']       = false;
+    $cfg['enable_debug']              = false;
+    $cfg['enable_logger']             = true;
+    $cfg['inline_errors']             = false;
     break;
 }
-
-/**
- * The name of the public directory.
- */
-$cfg['public_directory_name']   = 'public';
 
 /**
  * This is the default controller called by the framework. This does NOT support
