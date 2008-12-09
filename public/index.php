@@ -10,27 +10,26 @@
  * @copyright		Copyright (c) 2006, Joshua Davey
  * @link				http://www.madeam.com
  * @package			madeam
- * @version			0.1.0
+ * @version			1.0.0
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
 
-// start benchmark
-  $benchmarkStart = microtime(true);
-
 // set the public directory as our current working directory
   chdir(dirname(__FILE__));
-
-// include boostrap and include all of the madeam core files and configurations
-  require '..' . DIRECTORY_SEPARATOR . 'system' . DIRECTORY_SEPARATOR . 'bootstrap.php';
   
-// dispatch calls the framework and returns the resulting output
-//$uri, $_REQUEST, $_SERVER
+// if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
+  $lib = realpath('..') . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
+  require file_exists($lib . DIRECTORY_SEPARATOR . 'Madeam') ? $lib . DIRECTORY_SEPARATOR . 'Madeam.php' : 'Madeam.php';
+  
+// determine if mod_rewrite is enabled or not
+  $rewrite = (isset($_REQUEST['_uri'])) ? true : false;
+  
+// setup Madeam
+  Madeam::setup(getcwd() . DIRECTORY_SEPARATOR, $_REQUEST, $rewrite, $_SERVER['DOCUMENT_ROOT'], $_SERVER['REQUEST_URI'], $_SERVER['QUERY_STRING']);
+  
+// dispatch handles the request and returns the output  
   echo Madeam::dispatch();
 
-// end benchmark
-  $benchmarkEnd = microtime(true);
-  $time = $benchmarkEnd - $benchmarkStart;
-
 // interesting stuff
-  //echo 'Time: ' . $time . '<br />'; foreach (get_included_files() as $file) { isset($x) ? ++$x : $x = 1; echo $x . ' ' . $file . '<br />'; }
+  // foreach (get_included_files() as $file) { isset($x) ? ++$x : $x = 1; echo $x . ' ' . $file . '<br />'; }
