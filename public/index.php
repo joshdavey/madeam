@@ -26,7 +26,7 @@
   $rewrite = (isset($_REQUEST['_uri'])) ? true : false;
   
 // setup Madeam
-  Madeam::setup(getcwd() . DIRECTORY_SEPARATOR, $_REQUEST, $rewrite, $_SERVER['DOCUMENT_ROOT'], $_SERVER['REQUEST_URI'], $_SERVER['QUERY_STRING']);
+  Madeam::setup(require '../env.php', getcwd() . DIRECTORY_SEPARATOR, $rewrite);
   
 // dispatch handles the request and returns the output  
   echo Madeam::dispatch();

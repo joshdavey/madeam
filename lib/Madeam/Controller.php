@@ -55,7 +55,6 @@ class Madeam_Controller {
    */
   public $_content = null;
   
-  protected $name;
 
   /**
    * Enter description here...
@@ -379,8 +378,7 @@ class Madeam_Controller {
       if (method_exists('Madeam_Serialize', $_serializeMethod)) {
         $this->_content = Madeam_Serialize::$_serializeMethod($this->_data);
       } else {
-        //throw new Madeam_Controller_Exception();
-        exit('missing method ' . $_serializeMethod);
+        throw new Madeam_Controller_Exception('Unknown format "' . $this->params['_format'] . '"');
       }
     }
     

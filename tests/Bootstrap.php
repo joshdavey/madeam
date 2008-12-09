@@ -14,4 +14,4 @@ error_reporting(E_ALL);
 
 $_SERVER['REQUEST_URI'] = '/';
 
-Madeam::setup(realpath('../public/'));
+Madeam::setup(require '../env.php', realpath('../public/'));

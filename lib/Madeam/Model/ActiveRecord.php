@@ -172,8 +172,8 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
    */
   final public function execute($sql) {
     $count = 0;
-    $_SERVERs = Madeam_Config::get('connections');
-    $this->connect($_SERVERs[$this->_server]);
+    $_servers = Madeam_Config::get('connections');
+    $this->connect($_servers[$this->_server]);
     
     try {
       // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
@@ -196,8 +196,8 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
   }
   
   final public function query($sql) {    
-    $_SERVERs = Madeam_Config::get('data_servers');
-    $this->connect($_SERVERs[$this->_server]);
+    $conns = Madeam_Config::get('connections');
+    $this->connect($conns[$this->_server]);
     
     try {
       // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
@@ -221,13 +221,13 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
       // therefore if all we're doing is loading a cached page we won't need a database connection
       if (!isset(self::$_pdo[$this->_server])) {
         // parse DB information
-        $_SERVER = $this->parseDbConnection($connectionString);
+        $conn = $this->parseDbConnection($connectionString);
   
         // set PDO string
-        $pdoString = "$_SERVER[driver]:dbname=$_SERVER[name];host=$_SERVER[host]";
+        $pdoString = "$conn[driver]:dbname=$conn[name];host=$conn[host]";
         
         // create database connection
-        self::$_pdo[$this->_server] = new PDO($pdoString, $_SERVER['user'], $_SERVER['pass']);
+        self::$_pdo[$this->_server] = new PDO($pdoString, $conn['user'], $conn['pass']);
   
         // set exception error handling
         self::$_pdo[$this->_server]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

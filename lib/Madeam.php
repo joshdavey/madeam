@@ -183,17 +183,26 @@ class Madeam {
   /**
    *
    */
-  public static $requestUri = '/';
+  public static $requestUri         = '/';
   
-  public static $pathToProject  = false;
-  public static $pathToPublic   = false;
-  public static $pathToMadeam   = false;
-  public static $pathToApp      = false;
-  public static $pathToLib      = false;
-  public static $pathToEtc      = false;
+  public static $environment        = 'development';
   
-  public static $pathToUri      = false;
-  public static $pathToRel      = false;
+  public static $defaultController  = 'index';
+  public static $defaultAction      = 'index';
+  public static $defaultFormat      = 'html';
+  public static $errorController    = 'error';
+  
+  public static $pathToProject      = false;
+  public static $pathToPublic       = false;
+  public static $pathToMadeam       = false;
+  public static $pathToApp          = false;
+  public static $pathToLib          = false;
+  public static $pathToEtc          = false;
+                                    
+  public static $pathToUri          = false;
+  public static $pathToRel          = false;
+  
+  
   
   public static function cleanUriPath($docRoot, $publicPath) {
     return '/' . substr(str_replace(DS, '/', substr($publicPath, strlen($docRoot), - strlen(basename($publicPath)))), 0, - 1);
@@ -208,11 +217,13 @@ class Madeam {
   }
   
   
-  public static function setup($public, $rewrite = false) {    
+  public static function setup($environment, $public, $rewrite = false) {    
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
     if (substr($_SERVER['DOCUMENT_ROOT'], - 1) != '/') {
       $_SERVER['DOCUMENT_ROOT'] .= '/';
     }
+    
+    self::$environment = $environment;
     
     // set key paths
     self::$pathToPublic   = $public;
@@ -258,7 +269,6 @@ class Madeam {
     // configure core classes
     Madeam_Cache::$path   = self::$pathToEtc . 'cache' . DS;
     Madeam_Logger::$path  = self::$pathToEtc . 'log' . DS;
-    
     
     // include base setup configuration
     if (file_exists(self::$pathToApp . 'Config' . DS . 'setup.local.php')) {
@@ -352,7 +362,7 @@ class Madeam {
   public static function request($uri, $params = array()) {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
-    $params = array_merge($params, Madeam_Router::parse($uri));
+    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, self::$defaultController, self::$defaultAction, Madeam_Config::get('default_format')));
     
     // set request method in case it hasn't been set (command line environment)
     if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
@@ -375,7 +385,7 @@ class Madeam {
     // note: there is a consequence for this feature which means if you have a directory named 'admin'
     // you can't have a controller named 'Controller_Admin'
     if (is_dir(self::$pathToApp . 'Controller' . DS . ucfirst($params['_controller']))) {
-      $params['_controller'] .= '/' . Madeam_Config::get('default_controller');
+      $params['_controller'] .= '/' . self::$defaultController;
     }
     
     // set controller's class

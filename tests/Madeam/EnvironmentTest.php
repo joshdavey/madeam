@@ -1,7 +1,5 @@
 <?php
-
-require_once 'TestHelper.php';
-
+require_once '../Bootstrap.php';
 class Madeam_EnvironmentTest extends PHPUnit_Framework_TestCase {
   
   public function setUp() {

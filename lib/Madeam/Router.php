@@ -95,7 +95,7 @@ class Madeam_Router {
    * @param string $uri
    * @return array
    */
-  public static function parse($uri = false) {
+  public static function parse($uri = false, $baseUri, $defaultController = 'index', $defaultAction = 'index', $defaultFormat = 'html') {
     // makes sure the first character is "/"
     if (substr($uri, 0, 1) != '/') {
       $uri = '/' . $uri;
@@ -105,7 +105,7 @@ class Madeam_Router {
     $parsedURI = parse_url($uri);
             
     // set uri
-    if (isset($parsedURI['path']) && Madeam::$pathToUri == '/') {
+    if (isset($parsedURI['path']) && $baseUri == '/') {
       $uri = $parsedURI['path'];
     } elseif (isset($parsedURI['path'])) {
       // we do an explode because we can't always expect the uri path to be included
@@ -113,8 +113,8 @@ class Madeam_Router {
       // consist of just the uri without the path to the uri
       // for example on request: /madeam/posts/view/32
       // and during the request in a controller: /posts/view/32
-      $extracted_path = explode(Madeam::$pathToUri, $parsedURI['path'], 2);
-      $uri = array_pop($extracted_path);
+      $extractedPath = explode($baseUri, $parsedURI['path'], 2);
+      $uri = array_pop($extractedPath);
     } else {
       $uri = null;
     }
@@ -169,7 +169,7 @@ class Madeam_Router {
       // this is lame and needs to be done better
       header("HTTP/1.1 404 Not Found");
       //ob_clean();
-      throw new Madeam_Exception('Unable to find page');
+      throw new Madeam_Exception('Router: Unable to find page');
       // but what about returning the params if we throw an error?
       return $params;
     }
@@ -185,7 +185,7 @@ class Madeam_Router {
     }    
   	
   	// automagically disable the layout when making an AJAX call
-    if (!isset($params['_layout']) && !Madeam_Config::get('enable_ajax_layout') && $params['_ajax'] == 1) {
+    if (!isset($params['_layout']) && $params['_ajax'] == 1) {
       $params['_layout'] = 0;
     } elseif (!isset($params['_layout'])) {
     	$params['_layout'] = 1;
@@ -198,17 +198,17 @@ class Madeam_Router {
         
     // set default controller
     if (!isset($params['_controller']) || $params['_controller'] == null) {
-    	$params['_controller'] = Madeam_Config::get('default_controller');
+    	$params['_controller'] = $defaultController;
     }
     
     // set default action
     if (!isset($params['_action']) || $params['_action'] == null) {
-    	$params['_action'] = Madeam_Config::get('default_action');
+    	$params['_action'] = $defaultAction;
     }
     
     // set default format
     if (!isset($format) || $format == null) {
-    	$params['_format'] = Madeam_Config::get('default_format');
+    	$params['_format'] = $defaultFormat;
     } else {
     	$params['_format'] = $format;
     }

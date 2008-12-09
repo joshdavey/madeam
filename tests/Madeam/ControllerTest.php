@@ -1,5 +1,5 @@
 <?php
-
+require_once '../Bootstrap.php';
 class TestController extends PHPUnit_Framework_TestCase {
   
   public function setUp() {
