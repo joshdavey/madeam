@@ -1,5 +1,9 @@
 <?php
 
+// set path to public directory
+$publicDirectory = realpath('../public/') . DIRECTORY_SEPARATOR;
+
+
 require_once 'PHPUnit/Framework.php';
 require_once 'PHPUnit/Framework/IncompleteTestError.php';
 require_once 'PHPUnit/Framework/TestCase.php';
@@ -12,6 +16,7 @@ require_once '../lib/Madeam.php';
 
 error_reporting(E_ALL);
 
-$_SERVER['REQUEST_URI'] = '/';
+set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
 
-Madeam::setup(require '../env.php', realpath('../public/'));
+
+Madeam::setup(require '../env.php', true);
