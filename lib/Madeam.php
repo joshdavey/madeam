@@ -132,6 +132,17 @@ function Madeam_ErrorHandler($code, $string, $file, $line) {
 }
 
 
+// include core files
+$cd = dirname(__FILE__) . DS . 'Madeam' . DS;
+require $cd . 'Controller.php';
+require $cd . 'Inflector.php';
+require $cd . 'Router.php';
+require $cd . 'Config.php';
+require $cd . 'Cache.php';
+require $cd . 'Registry.php';
+require $cd . 'Logger.php';
+
+
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -180,17 +191,21 @@ class Madeam {
 	 */
   const associationJoint	= '.';
   
+  const defaultController = 'index';
+  
+  const defaultAction     = 'index';
+  
+  const defaultFormat     = 'html';
+  
+  const errorController   = 'error';
+  
   /**
    *
    */
   public static $requestUri         = '/';
+  public static $requestParams      = array();
   
   public static $environment        = 'development';
-  
-  public static $defaultController  = 'index';
-  public static $defaultAction      = 'index';
-  public static $defaultFormat      = 'html';
-  public static $errorController    = 'error';
   
   public static $pathToProject      = false;
   public static $pathToPublic       = false;
@@ -217,29 +232,40 @@ class Madeam {
   }
   
   
-  public static function setup($environment, $public, $rewrite = false) {    
-    // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
-    if (substr($_SERVER['DOCUMENT_ROOT'], - 1) != '/') {
-      $_SERVER['DOCUMENT_ROOT'] .= '/';
-    }
-    
-    self::$environment = $environment;
-    
-    // set key paths
+  public static function paths($public) {
     self::$pathToPublic   = $public;
     self::$pathToProject  = dirname(self::$pathToPublic) . DS;
     self::$pathToApp      = self::$pathToProject . 'app' . DS;
     self::$pathToLib      = self::$pathToProject . 'lib' . DS;
     self::$pathToEtc      = self::$pathToProject . 'etc' . DS;
     self::$pathToMadeam   = dirname(__FILE__) . DS . 'Madeam' . DS;
-
-    // set PATH_TO_URI based on whether mod_rewrite is turned on or off.
+    
+    return array(self::$pathToApp, self::$pathToLib, self::$pathToMadeam . 'Helper' . DS);
+  }
+  
+  
+  /**
+   * 
+   */
+  public static function setup($environment, $params, $serverDocRoot, $serverRequestUri, $serverQueryString, $serverRequestMethod, $rewrite = false, $cfg = array()) {    
+    // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
+    if (substr($serverDocRoot, - 1) != '/') {
+      $serverDocRoot .= '/';
+    }
+    
+    // define environment
+    self::$environment = $environment;
+    
+    // set request params
+    self::$requestParams = $params;
+      
+    // set path to uri based on whether mod_rewrite is turned on or off.
     if ($rewrite === true) {
-      self::$pathToUri = self::cleanUriPath($_SERVER['DOCUMENT_ROOT'], self::$pathToPublic);
-      self::$requestUri = $_REQUEST['_uri'] . '?' . $_SERVER['QUERY_STRING'];
+      self::$pathToUri = self::cleanUriPath($serverDocRoot, self::$pathToPublic);
+      self::$requestUri = $params['_uri'] . '?' . $serverQueryString;
     } else {
-      self::$pathToUri = self::dirtyUriPath($_SERVER['DOCUMENT_ROOT'], self::$pathToPublic);
-      $url = explode('index.php', $_SERVER['REQUEST_URI']);
+      self::$pathToUri = self::dirtyUriPath($serverDocRoot, self::$pathToPublic);
+      $url = explode('index.php', $serverRequestUri);
       // check if it exploded it into 2 peices.
       // If it didn't then there is an ending "index.php" so we assume there is no URI on the end either
       if (isset($url[1])) {
@@ -250,20 +276,19 @@ class Madeam {
     }
     
     // determine the relative path to the public directory
-    self::$pathToRel = self::relPath($_SERVER['DOCUMENT_ROOT'], self::$pathToPublic);
-
+    self::$pathToRel = self::relPath($serverDocRoot, self::$pathToPublic);    
     
-    // set include paths
-    set_include_path(implode(PATH_SEPARATOR, array(self::$pathToApp, self::$pathToLib, self::$pathToMadeam . 'Helper' . DS, get_include_path())));
-
-    // include core files
-    require self::$pathToMadeam . 'Controller.php';
-    require self::$pathToMadeam . 'Inflector.php';
-    require self::$pathToMadeam . 'Router.php';
-    require self::$pathToMadeam . 'Config.php';
-    require self::$pathToMadeam . 'Cache.php';
-    require self::$pathToMadeam . 'Registry.php';
-    require self::$pathToMadeam . 'Logger.php';
+    // set layout if it hasn't already been set
+    if (!isset(self::$requestParams['_layout'])) { self::$requestParams['_layout'] = 1; }
+    
+    // set overriding request method -- note: we need to get rid of all the $_SERVER references for testing purposes
+    if (isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
+      self::$requestParams['_method'] = low($_SERVER['X_HTTP_METHOD_OVERRIDE']);
+    } elseif (isset(self::$requestParams['_method']) && $serverRequestMethod == 'POST') {
+      self::$requestParams['_method'] = low($params['_method']);
+    } else {
+      self::$requestParams['_method'] = low($serverRequestMethod);
+    }
     
     
     // configure core classes
@@ -271,28 +296,17 @@ class Madeam {
     Madeam_Logger::$path  = self::$pathToEtc . 'log' . DS;
     
     // include base setup configuration
-    if (file_exists(self::$pathToApp . 'Config' . DS . 'setup.local.php')) {
-      require self::$pathToApp . 'Config' . DS . 'setup.local.php';
-    } else {
-      require self::$pathToApp . 'Config' . DS . 'setup.php';
+    if (empty($cfg)) {
+      if (file_exists(self::$pathToApp . 'Config' . DS . 'setup.local.php')) {
+        require self::$pathToApp . 'Config' . DS . 'setup.local.php';
+      } else {
+        require self::$pathToApp . 'Config' . DS . 'setup.php';
+      }
     }
 
     // save configuration
     Madeam_Config::set($cfg);
     unset($cfg);
-    
-    
-    // _uri is defined in the public/.htaccess file. Many developers may not notice it because of
-    // it's transparency during development. We unset it here incase developers are using the $_GET query string
-    // for any reason. An example of where it might be an unexpected problem is when taking the hash of the query
-    // string to identify the page. This problem was first noticed in some OpenID libraries
-    unset($_GET['_uri']);
-    unset($_REQUEST['_uri']);
-
-    // remove it from the query string as well
-    if (isset($_SERVER['QUERY_STRING'])) {
-      $_SERVER['QUERY_STRING'] = preg_replace('/&?_uri=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
-    }
   }
 
   /**
@@ -313,28 +327,9 @@ class Madeam {
 		    Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
 		  }
 		}
-		
-		// destroy flash data when it's life runs out
-    if (isset($_SESSION[self::flashLifeName])) {
-      if (-- $_SESSION[self::flashLifeName] < 1) {
-        unset($_SESSION[self::flashLifeName]);
-        if (isset($_SESSION[self::flashDataName])) {
-          unset($_SESSION[self::flashDataName]);
-        }
-      } else {
-        if (isset($_SESSION[self::flashDataName][self::flashDataName])) {
-          $_REQUEST = array_merge($_SESSION[self::flashDataName][self::flashPostName], $_REQUEST);
-        }
-      }
-    }
-
-    // set layout if it hasn't already been set
-    if (!isset($_REQUEST['_layout'])) { $_REQUEST['_layout'] = 1; }
     
-    
-    // call controller action
-    $output = Madeam::request(self::$requestUri, $_REQUEST);
-
+    // make request
+    $output = Madeam::request(self::$requestUri, self::$requestParams);
 
     // return output
     return $output;
@@ -356,25 +351,13 @@ class Madeam {
    *
    * If there is not method associated with the action called then it renders a view without calling the action.
    *
-   * @param string $url -- example: controller/action/32?foo=bar
+   * @param string $uri -- example: controller/action/32?foo=bar
    * @return string
    */
   public static function request($uri, $params = array()) {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
-    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, self::$defaultController, self::$defaultAction, Madeam_Config::get('default_format')));
-    
-    // set request method in case it hasn't been set (command line environment)
-    if (!isset($_SERVER['REQUEST_METHOD'])) { $_SERVER['REQUEST_METHOD'] = 'GET'; }
-    
-    // set overriding request method
-    if (isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
-      $params['_method'] = low($_SERVER['X_HTTP_METHOD_OVERRIDE']);
-    } elseif (isset($params['_method']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
-      $params['_method'] = low($params['_method']);
-    } else {
-      $params['_method'] = low($_SERVER['REQUEST_METHOD']);
-    }
+    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, self::defaultController, self::defaultAction, self::defaultFormat));
     
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
@@ -385,7 +368,7 @@ class Madeam {
     // note: there is a consequence for this feature which means if you have a directory named 'admin'
     // you can't have a controller named 'Controller_Admin'
     if (is_dir(self::$pathToApp . 'Controller' . DS . ucfirst($params['_controller']))) {
-      $params['_controller'] .= '/' . self::$defaultController;
+      $params['_controller'] .= '/' . self::defaultController;
     }
     
     // set controller's class
@@ -427,11 +410,6 @@ class Madeam {
 
       // delete controller
       unset($controller);
-      
-      // destroy user error notices after request has been processed
-      if (isset($_SESSION[self::userErrorName])) {
-        unset($_SESSION[self::userErrorName]);
-      }
 
       // return response
       return $response;

@@ -1,4 +1,7 @@
 <?php
+
+error_reporting(E_ALL);
+
 $cfg = array();
 
 switch (Madeam::$environment) {
@@ -11,6 +14,17 @@ switch (Madeam::$environment) {
     $cfg['enable_debug']              = true;
     $cfg['enable_logger']             = true;
     $cfg['inline_errors']             = false;
+    
+    /*
+    Madeam_Model::$connections[]      = 'mysql://username:password@localhost?name=madeam_development';
+    Madeam_Model::$disableCache       = false;
+    Madeam_Controller::$disableCache  = false;
+    Madeam_Router::$disableCache      = false;
+    Madeam_Cache::$disableCache       = true;
+    Madeam_Exception::$inlineErrors   = false;
+    Madeam_Exception::$enableDebug    = true;
+    //*/
+    
     break;
   case 'testing' :
     $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_testing';
@@ -23,6 +37,9 @@ switch (Madeam::$environment) {
     $cfg['inline_errors']             = false;
     break;
   case 'production' :
+    
+    error_reporting(0);
+  
     $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_production';
     $cfg['ignore_controllers_cache']  = false;
     $cfg['ignore_models_cache']       = false;
@@ -34,11 +51,6 @@ switch (Madeam::$environment) {
     break;
 }
 
-/**
- * This is the default file extension for Views and Layouts.
- * The "." is not necessary. Only the name.
- */
-$cfg['default_format']          = 'html';
 
 /**
  * This is the name of the log files. You can use the date formats from http://ca3.php.net/date

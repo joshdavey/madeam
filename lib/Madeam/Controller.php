@@ -55,7 +55,6 @@ class Madeam_Controller {
    */
   public $_content = null;
   
-
   /**
    * Enter description here...
    *
@@ -65,6 +64,20 @@ class Madeam_Controller {
   	
   	// set params
   	$this->params = $params;
+  	
+  	// destroy flash data when it's life runs out
+    if (isset($_SESSION[Madeam::flashLifeName])) {
+      if (-- $_SESSION[Madeam::flashLifeName] < 1) {
+        unset($_SESSION[Madeam::flashLifeName]);
+        if (isset($_SESSION[Madeam::flashDataName])) {
+          unset($_SESSION[Madeam::flashDataName]);
+        }
+      } else {
+        if (isset($_SESSION[Madeam::flashDataName][Madeam::flashDataName])) {
+          $this->flash = array_merge($_SESSION[Madeam::flashDataName][Madeam::flashPostName], $this->params);
+        }
+      }
+    }
   	
     // set resource the controller represents
     if (is_string($this->_represent)) {
@@ -378,7 +391,7 @@ class Madeam_Controller {
       if (method_exists('Madeam_Serialize', $_serializeMethod)) {
         $this->_content = Madeam_Serialize::$_serializeMethod($this->_data);
       } else {
-        throw new Madeam_Controller_Exception('Unknown format "' . $this->params['_format'] . '"');
+        throw new Madeam_Controller_Exception('Unknown format "<strong>' . $this->params['_format'] . '</strong>"');
       }
     }
     
