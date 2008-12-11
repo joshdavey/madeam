@@ -10,7 +10,7 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
     $this->server = array('DOCUMENT_ROOT' => TESTS_MADEAM_DOCUMENT_ROOT, 'REQUEST_METHOD' => 'GET', 'QUERY_STRING' => null, 'REQUEST_URI' => 'madeam/index.php');
     $this->params = array();
   }
-  
+    
   public function testPublicFolderExists() {
     Madeam::paths(TESTS_MADEAM_PUBLIC_DIRECTORY);
     $this->assertTrue(file_exists(Madeam::$pathToPublic), 'The public directory should exist');
