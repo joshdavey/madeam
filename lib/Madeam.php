@@ -12,9 +12,7 @@
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- 
-error_reporting(E_ALL);
- 
+
 // directory splitter
 if (! defined('DS')) {
   define('DS', DIRECTORY_SEPARATOR);
@@ -220,11 +218,11 @@ class Madeam {
   
   
   public static function cleanUriPath($docRoot, $publicPath) {
-    return '/' . substr(str_replace(DS, '/', substr($publicPath, strlen($docRoot), - strlen(basename($publicPath)))), 0, - 1);
+    return '/' . substr(str_replace(DS, '/', substr($publicPath, strlen($docRoot), -strlen(basename($publicPath)))), 0, -1);
   }
   
   public static function dirtyUriPath($docRoot, $publicPath) {
-    return '/' . str_replace(DS, '/', substr($publicPath, strlen($docRoot))) . 'index.php/';
+    return '/' . str_replace(DS, '/', substr(substr($publicPath, strlen($docRoot)), 0, -strlen(DS . basename($publicPath)))) . 'index.php/';
   }
   
   public static function relPath($docRoot, $publicPath) {
@@ -267,7 +265,6 @@ class Madeam {
    * 
    */
   public static function setup($environment, $params, $server, $cfg = array()) {    
-    
     // check for expected server parameters
   	$diff = array_diff(array('DOCUMENT_ROOT', 'REQUEST_URI', 'QUERY_STRING', 'REQUEST_METHOD'), array_keys($server));
   	if (!empty($diff)) {

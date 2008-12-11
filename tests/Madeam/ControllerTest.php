@@ -21,8 +21,6 @@ class TestController extends PHPUnit_Framework_TestCase {
   
   protected $params;
   
-  protected $controller;
-  
   public function setUp() {
     $this->params = array(
       '_controller' => 'tests',
@@ -30,10 +28,19 @@ class TestController extends PHPUnit_Framework_TestCase {
       '_layout'     => 1,
       '_method'     => 'get'
     );
-    
-    $this->controller = new Controller_Tests($this->params);
   }
   
-  
+  public function testControllerThrowsExceptionWhenMissingExpectedParams() {
+    $caught = false;
+
+    try {
+      $params = array();
+      $controller = new Controller_Tests($params);
+    } catch (Madeam_Controller_Exception_MissingExpectedParam $e) {
+      $caught = true;
+    }
+    
+    $this->assertTrue($caught);
+  }
   
 }
