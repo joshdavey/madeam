@@ -62,6 +62,12 @@ class Madeam_Controller {
    */
   final public function __construct($params) {
   	
+  	// check for expected params
+  	$diff = array_diff(array('_controller', '_action', '_format', '_layout', '_ajax'), array_keys($params));
+  	if (!empty($diff)) {
+  	  throw new Madeam_Controller_Exception_MissingExpectedParam('Missing expected Request Parameter(s).');
+  	}
+  	
   	// set params
   	$this->params = $params;
   	
