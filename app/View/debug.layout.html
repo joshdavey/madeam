@@ -9,11 +9,11 @@
 
   <!-- =header -->
   <div id="header" class="madeam container">
-    <h1 class="madeam">Oops<span style="color: #fff; letter-spacing: -0.05em;"></span></h1>
+    <h1 class="madeam">Oops, <span style="color: #fff; letter-spacing: -0.05em;"><?php echo $params['snippet']; ?></span></h1>
   </div>
 
   <!-- =content -->
-  <div id="content" class="container">
+  <div id="content" class="container error">
     <!-- content placeholder -->
     <?php echo $this->_content; ?>
   </div>
