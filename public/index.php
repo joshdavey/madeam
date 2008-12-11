@@ -40,7 +40,11 @@
   set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
   
 // setup Madeam
-  Madeam::setup(require '../env.php', $_REQUEST, $_SERVER['DOCUMENT_ROOT'], $_SERVER['REQUEST_URI'], $_SERVER['QUERY_STRING'], $_SERVER['REQUEST_METHOD'], $rewrite);
+  Madeam::setup(
+    require '../env.php',   // environment
+    $_REQUEST,              // params
+    $_SERVER                // server
+  );
   
   
 // remove _uri from request

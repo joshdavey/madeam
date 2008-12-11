@@ -231,15 +231,34 @@ class Madeam {
     return '/' . str_replace(DS, '/', substr($publicPath, strlen($docRoot)));
   }
   
-  
-  public static function paths($public) {
-    self::$pathToPublic   = $public;
+  /**
+   * This method defines all the absolute file paths to all the important
+   * Madeam directories.
+   * It returns the file paths that should be added to the include_path.
+   * 
+   * @param string $publicDirectory -- absolute path to the public directory
+   * @return array -- list of all paths to be added to the include_path
+   */
+  public static function paths($publicDirectory) {
+    // set public directory path
+    self::$pathToPublic   = $publicDirectory;
+    
+    // set path to entire project
     self::$pathToProject  = dirname(self::$pathToPublic) . DS;
+    
+    // set application path
     self::$pathToApp      = self::$pathToProject . 'app' . DS;
+    
+    // set library path
     self::$pathToLib      = self::$pathToProject . 'lib' . DS;
+    
+    // set etc path
     self::$pathToEtc      = self::$pathToProject . 'etc' . DS;
+    
+    // set path to madeam
     self::$pathToMadeam   = dirname(__FILE__) . DS . 'Madeam' . DS;
     
+    // return paths for include path
     return array(self::$pathToApp, self::$pathToLib, self::$pathToMadeam . 'Helper' . DS);
   }
   
@@ -247,26 +266,32 @@ class Madeam {
   /**
    * 
    */
-  public static function setup($environment, $params, $serverDocRoot, $serverRequestUri, $serverQueryString, $serverRequestMethod, $rewrite = false, $cfg = array()) {    
+  public static function setup($environment, $params, $server, $cfg = array()) {    
+    
+    // check for expected server parameters
+  	$diff = array_diff(array('DOCUMENT_ROOT', 'REQUEST_URI', 'QUERY_STRING', 'REQUEST_METHOD'), array_keys($server));
+  	if (!empty($diff)) {
+  	  throw new Madeam_Exception_MissingExpectedParam('Missing expected server Parameter(s).');
+  	}
+    
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
-    if (substr($serverDocRoot, - 1) != '/') {
-      $serverDocRoot .= '/';
-    }
+    if (substr($server['DOCUMENT_ROOT'], - 1) != '/') { $server['DOCUMENT_ROOT'] .= '/'; }
     
     // define environment
     self::$environment = $environment;
     
     // set request params
     self::$requestParams = $params;
+    
       
     // set path to uri based on whether mod_rewrite is turned on or off.
-    if ($rewrite === true) {
-      self::$pathToUri = self::cleanUriPath($serverDocRoot, self::$pathToPublic);
-      self::$requestUri = $params['_uri'] . '?' . $serverQueryString;
+    if (isset(self::$requestParams['_uri'])) {
+      self::$pathToUri = self::cleanUriPath($server['DOCUMENT_ROOT'], self::$pathToPublic);
+      self::$requestUri = self::$requestParams['_uri'] . '?' . $server['QUERY_STRING'];
     } else {
-      self::$pathToUri = self::dirtyUriPath($serverDocRoot, self::$pathToPublic);
-      $url = explode('index.php', $serverRequestUri);
-      // check if it exploded it into 2 peices.
+      self::$pathToUri = self::dirtyUriPath($server['DOCUMENT_ROOT'], self::$pathToPublic);
+      $url = explode('index.php', $server['REQUEST_URI']);
+      // check if it split into 2 peices.
       // If it didn't then there is an ending "index.php" so we assume there is no URI on the end either
       if (isset($url[1])) {
         self::$requestUri = $url[1];
@@ -276,18 +301,18 @@ class Madeam {
     }
     
     // determine the relative path to the public directory
-    self::$pathToRel = self::relPath($serverDocRoot, self::$pathToPublic);    
+    self::$pathToRel = self::relPath($server['DOCUMENT_ROOT'], self::$pathToPublic);    
     
     // set layout if it hasn't already been set
     if (!isset(self::$requestParams['_layout'])) { self::$requestParams['_layout'] = 1; }
     
     // set overriding request method -- note: we need to get rid of all the $_SERVER references for testing purposes
-    if (isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
-      self::$requestParams['_method'] = low($_SERVER['X_HTTP_METHOD_OVERRIDE']);
-    } elseif (isset(self::$requestParams['_method']) && $serverRequestMethod == 'POST') {
+    if (isset($server['X_HTTP_METHOD_OVERRIDE'])) {
+      self::$requestParams['_method'] = low($server['X_HTTP_METHOD_OVERRIDE']);
+    } elseif (isset(self::$requestParams['_method']) && $server['REQUEST_METHOD'] == 'POST') {
       self::$requestParams['_method'] = low($params['_method']);
     } else {
-      self::$requestParams['_method'] = low($serverRequestMethod);
+      self::$requestParams['_method'] = low($server['REQUEST_METHOD']);
     }
     
     
@@ -352,12 +377,13 @@ class Madeam {
    * If there is not method associated with the action called then it renders a view without calling the action.
    *
    * @param string $uri -- example: controller/action/32?foo=bar
+   * @param array $params
    * @return string
    */
   public static function request($uri, $params = array()) {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
-    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, self::defaultController, self::defaultAction, self::defaultFormat));
+    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, self::defaultController, self::defaultAction, self::defaultFormat));    
     
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
