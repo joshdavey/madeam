@@ -159,7 +159,7 @@ class Madeam {
 	/**
 	 * version of madeam
 	 */
-  const version = '0.1 Alpha';
+  const version = '0.2 Alpha';
   
   /**
 	 * define user errors variable name for $_SESSION
