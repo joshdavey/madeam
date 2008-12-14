@@ -33,9 +33,6 @@
   $lib = realpath('..') . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
   require file_exists($lib . DIRECTORY_SEPARATOR . 'Madeam') ? $lib . DIRECTORY_SEPARATOR . 'Madeam.php' : 'Madeam.php';
   
-// determine if mod_rewrite is enabled or not
-  $rewrite = (isset($_REQUEST['_uri'])) ? true : false;
-  
 // set include paths  
   set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
   

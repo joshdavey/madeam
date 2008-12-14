@@ -11,22 +11,22 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
     $this->params = array();
   }
     
-  public function testPublicFolderExists() {
+  public function testPublicFolderShouldExist() {
     Madeam::paths(TESTS_MADEAM_PUBLIC_DIRECTORY);
     $this->assertTrue(file_exists(Madeam::$pathToPublic), 'The public directory should exist');
   }
   
-  public function testAppFolderExists() {
+  public function testAppFolderShouldExist() {
     Madeam::paths(TESTS_MADEAM_PUBLIC_DIRECTORY);
     $this->assertTrue(file_exists(Madeam::$pathToApp), 'The app directory should exist');
   }
   
-  public function testEtcFolderExists() {
+  public function testEtcFolderShouldExist() {
     Madeam::paths(TESTS_MADEAM_PUBLIC_DIRECTORY);
     $this->assertTrue(file_exists(Madeam::$pathToEtc), 'The etc directory should exist');
   }
   
-  public function testLibFolderExists() {
+  public function testLibFolderShouldExist() {
     Madeam::paths(TESTS_MADEAM_PUBLIC_DIRECTORY);
     $this->assertTrue(file_exists(Madeam::$pathToLib), 'The lib directory should exist');
   }
