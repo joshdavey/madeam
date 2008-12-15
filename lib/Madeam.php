@@ -252,8 +252,8 @@ class Madeam {
     
     // set etc path
     self::$pathToEtc      = self::$pathToProject . 'etc' . DS;
-    
-    // set path to madeam
+
+    // set path to vendor
     self::$pathToMadeam   = dirname(__FILE__) . DS . 'Madeam' . DS;
     
     // return paths for include path

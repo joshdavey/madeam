@@ -19,7 +19,7 @@ require_once 'PHPUnit/Util/Filter.php';
 error_reporting(E_ALL);
 
 // include madeam
-require_once '../system/Madeam.php';
+require_once '../lib/Madeam.php';
 
 // define test constants
 define('TESTS_MADEAM_PUBLIC_DIRECTORY', $publicDirectory);

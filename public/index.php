@@ -10,7 +10,7 @@
  * @copyright		Copyright (c) 2006, Joshua Davey
  * @link				http://www.madeam.com
  * @package			madeam
- * @version			1.0.0
+ * @version			0.1.0
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
@@ -29,8 +29,8 @@
   chdir(dirname(__FILE__));
   
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
-  $system = realpath('..') . DIRECTORY_SEPARATOR . 'system' . DIRECTORY_SEPARATOR;
-  require file_exists($system . DIRECTORY_SEPARATOR . 'Madeam') ? $system . DIRECTORY_SEPARATOR . 'Madeam.php' : 'Madeam.php';
+  $lib = realpath('..') . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
+  require file_exists($lib . DIRECTORY_SEPARATOR . 'Madeam') ? $lib . DIRECTORY_SEPARATOR . 'Madeam.php' : 'Madeam.php';
   
 // set include paths  
   set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
