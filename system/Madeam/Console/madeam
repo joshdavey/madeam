@@ -1,5 +1,0 @@
-#!/bin/bash
-
-clear
-
-php madeam.php
