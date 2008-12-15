@@ -14,17 +14,6 @@ switch (Madeam::$environment) {
     $cfg['enable_debug']              = true;
     $cfg['enable_logger']             = true;
     $cfg['inline_errors']             = false;
-    
-    /*
-    Madeam_Model::$connections[]      = 'mysql://username:password@localhost?name=madeam_development';
-    Madeam_Model::$disableCache       = false;
-    Madeam_Controller::$disableCache  = false;
-    Madeam_Router::$disableCache      = false;
-    Madeam_Cache::$disableCache       = true;
-    Madeam_Exception::$inlineErrors   = false;
-    Madeam_Exception::$enableDebug    = true;
-    //*/
-    
     break;
   case 'testing' :
     $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_testing';
