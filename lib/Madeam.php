@@ -95,7 +95,7 @@ function fileLives($file) {
   
   foreach ($paths as $path) {
     if (is_file($path . $file)) {
-      return true;
+      return $path . $file;
     }
   }
   
@@ -160,12 +160,6 @@ class Madeam {
 	 * version of madeam
 	 */
   const version = '0.1 Alpha';
-  
-  /**
-	 * define user errors variable name for $_SESSION
-	 * example: $_SESSION[Madeam::userErrorName];
-	 */
-  const userErrorName = 'muerrors';  
   
   /**
 	 * this is used for passing misc data from one page to the other
@@ -349,10 +343,10 @@ class Madeam {
 		    Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
 		  }
 		}
-    
+		
     // make request
-    $output = Madeam::request(self::$requestUri, self::$requestParams);
-
+    $output = self::request(self::$requestUri, self::$requestParams, true);
+    
     // return output
     return $output;
   }
@@ -361,7 +355,7 @@ class Madeam {
    * This is where all the magic starts.
    *
    * This method workds by accepting a URL which acts as a query and some configuration information in the form of an array.
-   * The URL is processed by the madeamRouter which returns paramaters based on the routing @see config/routes.php
+   * The URL is processed by the madeamRouter which returns paramaters based on the routing @see app/Config/routes.php
    * The action of the framework is based on 3 parameters that are normally defined in the routes but have default values
    * assigned to them if not set. The 3 parameters are $controller, $action and $format.
    *
@@ -377,10 +371,10 @@ class Madeam {
    * @param array $params
    * @return string
    */
-  public static function request($uri, $params = array()) {
+  public static function request($uri, $params = array(), $front = false) {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
-    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, self::defaultController, self::defaultAction, self::defaultFormat));    
+    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, array('_controller' => self::defaultController, '_action' => self::defaultAction, '_format' => self::defaultFormat))); 
     
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
@@ -428,8 +422,17 @@ class Madeam {
     }
 
     try {
+      if ($front === true) {
+        $controller->callback('beforeRequest');
+      }
+      
       // process request
-      $response = $controller->process();
+      $response = $controller->process($controller);
+      //$response = Madeam_Controller::process(&$controller);
+      
+      if ($front === true) {
+        $controller->callback('afterRequest');
+      }
 
       // delete controller
       unset($controller);
@@ -484,14 +487,34 @@ class Madeam {
   }
   
   public static function autoload($class) {
-  	// set class file name
-	  //$file = preg_replace('/[\_]/', DS, $class) . '.php'; // for PHP 5.3+
-	  $file = str_replace('_', DS, $class) . '.php';
+  	// set class file name)
+	  $file = preg_replace('/[\\\_]/', DS, $class) . '.php'; // for PHP 5.3+
+	  //$file = str_replace('_', DS, $class) . '.php';
 	  
 	  // include class file
-	  if (fileLives($file)) {
+	  if (is_string(fileLives($file))) {
 	    require $file;
 	  }
+	  
+	  /*
+	  // PHP 5.3 way of checking to see if a file exists
+	  $paths = explode(PATH_SEPARATOR, get_include_path());
+
+    foreach ($paths as $path) {
+      $check = function ($file) use ($path) { 
+        if (file_exists($path . $file)) { 
+          return true; 
+        } else {
+          return false;
+        }
+      };
+
+      if ($check ($file)) {
+        require $path . $file;
+        break;
+      }
+    }
+    */
 	
 	  if (! class_exists($class, false) && ! interface_exists($class, false)) {
 	    $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt

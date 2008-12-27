@@ -147,13 +147,8 @@ class Madeam_Model {
     // set cache name
     $this->cacheName .= low($this->modelName) . '.setup';
 
-    // clear model cache if it cache is disabled for routes
-    if (!Madeam_Config::get('cache_models')) { 
-      Madeam_Cache::clear($this->cacheName);	
-    }
-
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1, Madeam_Config::get('ignore_model_cache'))) {
+    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1, Madeam_Config::get('ignore_models_cache'))) {
       
       // pre-load a reflection of this class for use in parseing the meta data and methods
       $reflection = new ReflectionClass(get_class($this));
@@ -163,7 +158,7 @@ class Madeam_Model {
       unset($reflection);
 
       // save cache
-      if (Madeam_Config::get('ignore_model_cache') === false) {
+      if (Madeam_Config::get('ignore_models_cache') === false) {
         Madeam_Cache::save($this->cacheName, $this->setup, true);
       }
     }

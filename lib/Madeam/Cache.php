@@ -17,8 +17,6 @@ class Madeam_Cache {
 
   public static $path = false;
 
-  public static $prefix = 'cache.';
-
   public static $openCaches = array();
 
   /**
@@ -32,9 +30,6 @@ class Madeam_Cache {
     
     if ($ignore === true) { return false; }
     
-    // prefix id with environment name
-    // the id is prefixed so that caches for one environment don't overlap another
-    $id = self::$prefix . $id;
     // check registry first
     if (Madeam_Registry::exists($id)) {
       return Madeam_Registry::get($id);
@@ -63,10 +58,6 @@ class Madeam_Cache {
    * @return unknown
    */
   public static function save($id, $value, $store_in_registry = false) {
-    // prefix id with environment name
-    // the id is prefixed so that caches for one environment don't overlap another
-    $id = self::$prefix . $id;
-
     // store in registry
     if ($store_in_registry === true) {
       Madeam_Registry::set($id, $value);
@@ -87,10 +78,6 @@ class Madeam_Cache {
    * @return unknown
    */
   public static function start($id, $life_time = 0) {
-    // prefix id with environment name
-    // the id is prefixed so that caches for one environment don't overlap another
-    $id = self::$prefix . $id;
-
     // check if inline cache is enabled
     if (Madeam_Config::get('cache_inline') === false) {
       return false;
@@ -131,10 +118,6 @@ class Madeam_Cache {
    * @param unknown_type $id
    */
   public static function clear($id) {
-    // prefix id with environment name
-    // the id is prefixed so that caches for one environment don't overlap another
-    $id = self::$prefix . $id;
-
     // set file name
     $file = self::$path . $id;
 
@@ -149,10 +132,6 @@ class Madeam_Cache {
    * @return boolean
    */
   public static function check($id) {
-    // prefix id with environment name
-    // the id is prefixed so that caches for one environment don't overlap another
-    $id = self::$prefix . $id;
-
     // check registry first
     if (Madeam_Registry::get($id)) {
       return true;

@@ -23,20 +23,6 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
   protected $entry = array();
 
   /**
-   * Enter description here...
-   *
-   * @var boolean
-   */
-  protected $isInsert = false;
-
-  /**
-   * Enter description here...
-   *
-   * @var boolean
-   */
-  protected $isUpdate = false;
-
-  /**
    * The name of the server configuration we want to use.
    *
    * @var string/integer
@@ -498,10 +484,13 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     
     // set primary key value
     if ($id != false) {
-      $data[$this->setup['primaryKey']] = $id;
+      //$data[$this->setup['primaryKey']] = $id;
+      $this->where(array($this->setup['primaryKey'] => $id));
     }
     
-    $affectedRows = $this->execute($this->buildQueryDelete($data));
+    //$affectedRows = $this->execute($this->buildQueryDelete($data));
+    //final private function buildQueryDelete($data, $table = false, $where = false, $start = false, $range = false) {
+    $affectedRows = $this->execute($this->buildQueryDelete($this->_data, $this->setup['resourceName'], $this->_sqlWhere, $this->_sqlStart, $this->_sqlRange));
 
     // after delete _callback
     $this->_callback('afterDelete');
@@ -554,6 +543,10 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     // after Validate _callback
     $this->_callback('afterValidate');
     
+    if ($update !== true) {
+      $this->_callback('beforeCreate');
+    }
+    
     // before save _callback
     $this->_callback('beforeSave');
           
@@ -562,15 +555,17 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
 
     // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
     if ($update === true) {
-      $this->isUpdate = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
       $count = $this->execute($this->buildQueryUpdate($this->_data, $this->setup['resourceName'], $this->_sqlWhere, $this->_sqlStart, $this->_sqlRange, $this->setup['primaryKey']));
     } else {
-      $this->isInsert = true; // can be used by the dev to figure out if it's an insert or update when using _callbacks
       $count = $this->execute($this->buildQueryInsert($this->_data, $this->setup['resourceName'], $this->setup['primaryKey']));
     }
 
     // grab entry id before it's overwritten by something that happens in afterSave()
     $entryId = $this->insertId();
+    
+    if ($update !== true) {
+      $this->_callback('afterCreate');
+    }
           
     // after save _callback
     $this->_callback('afterSave');
@@ -1002,8 +997,6 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     $this->fields = array();
     $this->entryId = - 1;
     $this->depth = 1;
-    $this->isInsert = false;
-    $this->isUpdate = false;
     $this->unbound = array();
     
     // reset child models

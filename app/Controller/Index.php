@@ -1,4 +1,4 @@
-<?php
+<?php 
 class Controller_Index extends Controller_App {
 
   public function indexAction() {

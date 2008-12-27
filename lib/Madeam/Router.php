@@ -95,7 +95,7 @@ class Madeam_Router {
    * @param string $uri
    * @return array
    */
-  public static function parse($uri = false, $baseUri, $defaultController = 'index', $defaultAction = 'index', $defaultFormat = 'html') {
+  public static function parse($uri = false, $baseUri, $defaults) {
     // makes sure the first character is "/"
     if (substr($uri, 0, 1) != '/') {
       $uri = '/' . $uri;
@@ -175,8 +175,8 @@ class Madeam_Router {
     }
 
     // get params from uri
-    $params = array_merge($params, $get);
-            
+    $params = array_merge($defaults, $params, $get);        
+    
     // check if this is an ajax call
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
       $params['_ajax'] = 1;
@@ -195,21 +195,9 @@ class Madeam_Router {
     if (isset($query)) {
     	$params['_query'] = $query;
   	}
-        
-    // set default controller
-    if (!isset($params['_controller']) || $params['_controller'] == null) {
-    	$params['_controller'] = $defaultController;
-    }
-    
-    // set default action
-    if (!isset($params['_action']) || $params['_action'] == null) {
-    	$params['_action'] = $defaultAction;
-    }
-    
-    // set default format
-    if (!isset($format) || $format == null) {
-    	$params['_format'] = $defaultFormat;
-    } else {
+  	
+    // set format
+    if ($format !== false) {
     	$params['_format'] = $format;
     }
     

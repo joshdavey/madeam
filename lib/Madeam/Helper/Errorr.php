@@ -17,10 +17,9 @@
  */
 class Errorr extends Htmlr {
 
-  public static function all($name = 'errors', $_params = array()) {
+  public static function all($errors = array(), $_params = array()) {
     $errors_box = null;
-    if (isset($_SESSION[Madeam::userErrorName])) {
-      $errors = $_SESSION[Madeam::userErrorName];
+    if (!empty($errors)) {
       $params['name'] = $name;
       $params['id'] = self::nameToId($name);
       $params['class'] = 'errors';
@@ -44,11 +43,11 @@ class Errorr extends Htmlr {
     }
   }
 
-  public static function single($name, $message = false) {
+  public static function single($name, $errors = array(), $message = false) {
     $error_tag = null;
-    if (isset($_SESSION[Madeam::userErrorName][$name])) {
+    if (isset($errors[$name]) && !empty($errors[$name])) {
       $error_tag .= self::openTag('ul', array('class' => 'error'));
-      foreach ($_SESSION[Madeam::userErrorName][$name] as $error) {
+      foreach ($errors[$name] as $error) {
         if ($message) {
           $error_tag .= self::wrappingTag('li', $message);
         } else {

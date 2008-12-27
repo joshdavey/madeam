@@ -18,6 +18,7 @@
 class Formr extends Htmlr {
   
   public static function open($action = null, $_params = array()) {
+    $params = array();
     
     if (isset($_params['file'])) {
       $params['enctype'] = 'multipart/form-data';
@@ -127,7 +128,7 @@ class Formr extends Htmlr {
 
   public static function file($name, $_params = array()) {
     $params = array();
-    $params['name'] = $name; // don't need to give it a form name
+    $params['name'] = self::fieldName($name); // don't need to give it a form name
     $params['type'] = 'file';
     $params['id'] = self::nameToId($name);
     $params = array_merge($params, $_params);

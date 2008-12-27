@@ -34,7 +34,14 @@ class Madeam_Session {
     session_destroy();
   }
 
+  public static function flash($name, $data) {
+    self::flashSet($name, $data);
+  }
+
   public static function flashSet($name, $data) {
+    if (!isset($_SESSION[Madeam::flashLifeName])) {
+      $_SESSION[Madeam::flashLifeName] = 1;
+    }
     $_SESSION[Madeam::flashDataName][$name] = $data;
   }
 
@@ -56,10 +63,6 @@ class Madeam_Session {
 
   public static function flashLife($pagesToLive = 1) {
     $_SESSION[Madeam::flashLifeName] = $pagesToLive;
-  }
-
-  public static function error($name, $msg) {
-    $_SESSION[Madeam::userErrorName][$name][] = $msg;
   }
 
   public static function set($name, $value) {
