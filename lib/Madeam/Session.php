@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
+ * self :  Rapid Development MVC Framework <http://www.self.com/>
  * Copyright (c)	2006, Joshua Davey
  *								24 Ridley Gardens, Toronto, Ontario, Canada
  *
@@ -9,8 +9,8 @@
  * Redistributions of files must retain the above copyright notice.
  *
  * @copyright		Copyright (c) 2006, Joshua Davey
- * @link				http://www.madeam.com
- * @package			madeam
+ * @link				http://www.self.com
+ * @package			self
  * @version			0.0.6
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
@@ -18,6 +18,10 @@
 class Madeam_Session {
 
 	public static $driver;
+	
+	public static $flashDataName = '_flash';
+	
+	public static $flashLifeName = '_flashData';
 
   public static function start($sess_id = false) {
     // load session by ID
@@ -25,8 +29,19 @@ class Madeam_Session {
       session_id($sess_id);
     }
     // start session
-    if (! isset($_SESSION)) {
+    if (!isset($_SESSION)) {
       session_start();
+      
+      // handle flash stuff here...
+      if (isset($_SESSION[self::$flashLifeName])) {
+        if (--$_SESSION[self::$flashLifeName] == 0) {
+          unset($_SESSION[self::$flashLifeName]);
+          if (isset($_SESSION[self::$flashDataName])) {
+            unset($_SESSION[self::$flashDataName]);
+          }
+        }
+      }
+      
     }
   }
 
@@ -39,15 +54,15 @@ class Madeam_Session {
   }
 
   public static function flashSet($name, $data) {
-    if (!isset($_SESSION[Madeam::flashLifeName])) {
-      $_SESSION[Madeam::flashLifeName] = 1;
+    if (!isset($_SESSION[self::$flashLifeName])) {
+      $_SESSION[self::$flashLifeName] = 1;
     }
-    $_SESSION[Madeam::flashDataName][$name] = $data;
+    $_SESSION[self::$flashDataName][$name] = $data;
   }
 
   public static function flashGet($name) {
-    if (isset($_SESSION[Madeam::flashDataName][$name])) {
-      return $_SESSION[Madeam::flashDataName][$name];
+    if (isset($_SESSION[self::$flashDataName][$name])) {
+      return $_SESSION[self::$flashDataName][$name];
     } else {
       return false;
     }
@@ -55,14 +70,14 @@ class Madeam_Session {
 
   public static function flashDestroy($name = false) {
     if ($name === false) {
-      unset($_SESSION[Madeam::flashDataName]);
+      unset($_SESSION[self::$flashDataName]);
     } else {
-      unset($_SESSION[Madeam::flashDataName][$name]);
+      unset($_SESSION[self::$flashDataName][$name]);
     }
   }
 
   public static function flashLife($pagesToLive = 1) {
-    $_SESSION[Madeam::flashLifeName] = $pagesToLive;
+    $_SESSION[self::$flashLifeName] = $pagesToLive;
   }
 
   public static function set($name, $value) {

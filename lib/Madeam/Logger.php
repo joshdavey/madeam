@@ -17,6 +17,8 @@ class Madeam_Logger {
   public $logs = array();
 
   public static $path = false;
+  
+  public static $fileName = 'Y-m';
 
 
   /**
@@ -27,8 +29,8 @@ class Madeam_Logger {
   private static $_instance = array();
 
   public static function setInstance($instance) {
-    if (! Madeam_Logger::$_instance) {
-      Madeam_Logger::$_instance = $instance;
+    if (! self::$_instance) {
+      self::$_instance = $instance;
     } else {
       throw new Madeam_Exception('Registry instance already exists');
     }
@@ -41,10 +43,10 @@ class Madeam_Logger {
    * @return madeam_registry object
    */
   public static function getInstance() {
-    if (! Madeam_Logger::$_instance) {
-      Madeam_Logger::$_instance = new Madeam_Logger(array());
+    if (! self::$_instance) {
+      self::$_instance = new Madeam_Logger(array());
     }
-    return Madeam_Logger::$_instance;
+    return self::$_instance;
   }
 
 
@@ -57,6 +59,10 @@ class Madeam_Logger {
   }
 
   public function __destruct() {
+    if (!is_writable(self::$path . date(self::$fileName) . '.txt')) {
+      throw new Madeam_Exception('Cannot write to log file directory');
+    }
+    
     $registry = self::getInstance();
 
     $requestLog = null;
@@ -66,7 +72,7 @@ class Madeam_Logger {
 
     if (Madeam_Config::get('enable_logger') == true && $requestLog != null) {
       $requestLog .= '------------------' . "\n";
-      file_put_contents(self::$path . date(Madeam_Config::get('log_file_name')) . '.txt',  $requestLog, FILE_APPEND | LOCK_EX);
+      file_put_contents(self::$path . date(self::$fileName) . '.txt',  $requestLog, FILE_APPEND | LOCK_EX);
     }
   }
 

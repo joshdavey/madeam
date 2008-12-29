@@ -47,7 +47,7 @@ function test($var = null) {
   }
   
   if (is_array($var) || is_object($var)) {
-    echo '<br /><pre>[TEST::' . $tests . '] &nbsp;&nbsp;' . "\n";
+    echo '<br /><pre>[T::' . $tests . '] &nbsp;&nbsp;' . "\n";
     print_r($var);
     echo ' &nbsp;&nbsp;</pre>' . "\n";
   } elseif (is_bool($var)) {
@@ -57,9 +57,9 @@ function test($var = null) {
       $var = 'FALSE';
     }
     
-    echo "<br /> [TEST::" . $tests . "] &nbsp;&nbsp;" . (string) $var . "&nbsp;&nbsp;  \n";
+    echo "<br /> [T::" . $tests . "] &nbsp;&nbsp;" . (string) $var . "&nbsp;&nbsp;  \n";
   } else {
-    echo "<br /> [TEST::" . $tests . "] &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
+    echo "<br /> [T::" . $tests . "] &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
   }
 }
 
@@ -81,6 +81,14 @@ function up($word) {
  */
 function low($word) {
   return strtolower($word);
+}
+
+function h($string) {
+  return htmlentities($string);
+}
+
+function eh($string) {
+  echo h($string);
 }
 
 /**
@@ -124,8 +132,7 @@ function Madeam_ErrorHandler($code, $string, $file, $line) {
   // return regular PHP errors when they're non-fatal
   if ($code == 2 || $code == 4 || $code == 8) { return false; }
 
-  $exception = new Madeam_Exception($string, $code);
-  throw $exception;
+  throw new Madeam_Exception($string, $code);
   return true;
 }
 
@@ -160,22 +167,6 @@ class Madeam {
 	 * version of madeam
 	 */
   const version = '0.1 Alpha';
-  
-  /**
-	 * this is used for passing misc data from one page to the other
-	 */
-  const flashDataName	= 'mflash';
-  
-  /**
-	 * this sets how many pages the flash has to live (ptl: pages to live)
-	 */
-  const flashLifeName	= 'mflife';
-  
-	/**
-	 * this is used for passing post data from one page to the next
-	 * the post data is merged with the flash post data on the next page
-	 */
-  const flashPostName	= 'mfpost';
   
 	/**
 	 * Used for joining models and other associations
@@ -306,11 +297,6 @@ class Madeam {
       self::$requestParams['_method'] = low($server['REQUEST_METHOD']);
     }
     
-    
-    // configure core classes
-    Madeam_Cache::$path   = self::$pathToEtc . 'cache' . DS;
-    Madeam_Logger::$path  = self::$pathToEtc . 'log' . DS;
-    
     // include base setup configuration
     if (empty($cfg)) {
       if (file_exists(self::$pathToApp . 'Config' . DS . 'setup.local.php')) {
@@ -334,15 +320,36 @@ class Madeam {
     
 		// include routes
 		// check cache for routes
-		if (! Madeam_Router::$routes = Madeam_Cache::read('madeam.routes', - 1, Madeam_Config::get('ignore_routes_cache'))) {
+		if (! Madeam_Router::$routes = Madeam_Cache::read(Madeam::$environment . '.madeam.routes', - 1, Madeam_Config::get('ignore_routes_cache'))) {
 		  // include routes configuration
 		  require self::$pathToApp . 'Config' . DS . 'routes.php';
 		
 		  // save routes to cache
 		  if (Madeam_Config::get('ignore_routes_cache') === false) {
-		    Madeam_Cache::save('madeam.routes', Madeam_Router::$routes);
+		    Madeam_Cache::save(Madeam::$environment . '.madeam.routes', Madeam_Router::$routes);
 		  }
 		}
+		
+		/**
+		 * This is messed up. I hate the way PHP handles the $_FILES array when using multidimensional arrays in your HTML forms
+		 */		
+		if (isset($_FILES)) {
+      $_files = array();
+      foreach ($_FILES as $key => $fields) {
+        $_files[$key] = array();
+        foreach ($fields as $field => $files) {
+          if (is_array($files)) {
+            foreach ($files as $file => $value) {
+              $_files[$key][$file][$field] = $value;
+            }
+          } else {
+            $_files[$key] = $fields;
+          }
+        }
+      }
+    }
+    
+    self::$requestParams = array_merge_recursive(self::$requestParams, $_files);
 		
     // make request
     $output = self::request(self::$requestUri, self::$requestParams, true);
@@ -422,17 +429,8 @@ class Madeam {
     }
 
     try {
-      if ($front === true) {
-        $controller->callback('beforeRequest');
-      }
-      
       // process request
-      $response = $controller->process($controller);
-      //$response = Madeam_Controller::process(&$controller);
-      
-      if ($front === true) {
-        $controller->callback('afterRequest');
-      }
+      $response = $controller->process();
 
       // delete controller
       unset($controller);
@@ -486,35 +484,19 @@ class Madeam {
     return $url;
   }
   
+  /**
+   * undocumented method
+   *
+   * @author Joshua Davey
+   */
   public static function autoload($class) {
   	// set class file name)
-	  $file = preg_replace('/[\\\_]/', DS, $class) . '.php'; // for PHP 5.3+
-	  //$file = str_replace('_', DS, $class) . '.php';
+	  $file = str_replace('_', DS, $class) . '.php';
 	  
 	  // include class file
 	  if (is_string(fileLives($file))) {
 	    require $file;
 	  }
-	  
-	  /*
-	  // PHP 5.3 way of checking to see if a file exists
-	  $paths = explode(PATH_SEPARATOR, get_include_path());
-
-    foreach ($paths as $path) {
-      $check = function ($file) use ($path) { 
-        if (file_exists($path . $file)) { 
-          return true; 
-        } else {
-          return false;
-        }
-      };
-
-      if ($check ($file)) {
-        require $path . $file;
-        break;
-      }
-    }
-    */
 	
 	  if (! class_exists($class, false) && ! interface_exists($class, false)) {
 	    $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
