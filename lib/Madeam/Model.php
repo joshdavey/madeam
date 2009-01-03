@@ -145,8 +145,8 @@ class Madeam_Model {
     }
 
     // set cache name
-    $this->cacheName .= Madeam::$environment . '.' . low($this->modelName) . '.setup';
-
+    $this->cacheName.= Madeam::$environment . '.' . $this->cacheName . low($this->modelName) . '.setup';
+    
     // check cache for setup. if cache doesn't exist define it and then save it
     if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1, Madeam_Config::get('ignore_models_cache'))) {
       
@@ -278,7 +278,7 @@ class Madeam_Model {
    * load a schema
    *
    */
-  final public function loadSchema() {
+  final public function loadSchema() {    
     $this->setup['schema'] = $this->describe();
   }
   

@@ -277,6 +277,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
 		$foreignKeyValues = array();
 		$belongsToForeignKeys = array();
     foreach ($results as &$result) {
+      $this->_data = $result;
     	$result = $this->prepareEntry($result);    	
       $foreignKeyValues[] = $result[$this->setup['primaryKey']];      
       
@@ -549,7 +550,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     
     // before save _callback
     $this->_callback('beforeSave');
-          
+    
     // filter out fields that don't exist in the model
     $this->_data = array_intersect_key($this->_data, array_flip($this->setup['standardFields']));
 

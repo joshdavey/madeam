@@ -59,10 +59,6 @@ class Madeam_Logger {
   }
 
   public function __destruct() {
-    if (!is_writable(self::$path . date(self::$fileName) . '.txt')) {
-      throw new Madeam_Exception('Cannot write to log file directory');
-    }
-    
     $registry = self::getInstance();
 
     $requestLog = null;

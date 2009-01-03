@@ -145,12 +145,14 @@ class Formr extends Htmlr {
     return self::wrappingTag('textarea', self::fieldValue($name, $value), $params);
   }
 
-  public static function button($name, $value = null, $_params = array()) {
+  public static function button($value = null, $_params = array()) {
     $params = array();
-    $params['name'] = $name;
+    if (! isset($params['name'])) {
+      $params['name'] = $value;
+    }
+    $params['value'] = $value;
+    $params['id'] = self::nameToId($value . '_btn');
     $params['type'] = 'button';
-    $params['id'] = self::nameToId($name);
-    $params['value'] = self::fieldValue($name, $value);
     $params = array_merge($params, $_params);
     return self::tag('input', $params);
   }
@@ -158,7 +160,7 @@ class Formr extends Htmlr {
   public static function submit($value = 'Submit', $_params = array()) {
     $params = array();
     if (! isset($params['name'])) {
-      $params['name'] = 'Submit';
+      $params['name'] = $value;
     }
     $params['value'] = $value;
     $params['id'] = self::nameToId($value . '_btn');
@@ -181,89 +183,189 @@ class Formr extends Htmlr {
     return self::tag('input', $params);
   }
 
+  public static function day($name, $value = null, $_params = array()) {
+    $params = array();
+    $params['class'] = 'day';
+    
+    $days = array();
+    for ($i=1; $i <= 31; $i++) { 
+      $days[$i] = $i;
+    }
+    
+    $value = strtotime($value);
+    
+    if ($value == false) { 
+      $value = date('d'); 
+    } else {
+      $value = date('d', $value);
+    }
+    
+    $params = array_merge($params, $_params);
+    return self::dropdown($name, $value, $days, $params);
+  }
+  
+  public static function month($name, $value = null, $format = 'F', $_params = array()) {
+    $params = array();
+    $params['class'] = 'month';
+    
+    $months = array();
+    for ($i=1; $i <= 12; $i++) { 
+      $months[$i] = date($format, mktime(0, 0, 0, $i, 1, 1986));
+    }
+    
+    $value = strtotime($value);
+    
+    if ($value == false) { 
+      $value = date('m'); 
+    } else {
+      $value = date('m', $value);
+    }
+    
+    $params = array_merge($params, $_params);
+    return self::dropdown($name, $value, $months, $params);
+  }
+  
+  public static function year($name, $value = null, $_params = array()) {
+    $params = array();
+    $params['size'] = '4';
+    $params['maxlength'] = '4';
+    $params['class'] = 'year';
+    
+    $value = strtotime($value);
+    
+    if ($value == false) { 
+      $value = date('Y'); 
+    } else {
+      $value = date('Y', $value);
+    }
+    
+    $params = array_merge($params, $_params);
+    return self::input($name, $value, $params);
+  }
+
   public static function date($name, $value = null, $_params = array()) {
     $returned = array();
-    // set name of IDs
-    $idname = self::nameToId($name);
-    if (is_string($value)) {
-      preg_match_all('/(\d{4})\-(\d{2})\-(\d{2})/', $value, $matchs);
-      $value = array();
-      $value[$name . Madeam::associationJoint . 'year'] = $matchs[1][0];
-      $value[$name . Madeam::associationJoint . 'month'] = $matchs[2][0];
-      $value[$name . Madeam::associationJoint . 'day'] = $matchs[3][0];
-    }
-    //date('Y-m-d H:i:s');
-    // month
-    $month_params = array();
-    $month_params['class'] = 'date_month';
-    $month_params['id'] = $idname . '_date_month';
-    if (@$value[$name . Madeam::associationJoint . 'month'] == null) {
-      @$value[$name . Madeam::associationJoint . 'month'] = date('m');
-    }
-    $returned[] = self::dropdown($name . Madeam::associationJoint . 'month', $value[$name . Madeam::associationJoint . 'month'], array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'), $month_params);
+    
+    if ($value == null) { $value = time(); }
+    
     // day
-    $day_params = array();
-    $day_params['class'] = 'date_day';
-    $day_params['id'] = $idname . '_date_day';
-    if (@$value[$name . Madeam::associationJoint . 'day'] == null) {
-      @$value[$name . Madeam::associationJoint . 'day'] = date('d');
-    }
-    $returned[] = self::dropdown($name . Madeam::associationJoint . 'day', $value[$name . Madeam::associationJoint . 'day'], array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'), $day_params);
+    $returned[] = self::day($name . Madeam::associationJoint . 'day', $value);
+    
+    // month
+    $returned[] = self::month($name . Madeam::associationJoint . 'month', $value);
+    
     // year
-    $year_params = array();
-    $year_params['size'] = '4';
-    $year_params['maxlength'] = '4';
-    $year_params['class'] = 'date_year';
-    $year_params['id'] = $idname . '_date_year';
-    if (@$value[$name . Madeam::associationJoint . 'year'] == null) {
-      @$value[$name . Madeam::associationJoint . 'year'] = date('Y');
+    $returned[] = self::year($name . Madeam::associationJoint . 'year', $value);
+    
+    return implode($returned);
+  }
+  
+
+  public static function second($name, $value = null, $_params = array()) {
+    $params = array();
+    $params['class'] = 'month';
+    
+    $seconds = array();
+    for ($i=0; $i < 60; $i++) {
+      if (strlen($i) < 2) { $i = '0' . $i; }
+      $seconds[$i] = $i;
     }
-    $returned[] = self::input($name . Madeam::associationJoint . 'year', $value[$name . Madeam::associationJoint . 'year'], $year_params);
+    
+    $value = strtotime($value);
+    
+    if ($value == false) { 
+      $value = date('s'); 
+    } else {
+      $value = date('s', $value);
+    }
+    
+    $params = array_merge($params, $_params);
+    return self::dropdown($name, $value, $seconds, $params);
+  }
+  
+  public static function minute($name, $value = null, $_params = array()) {
+    $params = array();
+    $params['class'] = 'month';
+    
+    $minutes = array();
+    for ($i=0; $i < 60; $i++) {
+      if (strlen($i) < 2) { $i = '0' . $i; }
+      $minutes[$i] = $i;
+    }
+    
+    $value = strtotime($value);
+    
+    if ($value == false) { 
+      $value = date('i'); 
+    } else {
+      $value = date('i', $value);
+    }
+    
+    $params = array_merge($params, $_params);
+    return self::dropdown($name, $value, $minutes, $params);
+  }
+  
+  public static function hour($name, $value = null, $format = 'g a', $_params = array()) {
+    $params = array();
+    $params['class'] = 'month';    
+    
+    $hours = array();
+    for ($i=0; $i < 24; ++$i) {
+      $hours[$i] = date($format, mktime($i, 0, 0, 1, 1, 1986));
+    }
+    
+    $value = strtotime($value);
+    
+    if ($value == false) { 
+      $value = date('G'); 
+    } else {
+      $value = date('G', $value);
+    }
+    
+    $params = array_merge($params, $_params);
+    return self::dropdown($name, $value, $hours, $params);
+  }
+  
+  public static function time($name, $value = null, $_params = array()) {
+    $returned = array();
+    
+    if ($value == null) { $value = time(); }
+    
+    // hour
+    $returned[] = self::hour($name . Madeam::associationJoint . 'hour', $value);
+    
+    // minute
+    $returned[] = self::minute($name . Madeam::associationJoint . 'minute', $value);
+    
+    // second
+    $returned[] = self::second($name . Madeam::associationJoint . 'second', $value);
+    
     return implode($returned);
   }
 
-  public static function datetime($name, $value, $_params = array()) {
+  public static function datetime($name, $value = null, $_params = array()) {
     $returned = array();
-    $returned[] = self::date($name, $value, $_params);
-    // set name of IDs
-    $idname = self::nameToId($name);
-    if (is_string($value)) {
-      preg_match_all('/(\d{2})\:(\d{2})\:(\d{2})/', $value, $matchs);
-      $value = array();
-      $value[$name . Madeam::associationJoint . 'hour'] = $matchs[1][0];
-      $value[$name . Madeam::associationJoint . 'minute'] = $matchs[2][0];
-      $value[$name . Madeam::associationJoint . 'second'] = $matchs[3][0];
-    }
-    //date('Y-m-d H:i:s');
-    // hour
-    $hour_params = array();
-    $hour_params['class'] = 'datetime_hour';
-    $hour_params['id'] = $idname . '_datetime_hour';
-    if (@$value[$name . Madeam::associationJoint . 'hour'] == null) {
-      $value[$name . Madeam::associationJoint . 'hour'] = date('H');
-    }
-    //if ($value[$name . Madeam::associationJoint . 'hour'] == null) { $value[$name . Madeam::associationJoint . 'hour'] = '12'; }
-    $returned[] = self::dropdown($name . Madeam::associationJoint . 'hour', $value[$name . Madeam::associationJoint . 'hour'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'), $hour_params) . ' : ';
-    // minute
-    $min_params = array();
-    $min_params['class'] = 'datetime_minute';
-    $min_params['id'] = $idname . '_datetime_minute';
-    if (@$value[$name . Madeam::associationJoint . 'minute'] == null) {
-      $value[$name . Madeam::associationJoint . 'minute'] = date('i');
-    }
-    //if ($value[$name . Madeam::associationJoint . 'minute'] == null) { $value[$name . Madeam::associationJoint . 'minute'] = '00'; }
-    $returned[] = self::dropdown($name . Madeam::associationJoint . 'minute', $value[$name . Madeam::associationJoint . 'minute'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'), $min_params) . ' : ';
-    // second
-    $sec_params = array();
-    $sec_params['class'] = 'datetime_second';
-    $sec_params['id'] = $idname . '_datetime_second';
-    if (@$value[$name . Madeam::associationJoint . 'second'] == null) {
-      $value[$name . Madeam::associationJoint . 'second'] = date('s');
-    }
-    //if ($value[$name . Madeam::associationJoint . 'second'] == null) { $value[$name . Madeam::associationJoint . 'second'] = '00'; }
-    $returned[] = self::dropdown($name . Madeam::associationJoint . 'second', $value[$name . Madeam::associationJoint . 'second'], array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'), $sec_params);
+    
+    if ($value == null) { $value = time(); }
+    
+    // date
+    $returned[] = self::date($name, $value);
+    
+    // time
+    $returned[] = self::time($name, $value);
+    
     return implode($returned);
   }
+  
+  
+  public static function timeBox($name, $value, $_params) {
+    test(strtotime('9:30pm'));
+  }
+  
+  public static function dateBox($name, $value, $_params) {
+    
+  }
+  
 
   public static function dropdown($name, $selected, $values = array(), $_params = array()) {
     $params         = array();

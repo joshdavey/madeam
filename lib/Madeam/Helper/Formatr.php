@@ -4,7 +4,7 @@ class Formatr {
 
   public static $dateFormat = 'd F o';
 
-  public static $datetimeFormat = 'd F o H:i:s';
+  public static $datetimeFormat = 'd F o \a\t g:i:s a';
 
   public static $moneyFormat = '%';
 

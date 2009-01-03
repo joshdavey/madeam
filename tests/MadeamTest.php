@@ -30,6 +30,10 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
     Madeam::paths(TESTS_MADEAM_PUBLIC_DIRECTORY);
     $this->assertTrue(file_exists(Madeam::$pathToLib), 'The lib directory should exist');
   }
+
+  public function testMagicQuotesAreOff() {
+    $this->assertEquals(get_magic_quotes_gpc(), 0, 'Magic quotes are the evil'));
+  }
   
   public function testRelativePath() {
     $docRoot  = '/Apache/htdocs/';

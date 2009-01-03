@@ -33,24 +33,26 @@ class Htmlr {
     return self::tag('img', $params);
   }
 
-  public static function imgResize($src, $toWidth = false, $toHeight = false, $_params = array()) {
+  public static function imgResize($src, $target = 0, $_params = array()) {
     $params = array();
     $params['alt'] = Madeam_Inflector::underscorize($src);
     $params['src'] = Madeam::url($src);
-    if ($toWidth !== false || $toHeight !== false) {
-      list($width, $height) = getimagesize(Madeam::$pathToPublic . $src);
-      $xscale = $width / $toWidth;
-      $yscale = $height / $toHeight;
-      if ($yscale > $xscale) {
-        $new_width = round($width * (1 / $yscale));
-        $new_height = round($height * (1 / $yscale));
-      } else {
-        $new_width = round($width * (1 / $xscale));
-        $new_height = round($height * (1 / $xscale));
-      }
-      $params['width'] = $new_width;
-      $params['height'] = $new_height;
+    
+    list($width, $height) = getimagesize(Madeam::$pathToPublic . $src);
+    
+    if ($width > $height) {
+      $percentage = ($target / $width);
+    } else {
+      $percentage = ($target / $height);
     }
+
+    //gets the new value and applies the percentage, then rounds the value
+    $width = round($width * $percentage);
+    $height = round($height * $percentage);
+    
+    $params['width'] = $width . 'px';
+    $params['height'] = $height . 'px';
+    
     $params = array_merge($params, $_params);
     return self::tag('img', $params);
   }

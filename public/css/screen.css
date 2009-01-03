@@ -1,0 +1,106 @@
+/* Normalization
+-----------------------------------------------------------------------------*/
+* { 
+  margin: 0; 
+  padding: 0; 
+  border: none; 
+}
+
+/* Document
+-----------------------------------------------------------------------------*/
+body {
+  font: 62.5%/1.5  "Lucida Grande", "Lucida Sans", Tahoma, Verdana, sans-serif;
+  color: #000000;
+  text-align: center;
+  background: #282e36;
+}
+
+/* Typography
+-----------------------------------------------------------------------------*/
+h1 { 
+  font-size: 2.2em; 
+}
+
+h2 { 
+  font-size: 2.0em; 
+}
+
+h3 { 
+  font-size: 1.8em; 
+}
+
+h4 { 
+  font-size: 1.6em; 
+}
+
+h5 { 
+  font-size: 1.4em;
+}
+
+p { 
+  font-size: 1.2em;
+}
+
+ul, ol, dl {
+	list-style: none;
+	font-size: 1.2em;
+}
+
+li, dd, dt {
+	font-size: 1.2em;
+}
+
+
+/* Tables 
+-----------------------------------------------------------------------------*/
+table { 
+  border-spacing: 0; 
+  border-collapse: collapse; 
+}
+
+td { 
+  text-align: left; 
+  font-weight: normal; 
+}
+
+/* Structural
+-------------------------------------- */
+.container { 
+  text-align: left;  
+  margin-left: 20px; 
+  margin-right: 20px;
+}
+
+#content {
+  padding: 10px; 
+  background: #fff;
+}
+  #content.debug { 
+    border: solid 3px #b43838; 
+  }
+
+#header { 
+  color: #fef38b; text-shadow: #000 4px 3px;
+  margin-top: 20px; 
+}
+
+/* Code
+-------------------------------------- */
+code { 
+  margin: 6px; 
+  background: #fcfcfc; 
+  padding: 6px; 
+  display: block;
+  border-top: solid 2px #eee;
+  border-bottom: solid 2px #eee;
+}
+
+
+/* Error
+-------------------------------------- */
+.error { background: #c60e1b; color: #fff; padding: 3px; border: solid 3px #b43838; }
+	.error li { margin-left: 20px; }
+
+/* =clear
+-------------------------------------- */
+.clr { clear: both; visibility: hidden; }

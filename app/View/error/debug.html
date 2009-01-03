@@ -1,10 +1,10 @@
 
-<div id="madeam-error">
+<div id="error">
   <h1>Error:</h1>
   <p>
   <?php echo $params['error']; ?>
   <br />
-  <?php echo $params['file']; ?> on line <?php echo $params['line']; ?>
+  <strong><?php echo $params['file']; ?></strong> on line <strong><?php echo $params['line']; ?></strong>
   </p>
 
   <br />
