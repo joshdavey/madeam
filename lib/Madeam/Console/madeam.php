@@ -1,34 +1,33 @@
 <?php
+
 // really weird bug when I installed zend core made SERVER_NAME inaccessible and threw a notice error
 // this is a simple hack to fix that
 if (! isset($_SERVER['SERVER_NAME'])) { $_SERVER['SERVER_NAME'] = 'localhost'; }
 
-// get our bearings
-$currentDir = getcwd();
+// use unicode
+  if (function_exists('mb_internal_encoding')) { mb_internal_encoding("UTF-8"); }
 
-// the path to the original copy of madeam - this is so we can point to an untouched copy for copying
-// where __FILE__ is madeam/system/Madeam/Console/madeam.php
-define('PATH_TO_MADEAM', dirname(dirname(dirname(dirname(__FILE__)))) . DIRECTORY_SEPARATOR);
+// set content type to utf8
+  header('Content-type: text/html; charset=utf-8');
 
-// set full path of current directory
-define('CURRENT_DIR', $currentDir . DIRECTORY_SEPARATOR);
-
-if (file_exists('system/Madeam/Console/' . basename(__FILE__))) {
-  // the console is currently relative to a project
-  // project specific scripts can be used
-  define('IS_RELATIVE_TO_PROJECT', 1);
-
-  require 'system/bootstrap.php';
-} else {
-  // the console is pointed outside of any projects
-  // project specific scripts cannot be used
-  define('IS_RELATIVE_TO_PROJECT', 0);
-
-  // ask the user if they want to create a madeam project here
+// set default timezone
+  date_default_timezone_set('America/Toronto');
+  
+// if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
+  $lib = getcwd() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
+  require file_exists($lib . 'Madeam') ? $lib . 'Madeam.php' : dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'Madeam.php';
+  
+  $public = dirname(dirname(dirname(dirname(__FILE__)))) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
+  
+// set include paths  
+  set_include_path(implode(PATH_SEPARATOR, Madeam::paths($public)) . PATH_SEPARATOR . get_include_path());
+  
+if (!file_exists($lib . 'Madeam/Console/' . basename(__FILE__))) {
   $_SERVER['argv'][1] = 'make';
   $_SERVER['argv'][2] = 'app';
-
-  require PATH_TO_MADEAM . 'system/bootstrap.php';
+} else {
+  // configure madeam
+  Madeam::configure();
 }
 
 // initiated console

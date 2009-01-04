@@ -14,7 +14,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
    * @param array $params
    * @return boolean
    */
-  function controller($params) {
+  public function controller($params) {
     // set scaffold setting
     if (isset($params['scaffold'])) {
       $scaffold = $params['scaffold'];
@@ -48,7 +48,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
    * @param array $params
    * @return boolean
    */
-  function model($params) {
+  public function model($params) {
     // set model type
     if (! isset($params['type'])) {
       $type = 'activerecord';
@@ -75,7 +75,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
    * @param array $params
    * @return boolean
    */
-  function view($params) {
+  public function view($params) {
     // set view name
     $viewName = $params['name'];
     // set file contents
@@ -104,7 +104,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
    * @param array $params
    * @return boolean
    */
-  function scaffold($params) {
+  public function scaffold($params) {
     // set scaffold setting
     if (isset($params['scaffold'])) {
       $scaffold = $params['scaffold'];

@@ -1,5 +1,6 @@
 #!/bin/bash
 
-clear
+LIB=${0/%madeam/}
+exec php -q ${LIB}madeam.php
 
-php madeam.php
+exit;

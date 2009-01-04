@@ -174,45 +174,88 @@ class Madeam {
 	 */
   const associationJoint	= '.';
   
+  /**
+   * undocumented constant
+   */
   const defaultController = 'index';
   
+  /**
+   * undocumented constant
+   */
   const defaultAction     = 'index';
   
+  /**
+   * undocumented constant
+   */
   const defaultFormat     = 'html';
   
+  /**
+   * undocumented
+   */
   const errorController   = 'error';
   
   /**
    *
    */
   public static $requestUri         = '/';
-  public static $requestParams      = array();
   
+  /**
+   * undocumented
+   */
+  public static $requestParams      = 
+    array(
+      '_method'     => 'get',
+      '_uri'        => '/',
+      '_controller' => 'index',
+      '_action'     => 'index',
+      '_layout'     => '1'
+    );
+  
+  /**
+   * undocumented
+   */
   public static $environment        = 'development';
   
+  /**
+   * undocumented
+   */
   public static $pathToProject      = false;
+  
+  /**
+   * undocumented
+   */
   public static $pathToPublic       = false;
+  
+  /**
+   * undocumented
+   */
   public static $pathToMadeam       = false;
+
+  /**
+   * undocumented
+   */
   public static $pathToApp          = false;
+  
+  /**
+   * undocumented
+   */
   public static $pathToLib          = false;
+
+  /**
+   * undocumented
+   */
   public static $pathToEtc          = false;
                                     
-  public static $pathToUri          = false;
-  public static $pathToRel          = false;
+  /**
+   * undocumented 
+   */
+  public static $pathToUri          = '/';
   
+  /**
+   * undocumented
+   */
+  public static $pathToRel          = '/public/';
   
-  
-  public static function cleanUriPath($docRoot, $publicPath) {
-    return '/' . substr(str_replace(DS, '/', substr($publicPath, strlen($docRoot), -strlen(basename($publicPath)))), 0, -1);
-  }
-  
-  public static function dirtyUriPath($docRoot, $publicPath) {
-    return '/' . str_replace(DS, '/', substr(substr($publicPath, strlen($docRoot)), 0, -strlen(DS . basename($publicPath)))) . 'index.php/';
-  }
-  
-  public static function relPath($docRoot, $publicPath) {
-    return '/' . str_replace(DS, '/', substr($publicPath, strlen($docRoot)));
-  }
   
   /**
    * This method defines all the absolute file paths to all the important
@@ -249,7 +292,7 @@ class Madeam {
   /**
    * 
    */
-  public static function setup($environment, $params, $server, $cfg = array()) {    
+  public static function setup($environment, $params, $server) {    
     // check for expected server parameters
   	$diff = array_diff(array('DOCUMENT_ROOT', 'REQUEST_URI', 'QUERY_STRING', 'REQUEST_METHOD'), array_keys($server));
   	if (!empty($diff)) {
@@ -297,6 +340,14 @@ class Madeam {
       self::$requestParams['_method'] = low($server['REQUEST_METHOD']);
     }
     
+    // configure Madeam
+    self::configure();
+  }
+
+  /**
+   * undocumented 
+   */
+  public static function configure($cfg = array()) {
     // include base setup configuration
     if (empty($cfg)) {
       if (file_exists(self::$pathToApp . 'Config' . DS . 'setup.local.php')) {
@@ -445,6 +496,27 @@ class Madeam {
       Madeam_Exception::catchException($e);
     }
   }
+  
+  /**
+   * undocumented 
+   */
+  public static function cleanUriPath($docRoot, $publicPath) {
+    return '/' . substr(str_replace(DS, '/', substr($publicPath, strlen($docRoot), -strlen(basename($publicPath)))), 0, -1);
+  }
+  
+  /**
+   * undocumented
+   */
+  public static function dirtyUriPath($docRoot, $publicPath) {
+    return '/' . str_replace(DS, '/', substr(substr($publicPath, strlen($docRoot)), 0, -strlen(DS . basename($publicPath)))) . 'index.php/';
+  }
+  
+  /**
+   * undocumented 
+   */
+  public static function relPath($docRoot, $publicPath) {
+    return '/' . str_replace(DS, '/', substr($publicPath, strlen($docRoot)));
+  }
 
   /**
    * Enter description here...
@@ -466,7 +538,7 @@ class Madeam {
   /**
    * Enter description here...
    *
-   * @param unknown_type $url
+   * @param string $url
    * @return unknown
    */
   public static function url($url) {
