@@ -1,6 +1,6 @@
 #!/bin/bash
 
 LIB=${0/%madeam/}
-exec php -q ${LIB}madeam.php
+exec php -q ${LIB}madeam.php "$@"
 
 exit;

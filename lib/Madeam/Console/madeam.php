@@ -17,7 +17,11 @@ if (! isset($_SERVER['SERVER_NAME'])) { $_SERVER['SERVER_NAME'] = 'localhost'; }
   $lib = getcwd() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
   require file_exists($lib . 'Madeam') ? $lib . 'Madeam.php' : dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'Madeam.php';
   
-  $public = dirname(dirname(dirname(dirname(__FILE__)))) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
+  $public = realpath('public') . DIRECTORY_SEPARATOR;
+  
+  if (!file_exists($public)) {
+    $public = dirname(dirname(dirname(dirname(__FILE__)))) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
+  }
   
 // set include paths  
   set_include_path(implode(PATH_SEPARATOR, Madeam::paths($public)) . PATH_SEPARATOR . get_include_path());
@@ -31,5 +35,4 @@ if (!file_exists($lib . 'Madeam/Console/' . basename(__FILE__))) {
 }
 
 // initiated console
-$console = new Madeam_Console();
-$console->initialize();
+$console = new Madeam_Console($_SERVER['argv']);

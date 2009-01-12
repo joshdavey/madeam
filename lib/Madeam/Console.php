@@ -13,16 +13,66 @@
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Console extends Madeam_Console_CLI {
+class Madeam_Console {
 
-  public function initialize() {      
+
+  public function __construct($params = array()) {
+    array_shift($params); // remove script path
+    
+    $script = array_shift($params); // example: create => Madeam_Console_Script_Create
+    $method = array_shift($params); // example: controller => Madeam_Console_Script_Create::controller();
+    
+    // parse POSIX params
+    // -name Posts => array('name' => 'Posts')
+    // -scaffold -name Posts => array('scaffold' => true, 'name' => 'Posts')
+    foreach ($params as $key => $param) {
+      if (preg_match('/-.*/', $param)) {
+        if (!isset($params[$key+1]) || preg_match('/-.*/', $params[$key+1])) {
+          $params[substr($param, 1)] = true;
+          unset($params[$key]);
+        } else {
+          $params[substr($param, 1)] = $params[$key+1];
+          unset($params[$key]);
+          unset($params[$key+1]);
+        }
+      }
+    }
+    
+    // make sure we're pointed at the project's root
+    if ($script != 'make') {
+      if (!file_exists(realpath('lib/Madeam.php'))) {
+        Madeam_Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
+        exit();
+      }
+    }
+    
+    // get list of scripts
+    $scripts = array();
+    foreach (new DirectoryIterator(realpath('lib/Madeam/Console/Script')) as $file) {
+      if ($file->isFile()) {
+        $scripts[] = low(substr($file->getFilename(), 0, -4));
+      }
+    }
+    
+    // make sure script entered exists
+    if (!in_array($script, $scripts)) {
+      Madeam_Console_CLI::outError('Oops. The script ' . $script . ' does not exist.');
+      exit();
+    }
+    
+    $class = 'Madeam_Console_Script_' . ucfirst($script);
+    $console = new $class;
+    $console->$method($params);
+  }
+
+  public function initialize2() {      
     array_shift($_SERVER['argv']);
     $args         = $_SERVER['argv'];
     $scriptName   = false;
     $commandName  = false;
     
     // get list of available consoles
-    $scriptNames = array('create', 'delete', 'test', 'migration');
+    $scriptNames = array('create', 'delete', 'test', 'migrate');
 
     while(true) {
       // reset console
@@ -35,8 +85,8 @@ class Madeam_Console extends Madeam_Console_CLI {
 
       // if the command requires to be in the application's root path then check it.
       // If we aren't in the applicatin's root path then tell the user and exit
-      if (!$scriptName != 'make') {
-        if (!file_exists('Madeam.php')) {
+      if ($scriptName != 'make') {
+        if (!file_exists(realpath('lib/Madeam.php'))) {
           Madeam_Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
           exit();
         }

@@ -21,22 +21,45 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
     } else {
       $scaffold = 'standard';
     }
+    
+    // default params
+    $_params = array(
+      'extends' => 'Controller_App', 
+      'actions' => 'index,show,new,create,edit,update,delete'
+    );
+    
+    // merge new params with default params
+    $params = array_merge($_params, $params);
 
     // set controller name and class name
-    $controllerName = Madeam_Inflector::underscorize(low($params['name']));
+    $controllerName = ucfirst(Madeam_Inflector::underscorize(low($params['name'])));
     $controllerClassName = 'Controller_' . $controllerName;
 
     // Send message to user that we are creating the controller
     Madeam_Console_CLI::outCreate('Controller ' . $controllerName);
+    
+    // Create View directory
+    $this->createDir(Madeam::$pathToApp . 'View' . DS . low($controllerName));
 
     // define controller class in controller file contents
-    $controllerContents = "<?php\nclass $controllerClassName extends Controller_App {";
+    $controllerContents = "<?php\nclass $controllerClassName extends " . $params['extends'] . " {\n";
+
+    if (isset($params['actions']) && $params['actions'] !== true) {
+      $actions = preg_split('/[\s\,]/', $params['actions']);
+      foreach ($actions as $action) {
+        // add action method to class
+        $controllerContents .= "\n  public function $action" . "Action() {\n    \n  }\n";
+        
+        // create view file
+        $this->createFile(low($action) . '.' . Madeam::defaultFormat, Madeam::$pathToApp . 'View' . DS . low($controllerName) . DS, "$action action's view");
+      }
+    }
 
     // close class definition
-    $controllerContents .= "\n\n}\n?>";
+    $controllerContents .= "\n}";    
 
     // save file contents to file
-    $this->createFile($controllerClassName . '.php', PATH_TO_CONTROLLER, $controllerContents);
+    $this->createFile($controllerName . '.php', Madeam::$pathToApp . 'Controller' . DS, $controllerContents);
 
     // completed with no errors
     return true;
@@ -55,15 +78,25 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
     } else {
       $type = $params['type'];
     }
+    
+    // default params
+    $_params = array(
+      'extends' => 'Madeam_Model_ActiveRecord',
+    );
+    
+    // merge new params with default params
+    $params = array_merge($_params, $params);
+    
+    
     // set model name and class name
     $modelName = Madeam_Inflector::modelNameize($params['name']);
     $modelClassName = Madeam_Inflector::modelClassize($modelName);
     // define model class
-    $modelContents = "<?php\nclass $modelClassName extends madeam_$type {";
+    $modelContents = "<?php\nclass $modelClassName extends " . $params['extends'] . " {";
     // close class definition
     $modelContents .= "\n\n}\n?>";
     // save file
-    if ($this->createFile($modelClassName . '.php', Madeam::$pathToPublic . 'Model' . DS, $modelContents) === true) {
+    if ($this->createFile($modelName . '.php', Madeam::$pathToApp . 'Model' . DS, $modelContents) === true) {
       return true;
     }
     return false;
@@ -92,7 +125,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
       mkdir(Madeam::$pathToPublic . 'view' . DS . dirname($viewName));
     }
     // save contents to new view file
-    if ($this->createFile($viewName . '.' . $viewFormat, Madeam::$pathToPublic . 'View' . DS, $viewContents) === true) {
+    if ($this->createFile($viewName . '.' . $viewFormat, Madeam::$pathToApp . 'View' . DS, $viewContents) === true) {
       return true;
     }
     return false;

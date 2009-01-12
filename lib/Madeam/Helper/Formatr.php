@@ -66,7 +66,27 @@ class Formatr {
    * @author Joshua Davey
    */
   static public function timeAgo($date) {
-    $ts = time() - strtotime(str_replace("-","/",$date));
+    $ts = time() - strtotime($date);
+
+    if ($ts>31536000)     $val = round($ts/31536000,0).' year';
+    elseif ($ts>2419200)  $val = round($ts/2419200,0).' month';
+    elseif ($ts>604800)   $val = round($ts/604800,0).' week';
+    elseif ($ts>86400)    $val = round($ts/86400,0).' day';
+    elseif ($ts>3600)     $val = round($ts/3600,0).' hour';
+    elseif ($ts>60)       $val = round($ts/60,0).' minute';
+    else                  $val = $ts.' second';
+
+    if($val>1) $val .= 's';
+    return $val;
+  }
+  
+  /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */
+  static public function timeUntil($date) {
+    $ts = strtotime($date) - time();
 
     if ($ts>31536000)     $val = round($ts/31536000,0).' year';
     elseif ($ts>2419200)  $val = round($ts/2419200,0).' month';
