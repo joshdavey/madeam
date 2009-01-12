@@ -42,10 +42,13 @@ switch (Madeam::$environment) {
 
 
 /**
- * This is the name of the log files. You can use the date formats from http://ca3.php.net/date
- * to custome the names and the accuracy of the logs. For example by default it's set to 'Y-m'
- * which is the year and month but if you want to log it every day you could do 'Y-m-d'.
- * Obviously if you want to be really crazy you can even identify the logs by seconds.
+ * Configure Cache
  */
-$cfg['log_file_name']           = 'Y-m-d';
+Madeam_Cache::$path   = Madeam::$pathToEtc . 'cache' . DS;
+
+/**
+ * Configure Logger
+ */
+Madeam_Logger::$path  = Madeam::$pathToEtc . 'log' . DS;
+Madeam_Logger::$fileName = 'Y-m-d';
 
