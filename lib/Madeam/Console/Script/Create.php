@@ -39,7 +39,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
     Madeam_Console_CLI::outCreate('Controller ' . $controllerName);
     
     // Create View directory
-    $this->createDir(Madeam::$pathToApp . 'View' . DS . low($controllerName));
+    $this->createDir(Madeam_Framework::$pathToApp . 'View' . DS . low($controllerName));
 
     // define controller class in controller file contents
     $controllerContents = "<?php\nclass $controllerClassName extends " . $params['extends'] . " {\n";
@@ -51,7 +51,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
         $controllerContents .= "\n  public function $action" . "Action() {\n    \n  }\n";
         
         // create view file
-        $this->createFile(low($action) . '.' . Madeam::defaultFormat, Madeam::$pathToApp . 'View' . DS . low($controllerName) . DS, "$action action's view");
+        $this->createFile(low($action) . '.' . Madeam_Framework::defaultFormat, Madeam_Framework::$pathToApp . 'View' . DS . low($controllerName) . DS, "$action action's view");
       }
     }
 
@@ -59,7 +59,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
     $controllerContents .= "\n}";    
 
     // save file contents to file
-    $this->createFile($controllerName . '.php', Madeam::$pathToApp . 'Controller' . DS, $controllerContents);
+    $this->createFile($controllerName . '.php', Madeam_Framework::$pathToApp . 'Controller' . DS, $controllerContents);
 
     // completed with no errors
     return true;
@@ -96,7 +96,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
     // close class definition
     $modelContents .= "\n\n}\n?>";
     // save file
-    if ($this->createFile($modelName . '.php', Madeam::$pathToApp . 'Model' . DS, $modelContents) === true) {
+    if ($this->createFile($modelName . '.php', Madeam_Framework::$pathToApp . 'Model' . DS, $modelContents) === true) {
       return true;
     }
     return false;
@@ -121,11 +121,11 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
     }
     // this needs a re-write because it should allow depth greater than 1 directory
     // make controller directory if it does not already exist
-    if (! file_exists(Madeam::$pathToPublic . 'view' . DS . dirname($viewName))) {
-      mkdir(Madeam::$pathToPublic . 'view' . DS . dirname($viewName));
+    if (! file_exists(Madeam_Framework::$pathToPublic . 'view' . DS . dirname($viewName))) {
+      mkdir(Madeam_Framework::$pathToPublic . 'view' . DS . dirname($viewName));
     }
     // save contents to new view file
-    if ($this->createFile($viewName . '.' . $viewFormat, Madeam::$pathToApp . 'View' . DS, $viewContents) === true) {
+    if ($this->createFile($viewName . '.' . $viewFormat, Madeam_Framework::$pathToApp . 'View' . DS, $viewContents) === true) {
       return true;
     }
     return false;
@@ -144,25 +144,32 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
     } else {
       $scaffold = 'standard';
     }
+    
     // set controller name and class name
     $controllerName = Madeam_Inflector::underscorize(low($params['name']));
     $controllerClassName = 'Controller_' . $controllerName;
+    
     // Send message to user that we are creating the controller
     Madeam_Console_CLI::outCreate('Controller ' . $controllerName);
+    
     // determine scaffold directory
     $dir = PATH_TO_ANTHOLOGY . SCAFFOLD_PATH . $scaffold . DS;
     $actions_dir = $dir . 'action' . DS;
     $views_dir = $dir . 'view' . DS;
+    
     // define controller class in controller file contents
     $controllerContents = "<?php\nclass $controllerClassName extends controller_app {";
+    
     // read scaffold directory for actions
     if ($dh = opendir($actions_dir)) {
       while(($file = readdir($dh)) !== false) {
         if ($file != '.' && $file != '..' && $file != '.svn') {
           $function_code = file_get_contents($actions_dir . $file);
+          
           /* remove <?php and ?> */
           $function_code = substr($function_code, 5);
           $function_code = substr($function_code, 0, - 2);
+          
           // add indents at every line break
           $function_code = str_replace("\n", "\n    ", trim($function_code));
           if (substr_count($function_code, '$this->represent') > 0) {
@@ -194,6 +201,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
           Madeam_Console_CLI::outCreate('action ' . $function_name);
         }
       }
+      
       closedir($dh);
     }
     // close class definition
@@ -240,6 +248,7 @@ class Madeam_Console_Script_Create extends Madeam_Console_Script {
       }
       closedir($dh);
     }
+    
     // completed with no errors
     return true;
   }

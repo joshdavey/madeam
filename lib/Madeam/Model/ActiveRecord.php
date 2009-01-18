@@ -546,10 +546,29 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     
     if ($update !== true) {
       $this->_callback('beforeCreate');
+      
+      // special create time fields
+      if (in_array('created_at', $this->setup['standardFields']) && !isset($this->_data['created_at'])) {
+        $this->_data['created_at'] = date('Y-m-d H:i:s');
+      }
+      
+      if (in_array('created_on', $this->setup['standardFields']) && !isset($this->_data['created_on'])) {
+        $this->_data['created_on'] = date('Y-m-d');
+      }
     }
     
     // before save _callback
     $this->_callback('beforeSave');
+    
+    // special update time fields
+    if (in_array('updated_at', $this->setup['standardFields']) && !isset($this->_data['updated_at'])) {
+      $this->_data['updated_at'] = date('Y-m-d H:i:s');
+    }
+    
+    if (in_array('updated_on', $this->setup['standardFields']) && !isset($this->_data['updated_on'])) {
+      $this->_data['updated_on'] = date('Y-m-d');
+    }
+    
     
     // filter out fields that don't exist in the model
     $this->_data = array_intersect_key($this->_data, array_flip($this->setup['standardFields']));

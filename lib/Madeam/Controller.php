@@ -56,6 +56,11 @@ class Madeam_Controller {
   public $_content = null;
   
   /**
+   * View directory
+   */
+  public static $viewDirectory = null;
+  
+  /**
    * Enter description here...
    *
    * @param unknown_type $params
@@ -63,9 +68,9 @@ class Madeam_Controller {
   final public function __construct($params) {
     
     // check for expected params
-    $diff = array_diff(array('_controller', '_action', '_format', '_layout', '_ajax'), array_keys($params));
+    $diff = array_diff(array('_controller', '_action', '_format', '_layout', '_ajax', '_method'), array_keys($params));
     if (!empty($diff)) {
-      throw new Madeam_Controller_Exception_MissingExpectedParam('Missing expected Request Parameter(s).');
+      throw new Madeam_Controller_Exception_MissingExpectedParam('Missing expected Request Parameter(s): ' . implode(', ', $diff));
     }
     
     // set params
@@ -96,7 +101,7 @@ class Madeam_Controller {
     }
 
     // set cache name
-    $cacheName = Madeam::$environment . '.madeam.controller.' . low(get_class($this)) . '.setup';
+    $cacheName = Madeam_Framework::$environment . '.madeam.controller.' . low(get_class($this)) . '.setup';
 
     // check cache for setup. if cache doesn't exist define it and then save it
     if (! $this->_setup = Madeam_Cache::read($cacheName, - 1, Madeam_Config::get('ignore_controllers_cache'))) {
@@ -235,9 +240,11 @@ class Madeam_Controller {
     	  exit('Invalid Action Characters');
     	}
     } else {
-      throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
-      . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . substr($action, 0, -6) . ".html</strong> OR Create a method called <strong>$action</strong> in <strong>" . get_class($this) . "</strong> class."
-      . " \n <code>public function $action() {\n}</code>");
+      if (!file_exists(Madeam_Controller::$viewDirectory . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'])) {
+        throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
+        . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . substr($action, 0, -6) . ".html</strong> OR Create a method called <strong>$action</strong> in <strong>" . get_class($this) . "</strong> class."
+        . " \n <code>public function $action() {\n\n}</code>");
+      }
     }
     
     // render
@@ -284,7 +291,7 @@ class Madeam_Controller {
     } else {
       throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
       . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . substr($action, 0, -6) . ".html</strong> OR Create a method called <strong>$action</strong> in <strong>" . get_class($this) . "</strong> class."
-      . " \n <code>public function $action() {\n}</code>");
+      . " \n <code>public function $action() {\n\n}</code>");
     }
     
     // render
@@ -353,13 +360,26 @@ class Madeam_Controller {
    * 
    */
   final public function render($settings) {
+    
+    if (!isset($settings['controller'])) {
+      $settings['controller'] = $this->params['_controller'];
+    }
+    
+    if (!isset($settings['view'])) {
+      $settings['view'] = $settings['controller'] . '/' . $this->params['_action'];
+    }
+    
+    if (!isset($settings['layout'])) {
+      $settings['layout'] = $this->_layout;
+    }
+    
     // set the view file path
     if (isset($settings['partial'])) {
       $partial = explode('/', $settings['partial']);
       $partialName = array_pop($partial);
-      $view = Madeam::$pathToApp . 'View' . DS . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
+      $view = Madeam_Controller::$viewDirectory . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
     } else {
-      $view = Madeam::$pathToApp . 'View' . DS . str_replace('/', DS, low($settings['view'])) . '.' . $this->params['_format'];
+      $view = Madeam_Controller::$viewDirectory . str_replace('/', DS, low($settings['view'])) . '.' . $this->params['_format'];
     }
     
     if (!isset($settings['data'])) {
@@ -381,7 +401,7 @@ class Madeam_Controller {
       // apply layout to view's content
       if (!isset($settings['partial']) && $settings['layout'] !== false && isset($settings['layout'])) {
         foreach ($settings['layout'] as $_layout) {
-          $_layout = Madeam::$pathToApp . 'View' . DS . $_layout . '.layout.' . $this->params['_format'];
+          $_layout = Madeam_Controller::$viewDirectory . $_layout . '.layout.' . $this->params['_format'];
           
           // render layouts with builder
           ob_start();

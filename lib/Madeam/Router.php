@@ -33,7 +33,7 @@ class Madeam_Router {
    * @param string $route
    * @param array $params
    */
-  public static function connect($route, $params = array()) {
+  public static function connect($route, $params = array(), $rules = array()) {
     if (! is_array(self::$routes)) {
       self::$routes = array();
     }
@@ -74,7 +74,7 @@ class Madeam_Router {
       $regexp = '/^' . implode('', $mini_exp) . '\/?(.*)$/';
       
       // add to routes list
-      self::$routes[] = array($regexp, $names, $params);
+      self::$routes[] = array($regexp, $names, $params, $rules);
     }
   }
 
@@ -164,7 +164,7 @@ class Madeam_Router {
         break;
       }
     }
-
+    
     if ($matchs == 0) {
       // this is lame and needs to be done better
       header("HTTP/1.1 404 Not Found");

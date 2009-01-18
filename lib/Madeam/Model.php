@@ -145,7 +145,7 @@ class Madeam_Model {
     }
 
     // set cache name
-    $this->cacheName.= Madeam::$environment . '.' . $this->cacheName . low($this->modelName) . '.setup';
+    $this->cacheName.= Madeam_Framework::$environment . '.' . $this->cacheName . low($this->modelName) . '.setup';
     
     // check cache for setup. if cache doesn't exist define it and then save it
     if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1, Madeam_Config::get('ignore_models_cache'))) {
@@ -439,7 +439,7 @@ class Madeam_Model {
     foreach ($this->setup['validators'] as $validator) {
       $field = $validator['args']['field'];
       $method = $validator['method'];
-      $errorKey = $this->modelName . Madeam::associationJoint . $field;
+      $errorKey = $this->modelName . Madeam_Framework::associationJoint . $field;
       
       // validate to make sure the validating method doesn't return false. If it does then save the error
       if ($check_non_existent_fields === false || isset($entry[$field])) {

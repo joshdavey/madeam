@@ -19,7 +19,7 @@ class Htmlr {
 
   public static function link($label, $link = null, $_params = array()) {
     $params = array();
-    $params['href'] = Madeam::url($link);
+    $params['href'] = Madeam_Framework::url($link);
     $params['id'] = Madeam_Inflector::underscorize(low(strip_tags($label))) . '_link';
     $params = array_merge($params, $_params);
     return self::wrappingTag('a', $label, $params);
@@ -28,7 +28,7 @@ class Htmlr {
   public static function img($src, $_params = array()) {
     $params = array();
     $params['alt'] = Madeam_Inflector::underscorize($src);
-    $params['src'] = Madeam::url($src);
+    $params['src'] = Madeam_Framework::url($src);
     $params = array_merge($params, $_params);
     return self::tag('img', $params);
   }
@@ -36,9 +36,9 @@ class Htmlr {
   public static function imgResize($src, $target = 0, $_params = array()) {
     $params = array();
     $params['alt'] = Madeam_Inflector::underscorize($src);
-    $params['src'] = Madeam::url($src);
+    $params['src'] = Madeam_Framework::url($src);
     
-    list($width, $height) = getimagesize(Madeam::$pathToPublic . $src);
+    list($width, $height) = getimagesize(Madeam_Framework::$pathToPublic . $src);
     
     if ($width > $height) {
       $percentage = ($target / $width);
@@ -58,11 +58,11 @@ class Htmlr {
   }
 
   public static function css($src, $_params = array()) {
-    return '<link rel="stylesheet" href="' . Madeam::url($src) . '.css" type="text/css" media="screen" />';
+    return '<link rel="stylesheet" href="' . Madeam_Framework::url($src) . '.css" type="text/css" media="screen" />';
   }
 
   public static function js($src, $_params = array()) {
-    return '<script src="' . Madeam::url($src) . '.js" type="text/javascript"></script>';
+    return '<script src="' . Madeam_Framework::url($src) . '.js" type="text/javascript"></script>';
   }
   
   public static function gjs($library, $version) {
@@ -109,7 +109,7 @@ class Htmlr {
    * @param string $name
    */
   protected static function nameToId($name) {
-    return str_replace(Madeam::associationJoint, '_', low($name));
+    return str_replace(Madeam_Framework::associationJoint, '_', low($name));
   }
 
   /**

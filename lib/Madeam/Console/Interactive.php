@@ -13,7 +13,7 @@
   require file_exists($lib . 'Madeam') ? $lib . 'Madeam.php' : 'Madeam.php';
   
 // set include paths  
-  set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
+  set_include_path(implode(PATH_SEPARATOR, Madeam_Framework::paths(getcwd() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
   
 // configure madeam
-  Madeam::configure();
+  Madeam_Framework::configure();

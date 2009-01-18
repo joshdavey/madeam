@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 
 $cfg = array();
 
-switch (Madeam::$environment) {
+switch (Madeam_Framework::$environment) {
   case 'development' :
     $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_development';
     $cfg['ignore_controllers_cache']  = true;
@@ -44,11 +44,11 @@ switch (Madeam::$environment) {
 /**
  * Configure Cache
  */
-Madeam_Cache::$path   = Madeam::$pathToEtc . 'cache' . DS;
+Madeam_Cache::$path   = Madeam_Framework::$pathToEtc . 'cache' . DS;
 
 /**
  * Configure Logger
  */
-Madeam_Logger::$path  = Madeam::$pathToEtc . 'log' . DS;
+Madeam_Logger::$path  = Madeam_Framework::$pathToEtc . 'log' . DS;
 Madeam_Logger::$fileName = 'Y-m-d';
 

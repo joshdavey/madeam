@@ -22,7 +22,7 @@ class Madeam_Serialize {
     $xml->openMemory();
     $xml->startDocument('1.0', 'UTF-8');
     $xml->startElement('response');
-
+    
     self::_array2Xml($data, $xml);
 
     $xml->endElement();

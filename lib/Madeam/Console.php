@@ -19,8 +19,10 @@ class Madeam_Console {
   public function __construct($params = array()) {
     array_shift($params); // remove script path
     
-    $script = array_shift($params); // example: create => Madeam_Console_Script_Create
-    $method = array_shift($params); // example: controller => Madeam_Console_Script_Create::controller();
+    $action = explode('/', array_shift($params)); // example: create/controller => Madeam_Console_Script_Create::controller();
+    
+    $script = array_shift($action);
+    $method = array_shift($action);
     
     // parse POSIX params
     // -name Posts => array('name' => 'Posts')
@@ -40,25 +42,26 @@ class Madeam_Console {
     
     // make sure we're pointed at the project's root
     if ($script != 'make') {
-      if (!file_exists(realpath('lib/Madeam.php'))) {
+      if (!file_exists(realpath('lib/Madeam/Framework.php'))) {
         Madeam_Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
+        exit();
+      }
+    
+      // get list of scripts
+      $scripts = array();
+      foreach (new DirectoryIterator(realpath('lib/Madeam/Console/Script')) as $file) {
+        if ($file->isFile()) {
+          $scripts[] = low(substr($file->getFilename(), 0, -4));
+        }
+      }
+  
+      // make sure script entered exists
+      if (!in_array($script, $scripts)) {
+        Madeam_Console_CLI::outError('Oops. The script ' . $script . ' does not exist.');
         exit();
       }
     }
     
-    // get list of scripts
-    $scripts = array();
-    foreach (new DirectoryIterator(realpath('lib/Madeam/Console/Script')) as $file) {
-      if ($file->isFile()) {
-        $scripts[] = low(substr($file->getFilename(), 0, -4));
-      }
-    }
-    
-    // make sure script entered exists
-    if (!in_array($script, $scripts)) {
-      Madeam_Console_CLI::outError('Oops. The script ' . $script . ' does not exist.');
-      exit();
-    }
     
     $class = 'Madeam_Console_Script_' . ucfirst($script);
     $console = new $class;

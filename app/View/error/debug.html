@@ -1,16 +1,14 @@
 
-<div id="error">
-  <h1>Error:</h1>
-  <p>
-  <?php echo $params['error']; ?>
-  <br />
-  <strong><?php echo $params['file']; ?></strong> on line <strong><?php echo $params['line']; ?></strong>
-  </p>
+    <h1 class="debug  ">Oops, <?php echo $params['snippet']; ?></h1>
+    <p>
+    <strong>Error:</strong> <?php echo $params['error']; ?>
+    <br />
+    <strong><?php echo $params['file']; ?></strong> on line <strong><?php echo $params['line']; ?></strong>
+    </p>
 
-  <br />
-  <h1>Backtrace:</h1>
-  <pre class="backtrace"><?php echo $params['backtrace']; ?></pre>
+    <br />
+    <h1>Backtrace:</h1>
+    <pre class="backtrace"><?php echo $params['backtrace']; ?></pre>
   
-  <br />
-  <p><em><strong>Note</strong>: You can disable these error messages in Config/setup.php</em></p>
-</div>
+    <br />
+    <p><em><strong>Note</strong>: You can disable these error messages in Config/setup.php</em></p>

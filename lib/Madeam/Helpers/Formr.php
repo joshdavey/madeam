@@ -22,13 +22,14 @@ class Formr extends Htmlr {
     
     if (isset($_params['file'])) {
       $params['enctype'] = 'multipart/form-data';
+      unset($_params['file']);
     }
     
     if (!isset($_params['method'])) {
       $_params['method'] = 'post';
     }
     
-    $params['action'] = Madeam::url($action);
+    $params['action'] = Madeam_Framework::url($action);
     $params['id'] = 'form_' . Madeam_Inflector::underscorize(Madeam_Inflector::slug($params['action']));
     
     $params = array_merge($params, $_params);
@@ -249,13 +250,13 @@ class Formr extends Htmlr {
     if ($value == null) { $value = time(); }
     
     // day
-    $returned[] = self::day($name . Madeam::associationJoint . 'day', $value);
+    $returned[] = self::day($name . Madeam_Framework::associationJoint . 'day', $value);
     
     // month
-    $returned[] = self::month($name . Madeam::associationJoint . 'month', $value);
+    $returned[] = self::month($name . Madeam_Framework::associationJoint . 'month', $value);
     
     // year
-    $returned[] = self::year($name . Madeam::associationJoint . 'year', $value);
+    $returned[] = self::year($name . Madeam_Framework::associationJoint . 'year', $value);
     
     return implode($returned);
   }
@@ -332,13 +333,13 @@ class Formr extends Htmlr {
     if ($value == null) { $value = time(); }
     
     // hour
-    $returned[] = self::hour($name . Madeam::associationJoint . 'hour', $value);
+    $returned[] = self::hour($name . Madeam_Framework::associationJoint . 'hour', $value);
     
     // minute
-    $returned[] = self::minute($name . Madeam::associationJoint . 'minute', $value);
+    $returned[] = self::minute($name . Madeam_Framework::associationJoint . 'minute', $value);
     
     // second
-    $returned[] = self::second($name . Madeam::associationJoint . 'second', $value);
+    $returned[] = self::second($name . Madeam_Framework::associationJoint . 'second', $value);
     
     return implode($returned);
   }
@@ -471,7 +472,7 @@ class Formr extends Htmlr {
    * =======================================================================
    */
   protected static function fieldName($fieldName) {
-    $nodes = explode(Madeam::associationJoint, $fieldName);
+    $nodes = explode(Madeam_Framework::associationJoint, $fieldName);
     $name = array_shift($nodes);
     if (! empty($nodes)) {
       $name .= '[' . implode('][', $nodes) . ']';
@@ -481,7 +482,7 @@ class Formr extends Htmlr {
 
   protected static function fieldValue($fieldName, $setValue) {
     // get nodes of field name to identify it's value
-    $nodes = explode(Madeam::associationJoint, $fieldName);
+    $nodes = explode(Madeam_Framework::associationJoint, $fieldName);
     // get root of value
     $value = $_POST;
     foreach ($nodes as $node) {

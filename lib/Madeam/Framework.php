@@ -20,17 +20,17 @@ if (! defined('DS')) {
 
 // idea... use this as a last resort when all autoloads fail.
 // have this one throw an exception or make a last resort to check every path for the file.
-spl_autoload_register('Madeam::autoload');
+spl_autoload_register('Madeam_Framework::autoload');
 
 /**
  * Set exception handler
  */
-set_exception_handler('Madeam_UncaughtException');
+//set_exception_handler('Madeam_UncaughtException');
 
 /**
  * Set error handler
  */
-set_error_handler('Madeam_ErrorHandler');
+//set_error_handler('Madeam_ErrorHandler');
 
 
 // function library
@@ -138,7 +138,7 @@ function Madeam_ErrorHandler($code, $string, $file, $line) {
 
 
 // include core files
-$cd = dirname(__FILE__) . DS . 'Madeam' . DS;
+$cd = dirname(__FILE__) . DS;
 require $cd . 'Controller.php';
 require $cd . 'Inflector.php';
 require $cd . 'Router.php';
@@ -245,6 +245,11 @@ class Madeam_Framework {
    * undocumented
    */
   public static $pathToEtc          = false;
+  
+  /**
+   * undocumented
+   */
+  public static $pathToTests        = false;
                                     
   /**
    * undocumented 
@@ -280,12 +285,15 @@ class Madeam_Framework {
     
     // set etc path
     self::$pathToEtc      = self::$pathToProject . 'etc' . DS;
+    
+    // set tests path
+    self::$pathToTests    = self::$pathToProject . 'tests' . DS;
 
     // set path to vendor
-    self::$pathToMadeam   = dirname(__FILE__) . DS . 'Madeam' . DS;
+    self::$pathToMadeam   = dirname(__FILE__) . DS;
     
     // return paths for include path
-    return array(self::$pathToApp, self::$pathToLib, self::$pathToMadeam . 'Helper' . DS);
+    return array(self::$pathToApp, self::$pathToLib, self::$pathToMadeam . 'Helpers' . DS, self::$pathToTests);
   }
   
   
@@ -350,11 +358,7 @@ class Madeam_Framework {
   public static function configure($cfg = array()) {
     // include base setup configuration
     if (empty($cfg)) {
-      if (file_exists(self::$pathToApp . 'Config' . DS . 'setup.local.php')) {
-        require self::$pathToApp . 'Config' . DS . 'setup.local.php';
-      } else {
-        require self::$pathToApp . 'Config' . DS . 'setup.php';
-      }
+      require self::$pathToApp . 'Config' . DS . 'setup.php';
     }
 
     // save configuration
@@ -371,15 +375,18 @@ class Madeam_Framework {
     
 		// include routes
 		// check cache for routes
-		if (! Madeam_Router::$routes = Madeam_Cache::read(Madeam::$environment . '.madeam.routes', - 1, Madeam_Config::get('ignore_routes_cache'))) {
+		if (! Madeam_Router::$routes = Madeam_Cache::read(self::$environment . '.madeam.routes', - 1, Madeam_Config::get('ignore_routes_cache'))) {
 		  // include routes configuration
 		  require self::$pathToApp . 'Config' . DS . 'routes.php';
 		
 		  // save routes to cache
 		  if (Madeam_Config::get('ignore_routes_cache') === false) {
-		    Madeam_Cache::save(Madeam::$environment . '.madeam.routes', Madeam_Router::$routes);
+		    Madeam_Cache::save(self::$environment . '.madeam.routes', Madeam_Router::$routes);
 		  }
 		}
+		
+		// set controller's view directory
+		Madeam_Controller::$viewDirectory = Madeam_Framework::$pathToApp . 'View' . DS;
 		
 		/**
 		 * This is messed up. I hate the way PHP handles the $_FILES array when using multidimensional arrays in your HTML forms
@@ -403,7 +410,7 @@ class Madeam_Framework {
     self::$requestParams = array_merge_recursive(self::$requestParams, $_files);
 		
     // make request
-    $output = self::request(self::$requestUri, self::$requestParams, true);
+    $output = self::request(self::$requestUri, self::$requestParams);
     
     // return output
     return $output;
@@ -429,10 +436,15 @@ class Madeam_Framework {
    * @param array $params
    * @return string
    */
-  public static function request($uri, $params = array(), $front = false) {
+  public static function request($uri, $params = array()) {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
-    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, array('_controller' => self::defaultController, '_action' => self::defaultAction, '_format' => self::defaultFormat))); 
+    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, array(
+      '_controller' => self::defaultController,
+      '_action'     => self::defaultAction,
+      '_format'     => self::defaultFormat,
+      '_method'     => 'get',
+    )));
     
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
@@ -475,7 +487,7 @@ class Madeam_Framework {
       } else {
         // no controller or view found = critical error.
         header("HTTP/1.1 404 Not Found");
-        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>php \n class $controllerClass extends Controller_App {\n}</code>"));
+        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n}</code>"));
       }
     }
 
@@ -498,21 +510,40 @@ class Madeam_Framework {
   }
   
   /**
-   * undocumented 
+   * This method returns a clean base uri path.
+   * 
+   * /apache/document_root/website/  => /website/
+   * /apache/document_root/          => /
+   * 
+   * @param $docRoot 
+   * @param $publicPath
    */
   public static function cleanUriPath($docRoot, $publicPath) {
     return '/' . substr(str_replace(DS, '/', substr($publicPath, strlen($docRoot), -strlen(basename($publicPath)))), 0, -1);
   }
   
   /**
-   * undocumented
+   * This method returns a base uri path but includes the "index.php" at the end, hence the dirty part. This is used
+   * for sites that don't have mod_rewrite enabled and required the "index.php" at the end.
+   * 
+   * /apache/document_root/website/  => /website/index.php/
+   * /apache/document_root/          => /index.php/
+   * 
+   * @param $docRoot 
+   * @param $publicPath
    */
   public static function dirtyUriPath($docRoot, $publicPath) {
     return '/' . str_replace(DS, '/', substr(substr($publicPath, strlen($docRoot)), 0, -strlen(DS . basename($publicPath)))) . 'index.php/';
   }
   
   /**
-   * undocumented 
+   * This method returns the relative path to the public directory
+   * 
+   * /apache/document_root/website/  => /website/public/
+   * /apache/document_root/          => /public/
+   * 
+   * @param $docRoot 
+   * @param $publicPath
    */
   public static function relPath($docRoot, $publicPath) {
     return '/' . str_replace(DS, '/', substr($publicPath, strlen($docRoot)));
@@ -558,11 +589,10 @@ class Madeam_Framework {
   
   /**
    * undocumented method
-   *
-   * @author Joshua Davey
    */
   public static function autoload($class) {
   	// set class file name)
+	  //$file = str_replace('_', DS, str_replace('/', DS, $class)) . '.php';
 	  $file = str_replace('_', DS, $class) . '.php';
 	  
 	  // include class file
