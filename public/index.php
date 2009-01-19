@@ -19,7 +19,7 @@
 // use unicode
   if (function_exists('mb_internal_encoding')) { mb_internal_encoding("UTF-8"); }
 
-// uncomment to set content type to utf8
+// content type to utf8
   header('Content-type: text/html; charset=utf-8');
 
 // set default timezone
@@ -58,6 +58,3 @@
   
 // dispatch handles the request and returns the output  
   echo Madeam_Framework::dispatch();
-
-// interesting stuff
-  // foreach (get_included_files() as $file) { isset($x) ? ++$x : $x = 1; echo $x . ' ' . $file . '<br />'; }

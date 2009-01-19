@@ -18,6 +18,7 @@ if (! defined('DS')) {
   define('DS', DIRECTORY_SEPARATOR);
 }
 
+
 // idea... use this as a last resort when all autoloads fail.
 // have this one throw an exception or make a last resort to check every path for the file.
 spl_autoload_register('Madeam_Framework::autoload');
@@ -364,6 +365,9 @@ class Madeam_Framework {
     // save configuration
     Madeam_Config::set($cfg);
     unset($cfg);
+    
+    // set controller's view directory
+		Madeam_Controller::$viewPath = Madeam_Framework::$pathToApp . 'View' . DS;
   }
 
   /**
@@ -384,9 +388,6 @@ class Madeam_Framework {
 		    Madeam_Cache::save(self::$environment . '.madeam.routes', Madeam_Router::$routes);
 		  }
 		}
-		
-		// set controller's view directory
-		Madeam_Controller::$viewDirectory = Madeam_Framework::$pathToApp . 'View' . DS;
 		
 		/**
 		 * This is messed up. I hate the way PHP handles the $_FILES array when using multidimensional arrays in your HTML forms
@@ -446,6 +447,11 @@ class Madeam_Framework {
       '_method'     => 'get',
     )));
     
+    return self::control($params);
+  }
+  
+  
+  public static function control($params) {    
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
     // they should be able to just type in 'admin' because 'index' is the default controller in that
@@ -465,7 +471,7 @@ class Madeam_Framework {
       $node = Madeam_Inflector::camelize($node);
       $node = ucfirst($node);
     }
-
+    
     // set controller class
     $controllerClass = 'Controller_' . implode('_', $controllerClassNodes);
     
@@ -473,12 +479,12 @@ class Madeam_Framework {
       // create controller instance
       $controller = new $controllerClass($params);
     } catch(Madeam_Exception_AutoloadFail $e) {
-      if (is_dir(self::$pathToApp . 'View' . DS . $params['_controller'])) {
+      if (is_dir(Madeam_Controller::$viewPath . $params['_controller'])) {
         $view = $params['_controller'] . '/' . $params['_action'];
         $params['_controller'] = 'app';
         $controller = new Controller_App($params);
         $controller->view($view);
-      } elseif (is_file(self::$pathToApp . 'View' . DS . $params['_controller'] . '.' . $params['_format'])) {
+      } elseif (is_file(Madeam_Controller::$viewPath . $params['_controller'] . DS . $params['_action'] . '.' . $params['_format'])) {
         $view = $params['_controller'];
         $params['_action'] = $params['_controller'];
         $params['_controller'] = 'app';
@@ -494,7 +500,7 @@ class Madeam_Framework {
     try {
       // process request
       $response = $controller->process();
-
+      
       // delete controller
       unset($controller);
 
@@ -508,6 +514,7 @@ class Madeam_Framework {
       Madeam_Exception::catchException($e);
     }
   }
+  
   
   /**
    * This method returns a clean base uri path.
@@ -552,8 +559,8 @@ class Madeam_Framework {
   /**
    * Enter description here...
    *
-   * @param unknown_type $url
-   * @param unknown_type $exit
+   * @param string $url
+   * @param boolean $exit
    */
   public static function redirect($url, $exit = true) {
     if (! headers_sent()) {
@@ -567,10 +574,20 @@ class Madeam_Framework {
   }
 
   /**
-   * Enter description here...
+   * This method is used for creating application urls and external urls.
+   * For the examples below assume the website is located at "apache/htdocs/website/"
+   * 
+   * URL:
+   * posts/show         => /website/posts/show/
+   * 
+   * Relative URL: (beings with /)
+   * /imgs/header.png   => /website/public/imgs/header.png
+   * 
+   * External URL: (beings with a protocol)
+   * http://example.com => http://example.com
    *
    * @param string $url
-   * @return unknown
+   * @return string
    */
   public static function url($url) {
     if ($url == null || $url == '/') {
@@ -587,8 +604,12 @@ class Madeam_Framework {
     return $url;
   }
   
+  
   /**
-   * undocumented method
+   * Madeam's class Autoloader. This method should be used for autoloading by loading it with spl.
+   * Example: spl_autoload_register('Madeam_Framework::autoload');
+   * 
+   * @param string $class
    */
   public static function autoload($class) {
   	// set class file name)

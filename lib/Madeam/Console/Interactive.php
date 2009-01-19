@@ -10,7 +10,7 @@
     
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
   $lib = getcwd() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
-  require file_exists($lib . 'Madeam') ? $lib . 'Madeam.php' : 'Madeam.php';
+  require file_exists($lib . 'Madeam') ? $lib . 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php' : 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php';
   
 // set include paths  
   set_include_path(implode(PATH_SEPARATOR, Madeam_Framework::paths(getcwd() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());

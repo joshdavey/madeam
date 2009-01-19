@@ -34,6 +34,11 @@ class Madeam_Controller {
    * @var unknown_type
    */
   public $_data = array();
+  
+  /**
+   * 
+   */
+  public $_models = array();
 
   /**
    * Enter description here...
@@ -55,10 +60,13 @@ class Madeam_Controller {
    */
   public $_content = null;
   
+  public $params = array();
+  
   /**
    * View directory
    */
-  public static $viewDirectory = null;
+  public static $viewPath = null;
+  
   
   /**
    * Enter description here...
@@ -176,31 +184,47 @@ class Madeam_Controller {
     }
   }
 
+
+  /**
+   * 
+   */
   final public function &__get($name) {
     $match = array();
-    if (preg_match("/^[A-Z]{1}/", $name, $match)) {
+    
+    if (array_key_exists($name, $this->_models)) {
+      return $this->_models[$name];
+    } elseif (preg_match("/^[A-Z]{1}/", $name, $match)) {
       // set model class name
       $modelClassName = 'Model_' . $name;
 
       // create model instance
       $model = new $modelClassName();
-      $this->$name = $model;   
-    } 
+      $this->_models[$name] = $model;
+      return $this->_models[$name];
+    }
     
     if (array_key_exists($name, $this->_data)) {
       return $this->_data[$name];
     } else {
       $this->_data[$name] = null;
-      return $this->_data[$name]; 
+      return $this->_data[$name];
     }
   }
 
+
+  /**
+   * 
+   */
   final public function __set($name, $value) {
     if (!preg_match('/^(?:_[A-Z])/', $name)) {
       $this->_data[$name] = $value;
     }
   }
+
   
+  /**
+   * 
+   */
   final public function __isset($name) {
     if (isset($this->_data[$name])) {
       return true;
@@ -209,10 +233,18 @@ class Madeam_Controller {
     }
   }
   
+  
+  /**
+   * 
+   */
   final public function __unset($name) {
     unset($this->_data[$name]);
   }
   
+  
+  /**
+   * 
+   */
   final public function process() {
 
     $output = null;
@@ -240,7 +272,7 @@ class Madeam_Controller {
     	  exit('Invalid Action Characters');
     	}
     } else {
-      if (!file_exists(Madeam_Controller::$viewDirectory . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'])) {
+      if (!file_exists(Madeam_Controller::$viewPath . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'])) {
         throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
         . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . substr($action, 0, -6) . ".html</strong> OR Create a method called <strong>$action</strong> in <strong>" . get_class($this) . "</strong> class."
         . " \n <code>public function $action() {\n\n}</code>");
@@ -262,53 +294,7 @@ class Madeam_Controller {
     return $output;
   }
   
-  final public function action($action, $front = false) {
-
-    $output = null;
-    
-    // beforeFilter callbacks
-    $this->callback('beforeFilter');
-    
-    // action
-    $action = Madeam_Inflector::camelize($action) . 'Action';
-    
-    $params = array();
-    // check to see if method/action exists
-    if (isset($this->_setup[$action])) {      
-      foreach ($this->_setup[$action] as $param => $value) {
-      	if (isset($this->params[$param])) {
-      		$params[] = "\$this->params['$param']";
-      	} else {
-      		$params[] = "\$this->_setup['$action']['$param']";
-      	}
-      }
-      
-      if (preg_match('/[a-zA-Z_]*/', $action)) {
-      	eval('$output = $this->' . $action . "(" . implode(',', $params) . ");");
-    	} else {
-    	  exit('Invalid Action Characters');
-    	}
-    } else {
-      throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
-      . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . substr($action, 0, -6) . ".html</strong> OR Create a method called <strong>$action</strong> in <strong>" . get_class($this) . "</strong> class."
-      . " \n <code>public function $action() {\n\n}</code>");
-    }
-    
-    // render
-    if ($output == null) {
-    	// beforeRender callbacks
-      $this->callback('beforeRender');
-    	
-      $output = $this->render(array('view' => $this->_view, 'layout' => $this->_layout, 'data' => $this->_data));
-    }
-    
-    // afterRender callbacks
-    $this->callback('afterRender');
-
-    // return response
-    return $output;
-  }
-
+  
   /**
    * Enter description here...
    *
@@ -325,6 +311,7 @@ class Madeam_Controller {
     }
   }
 
+
   /**
    * Enter description here...
    *
@@ -334,6 +321,7 @@ class Madeam_Controller {
     $this->_view = $view;
     return $this->_view;
   }
+
 
   /**
    * Enter description here...
@@ -356,6 +344,7 @@ class Madeam_Controller {
     return $this->_layout;
   }
 
+
   /**
    * 
    */
@@ -373,13 +362,27 @@ class Madeam_Controller {
       $settings['layout'] = $this->_layout;
     }
     
+    if (!is_array($settings['layout'])) {
+      $settings['layout'] = $this->layout($settings['layout']);
+    }
+    
+    
+    if (isset($settings['action'])) {
+      $params = $this->params;
+      $params['_action']      = $settings['action'];
+      $params['_controller']  = $settings['controller'];
+      
+      return Madeam_Framework::control($params);
+    }
+    
+    
     // set the view file path
     if (isset($settings['partial'])) {
       $partial = explode('/', $settings['partial']);
       $partialName = array_pop($partial);
-      $view = Madeam_Controller::$viewDirectory . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
+      $view = Madeam_Controller::$viewPath . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
     } else {
-      $view = Madeam_Controller::$viewDirectory . str_replace('/', DS, low($settings['view'])) . '.' . $this->params['_format'];
+      $view = Madeam_Controller::$viewPath . str_replace('/', DS, low($settings['view'])) . '.' . $this->params['_format'];
     }
     
     if (!isset($settings['data'])) {
@@ -390,7 +393,8 @@ class Madeam_Controller {
     // if the view doesn't exist we need to serialize it.
     if (file_exists($view)) {
       // extract data to view and layout
-      extract($settings['data']);
+      //extract(array_merge($settings['data'], array('params' => $this->params)));
+      extract(array_merge($settings['data'], (array) $this));
       
       // render view's content
       ob_start();
@@ -401,7 +405,7 @@ class Madeam_Controller {
       // apply layout to view's content
       if (!isset($settings['partial']) && $settings['layout'] !== false && isset($settings['layout'])) {
         foreach ($settings['layout'] as $_layout) {
-          $_layout = Madeam_Controller::$viewDirectory . $_layout . '.layout.' . $this->params['_format'];
+          $_layout = Madeam_Controller::$viewPath . $_layout . '.layout.' . $this->params['_format'];
           
           // render layouts with builder
           ob_start();
@@ -416,7 +420,7 @@ class Madeam_Controller {
       if (method_exists('Madeam_Serialize', $_serializeMethod)) {
         $_content = Madeam_Serialize::$_serializeMethod($settings['data']);
       } else {
-        throw new Madeam_Controller_Exception('Unknown serialization format "<strong>' . $this->params['_format'] . '</strong>"' . "\n Create a new view: " . $view);
+        throw new Madeam_Controller_Exception('Missing View: ' . $view . "\n Unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create a new view: " . $view);
       }
     }
     

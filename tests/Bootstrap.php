@@ -28,5 +28,18 @@
   define('TESTS_MADEAM_PUBLIC_DIRECTORY', $publicDirectory);
   define('TESTS_MADEAM_DOCUMENT_ROOT', dirname(dirname(TESTS_MADEAM_PUBLIC_DIRECTORY)));
 
+// configure Madeam paths
+  Madeam_Framework::paths(TESTS_MADEAM_PUBLIC_DIRECTORY);
+  
+  Madeam_Framework::$pathToApp = realpath('tests/Madeam/_application/app') . DS;
+  
+  Madeam_Controller::$viewPath = Madeam_Framework::$pathToApp . 'View' . DS;
+  
+  $paths = array(
+    Madeam_Framework::$pathToApp,
+    Madeam_Framework::$pathToLib,
+    Madeam_Framework::$pathToTests
+  );
+
 // set include path
-  set_include_path(implode(PATH_SEPARATOR, Madeam_Framework::paths(TESTS_MADEAM_PUBLIC_DIRECTORY)) . PATH_SEPARATOR . get_include_path());
+  set_include_path(implode(PATH_SEPARATOR, $paths) . PATH_SEPARATOR . get_include_path());
