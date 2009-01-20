@@ -1,7 +1,7 @@
 <?php
 require_once 'Bootstrap.php';
 
-class MadeamTest extends PHPUnit_Framework_TestCase {
+class Madeam_FrameworkTest extends PHPUnit_Framework_TestCase {
   
   protected $server;
   protected $params;

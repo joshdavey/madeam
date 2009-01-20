@@ -133,6 +133,10 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   
   /**
    * 
+   *  public function dataAction() {
+   *    $this->data = 'True';
+   *  }
+   * 
    * <File tests/data.html>
    * Data is <?php echo $data; ?>
    * </File>
@@ -144,6 +148,10 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   
   /**
    * 
+   *  public function viewAction() {
+   *    
+   *  }
+   * 
    * <File tests/view.html>
    * View
    * </File>
@@ -151,6 +159,122 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   public function testRenderControllerAction() {
     $return = $this->controller->render(array('action' => 'view', 'controller' => 'tests'));
     $this->assertEquals('View', $return);
+  }
+  
+  /**
+   *  
+   * 
+   *  public function excludeAction() {
+   *    if ($this->exclude == 'False' && $this->include == 'False') {
+   *      return 'True';
+   *    } else {
+   *      return 'False';
+   *    }
+   *  }
+   */
+  public function testCallbackDataWhenExcludingActions() {
+    $params = array(
+      '_controller' => 'tests',
+      '_action'     => 'exclude',
+      '_format'     => 'html',
+      '_method'     => 'get',
+      '_ajax'       => 0,
+      '_layout'     => 1
+    );
+    
+    $controller = new Controller_Tests($params);
+    $return = $controller->process();
+    $this->assertEquals('True', $return);
+  }
+  
+  /**
+   *  
+   * 
+   *  public function includeAction() {
+   *    if ($this->exclude == 'True' && $this->include == 'True') {
+   *      return 'True';
+   *    } else {
+   *      return 'False';
+   *    }
+   *  }
+   */
+  public function testCallbackDataWhenIncludingActions() {
+    $params = array(
+      '_controller' => 'tests',
+      '_action'     => 'include',
+      '_format'     => 'html',
+      '_method'     => 'get',
+      '_ajax'       => 0,
+      '_layout'     => 1
+    );
+    
+    $controller = new Controller_Tests($params);
+    $return = $controller->process();
+    $this->assertEquals('True', $return);
+  }
+  
+  /**
+   * 
+   *  public function serializeAction() {
+   * 
+   *  }
+   */
+  public function testSerializationWhenMissingView() {
+    $this->params['_action'] = 'serialize';
+    $this->params['_format'] = 'json';
+    
+    $controller = new Controller_Tests($this->params);
+    $return = $controller->process();
+    $this->assertEquals('{"data":"True"}', $return);
+  }
+  
+  /**
+   * 
+   *  public function serializeAction() {
+   * 
+   *  }
+   */
+  public function testPredefinedClassParametersAreNotSerialized() {
+    $this->params['_action'] = 'serialize';
+    $this->params['_format'] = 'json';
+    
+    $controller = new Controller_Tests($this->params);
+    $return = $controller->process();
+    $this->assertEquals('{"data":"True"}', $return);
+  }
+  
+  /**
+   * 
+   *  public function modelAction() {
+   *    $this->Test->findAll();
+   *  }
+   */
+  public function testModelsAreNotSerialized() {
+    $this->params['_action'] = 'model';
+    $this->params['_format'] = 'json';
+    
+    $controller = new Controller_Tests($this->params);
+    $return = $controller->process();
+    $this->assertEquals('[]', $return);
+  }
+  
+  /**
+   * 
+   *  public function modelAction() {
+   *    $this->Test->findAll();
+   *  }
+   */
+  public function testModelsAreBeingStoredWhenInitialized() {
+    $this->params['_action'] = 'model';
+    
+    $controller = new Controller_Tests($this->params);
+    $controller->process();
+    
+    if (isset($controller->_models['Test'])) {
+      $this->assertTrue(true);
+    } else {
+      $this->fail('The model should be stored in the _models property when initialized');
+    }
   }
   
 }
