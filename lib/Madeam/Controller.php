@@ -75,7 +75,6 @@ class Madeam_Controller {
    * @author Joshua Davey
    */
   final public function __construct($params) {
-    
     // check for expected params
     $diff = array_diff(array('_controller', '_action', '_format', '_layout', '_method'), array_keys($params));
     if (!empty($diff)) {
