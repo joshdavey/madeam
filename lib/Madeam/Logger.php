@@ -1,4 +1,9 @@
 <?php
+
+if (Madeam_Logger::$path === false) {
+  Madeam_Logger::$path  = Madeam_Framework::$pathToEtc . 'log' . DS;
+}
+
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -19,7 +24,6 @@ class Madeam_Logger {
   public static $path = false;
   
   public static $fileName = 'Y-m';
-
 
   /**
    * Stores this registry's instance

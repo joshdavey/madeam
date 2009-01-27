@@ -13,7 +13,7 @@ switch (Madeam_Framework::$environment) {
     $cfg['ignore_inline_cache']       = true;
     $cfg['enable_debug']              = true;
     $cfg['enable_logger']             = true;
-    $cfg['inline_errors']             = false;
+    $cfg['inline_errors']             = true;
     break;
   case 'testing' :
     $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_testing';
@@ -40,15 +40,17 @@ switch (Madeam_Framework::$environment) {
     break;
 }
 
+Madeam_Config::set('Madeam_Model', array());
 
 /**
  * Configure Cache
  */
 Madeam_Cache::$path   = Madeam_Framework::$pathToEtc . 'cache' . DS;
 
-/**
- * Configure Logger
- */
-Madeam_Logger::$path  = Madeam_Framework::$pathToEtc . 'log' . DS;
-Madeam_Logger::$fileName = 'Y-m-d';
 
+/*
+// config idea...
+Madeam_Config::set('Madeam_Model', array(
+  'connections' => 'mysql://username:password@localhost?name=madeam_development'
+));
+*/

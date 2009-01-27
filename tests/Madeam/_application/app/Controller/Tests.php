@@ -61,7 +61,6 @@ class Controller_Tests extends Madeam_Controller {
   
   public function modelAction() {
     $this->Test->findAll();
-    $this->Test->findAll();
   }
   
 }

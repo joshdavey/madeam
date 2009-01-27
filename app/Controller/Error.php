@@ -2,7 +2,7 @@
 class Controller_Error extends Madeam_Controller {
 
   public $_layout = 'error';
-
+  
   public function debugAction() {    
     $this->layout('debug');
     $this->title = 'Debugging';

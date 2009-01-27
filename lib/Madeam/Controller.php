@@ -24,46 +24,46 @@ class Madeam_Controller {
   /**
    * Enter description here...
    *
-   * @var unknown_type
+   * @var string
    */
   public $_view = null;
 
   /**
    * Enter description here...
    *
-   * @var unknown_type
+   * @var array
    */
   public $_data = array();
   
   /**
    * 
+   * @var array
    */
   public $_models = array();
 
   /**
    * Enter description here...
    *
-   * @var unknown_type
-   */
-  public $_represent = false;
-
-  /**
-   * Enter description here...
-   *
-   * @var unknown_type
+   * @var array
    */
   public $_setup = array();
   
   /**
    * This holds the view's final output's content so that it can be included into a layout
    * for example: <?php echo $this->_content; ?>
+   * @var string
    */
   public $_content = null;
   
+  /**
+   * Request parameters
+   * @var array
+   */
   public $params = array();
   
   /**
    * View directory
+   * @var string
    */
   public static $viewPath = null;
   
@@ -71,12 +71,13 @@ class Madeam_Controller {
   /**
    * Enter description here...
    *
-   * @param unknown_type $params
+   * @param array $params
+   * @author Joshua Davey
    */
   final public function __construct($params) {
     
     // check for expected params
-    $diff = array_diff(array('_controller', '_action', '_format', '_layout', '_ajax', '_method'), array_keys($params));
+    $diff = array_diff(array('_controller', '_action', '_format', '_layout', '_method'), array_keys($params));
     if (!empty($diff)) {
       throw new Madeam_Controller_Exception_MissingExpectedParam('Missing expected Request Parameter(s): ' . implode(', ', $diff));
     }
@@ -87,14 +88,6 @@ class Madeam_Controller {
     if (isset($params['_flash'])) {
       $this->flash = $params['_flash'];
       unset($params['_flash']);
-    }
-    
-    // set resource the controller represents
-    if (is_string($this->_represent)) {
-      $this->_represent = Madeam_Inflector::modelNameize($this->_represent);
-    } else {
-      $represent = explode('/', $this->params['_controller']);
-      $this->_represent = Madeam_Inflector::modelNameize(array_pop($represent));
     }
     
     // set view
@@ -158,22 +151,6 @@ class Madeam_Controller {
         }
       }
       
-      // idea -- all protected properties load controller components by name.
-      /*
-      $properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
-      foreach ($properties as $property) {
-        test($property->getName());
-        
-        // set component class name
-        $componentClassName = 'Madeam_Controller_Component_' . $name;
-
-        // create component instance
-        $component = new $componentClassName($this);
-        $this->$name = $component;
-        return $component;
-      }
-      */
-      
       // save cache
       if (Madeam_Config::get('ignore_controllers_cache') === false) {
         Madeam_Cache::save($cacheName, $this->_setup, true);
@@ -187,6 +164,8 @@ class Madeam_Controller {
 
   /**
    * 
+   * @param string $name
+   * @author Joshua Davey
    */
   final public function &__get($name) {
     $match = array();
@@ -214,6 +193,9 @@ class Madeam_Controller {
 
   /**
    * 
+   * @param string $name
+   * @param string $value
+   * @author Joshua Davey
    */
   final public function __set($name, $value) {
     if (!preg_match('/^(?:_[A-Z])/', $name)) {
@@ -224,6 +206,8 @@ class Madeam_Controller {
   
   /**
    * 
+   * @param string $name
+   * @author Joshua Davey
    */
   final public function __isset($name) {
     if (isset($this->_data[$name])) {
@@ -236,6 +220,8 @@ class Madeam_Controller {
   
   /**
    * 
+   * @param string $name
+   * @author Joshua Davey
    */
   final public function __unset($name) {
     unset($this->_data[$name]);
@@ -244,6 +230,7 @@ class Madeam_Controller {
   
   /**
    * 
+   * @author Joshua Davey
    */
   final public function process() {
 
@@ -257,7 +244,7 @@ class Madeam_Controller {
     
     $params = array();
     // check to see if method/action exists
-    if (isset($this->_setup[$action])) {      
+    if (isset($this->_setup[$action])) {
       foreach ($this->_setup[$action] as $param => $value) {
       	if (isset($this->params[$param])) {
       		$params[] = "\$this->params['$param']";
@@ -299,6 +286,7 @@ class Madeam_Controller {
    * Enter description here...
    *
    * @param string $name
+   * @author Joshua Davey
    */
   final public function callback($name) {
     foreach ($this->_setup[$name] as $callback) {
@@ -316,6 +304,7 @@ class Madeam_Controller {
    * Enter description here...
    *
    * @param string $view
+   * @author Joshua Davey
    */
   final public function view($view) {
     $this->_view = $view;
@@ -327,6 +316,7 @@ class Madeam_Controller {
    * Enter description here...
    *
    * @param string/array $layouts
+   * @author Joshua Davey
    */
   final public function layout($layouts) {
     $this->_layout = array();
@@ -347,6 +337,7 @@ class Madeam_Controller {
 
   /**
    * 
+   * @author Joshua Davey
    */
   final public function render($settings) {
     

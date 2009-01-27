@@ -25,7 +25,12 @@ class Madeam_Exception extends Exception {
   	"the tech bubble burst! Run, save yourself!",
   	"is this your idea of web 3.0?",
   	"the Quality Assurance team is unimpressed.",
-  	"maybe you should consider a new profession?"
+  	"maybe you should consider a new profession?",
+  	"oopsy",
+  	"overated PHP software?",
+  	'is this a candidate for <a href="http://thedailywtf.com">The Daily WTF</a>?',
+  	'click "OK" to continue.',
+  	"this looks ready to launch. /sarcasm"
   );
 
   /**
@@ -91,12 +96,35 @@ class Madeam_Exception extends Exception {
     if (Madeam_Config::get('enable_debug') == true) {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
+      
       // call error controller and pass information
-      echo Madeam_Framework::request(Madeam_Framework::errorController . '/debug?error=' . urlencode(nl2br($message)) . '&backtrace=' . urlencode($e->getTraceAsString()) . '&snippet=' . urlencode($snippet) . '&line=' . urlencode($line) . '&code=' . urlencode($code) . '&file=' . urlencode($file) . '&documentation=' . 'comingsoong&_layout=1');
+      $params = array(
+        '_controller' => Madeam_Framework::errorController, 
+        '_action'     => 'debug',
+        '_method'     => 'get',
+        '_layout'     => 1,
+        '_format'     => 'html',
+        'error'       => nl2br($message),
+        'backtrace'   => $e->getTraceAsString(),
+        'snippet'     => $snippet,
+        'line'        => $line,
+        'code'        => $code,
+        'file'        => $file
+      );
+      
+      echo Madeam_Framework::control($params);
       exit();
     } else {
       // return 404 error page
-      echo Madeam_Framework::request(Madeam_Framework::errorController . '/http404?_layout=1');
+      $params = array(
+        '_controller' => Madeam_Framework::errorController, 
+        '_action'     => 'http404',
+        '_method'     => 'get',
+        '_layout'     => 1,
+        '_format'     => 'html'
+      );
+      
+      echo Madeam_Framework::control($params);
       exit();
     }
   }

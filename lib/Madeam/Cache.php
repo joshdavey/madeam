@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -12,6 +11,7 @@
  * @link				http://www.madeam.com
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @author      Joshua Davey
  */
 class Madeam_Cache {
 
@@ -22,11 +22,12 @@ class Madeam_Cache {
   /**
    * Enter description here...
    *
-   * @param unknown_type $id
-   * @param unknown_type $life_time
+   * @param string $id
+   * @param int $lifeTime
    * @return unknown
+   * @author Joshua Davey
    */
-  public static function read($id, $life_time = 0, $ignore = false) {
+  public static function read($id, $lifeTime = 0, $ignore = false) {
     
     if ($ignore === true) { return false; }
     
@@ -38,7 +39,7 @@ class Madeam_Cache {
     // set file name
     $file = self::$path . $id;
     if (file_exists($file)) {
-      if ((time() - filemtime($file)) <= $life_time || $life_time == - 1) {
+      if ((time() - filemtime($file)) <= $lifeTime || $lifeTime == - 1) {
         // get cache from file and unserialize
         return unserialize(file_get_contents($file));
       } else {
@@ -52,14 +53,15 @@ class Madeam_Cache {
   /**
    * Enter description here...
    *
-   * @param unknown_type $id
-   * @param unknown_type $value
-   * @param unknown_type $store_in_registry
+   * @param string $id
+   * @param string $value
+   * @param boolean $storeInRegistry
    * @return unknown
+   * @author Joshua Davey
    */
-  public static function save($id, $value, $store_in_registry = false) {
+  public static function save($id, $value, $storeInRegistry = false) {
     // store in registry
-    if ($store_in_registry === true) {
+    if ($storeInRegistry === true) {
       Madeam_Registry::set($id, $value);
     }
 
@@ -73,17 +75,18 @@ class Madeam_Cache {
   /**
    * Enter description here...
    *
-   * @param unknown_type $id
-   * @param unknown_type $life_time
+   * @param string $id
+   * @param int $lifeTime
    * @return unknown
+   * @author Joshua Davey
    */
-  public static function start($id, $life_time = 0) {
+  public static function start($id, $lifeTime = 0) {
     // check if inline cache is enabled
     if (Madeam_Config::get('cache_inline') === false) {
       return false;
     }
 
-    if (! $cache = self::read($id, $life_time)) {
+    if (! $cache = self::read($id, $lifeTime)) {
       ob_start();
       self::$openCaches[] = $id;
       return false;
@@ -97,6 +100,7 @@ class Madeam_Cache {
    * Enter description here...
    *
    * @return unknown
+   * @author Joshua Davey
    */
   public static function stop() {
     // check if inline cache is enabled
@@ -115,7 +119,8 @@ class Madeam_Cache {
   /**
    * Enter description here...
    *
-   * @param unknown_type $id
+   * @param string $id
+   * @author Joshua Davey
    */
   public static function clear($id) {
     // set file name
@@ -130,6 +135,7 @@ class Madeam_Cache {
    *
    * @param string $id
    * @return boolean
+   * @author Joshua Davey
    */
   public static function check($id) {
     // check registry first

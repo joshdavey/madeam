@@ -1,5 +1,4 @@
 <?php
-
 require_once 'Bootstrap.php';
 
 class Madeam_AllTests {
@@ -14,6 +13,8 @@ class Madeam_AllTests {
     $suite->addTestSuite('Madeam_FrameworkTest');
     $suite->addTestSuite('Madeam_EnvironmentTest');
     $suite->addTestSuite('Madeam_ControllerTest');
+    $suite->addTestSuite('Madeam_RouterTest');
+    $suite->addTestSuite('Madeam_InflectorTest');
     $suite->addTestSuite('Madeam_ModelTest');
     $suite->addTestSuite('Madeam_Model_ActiveRecordTest');
 

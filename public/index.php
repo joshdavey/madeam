@@ -58,3 +58,6 @@
   
 // dispatch handles the request and returns the output  
   echo Madeam_Framework::dispatch();
+  
+  
+  //foreach (get_included_files() as $file) { isset($x) ? ++$x : $x = 1; echo $x . ' ' . $file . '<br />'; }

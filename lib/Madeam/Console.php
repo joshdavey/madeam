@@ -12,10 +12,15 @@
  * @link				http://www.madeam.com
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @author      Joshua Davey
  */
 class Madeam_Console {
 
-
+  /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */
   public function __construct($params = array()) {
     array_shift($params); // remove script path
     
@@ -68,6 +73,11 @@ class Madeam_Console {
     $console->$method($params);
   }
 
+  /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */
   public function initialize2() {      
     array_shift($_SERVER['argv']);
     $args         = $_SERVER['argv'];
@@ -153,6 +163,11 @@ class Madeam_Console {
     $args = array();
   }
 
+  /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */
   protected function parseArguments($commandNames) {
     $params = array();
     foreach ($commandNames as $commandName) {
@@ -164,6 +179,11 @@ class Madeam_Console {
     return $params;
   }
 
+  /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */
   protected function createFile($file_name, $file_path, $file_content) {
     if (substr($file_path, - 1) !== DS) {
       $file_path = $file_path . DS;

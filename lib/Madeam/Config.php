@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -12,11 +11,23 @@
  * @link				http://www.madeam.com
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @author      Joshua Davey
  */
 class Madeam_Config {
 
+  /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */  
   public static $heap;
 
+  /**
+   * undocumented function
+   *
+   * @return void
+   * @author Joshua Davey
+   */  
   public static function set() {
     if (func_num_args() == 2) {
       self::$heap[func_get_arg(0)] = func_get_arg(1);
@@ -25,7 +36,30 @@ class Madeam_Config {
     }
   }
 
+  /**
+   * undocumented function
+   *
+   * @param string $name 
+   * @return void
+   * @author Joshua Davey
+   */  
   public static function get($name) {
     return self::$heap[$name];
   }
+  
+  /**
+   * undocumented function
+   *
+   * @param string $name 
+   * @return void
+   * @author Joshua Davey
+   */  
+  public static function exists($name) {
+    if (isset(self::$heap[$name])) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
 }

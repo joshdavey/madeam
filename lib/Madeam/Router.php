@@ -32,6 +32,7 @@ class Madeam_Router {
    *
    * @param string $route
    * @param array $params
+   * @author Joshua Davey
    */
   public static function connect($route, $params = array(), $rules = array()) {
     if (! is_array(self::$routes)) {
@@ -94,6 +95,7 @@ class Madeam_Router {
    *
    * @param string $uri
    * @return array
+   * @author Joshua Davey
    */
   public static function parse($uri = false, $baseUri, $defaults) {
     // makes sure the first character is "/"
@@ -167,25 +169,18 @@ class Madeam_Router {
     
     if ($matchs == 0) {
       // this is lame and needs to be done better
-      header("HTTP/1.1 404 Not Found");
+      //header("HTTP/1.1 404 Not Found");
       //ob_clean();
-      throw new Madeam_Exception('Router: Unable to find page');
+      throw new Madeam_Exception('Unable to find page');
       // but what about returning the params if we throw an error?
       return $params;
     }
 
     // get params from uri
-    $params = array_merge($defaults, $params, $get);        
-    
-    // check if this is an ajax call
-    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
-      $params['_ajax'] = 1;
-    } else {
-    	$params['_ajax']	= 0;
-    }    
+    $params = array_merge($defaults, $params, $get);
   	
   	// automagically disable the layout when making an AJAX call
-    if (!isset($params['_layout']) && $params['_ajax'] == 1) {
+    if (!isset($params['_layout']) && isset($params['_ajax']) && $params['_ajax'] == 1) {
       $params['_layout'] = 0;
     } elseif (!isset($params['_layout'])) {
     	$params['_layout'] = 1;

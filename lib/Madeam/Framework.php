@@ -18,10 +18,16 @@ if (! defined('DS')) {
   define('DS', DIRECTORY_SEPARATOR);
 }
 
+// .php should be first
+spl_autoload_extensions('.php,.inc');
 
 // idea... use this as a last resort when all autoloads fail.
 // have this one throw an exception or make a last resort to check every path for the file.
 spl_autoload_register('Madeam_Framework::autoload');
+
+// move the autoload fail logic into it's own function so that we don't need to do checks
+// every time we attempt to load a file.
+spl_autoload_register('Madeam_Framework::autoloadFail');
 
 /**
  * Set exception handler
@@ -146,7 +152,6 @@ require $cd . 'Router.php';
 require $cd . 'Config.php';
 require $cd . 'Cache.php';
 require $cd . 'Registry.php';
-require $cd . 'Logger.php';
 
 
 /**
@@ -265,11 +270,12 @@ class Madeam_Framework {
   
   /**
    * This method defines all the absolute file paths to all the important
-   * Madeam directories.
+   * Madeam application directories.
    * It returns the file paths that should be added to the include_path.
    * 
    * @param string $publicDirectory -- absolute path to the public directory
    * @return array -- list of all paths to be added to the include_path
+   * @author Joshua Davey
    */
   public static function paths($publicDirectory) {
     // set public directory path
@@ -300,6 +306,7 @@ class Madeam_Framework {
   
   /**
    * 
+   * @author Joshua Davey
    */
   public static function setup($environment, $params, $server) {    
     // check for expected server parameters
@@ -349,12 +356,20 @@ class Madeam_Framework {
       self::$requestParams['_method'] = low($server['REQUEST_METHOD']);
     }
     
+    // check if this is an ajax call
+    if (isset($server['HTTP_X_REQUESTED_WITH']) && $server['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+      self::$requestParams['_ajax'] = 1;
+    } else {
+    	self::$requestParams['_ajax']	= 0;
+    }
+    
     // configure Madeam
     self::configure();
   }
 
   /**
    * undocumented 
+   * @author Joshua Davey
    */
   public static function configure($cfg = array()) {
     // include base setup configuration
@@ -374,6 +389,7 @@ class Madeam_Framework {
    * dispatches all operations to controller specified by uri
    *
    * @return boolean
+   * @author Joshua Davey
    */
   public static function dispatch() {
     
@@ -436,6 +452,7 @@ class Madeam_Framework {
    * @param string $uri -- example: controller/action/32?foo=bar
    * @param array $params
    * @return string
+   * @author Joshua Davey
    */
   public static function request($uri, $params = array()) {
     // get request parameters from uri and merge them with other params
@@ -443,14 +460,18 @@ class Madeam_Framework {
     $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, array(
       '_controller' => self::defaultController,
       '_action'     => self::defaultAction,
-      '_format'     => self::defaultFormat,
-      '_method'     => 'get',
+      '_format'     => self::defaultFormat
     )));
     
     return self::control($params);
   }
   
   
+  /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */
   public static function control($params) {    
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
@@ -476,7 +497,6 @@ class Madeam_Framework {
     $controllerClass = 'Controller_' . implode('_', $controllerClassNodes);
     
     try {
-      // create controller instance
       $controller = new $controllerClass($params);
     } catch(Madeam_Exception_AutoloadFail $e) {
       if (is_dir(Madeam_Controller::$viewPath . $params['_controller'])) {
@@ -524,6 +544,7 @@ class Madeam_Framework {
    * 
    * @param $docRoot 
    * @param $publicPath
+   * @author Joshua Davey
    */
   public static function cleanUriPath($docRoot, $publicPath) {
     return '/' . substr(str_replace(DS, '/', substr($publicPath, strlen($docRoot), -strlen(basename($publicPath)))), 0, -1);
@@ -538,6 +559,7 @@ class Madeam_Framework {
    * 
    * @param $docRoot 
    * @param $publicPath
+   * @author Joshua Davey
    */
   public static function dirtyUriPath($docRoot, $publicPath) {
     return '/' . str_replace(DS, '/', substr(substr($publicPath, strlen($docRoot)), 0, -strlen(DS . basename($publicPath)))) . 'index.php/';
@@ -551,6 +573,7 @@ class Madeam_Framework {
    * 
    * @param $docRoot 
    * @param $publicPath
+   * @author Joshua Davey
    */
   public static function relPath($docRoot, $publicPath) {
     return '/' . str_replace(DS, '/', substr($publicPath, strlen($docRoot)));
@@ -561,6 +584,7 @@ class Madeam_Framework {
    *
    * @param string $url
    * @param boolean $exit
+   * @author Joshua Davey
    */
   public static function redirect($url, $exit = true) {
     if (! headers_sent()) {
@@ -588,6 +612,7 @@ class Madeam_Framework {
    *
    * @param string $url
    * @return string
+   * @author Joshua Davey
    */
   public static function url($url) {
     if ($url == null || $url == '/') {
@@ -610,18 +635,33 @@ class Madeam_Framework {
    * Example: spl_autoload_register('Madeam_Framework::autoload');
    * 
    * @param string $class
+   * @author Joshua Davey
    */
   public static function autoload($class) {
   	// set class file name)
-	  //$file = str_replace('_', DS, str_replace('/', DS, $class)) . '.php';
+	  //$file = str_replace('_', DS, str_replace('/', DS, $class)) . '.php'; // PHP 5.3
 	  $file = str_replace('_', DS, $class) . '.php';
-	  
+    
+    // checks all the include paths to see if the file exist and then returns a
+    // full path to the file or false
+	  $file = fileLives($file);
+
 	  // include class file
-	  if (is_string(fileLives($file))) {
+	  if (is_string($file)) {
 	    require $file;
-	  }
-	
-	  if (! class_exists($class, false) && ! interface_exists($class, false)) {
+	  }	  
+  }
+  
+
+  /**
+   * Catch all failed attempts at finding a class. By putting this logic in it's own function
+   * instead of in the other autoload functions we save time but not having to check to see
+   * if the class or interface exists
+   *
+   * @author Joshua Davey
+   */
+  public static function autoloadFail($class) {
+    if (! class_exists($class, false) && ! interface_exists($class, false)) {
 	    $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
 	    eval("class $class {}");
 	    throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);

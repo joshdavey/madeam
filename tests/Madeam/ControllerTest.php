@@ -1,5 +1,5 @@
 <?php
-require_once 'Bootstrap.php';
+require_once 'tests' . DIRECTORY_SEPARATOR . 'Bootstrap.php';
 
 class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   
@@ -28,6 +28,8 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
       '_ajax'       => 0
     );
     
+    Madeam_Controller::$viewPath = TESTS_MADEAM_APP_DIRECTORY . 'View' . DIRECTORY_SEPARATOR;
+    
     // create controller instance
     $this->controller = new Controller_Tests($this->params);
   }
@@ -36,6 +38,10 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
    * 
    */
   public function tearDown() {
+    // reset view path
+    Madeam_Controller::$viewPath = false;
+    
+    // reset controller
     unset($this->controller);
   }
   
@@ -216,7 +222,7 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   /**
    * 
    *  public function serializeAction() {
-   * 
+   *    $this->data = 'True';
    *  }
    */
   public function testSerializationWhenMissingView() {
@@ -231,7 +237,7 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   /**
    * 
    *  public function serializeAction() {
-   * 
+   *    $this->data = 'True';
    *  }
    */
   public function testPredefinedClassParametersAreNotSerialized() {

@@ -1,5 +1,10 @@
 <?php
 
+// configure class
+if (Madeam_Config::exists('Madeam_Model_ActiveRecord')) {
+  Madeam_Model_ActiveRecord::configure(Madeam_Config::get('Madeam_Model_ActiveRecord'));
+}
+
 /**
  * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
  * Copyright (c)	2006, Joshua Davey
@@ -14,6 +19,11 @@
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Model_ActiveRecord extends Madeam_Model {
+
+
+  public static function _configure($config) {
+    
+  }
 
   /**
    * Represents a single row
@@ -167,15 +177,10 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
 
       // link
       $count = self::$_pdo[$this->_server]->exec($sql);
-
     } catch (PDOException $e) {
-      if (Madeam_Config::get('enable_debug') == true) {
-        $trace = $e->getTrace();
-        $error = self::$_pdo[$this->_server]->errorInfo();
-        Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[2]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
-      } else {
-        return 0;
-      }
+      $trace = $e->getTrace();
+      $error = self::$_pdo[$this->_server]->errorInfo();
+      Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[2]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
     }
 
     return $count;

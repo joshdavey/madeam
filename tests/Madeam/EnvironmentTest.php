@@ -1,5 +1,5 @@
 <?php
-require_once 'Bootstrap.php';
+require_once 'tests' . DIRECTORY_SEPARATOR . 'Bootstrap.php';
 
 class Madeam_EnvironmentTest extends PHPUnit_Framework_TestCase {
  
