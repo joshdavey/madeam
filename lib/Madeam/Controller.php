@@ -129,11 +129,11 @@ class Madeam_Controller {
       foreach ($methods as $method) {
         $matches = array();
         if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {
-					// callback properties (name, include, exclude)
-	        $callback = array();
-	
-	        // set callback method name
-	        $callback['name'] = $method->getName();
+          // callback properties (name, include, exclude)
+          $callback = array();
+          
+          // set callback method name
+          $callback['name'] = $method->getName();
 
           $parameters = $method->getParameters();
           foreach ($parameters as $parameter) {
@@ -144,18 +144,18 @@ class Madeam_Controller {
           $this->_setup[$matches[1]][] = $callback;
           
         } elseif (preg_match('/^[a-zA-Z0-9]*Action?/', $method->getName(), $matches)) {
-        	// for each action we save it's arguments and map them to http params
-        	
-        	$action = array();
-        	
+          // for each action we save it's arguments and map them to http params
+          
+          $action = array();
+          
           $parameters = $method->getParameters();
           foreach ($parameters as $parameter) {
             // set parameters of callback (parameters in methods act as meta data for callbacks)
             if ($parameter->isDefaultValueAvailable()) {
-            	$action[$parameter->getName()] = $parameter->getDefaultValue();
-          	} else {
-          		$action[$parameter->getName()] = null;
-          	}
+              $action[$parameter->getName()] = $parameter->getDefaultValue();
+            } else {
+              $action[$parameter->getName()] = null;
+            }
           }
           
           $this->_setup[$matches[0]] = $action;
@@ -257,31 +257,31 @@ class Madeam_Controller {
     // check to see if method/action exists
     if (isset($this->_setup[$action])) {
       foreach ($this->_setup[$action] as $param => $value) {
-      	if (isset($this->params[$param])) {
-      		$params[] = "\$this->params['$param']";
-      	} else {
-      		$params[] = "\$this->_setup['$action']['$param']";
-      	}
+        if (isset($this->params[$param])) {
+          $params[] = "\$this->params['$param']";
+        } else {
+          $params[] = "\$this->_setup['$action']['$param']";
+        }
       }
       
       if (preg_match('/[a-zA-Z_]*/', $action)) {
-      	eval('$output = $this->' . $action . "(" . implode(',', $params) . ");");
-    	} else {
-    	  exit('Invalid Action Characters');
-    	}
+        eval('$output = $this->' . $action . "(" . implode(',', $params) . ");");
+      } else {
+        exit('Invalid Action Characters');
+      }
     } else {
       if (!file_exists(Madeam_Controller::$viewPath . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'])) {
         throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
-        . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . substr($action, 0, -6) . ".html</strong> OR Create a method called <strong>$action</strong> in <strong>" . get_class($this) . "</strong> class."
-        . " \n <code>public function $action() {\n\n}</code>");
+        . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . Madeam_Inflector::dashize(lcfirst(substr($action, 0, -6))) . '.' . $this->params['_format'] . "</strong> OR Create a method called <strong>" . lcfirst($action) . "</strong> in <strong>" . get_class($this) . "</strong> class."
+        . " \n <code>public function " . lcfirst($action) . "() {\n\n}</code>");
       }
     }
     
     // render
     if ($output == null) {
-    	// beforeRender callbacks
+      // beforeRender callbacks
       $this->callback('beforeRender');
-    	
+      
       $output = $this->render(array('view' => $this->_view, 'layout' => $this->_layout, 'data' => $this->_data));
     }
     
@@ -301,12 +301,12 @@ class Madeam_Controller {
    */
   final public function callback($name) {
     foreach ($this->_setup[$name] as $callback) {
-    	// there has to be a better algorithm for this....
-    	if (empty($callback['include']) || (in_array($this->params['_controller'] . '/' . $this->params['_action'], $callback['include']) || in_array($this->params['_controller'], $callback['include']))) {
-    		if (empty($callback['exclude']) || (!in_array($this->params['_controller'] . '/' . $this->params['_action'], $callback['exclude']) && !in_array($this->params['_controller'], $callback['exclude']))) {
-      		$this->{$callback['name']}();
-    		}
-    	}
+      // there has to be a better algorithm for this....
+      if (empty($callback['include']) || (in_array($this->params['_controller'] . '/' . $this->params['_action'], $callback['include']) || in_array($this->params['_controller'], $callback['include']))) {
+        if (empty($callback['exclude']) || (!in_array($this->params['_controller'] . '/' . $this->params['_action'], $callback['exclude']) && !in_array($this->params['_controller'], $callback['exclude']))) {
+          $this->{$callback['name']}();
+        }
+      }
     }
   }
 

@@ -143,6 +143,12 @@ function Madeam_ErrorHandler($code, $string, $file, $line) {
   return true;
 }
 
+if (function_exists('lcfirst') === false) {
+  function lcfirst($str) { 
+    return (string) (strtolower(substr($str,0,1)) . substr($str,1));
+  }
+}
+
 
 // include core files
 $cd = dirname(__FILE__) . DS;
@@ -512,7 +518,7 @@ class Madeam_Framework {
       } else {
         // no controller or view found = critical error.
         header("HTTP/1.1 404 Not Found");
-        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n}</code>"));
+        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . Madeam_Inflector::camelize(lcfirst($params['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
       }
     }
 

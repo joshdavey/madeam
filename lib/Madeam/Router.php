@@ -121,15 +121,27 @@ class Madeam_Router {
       $uri = null;
     }
     
-    // set format
+    
     $format = false;
-    $URIAnatomy = explode('.', $uri, 2);
-    if (count($URIAnatomy) > 1) {
-      $format = array_pop($URIAnatomy);
-      $uri = implode($URIAnatomy);
-    } else {
-      $uri = $URIAnatomy[0];
+    
+    // grab format if it exists in the uri and strip it from the uri
+    // index.html => format = 'html' && uri = 'index'
+    $dotPosition = (int) strrpos($uri, '.');
+    if ($dotPosition !== 0) {
+      $format = substr($uri, $dotPosition + 1);
+      $uri    = substr($uri, 0, $dotPosition);
     }
+    
+    
+    // TODO: Benchmark this format and URI code against the code above
+    //$URIAnatomy = explode('.', $uri, 2);
+    //if (count($URIAnatomy) > 1) {
+    //  $format = array_pop($URIAnatomy);
+    //  $uri = implode($URIAnatomy);
+    //} else {
+    //  $uri = $URIAnatomy[0];
+    //}
+   
 
     // set get
     $get = array();
