@@ -54,7 +54,7 @@ class Madeam_Console {
     
       // get list of scripts
       $scripts = array();
-      foreach (new DirectoryIterator(realpath('lib/Madeam/Console/Script')) as $file) {
+      foreach (new DirectoryIterator(realpath('lib/Madeam/Script')) as $file) {
         if ($file->isFile()) {
           $scripts[] = low(substr($file->getFilename(), 0, -4));
         }
@@ -68,7 +68,7 @@ class Madeam_Console {
     }
     
     
-    $class = 'Madeam_Console_Script_' . ucfirst($script);
+    $class = 'Madeam_Script_' . ucfirst($script);
     $console = new $class;
     $console->$method($params);
   }

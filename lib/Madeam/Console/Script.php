@@ -15,8 +15,6 @@
  */
 class Madeam_Console_Script {
 
-  public $execute_outside_root = array();
-
   public $command_requirements = array();
 
   protected function createFile($file_name, $file_path, $file_content) {

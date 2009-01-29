@@ -1,23 +1,7 @@
 <?php
-class Madeam_Serialize {
+class Madeam_Serialize_Xml {
   
-  public static function encodeJson($data) {
-    return json_encode($data);
-  }
-  
-  public static function decodeJson($json) {
-    return json_decode($json);
-  }
-  
-  public static function encodeSphp($data) {
-    return serialize($data);
-  }
-  
-  public static function decodeSphp($php) {
-    return unserialize($php);
-  }
-  
-  public static function encodeXml($data) {
+  public static function encode($data) {
     $xml = new XmlWriter();
     $xml->openMemory();
     $xml->startDocument('1.0', 'UTF-8');
@@ -30,8 +14,13 @@ class Madeam_Serialize {
     return $xml->outputMemory(false);
   }
   
+  public static function decode($data) {
+    
+  }
+  
   private static function _array2Xml($array, XmlWriter &$xml) {
-    foreach($array as $key => $value){
+    foreach($array as $key => $value) {
+      $key = str_replace(" ", '_', $key);
       if(is_array($value)){
         $xml->startElement($key);
         self::_array2Xml($value, $xml);

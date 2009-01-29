@@ -3,13 +3,13 @@ class Breadcrumbr extends Htmlr {
 
   static $breadcrumbs = array();
 
-  public static function create($crumbs = array()) {
+  public static function create($crumbs = array(), $params = array()) {
     $breadcrumb = null;
     $breadcrumbs = array_merge($crumbs, self::$breadcrumbs);
     
     $crumbCount = count($breadcrumbs);
     
-    $breadcrumb .= self::openTag('ul', array('class' => 'breadcrumb'));
+    $breadcrumb .= self::openTag('ol', array_merge(array('class' => 'breadcrumb'), $params));
     
     $x = 0;
     foreach ($breadcrumbs as $crumb => $url) {
@@ -25,7 +25,7 @@ class Breadcrumbr extends Htmlr {
         $breadcrumb .= self::wrappingTag('li', $link);
       }
     }
-    $breadcrumb .= self::closedTag('ul');
+    $breadcrumb .= self::closedTag('ol');
     return $breadcrumb;
   }
 

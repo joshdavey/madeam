@@ -256,17 +256,16 @@ class Madeam_Framework {
    * undocumented
    */
   public static $pathToTests        = false;
-                                    
+  
   /**
    * undocumented 
    */
-  public static $pathToUri          = '/';
+  public static $uriAppPath          = '/';
   
   /**
    * undocumented
    */
-  public static $pathToRel          = '/public/';
-  
+  public static $uriPubPath          = '/public/';
   
   /**
    * This method defines all the absolute file paths to all the important
@@ -327,10 +326,10 @@ class Madeam_Framework {
       
     // set path to uri based on whether mod_rewrite is turned on or off.
     if (isset(self::$requestParams['_uri'])) {
-      self::$pathToUri = self::cleanUriPath($server['DOCUMENT_ROOT'], self::$pathToPublic);
+      self::$uriAppPath = self::cleanUriPath($server['DOCUMENT_ROOT'], self::$pathToPublic);
       self::$requestUri = self::$requestParams['_uri'] . '?' . $server['QUERY_STRING'];
     } else {
-      self::$pathToUri = self::dirtyUriPath($server['DOCUMENT_ROOT'], self::$pathToPublic);
+      self::$uriAppPath = self::dirtyUriPath($server['DOCUMENT_ROOT'], self::$pathToPublic);
       $url = explode('index.php', $server['REQUEST_URI']);
       // check if it split into 2 peices.
       // If it didn't then there is an ending "index.php" so we assume there is no URI on the end either
@@ -342,7 +341,7 @@ class Madeam_Framework {
     }
     
     // determine the relative path to the public directory
-    self::$pathToRel = self::relPath($server['DOCUMENT_ROOT'], self::$pathToPublic);    
+    self::$uriPubPath = self::pubPath($server['DOCUMENT_ROOT'], self::$pathToPublic);    
     
     // set layout if it hasn't already been set
     if (!isset(self::$requestParams['_layout'])) { self::$requestParams['_layout'] = 1; }
@@ -457,7 +456,7 @@ class Madeam_Framework {
   public static function request($uri, $params = array()) {
     // get request parameters from uri and merge them with other params
     // example input: 'posts/show/32'
-    $params = array_merge($params, Madeam_Router::parse($uri, self::$pathToUri, array(
+    $params = array_merge($params, Madeam_Router::parse($uri, self::$uriAppPath, array(
       '_controller' => self::defaultController,
       '_action'     => self::defaultAction,
       '_format'     => self::defaultFormat
@@ -575,7 +574,7 @@ class Madeam_Framework {
    * @param $publicPath
    * @author Joshua Davey
    */
-  public static function relPath($docRoot, $publicPath) {
+  public static function pubPath($docRoot, $publicPath) {
     return '/' . str_replace(DS, '/', substr($publicPath, strlen($docRoot)));
   }
 
@@ -616,14 +615,14 @@ class Madeam_Framework {
    */
   public static function url($url) {
     if ($url == null || $url == '/') {
-      return self::$pathToUri;
+      return self::$uriAppPath;
     }
 
     if (substr($url, 0, 1) != "#") {
       if (substr($url, 0, 1) == '/') {
-        $url = self::$pathToRel . substr($url, 1, strlen($url));
+        $url = self::$uriPubPath . substr($url, 1, strlen($url));
       } elseif (! preg_match('/^[a-z]+:/', $url, $matchs)) {
-        $url = self::$pathToUri . $url;
+        $url = self::$uriAppPath . $url;
       }
     }
     return $url;

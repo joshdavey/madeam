@@ -69,6 +69,18 @@ class Madeam_Controller {
   
   
   /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */
+  public static $formatMethodMap = array(
+    'xml'   => array('Madeam_Serialize_Xml',  'encode'),
+    'json'  => array('Madeam_Serialize_Json', 'encode'),
+    'sphp'  => array('Madeam_Serialize_Sphp', 'encode'),
+  );
+  
+  
+  /**
    * Enter description here...
    *
    * @param array $params
@@ -406,9 +418,11 @@ class Madeam_Controller {
       }
     } else {
       // serialize output
-      $_serializeMethod = 'encode' . ucfirst($this->params['_format']);
-      if (method_exists('Madeam_Serialize', $_serializeMethod)) {
-        $_content = Madeam_Serialize::$_serializeMethod($settings['data']);
+      $format = $this->params['_format'];
+      $class  = self::$formatMethodMap[$format][0];
+      $method = self::$formatMethodMap[$format][1];
+      if (method_exists($class, $method)) {
+        $_content = call_user_func($class .'::' . $method, $settings['data']);
       } else {
         throw new Madeam_Controller_Exception('Missing View: ' . $view . "\n Unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create a new view: " . $view);
       }
