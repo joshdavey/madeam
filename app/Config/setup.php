@@ -14,17 +14,7 @@ switch (Madeam_Framework::$environment) {
     $cfg['enable_debug']              = true;
     $cfg['enable_logger']             = true;
     $cfg['inline_errors']             = true;
-    break;
-  case 'testing' :
-    $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_testing';
-    $cfg['ignore_controllers_cache']  = true;
-    $cfg['ignore_models_cache']       = true;
-    $cfg['ignore_routes_cache']       = true;
-    $cfg['ignore_inline_cache']       = true;
-    $cfg['enable_debug']              = false;
-    $cfg['enable_logger']             = true;
-    $cfg['inline_errors']             = false;
-    break;
+    break;  
   case 'production' :
     
     error_reporting(0);
@@ -38,6 +28,16 @@ switch (Madeam_Framework::$environment) {
     $cfg['enable_logger']             = true;
     $cfg['inline_errors']             = false;
     break;
+  case 'testing' :
+      $cfg['connections'][]             = 'mysql://username:password@localhost?name=madeam_testing';
+      $cfg['ignore_controllers_cache']  = true;
+      $cfg['ignore_models_cache']       = true;
+      $cfg['ignore_routes_cache']       = true;
+      $cfg['ignore_inline_cache']       = true;
+      $cfg['enable_debug']              = false;
+      $cfg['enable_logger']             = true;
+      $cfg['inline_errors']             = false;
+      break;
 }
 
 Madeam_Config::set('Madeam_Model', array());
