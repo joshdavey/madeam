@@ -79,12 +79,26 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   }
   
   /**
+   *  public function actionAction() {
+   *    
+   *  }
+   * 
+   * <File tests/view.html>
+   * Action View
+   * </File>
+   */
+  public function testRenderViewWithActionMethod() {
+    $return = $this->controller->render(array('view' => 'tests/action'));
+    $this->assertEquals('Action View', $return);
+  }
+  
+  /**
    * 
    * <File tests/view.html>
    * View
    * </File>
    */
-  public function testRenderView() {
+  public function testRenderViewWhenActionMethodMissing() {
     $return = $this->controller->render(array('view' => 'tests/view'));
     $this->assertEquals('View', $return);
   }
@@ -168,7 +182,6 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   }
   
   /**
-   *  
    * 
    *  public function excludeAction() {
    *    if ($this->exclude == 'False' && $this->include == 'False') {

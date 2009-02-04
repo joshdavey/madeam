@@ -27,6 +27,13 @@
 
 // set the public directory as our current working directory
   chdir(dirname(__FILE__));
+
+  /*
+  $path = getcwd() . '/posts/show/32';
+  //mkdir(getcwd() . '/posts/show/32/', 0777, true);
+  file_put_contents($path . '.html', '<?php unlink($_SERVER["SCRIPT_FILENAME"]); ?> tests ' . time());
+  file_put_contents($path . '/index.html', '<?php unlink($_SERVER["SCRIPT_FILENAME"]); ?> tests ' . time());
+  //*/
   
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
   $lib = realpath('..') . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
@@ -58,6 +65,5 @@
   
 // dispatch handles the request and returns the output  
   echo Madeam_Framework::dispatch();
-  
   
   //foreach (get_included_files() as $file) { isset($x) ? ++$x : $x = 1; echo $x . ' ' . $file . '<br />'; }

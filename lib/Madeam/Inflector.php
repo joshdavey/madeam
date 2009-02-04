@@ -152,6 +152,11 @@ class Madeam_Inflector {
     return self::singalize(self::underscorize($string)) . '_id';
   }
 
+  /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */
   public static function specialize($char, $string) {
     $matchs = array();
     preg_match_all('/([\/\-\_\s\\\\.]{1}.{1})||([A-Z])/', $string, $matchs);

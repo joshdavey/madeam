@@ -36,6 +36,13 @@ class Madeam_Controller {
   public $_data = array();
   
   /**
+   * undocumented 
+   *
+   * @author Joshua Davey
+   */
+  public $_output = null;
+  
+  /**
    * 
    * @var array
    */
@@ -282,14 +289,14 @@ class Madeam_Controller {
       // beforeRender callbacks
       $this->callback('beforeRender');
       
-      $output = $this->render(array('view' => $this->_view, 'layout' => $this->_layout, 'data' => $this->_data));
+      $this->_output = $this->render(array('view' => $this->_view, 'layout' => $this->_layout, 'data' => $this->_data));
     }
     
     // afterRender callbacks
     $this->callback('afterRender');
 
     // return response
-    return $output;
+    return $this->_output;
   }
   
   

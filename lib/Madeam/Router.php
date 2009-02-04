@@ -26,6 +26,14 @@ class Madeam_Router {
   array('_action' => 'edit', '_method' => 'post', 'id' => false), 
   array('_action' => 'add', '_method' => 'post', 'id' => false));
 
+  public static function resource($name) {
+    self::connect("$name",      array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
+    self::connect("$name/:id",  array('_action' => 'show',    '_controller' => $name),  array('_method' => 'get'));
+    self::connect("$name",      array('_action' => 'delete',  '_controller' => $name),  array('_method' => 'delete'));
+    self::connect("$name",      array('_action' => 'update',  '_controller' => $name),  array('_method' => 'put'));
+    self::connect("$name",      array('_action' => 'create',  '_controller' => $name),  array('_method' => 'post'));
+  }
+
   /**
    * This cool method adds paths by formatting the string the user has entered and turning it into a regular expression
    * which can be used to be compared against URIs.
@@ -163,6 +171,7 @@ class Madeam_Router {
       if (preg_match($route[0], $uri, $match)) {
         // set default params
         $params = $route[2]; // default values
+        //test($match);
         
         // set derived params
         foreach ($route[1] as $key => $name) {

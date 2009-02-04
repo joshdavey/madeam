@@ -8,7 +8,7 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,
 body {
   font: 62.5%/1.5 "Lucida Grande", "Lucida Sans", Tahoma, Verdana, sans-serif;
   color: #333333;
-  background: #f8fcff;
+  background: #fcfeff;
   text-align: center;
 }
 
@@ -94,11 +94,11 @@ td {
 /* Code
 -----------------------------------------------------------------------------*/
 code {
-  background: #fcfcfc; 
+  background: #fff; 
   padding: 0.75em;
   display: block;
-  border-top: solid 2px #eee;
-  border-bottom: solid 2px #eee;
+  border-top: solid 2px #f9fcff;
+  border-bottom: solid 2px #f9fcff;
 }
 
 

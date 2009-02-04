@@ -43,7 +43,7 @@ class Controller_Tests extends Madeam_Controller {
     return 'Action';
   }
   
-  public function viewAction() {
+  public function actionAction() {
     
   }
   
