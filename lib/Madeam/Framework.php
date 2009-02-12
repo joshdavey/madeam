@@ -90,10 +90,20 @@ function low($word) {
   return strtolower($word);
 }
 
+/**
+ * undocumented 
+ *
+ * @author Joshua Davey
+ */
 function h($string) {
   return htmlentities($string);
 }
 
+/**
+ * undocumented 
+ *
+ * @author Joshua Davey
+ */
 function eh($string) {
   echo h($string);
 }
@@ -354,11 +364,11 @@ class Madeam_Framework {
     
     // set overriding request method -- note: we need to get rid of all the $_SERVER references for testing purposes
     if (isset($server['X_HTTP_METHOD_OVERRIDE'])) {
-      self::$requestParams['_method'] = low($server['X_HTTP_METHOD_OVERRIDE']);
+      self::$requestParams['_method'] = strtolower($server['X_HTTP_METHOD_OVERRIDE']);
     } elseif (isset(self::$requestParams['_method']) && $server['REQUEST_METHOD'] == 'POST') {
-      self::$requestParams['_method'] = low($params['_method']);
+      self::$requestParams['_method'] = strtolower($params['_method']);
     } else {
-      self::$requestParams['_method'] = low($server['REQUEST_METHOD']);
+      self::$requestParams['_method'] = strtolower($server['REQUEST_METHOD']);
     }
     
     // check if this is an ajax call
@@ -518,7 +528,7 @@ class Madeam_Framework {
       } else {
         // no controller or view found = critical error.
         header("HTTP/1.1 404 Not Found");
-        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . Madeam_Inflector::camelize(lcfirst($params['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
+        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>app/Controller/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . Madeam_Inflector::camelize(lcfirst($params['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
       }
     }
 

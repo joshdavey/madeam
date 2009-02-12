@@ -120,7 +120,7 @@ class Madeam_Controller {
     }
 
     // set cache name
-    $cacheName = Madeam_Framework::$environment . '.madeam.controller.' . low(get_class($this)) . '.setup';
+    $cacheName = Madeam_Framework::$environment . '.madeam.controller.' . strtolower(get_class($this)) . '.setup';
 
     // check cache for setup. if cache doesn't exist define it and then save it
     if (! $this->_setup = Madeam_Cache::read($cacheName, - 1, Madeam_Config::get('ignore_controllers_cache'))) {
@@ -252,7 +252,7 @@ class Madeam_Controller {
    */
   final public function process() {
 
-    $output = null;
+    $this->_output = null;
     
     // beforeFilter callbacks
     $this->callback('beforeFilter');
@@ -272,12 +272,12 @@ class Madeam_Controller {
       }
       
       if (preg_match('/[a-zA-Z_]*/', $action)) {
-        eval('$output = $this->' . $action . "(" . implode(',', $params) . ");");
+        eval('$this->_output = $this->' . $action . "(" . implode(',', $params) . ");");
       } else {
         exit('Invalid Action Characters');
       }
     } else {
-      if (!file_exists(Madeam_Controller::$viewPath . str_replace('/', DS, low($this->_view)) . '.' . $this->params['_format'])) {
+      if (!file_exists(Madeam_Controller::$viewPath . str_replace('/', DS, strtolower($this->_view)) . '.' . $this->params['_format'])) {
         throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
         . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . Madeam_Inflector::dashize(lcfirst(substr($action, 0, -6))) . '.' . $this->params['_format'] . "</strong> OR Create a method called <strong>" . lcfirst($action) . "</strong> in <strong>" . get_class($this) . "</strong> class."
         . " \n <code>public function " . lcfirst($action) . "() {\n\n}</code>");
@@ -285,7 +285,7 @@ class Madeam_Controller {
     }
     
     // render
-    if ($output == null) {
+    if ($this->_output == null) {
       // beforeRender callbacks
       $this->callback('beforeRender');
       
@@ -389,10 +389,12 @@ class Madeam_Controller {
     if (isset($settings['partial'])) {
       $partial = explode('/', $settings['partial']);
       $partialName = array_pop($partial);
-      $view = Madeam_Controller::$viewPath . implode(DS, $partial) . DS . low($partialName) . '.' . $this->params['_format'];
+      $viewFile = implode(DS, $partial) . DS . strtolower($partialName) . '.' . $this->params['_format'];
     } else {
-      $view = Madeam_Controller::$viewPath . str_replace('/', DS, low($settings['view'])) . '.' . $this->params['_format'];
+      $viewFile = str_replace('/', DS, strtolower($settings['view'])) . '.' . $this->params['_format'];
     }
+    
+    $view = Madeam_Controller::$viewPath . $viewFile;
     
     if (!isset($settings['data'])) {
       $settings['data'] = array();
@@ -426,12 +428,16 @@ class Madeam_Controller {
     } else {
       // serialize output
       $format = $this->params['_format'];
-      $class  = self::$formatMethodMap[$format][0];
-      $method = self::$formatMethodMap[$format][1];
+      $class = false;
+      $method = false;
+      if (isset(self::$formatMethodMap[$format])) {
+        $class  = self::$formatMethodMap[$format][0];
+        $method = self::$formatMethodMap[$format][1];
+      }
       if (method_exists($class, $method)) {
         $_content = call_user_func($class .'::' . $method, $settings['data']);
       } else {
-        throw new Madeam_Controller_Exception('Missing View: ' . $view . "\n Unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create a new view: " . $view);
+        throw new Madeam_Controller_Exception_MissingView('Missing View: <strong>' . $viewFile . "</strong> and unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create File: <strong>app/View/" . $viewFile . "</strong>");
       }
     }
     

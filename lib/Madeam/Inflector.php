@@ -15,7 +15,7 @@
  */
 class Madeam_Inflector {
 
-  public static $irregulars = array('amoyese' => 'amoyese', 'atlas' => 'atlases', 'beef' => 'beefs', 'bison' => 'bison', 'brother' => 'brothers', 'child' => 'children', 'corpus' => 'corpuses', 'cow' => 'cows', 'deer' => 'deer', 'fish' => 'fish', 'ganglion' => 'ganglions', 'genie' => 'genies', 'genus' => 'genera', 'graffito' => 'graffiti', 'hoof' => 'hoofs', 'loaf' => 'loaves', 'man' => 'men', 'measles' => 'measles', 'money' => 'monies', 'mongoose' => 'mongooses', 'move' => 'moves', 'mythos' => 'mythoi', 'numen' => 'numina', 'occiput' => 'occiputs', 'octopus' => 'octopuses', 'opus' => 'opuses', 'ox' => 'oxen', 'penis' => 'penises', 'person' => 'people', 'rice' => 'rice', 'sex' => 'sexes', 'sheep' => 'sheep', 'soliloquy' => 'soliloquies', 'testis' => 'testes', 'trilby' => 'trilbys', 'turf' => 'turfs');
+  public static $irregulars = array('amoyese' => 'amoyese', 'atlas' => 'atlases', 'beef' => 'beeves', 'bison' => 'bison', 'brother' => 'brothers', 'canto', 'child' => 'children', 'corpus' => 'corpuses', 'cow' => 'cows', 'deer' => 'deer', 'fish' => 'fish', 'ganglion' => 'ganglions', 'genie' => 'genies', 'genus' => 'genera', 'graffito' => 'graffiti', 'hoof' => 'hoofs', 'loaf' => 'loaves', 'man' => 'men', 'measles' => 'measles', 'money' => 'monies', 'mongoose' => 'mongooses', 'move' => 'moves', 'mythos' => 'mythoi', 'numen' => 'numina', 'occiput' => 'occiputs', 'octopus' => 'octopuses', 'opus' => 'opuses', 'ox' => 'oxen', 'penis' => 'penises', 'person' => 'people', 'rice' => 'rice', 'sex' => 'sexes', 'sheep' => 'sheep', 'soliloquy' => 'soliloquies', 'testis' => 'testes', 'trilby' => 'trilbys', 'turf' => 'turfs');
 
   /**
    * Pluralizes a string
@@ -24,15 +24,19 @@ class Madeam_Inflector {
    * @return string
    */
   public static function pluralize($string) {
-    if (array_key_exists(low($string), self::$irregulars)) {
+    $lastLetter = substr($string, -1);
+    if (array_key_exists(strtolower($string), self::$irregulars)) {
       return self::$irregulars[$string];
-    } elseif (low($string[strlen($string) - 1]) == 's') {
-      return $string;
-    } elseif (low($string[strlen($string) - 1]) == 'y') {
-      $string = preg_replace('/y/i', 'sei', strrev($string), 1); // add ies backwards so it gets set back later
-      return strrev($string);
+    } elseif (in_array($lastLetter, array('s', 'z', 'x')) || in_array(substr($string, -2), array('sh', 'ch'))) {
+      return $string . 'es';
+      } elseif (in_array(substr($string, -2, 1), array('a', 'e', 'i', 'o', 'u')) && $lastLetter == 'y') {
+        return $string . 's';
+    } elseif ($lastLetter == 'y') {
+      return substr_replace($string, 'sei', -1, 1);
+    } elseif ($lastLetter == 'o' && in_array(substr($string, -2, 1), array('b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'))) {
+      return $string . 's';
     } else {
-      return $string .= 's';
+      return $string . 's';
     }
   }
 
@@ -44,11 +48,11 @@ class Madeam_Inflector {
    */
   public static function singalize($string) {
     $plural_irregulars = array_flip(self::$irregulars);
-    if (array_key_exists(low($string), $plural_irregulars)) {
+    if (array_key_exists(strtolower($string), $plural_irregulars)) {
       return $plural_irregulars[$string];
-    } elseif (low($string[strlen($string) - 1]) != 's') {
+    } elseif (strtolower($string[strlen($string) - 1]) != 's') {
       return $string;
-    } elseif (substr(low($string), - 3, 3) == 'ies') {
+    } elseif (substr(strtolower($string), - 3, 3) == 'ies') {
       $string = preg_replace('/sei/i', 'y', strrev($string), 1);
       return strrev($string);
     } else {
@@ -124,12 +128,12 @@ class Madeam_Inflector {
   }
 
   public static function modelTableize($string) {
-    $string[0] = low($string[0]);
+    $string[0] = strtolower($string[0]);
     return self::underscorize((self::pluralize($string)));
   }
 
   public static function modelNameize($string) {
-    $string[0] = low($string[0]);
+    $string[0] = strtolower($string[0]);
     return ucfirst(self::camelize((self::singalize($string))));
   }
 
@@ -148,7 +152,7 @@ class Madeam_Inflector {
   }
 
   public static function modelForeignKey($string) {
-    $string[0] = low($string[0]);
+    $string[0] = strtolower($string[0]);
     return self::singalize(self::underscorize($string)) . '_id';
   }
 
@@ -162,17 +166,17 @@ class Madeam_Inflector {
     preg_match_all('/([\/\-\_\s\\\\.]{1}.{1})||([A-Z])/', $string, $matchs);
     foreach ($matchs[0] as $match) {
       if (strlen($match) == 1) {
-        $replacement = $char . low($match);
+        $replacement = $char . strtolower($match);
         $string = str_replace($match, $replacement, $string);
       }
-      $replacement = $char . low(substr($match, 1, 1));
+      $replacement = $char . strtolower(substr($match, 1, 1));
       $string = str_replace($match, $replacement, $string);
     }
     return $string;
   }
 
   public static function slug($string, $seperator = '-') {
-    $string = low(str_replace(' ', $seperator, trim($string)));
+    $string = strtolower(str_replace(' ', $seperator, trim($string)));
     $string = preg_replace('/[\$,!\/\?\\\\&\.\#]/', '', $string);
     return $string;
   }

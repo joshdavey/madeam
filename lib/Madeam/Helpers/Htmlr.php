@@ -20,7 +20,7 @@ class Htmlr {
   public static function link($label, $link = null, $_params = array()) {
     $params = array();
     $params['href'] = Madeam_Framework::url($link);
-    $params['id'] = Madeam_Inflector::underscorize(low(strip_tags($label))) . '_link';
+    $params['id'] = Madeam_Inflector::underscorize(strtolower(strip_tags($label))) . '_link';
     $params = array_merge($params, $_params);
     return self::wrappingTag('a', $label, $params);
   }
@@ -109,7 +109,7 @@ class Htmlr {
    * @param string $name
    */
   protected static function nameToId($name) {
-    return str_replace(Madeam_Framework::associationJoint, '_', low($name));
+    return str_replace(Madeam_Framework::associationJoint, '_', strtolower($name));
   }
 
   /**
