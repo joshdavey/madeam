@@ -1,13 +1,15 @@
+<style>
+h4 + p { margin-top: 0; }
+</style>
 
     <h1 class="debug  ">Oops, <?php echo $params['snippet']; ?></h1>
-    <p>
-    <strong>Error:</strong> <?php echo $params['error']; ?>
-    <br />
-    <strong><?php echo $params['file']; ?></strong> on line <strong><?php echo $params['line']; ?></strong>
-    </p>
+    <h4>Error:</h4>
+    <p><?php echo $params['error']; ?></p>
+    
+    <p><strong><?php echo $params['file']; ?></strong> on line <strong><?php echo $params['line']; ?></strong></p>
 
     <br />
-    <h1>Backtrace:</h1>
+    <h4>Backtrace:</h4>
     <pre class="backtrace"><?php echo $params['backtrace']; ?></pre>
   
     <br />

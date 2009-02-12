@@ -8,7 +8,7 @@ body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,
 body {
   font: 62.5%/1.5 "Lucida Grande", "Lucida Sans", Tahoma, Verdana, sans-serif;
   color: #333333;
-  background: #fcfeff;
+  background: #fafbfb;
   text-align: center;
 }
 
@@ -17,6 +17,12 @@ body {
 -----------------------------------------------------------------------------*/
 p, h1, h2, h3, h4, h5, ul, ol, table, blockquote, code {
   margin-top: 1em;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: #666;
 }
 
 strong, h1, h2, h3, h4, h5 {
@@ -52,20 +58,24 @@ h5 {
 }
 
 p { 
-  font-size: 1.2em;
+  font-size: 1.4em;
 }
 
 pre, code {
-  font-size: 1.2em;
+  font-size: 1.4em;
 }
 
 ul, ol, dl {
 	list-style: none;
-	font-size: 1.2em;
+	font-size: 1.4em;
 }
 
 li, dd, dt {
-	font-size: 1.2em;
+	font-size: 1.4em;
+}
+
+p + code {
+  margin-top: 0.2em;
 }
 
 
@@ -86,8 +96,12 @@ td {
 -----------------------------------------------------------------------------*/
 .fullspan {
   text-align: left;
-  margin-left: 10px; 
-  margin-right: 10px;
+  margin: 0 10px 0 10px;
+}
+
+.wrapper {
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 
@@ -95,10 +109,9 @@ td {
 -----------------------------------------------------------------------------*/
 code {
   background: #fff; 
-  padding: 0.75em;
+  padding: 1em;
   display: block;
-  border-top: solid 2px #f9fcff;
-  border-bottom: solid 2px #f9fcff;
+  border: 1px solid #ccc;
 }
 
 

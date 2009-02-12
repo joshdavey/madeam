@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * 
+ */
+
 error_reporting(E_ALL);
 
 $cfg = array();
@@ -40,7 +44,10 @@ switch (Madeam_Framework::$environment) {
       break;
 }
 
-Madeam_Config::set('Madeam_Model', array());
+/**
+ * 
+ */
+session_save_path(Madeam_Framework::$pathToEtc . 'sessions' . DS);
 
 /**
  * Configure Cache
