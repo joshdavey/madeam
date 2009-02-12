@@ -37,8 +37,8 @@ class Madeam_Console_Script {
   
   protected function createDir($dir) {
     if (!file_exists($dir)) {
-      mkdir($dir);
-      Madeam_Console_CLI::outCreate('directory ' . basename($dir));
+      mkdir($dir, 0777, true);
+      Madeam_Console_CLI::outCreate('directory ' . $dir);
     }
   }
   

@@ -56,7 +56,7 @@ class Madeam_Console {
       $scripts = array();
       foreach (new DirectoryIterator(realpath('lib/Madeam/Script')) as $file) {
         if ($file->isFile()) {
-          $scripts[] = low(substr($file->getFilename(), 0, -4));
+          $scripts[] = strtolower(substr($file->getFilename(), 0, -4));
         }
       }
   

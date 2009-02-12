@@ -32,14 +32,24 @@ class Madeam_Script_Create extends Madeam_Console_Script {
     $params = array_merge($_params, $params);
 
     // set controller name and class name
-    $controllerName = ucfirst(Madeam_Inflector::underscorize(low($params['name'])));
-    $controllerClassName = 'Controller_' . $controllerName;
-
+    $nameNodes = explode('/', $params['name']);
+    foreach ($nameNodes as &$node) {
+      $node = ucfirst($node);
+    }
+    $controllerClassName      = 'Controller_' . implode('_', $nameNodes);
+    $controllerViewFilePath   = Madeam_Framework::$pathToApp . 'View' . DS . strtolower(implode(DS, $nameNodes));
+    $controllerName           = array_pop($nameNodes);
+    $controllerClassFilePath  = Madeam_Framework::$pathToApp . 'Controller' . DS . implode(DS, $nameNodes);    
+    
+    
     // Send message to user that we are creating the controller
-    Madeam_Console_CLI::outCreate('Controller ' . $controllerName);
+    Madeam_Console_CLI::outCreate('Controller ' . $controllerClassName);
+    
+    // Create Class directory
+    $this->createDir($controllerClassFilePath);
     
     // Create View directory
-    $this->createDir(Madeam_Framework::$pathToApp . 'View' . DS . low($controllerName));
+    $this->createDir($controllerViewFilePath);
 
     // define controller class in controller file contents
     $controllerContents = "<?php\nclass $controllerClassName extends " . $params['extends'] . " {\n";
@@ -51,7 +61,7 @@ class Madeam_Script_Create extends Madeam_Console_Script {
         $controllerContents .= "\n  public function $action" . "Action() {\n    \n  }\n";
         
         // create view file
-        $this->createFile(low($action) . '.' . Madeam_Framework::defaultFormat, Madeam_Framework::$pathToApp . 'View' . DS . low($controllerName) . DS, "$action action's view");
+        $this->createFile(strtolower($action) . '.' . Madeam_Framework::defaultFormat, $controllerViewFilePath . DS, "$action action's view");
       }
     }
 
@@ -59,7 +69,7 @@ class Madeam_Script_Create extends Madeam_Console_Script {
     $controllerContents .= "\n}";    
 
     // save file contents to file
-    $this->createFile($controllerName . '.php', Madeam_Framework::$pathToApp . 'Controller' . DS, $controllerContents);
+    $this->createFile($controllerName . '.php', $controllerClassFilePath . DS, $controllerContents);
 
     // completed with no errors
     return true;
@@ -121,8 +131,8 @@ class Madeam_Script_Create extends Madeam_Console_Script {
     }
     // this needs a re-write because it should allow depth greater than 1 directory
     // make controller directory if it does not already exist
-    if (! file_exists(Madeam_Framework::$pathToPublic . 'view' . DS . dirname($viewName))) {
-      mkdir(Madeam_Framework::$pathToPublic . 'view' . DS . dirname($viewName));
+    if (! file_exists(Madeam_Framework::$pathToApp . 'View' . DS . dirname($viewName))) {
+      mkdir(Madeam_Framework::$pathToApp . 'View' . DS . dirname($viewName));
     }
     // save contents to new view file
     if ($this->createFile($viewName . '.' . $viewFormat, Madeam_Framework::$pathToApp . 'View' . DS, $viewContents) === true) {
@@ -146,7 +156,7 @@ class Madeam_Script_Create extends Madeam_Console_Script {
     }
     
     // set controller name and class name
-    $controllerName = Madeam_Inflector::underscorize(low($params['name']));
+    $controllerName = Madeam_Inflector::underscorize(strtolower($params['name']));
     $controllerClassName = 'Controller_' . $controllerName;
     
     // Send message to user that we are creating the controller
