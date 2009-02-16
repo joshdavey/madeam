@@ -31,8 +31,8 @@ error_reporting(E_ALL);
 if (!file_exists($lib . 'Madeam/Console/' . basename(__FILE__))) {
   $_SERVER['argv'][1] = 'make/app';
 } else {
-  // configure madeam
-  Madeam_Framework::configure();
+  // setup madeam
+  Madeam_Framework::basicSetup();
 }
 
 // initiated console

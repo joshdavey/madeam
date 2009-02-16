@@ -2,16 +2,16 @@
 
 /**
  * Madeam PHP Framework <http://www.madeam.com/>
- * Copyright (c)	2009, Joshua Davey
- *								202-212 Adeliade St. W, Toronto, Ontario, Canada
+ * Copyright (c)  2009, Joshua Davey
+ *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2009, Joshua Davey
- * @link				http://www.madeam.com
- * @package			madeam
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright    Copyright (c) 2009, Joshua Davey
+ * @link        http://www.madeam.com
+ * @package      madeam
+ * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Inflector {
 
@@ -182,9 +182,9 @@ class Madeam_Inflector {
   }
   
   public static function map($string, $maps = array()) {
-  	foreach ($maps as $pattern => $replacement) {
-  		$string = preg_replace('/' . $pattern . '/', $replacement, $string); 
-  	}
-  	return $string;
+    foreach ($maps as $pattern => $replacement) {
+      $string = preg_replace('/' . $pattern . '/', $replacement, $string); 
+    }
+    return $string;
   }
 }

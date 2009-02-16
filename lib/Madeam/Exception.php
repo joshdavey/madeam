@@ -2,35 +2,35 @@
 
 /**
  * Madeam PHP Framework <http://www.madeam.com/>
- * Copyright (c)	2009, Joshua Davey
- *								202-212 Adeliade St. W, Toronto, Ontario, Canada
+ * Copyright (c)  2009, Joshua Davey
+ *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2009, Joshua Davey
- * @link				http://www.madeam.com
- * @package			madeam
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright    Copyright (c) 2009, Joshua Davey
+ * @link        http://www.madeam.com
+ * @package      madeam
+ * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Exception extends Exception {
 
   private static $funSnippets = array(
-  	"don't worry, be happy. It could be worse.",
-  	"did someone make a boo boo?",
-  	"you should really fix this.",
-  	"this is neither a horse, or a stable.",
-  	"what have you done!?",
-  	"oh @%&#!",
-  	"the tech bubble burst! Run, save yourself!",
-  	"is this your idea of web 3.0?",
-  	"the Quality Assurance team is unimpressed.",
-  	"maybe you should consider a new profession?",
-  	"oopsy",
-  	"overated PHP software?",
-  	'is this a candidate for <a href="http://thedailywtf.com">The Daily WTF</a>?',
-  	'click "OK" to continue.',
-  	"this looks ready to launch. /sarcasm"
+    "don't worry, be happy. It could be worse.",
+    "did someone make a boo boo?",
+    "you should really fix this.",
+    "this is neither a horse, or a stable.",
+    "what have you done!?",
+    "oh @%&#!",
+    "the tech bubble burst! Run, save yourself!",
+    "is this your idea of web 3.0?",
+    "the Quality Assurance team is unimpressed.",
+    "maybe you should consider a new profession?",
+    "oopsy",
+    "overated PHP software?",
+    'is this a candidate for <a href="http://thedailywtf.com">The Daily WTF</a>?',
+    'click "OK" to continue.',
+    "this looks ready to launch. /sarcasm"
   );
 
   /**

@@ -16,4 +16,4 @@
   set_include_path(implode(PATH_SEPARATOR, Madeam_Framework::paths(getcwd() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
   
 // configure madeam
-  Madeam_Framework::configure();
+  Madeam_Framework::basicSetup();

@@ -1,6 +1,6 @@
 /* Reset
 -----------------------------------------------------------------------------*/
-body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { margin:0;padding:0; } table { border-collapse:collapse; border-spacing:0; } fieldset,img { border:0; } address,caption,cite,code,dfn,em,strong,th,var { font-style:normal;	font-weight:normal; } ol,ul {	list-style:none; } caption,th {	text-align:left; } h1,h2,h3,h4,h5,h6 { font-size:100%;	font-weight:normal; } q:before,q:after { content:''; } abbr,acronym { border:0; }
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { margin:0;padding:0; } table { border-collapse:collapse; border-spacing:0; } fieldset,img { border:0; } address,caption,cite,code,dfn,em,strong,th,var { font-style:normal;  font-weight:normal; } ol,ul {  list-style:none; } caption,th {  text-align:left; } h1,h2,h3,h4,h5,h6 { font-size:100%;  font-weight:normal; } q:before,q:after { content:''; } abbr,acronym { border:0; }
 
 
 /* Document
@@ -66,12 +66,12 @@ pre, code {
 }
 
 ul, ol, dl {
-	list-style: none;
-	font-size: 1.4em;
+  list-style: none;
+  font-size: 1.4em;
 }
 
 li, dd, dt {
-	font-size: 1.4em;
+  font-size: 1.4em;
 }
 
 
@@ -110,7 +110,7 @@ code {
   display: block;
   border: 1px solid #bfc9d9;
   font-family: Monaco, Verdana, Sans-serif;
-  
+  color: #253248;
   font-size: 1.2em;
 }
 
@@ -124,6 +124,6 @@ code {
   border: solid 3px #b43838; 
 }
 
-	.error li { 
-	  margin-left: 20px; 
-	}
+  .error li { 
+    margin-left: 20px; 
+  }

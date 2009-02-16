@@ -2,16 +2,16 @@
 
 /**
  * Madeam PHP Framework <http://www.madeam.com/>
- * Copyright (c)	2009, Joshua Davey
- *								202-212 Adeliade St. W, Toronto, Ontario, Canada
+ * Copyright (c)  2009, Joshua Davey
+ *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2009, Joshua Davey
- * @link				http://www.madeam.com
- * @package			madeam
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright    Copyright (c) 2009, Joshua Davey
+ * @link        http://www.madeam.com
+ * @package      madeam
+ * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Model {
 
@@ -86,7 +86,7 @@ class Madeam_Model {
    */
   protected $fields = array(); // list of fields to be included when returning result
 
-	/**
+  /**
    * Enter description here...
    *
    * @var unknown_type
@@ -130,7 +130,7 @@ class Madeam_Model {
     }
     
     if (isset($params['primaryKey'])) {
-    	$this->primaryKey = $params['primaryKey'];
+      $this->primaryKey = $params['primaryKey'];
     }
 
     if (isset($params['name'])) {
@@ -219,7 +219,7 @@ class Madeam_Model {
   }
   
   public function __clone() {
-  	$this->depth--;
+    $this->depth--;
   }
 
   /**

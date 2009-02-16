@@ -1,22 +1,20 @@
 <?php
 /**
  * Madeam PHP Framework <http://www.madeam.com/>
- * Copyright (c)	2009, Joshua Davey
- *								202-212 Adeliade St. W, Toronto, Ontario, Canada
+ * Copyright (c)  2009, Joshua Davey
+ *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2009, Joshua Davey
- * @link				http://www.madeam.com
- * @package			madeam
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright    Copyright (c) 2009, Joshua Davey
+ * @link        http://www.madeam.com
+ * @package      madeam
+ * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
 // directory splitter
-if (! defined('DS')) {
-  define('DS', DIRECTORY_SEPARATOR);
-}
+if (! defined('DS')) { define('DS', DIRECTORY_SEPARATOR); }
 
 // .php should be first
 spl_autoload_extensions('.php,.inc');
@@ -172,29 +170,29 @@ require $cd . 'Registry.php';
 
 /**
  * Madeam PHP Framework <http://www.madeam.com/>
- * Copyright (c)	2009, Joshua Davey
- *								202-212 Adeliade St. W, Toronto, Ontario, Canada
+ * Copyright (c)  2009, Joshua Davey
+ *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2009, Joshua Davey
- * @link				http://www.madeam.com
- * @package			madeam
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright    Copyright (c) 2009, Joshua Davey
+ * @link        http://www.madeam.com
+ * @package      madeam
+ * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Framework {
 
-	/**
-	 * version of madeam
-	 */
+  /**
+   * version of madeam
+   */
   const version = '0.1 Alpha';
   
-	/**
-	 * Used for joining models and other associations
-	 * example use: "user.name"
-	 */
-  const associationJoint	= '.';
+  /**
+   * Used for joining models and other associations
+   * example use: "user.name"
+   */
+  const associationJoint  = '.';
   
   /**
    * undocumented constant
@@ -323,12 +321,12 @@ class Madeam_Framework {
    * 
    * @author Joshua Davey
    */
-  public static function setup($environment, $params, $server) {    
+  public static function webSetup($environment, $params, $server) {    
     // check for expected server parameters
-  	$diff = array_diff(array('DOCUMENT_ROOT', 'REQUEST_URI', 'QUERY_STRING', 'REQUEST_METHOD'), array_keys($server));
-  	if (!empty($diff)) {
-  	  throw new Madeam_Exception_MissingExpectedParam('Missing expected server Parameter(s).');
-  	}
+    $diff = array_diff(array('DOCUMENT_ROOT', 'REQUEST_URI', 'QUERY_STRING', 'REQUEST_METHOD'), array_keys($server));
+    if (!empty($diff)) {
+      throw new Madeam_Exception_MissingExpectedParam('Missing expected server Parameter(s).');
+    }
     
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
     if (substr($server['DOCUMENT_ROOT'], - 1) != '/') { $server['DOCUMENT_ROOT'] .= '/'; }
@@ -375,18 +373,18 @@ class Madeam_Framework {
     if (isset($server['HTTP_X_REQUESTED_WITH']) && $server['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
       self::$requestParams['_ajax'] = 1;
     } else {
-    	self::$requestParams['_ajax']	= 0;
+      self::$requestParams['_ajax']  = 0;
     }
     
     // configure Madeam
-    self::configure();
+    self::basicSetup();
   }
 
   /**
    * undocumented 
    * @author Joshua Davey
    */
-  public static function configure($cfg = array()) {
+  public static function basicSetup($cfg = array()) {
     // include base setup configuration
     if (empty($cfg)) {
       require self::$pathToApp . 'Config' . DS . 'setup.php';
@@ -397,7 +395,7 @@ class Madeam_Framework {
     unset($cfg);
     
     // set controller's view directory
-		Madeam_Controller::$viewPath = Madeam_Framework::$pathToApp . 'View' . DS;
+    Madeam_Controller::$viewPath = Madeam_Framework::$pathToApp . 'View' . DS;
   }
 
   /**
@@ -408,22 +406,22 @@ class Madeam_Framework {
    */
   public static function dispatch() {
     
-		// include routes
-		// check cache for routes
-		if (! Madeam_Router::$routes = Madeam_Cache::read(self::$environment . '.madeam.routes', - 1, Madeam_Config::get('ignore_routes_cache'))) {
-		  // include routes configuration
-		  require self::$pathToApp . 'Config' . DS . 'routes.php';
-		
-		  // save routes to cache
-		  if (Madeam_Config::get('ignore_routes_cache') === false) {
-		    Madeam_Cache::save(self::$environment . '.madeam.routes', Madeam_Router::$routes);
-		  }
-		}
-		
-		/**
-		 * This is messed up. I hate the way PHP handles the $_FILES array when using multidimensional arrays in your HTML forms
-		 */		
-		if (isset($_FILES)) {
+    // include routes
+    // check cache for routes
+    if (! Madeam_Router::$routes = Madeam_Cache::read(self::$environment . '.madeam.routes', - 1, Madeam_Config::get('ignore_routes_cache'))) {
+      // include routes configuration
+      require self::$pathToApp . 'Config' . DS . 'routes.php';
+    
+      // save routes to cache
+      if (Madeam_Config::get('ignore_routes_cache') === false) {
+        Madeam_Cache::save(self::$environment . '.madeam.routes', Madeam_Router::$routes);
+      }
+    }
+    
+    /**
+     * This is messed up. I hate the way PHP handles the $_FILES array when using multidimensional arrays in your HTML forms
+     */    
+    if (isset($_FILES)) {
       $_files = array();
       foreach ($_FILES as $key => $fields) {
         $_files[$key] = array();
@@ -440,7 +438,7 @@ class Madeam_Framework {
     }
     
     self::$requestParams = array_merge_recursive(self::$requestParams, $_files);
-		
+    
     // make request
     $output = self::request(self::$requestUri, self::$requestParams);
     
@@ -638,18 +636,18 @@ class Madeam_Framework {
    * @author Joshua Davey
    */
   public static function autoload($class) {
-  	// set class file name)
-	  //$file = str_replace('_', DS, str_replace('/', DS, $class)) . '.php'; // PHP 5.3
-	  $file = str_replace('_', DS, $class) . '.php';
+    // set class file name)
+    //$file = str_replace('_', DS, str_replace('/', DS, $class)) . '.php'; // PHP 5.3
+    $file = str_replace('_', DS, $class) . '.php';
     
     // checks all the include paths to see if the file exist and then returns a
     // full path to the file or false
-	  $file = fileLives($file);
+    $file = fileLives($file);
 
-	  // include class file
-	  if (is_string($file)) {
-	    require $file;
-	  }	  
+    // include class file
+    if (is_string($file)) {
+      require $file;
+    }    
   }
   
 
@@ -662,10 +660,10 @@ class Madeam_Framework {
    */
   public static function autoloadFail($class) {
     if (! class_exists($class, false) && ! interface_exists($class, false)) {
-	    $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
-	    eval("class $class {}");
-	    throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
-	  }
+      $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
+      eval("class $class {}");
+      throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
+    }
   }
   
 }

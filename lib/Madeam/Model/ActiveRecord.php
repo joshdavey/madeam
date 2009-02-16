@@ -7,16 +7,16 @@ if (Madeam_Config::exists('Madeam_Model_ActiveRecord')) {
 
 /**
  * Madeam PHP Framework <http://www.madeam.com/>
- * Copyright (c)	2009, Joshua Davey
- *								202-212 Adeliade St. W, Toronto, Ontario, Canada
+ * Copyright (c)  2009, Joshua Davey
+ *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2009, Joshua Davey
- * @link				http://www.madeam.com
- * @package			madeam
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright    Copyright (c) 2009, Joshua Davey
+ * @link        http://www.madeam.com
+ * @package      madeam
+ * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Model_ActiveRecord extends Madeam_Model {
 
@@ -271,26 +271,26 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     
     // build select query and set resource link
     $link = $this->query($this->buildQuerySelect());
-		
+    
     $results = $link->fetchAll(PDO::FETCH_ASSOC);
     //$link->setFetchMode(PDO::FETCH_CLASS, get_class($this));
     //$link->setFetchMode(PDO::FETCH_OBJ);
     //$link->execute();
     //$results = $link->fetchAll();
     $link->closeCursor();
-    		
-		$foreignKeyValues = array();
-		$belongsToForeignKeys = array();
+        
+    $foreignKeyValues = array();
+    $belongsToForeignKeys = array();
     foreach ($results as &$result) {
       $this->_data = $result;
-    	$result = $this->prepareEntry($result);    	
+      $result = $this->prepareEntry($result);      
       $foreignKeyValues[] = $result[$this->setup['primaryKey']];      
       
       foreach ($this->setup['belongsTo'] as $model => $params) {
-      	if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
-      		$belongsToForeignKeys[$params['model']][] = $result[$params['foreignKey']];
-    		}
-    	}
+        if (! in_array($model, array_values($this->unbound)) && ! in_array($model, array_keys($this->_sqlJoins))) {
+          $belongsToForeignKeys[$params['model']][] = $result[$params['foreignKey']];
+        }
+      }
     }
     
     // find related content
@@ -381,24 +381,24 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
   
   private function _combineSingleDataOnKeys(&$result1Data, $result1Key, &$result2Data, $result2Key, $combineKey) {
     foreach ($result1Data as &$entry) {
-    	foreach ($result2Data as $key => &$result) {    	  
-    		if ($entry[$result1Key] === $result[$result2Key]) {
-    			$entry[$combineKey] = $result;
-    		}
-  		}
+      foreach ($result2Data as $key => &$result) {        
+        if ($entry[$result1Key] === $result[$result2Key]) {
+          $entry[$combineKey] = $result;
+        }
+      }
     }        
     unset($entry);
-	}
+  }
   
   private function _combineDataOnKeys(&$result1Data, $result1Key, &$result2Data, $result2Key, $combineKey) {
-  	foreach ($result1Data as &$entry) {
-    	foreach ($result2Data as $key => &$result) {
-    		if ($entry[$result1Key] === $result[$result2Key]) {
-    			$entry[$combineKey][] = $result;
-    			unset($result2Data[$key]);
-    		}
-  		}
-  		unset($result);
+    foreach ($result1Data as &$entry) {
+      foreach ($result2Data as $key => &$result) {
+        if ($entry[$result1Key] === $result[$result2Key]) {
+          $entry[$combineKey][] = $result;
+          unset($result2Data[$key]);
+        }
+      }
+      unset($result);
     }        
     unset($entry);
   }
@@ -867,61 +867,61 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
    * @param array $conditions
    */
   final public function where() {
-  	$conditions = func_get_args();
-  	$condition = $this->_conditions($conditions);
-  	
-  	if ($this->_sqlWhere != false) {
-  		$this->_sqlWhere .= ' and ' . $condition;
-		} else {
-			$this->_sqlWhere = $condition;
-		}
-		
-  	return $this;
+    $conditions = func_get_args();
+    $condition = $this->_conditions($conditions);
+    
+    if ($this->_sqlWhere != false) {
+      $this->_sqlWhere .= ' and ' . $condition;
+    } else {
+      $this->_sqlWhere = $condition;
+    }
+    
+    return $this;
   }
   
   
   /**
-	 * Generates sql conditions
-	 * Note - should try using pdo's prepared statements instead of escaping input 
-	 * with the quote method
-	 * 
-	 * @return string
-	 */
+   * Generates sql conditions
+   * Note - should try using pdo's prepared statements instead of escaping input 
+   * with the quote method
+   * 
+   * @return string
+   */
   private function _conditions($conditions) {
-  	$condition = null;
-  	
-  	foreach ($conditions as $field => $value) {	
-  		if (is_array($value) && is_integer($field)) {
-  			$condition .= ' (' . $this->_conditions($value) . ') ';
-			} elseif (is_integer($field) && in_array($value, array('or', 'and', 'xor'))) {
-				// this isn't a condition but an operator joining conditions
-				$condition .= ' ' . $value . ' ';
-			} elseif (is_integer($field)) {
-				// when the field is an integer and none of the above conditions are met we assume
-				// that this condition is written by the user and doesn't need madeam's help
-				$condition .= ' (' . $value . ') ';
-  		} else {
-  			$x = strstr($field, ' ');
-  			if ($x == null && !is_array($value)) {
-  				$condition .= $field . ' = ';
-				} else {
-					$condition .= $field . ' ';
-				}
-				
-				if (is_array($value)) {
-					if (!empty($value)) {
-						// when the value is an array we assume the user is trying to do an "IN" comparison
-						$condition .= ' in (' . implode(',', $value) . ')';
-					}
-				} else {
-					// if the value didn't match any of the above conditions then it must be a string
-					// and therefore needs quotes
-					$condition .= Madeam_Sanitize::escape($value);
-				}
-  		}
-  	}
-  	
-  	return $condition;
+    $condition = null;
+    
+    foreach ($conditions as $field => $value) {  
+      if (is_array($value) && is_integer($field)) {
+        $condition .= ' (' . $this->_conditions($value) . ') ';
+      } elseif (is_integer($field) && in_array($value, array('or', 'and', 'xor'))) {
+        // this isn't a condition but an operator joining conditions
+        $condition .= ' ' . $value . ' ';
+      } elseif (is_integer($field)) {
+        // when the field is an integer and none of the above conditions are met we assume
+        // that this condition is written by the user and doesn't need madeam's help
+        $condition .= ' (' . $value . ') ';
+      } else {
+        $x = strstr($field, ' ');
+        if ($x == null && !is_array($value)) {
+          $condition .= $field . ' = ';
+        } else {
+          $condition .= $field . ' ';
+        }
+        
+        if (is_array($value)) {
+          if (!empty($value)) {
+            // when the value is an array we assume the user is trying to do an "IN" comparison
+            $condition .= ' in (' . implode(',', $value) . ')';
+          }
+        } else {
+          // if the value didn't match any of the above conditions then it must be a string
+          // and therefore needs quotes
+          $condition .= Madeam_Sanitize::escape($value);
+        }
+      }
+    }
+    
+    return $condition;
   }
 
   /**
