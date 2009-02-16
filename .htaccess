@@ -8,6 +8,6 @@
   #To use sub directories uncomment this line and replace "sub" with the name of your directory
   #RewriteRule sub$ /sub/ [L]
 
-  RewriteRule ^$ public/ [L]
-  RewriteRule (.*) public/$1 [L]
+  RewriteRule ^$ public/dispatcher.php [L]
+  RewriteRule (.*) public/dispatcher.php$1 [L]
 </IfModule>
