@@ -2,16 +2,16 @@
 
 /**
  * Madeam PHP Framework <http://www.madeam.com/>
- * Copyright (c)	2009, Joshua Davey
- *								202-212 Adeliade St. W, Toronto, Ontario, Canada
+ * Copyright (c)  2009, Joshua Davey
+ *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2009, Joshua Davey
- * @link				http://www.madeam.com
- * @package			madeam
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright    Copyright (c) 2009, Joshua Davey
+ * @link        http://www.madeam.com
+ * @package      madeam
+ * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Madeam_Router {
 
@@ -35,42 +35,35 @@ class Madeam_Router {
    * @author Joshua Davey
    */
   public static function connect($route, $values = array(), $rules = array()) {
-    if (! is_array(self::$routes)) {
-      self::$routes = array();
-    }
+    // break into pieces/bits
+    $bits = explode('/', $route);
+    $regex = null;
 
-    // root route - doesn't require parsing
-    if ($route == '' || $route == '/') {
-      self::$routes[] = array('/^\/*$/', array(), $params);
-      // parse route
-    } else {
-      // break into pieces/bits
-      $bits = explode('/', $route);
-      $regex = null;
-
-      // parse each bit into it's regular expression form
-      foreach ($bits as $bit) {
-        if (preg_match('/^:([a-zA-Z_]+)$/', $bit, $match)) {
-          // named parameter
-          $name = $match[1];
-          if (isset($rules[$name])) {
-            $regex .= '(?:\\/(?P<' . $name . '>' . $rules[$name] . '))';
-            unset($rules[$name]);
-          } else {
-            $regex .= '(?:\\/(?P<' . $name . '>' . '[^\/]+))?';
-          }
+    // parse each bit into it's regular expression form
+    foreach ($bits as $bit) {
+      if (preg_match('/^:([a-zA-Z_]+)$/', $bit, $match)) {
+        // named parameter
+        $name = $match[1];
+        if (isset($rules[$name])) {
+          // named param with a rule
+          $regex .= '(?:\\/(?P<' . $name . '>' . $rules[$name] . '))'; 
+          // we don't need the rule anymore if its in the regex
+          unset($rules[$name]); 
         } else {
-          // a string
-          $regex .= '\\/' . $bit;
+          // named param with no rules
+          $regex .= '(?:\\/(?P<' . $name . '>' . '[^\/]+))?';
         }
+      } else {
+        // a string
+        $regex .= '\\/' . $bit;
       }
-      
-      // build route's regexp
-      $regex = '/^' . $regex . '\/?(.*)$/';
-      
-      // add to routes list
-      self::$routes[] = array($regex, $values, $rules);
     }
+    
+    // build route's regexp
+    $regex = '/^' . $regex . '\/?(?P<_extra>.*)$/';
+    
+    // add to routes list
+    self::$routes[] = array($regex, $values, $rules);
   }
 
   /**
@@ -91,7 +84,7 @@ class Madeam_Router {
    * @return array
    * @author Joshua Davey
    */
-  public static function parse($uri = false, $baseUri, $defaults) {
+  public static function parse($uri = false, $baseUri = '/', $defaults = array()) {
     // makes sure the first character is "/"
     if (substr($uri, 0, 1) != '/') { $uri = '/' . $uri; }
     
@@ -188,22 +181,22 @@ class Madeam_Router {
 
     // get params from uri
     $params = array_merge($defaults, $params, $get);
-  	
-  	// automagically disable the layout when making an AJAX call
+    
+    // automagically disable the layout when making an AJAX call
     if (!isset($params['_layout']) && isset($params['_ajax']) && $params['_ajax'] == 1) {
       $params['_layout'] = 0;
     } elseif (!isset($params['_layout'])) {
-    	$params['_layout'] = 1;
+      $params['_layout'] = 1;
     }
     
     // add query to params
     if (isset($query)) {
-    	$params['_query'] = $query;
-  	}
-  	
+      $params['_query'] = $query;
+    }
+    
     // set format
     if ($format !== false) {
-    	$params['_format'] = $format;
+      $params['_format'] = $format;
     }
     
     return $params;
