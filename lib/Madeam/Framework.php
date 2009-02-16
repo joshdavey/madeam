@@ -1,13 +1,13 @@
 <?php
 /**
- * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
- * Copyright (c)	2006, Joshua Davey
- *								24 Ridley Gardens, Toronto, Ontario, Canada
+ * Madeam PHP Framework <http://www.madeam.com/>
+ * Copyright (c)	2009, Joshua Davey
+ *								202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2006, Joshua Davey
+ * @copyright		Copyright (c) 2009, Joshua Davey
  * @link				http://www.madeam.com
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -171,14 +171,14 @@ require $cd . 'Registry.php';
 
 
 /**
- * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
- * Copyright (c)	2006, Joshua Davey
- *								24 Ridley Gardens, Toronto, Ontario, Canada
+ * Madeam PHP Framework <http://www.madeam.com/>
+ * Copyright (c)	2009, Joshua Davey
+ *								202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2006, Joshua Davey
+ * @copyright		Copyright (c) 2009, Joshua Davey
  * @link				http://www.madeam.com
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -451,32 +451,17 @@ class Madeam_Framework {
   /**
    * This is where all the magic starts.
    *
-   * This method workds by accepting a URL which acts as a query and some configuration information in the form of an array.
-   * The URL is processed by the madeamRouter which returns paramaters based on the routing @see app/Config/routes.php
-   * The action of the framework is based on 3 parameters that are normally defined in the routes but have default values
-   * assigned to them if not set. The 3 parameters are $controller, $action and $format.
-   *
-   * $controller is the name of the controller's class that the framework calls.  example: article
-   * $action is the name of the controller class's method that is called.         example: show
-   * $format is a file extension that determines which view to call.              example: html
-   *
-   * If there is not class associated with the controller being called then it looks for a view instead.
-   *
-   * If there is not method associated with the action called then it renders a view without calling the action.
-   *
    * @param string $uri -- example: controller/action/32?foo=bar
    * @param array $params
    * @return string
    * @author Joshua Davey
    */
   public static function request($uri, $params = array()) {
-    // get request parameters from uri and merge them with other params
-    // example input: 'posts/show/32'
-    $params = array_merge($params, Madeam_Router::parse($uri, self::$uriAppPath, array(
+    $params = Madeam_Router::parse($uri, self::$uriAppPath, $params + array(
       '_controller' => self::defaultController,
       '_action'     => self::defaultAction,
       '_format'     => self::defaultFormat
-    )));
+    ));
     
     return self::control($params);
   }

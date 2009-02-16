@@ -45,7 +45,7 @@ switch (Madeam_Framework::$environment) {
 }
 
 /**
- * 
+ * Set session path
  */
 session_save_path(Madeam_Framework::$pathToEtc . 'sessions' . DS);
 

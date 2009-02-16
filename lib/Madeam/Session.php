@@ -1,14 +1,14 @@
 <?php
 
 /**
- * self :  Rapid Development MVC Framework <http://www.self.com/>
- * Copyright (c)	2006, Joshua Davey
- *								24 Ridley Gardens, Toronto, Ontario, Canada
+ * self :  PHP Framework <http://www.self.com/>
+ * Copyright (c)	2009, Joshua Davey
+ *								202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2006, Joshua Davey
+ * @copyright		Copyright (c) 2009, Joshua Davey
  * @link				http://www.self.com
  * @package			self
  * @version			0.0.6
