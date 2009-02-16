@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Madeam :  Rapid Development MVC Framework <http://www.madeam.com/>
- * Copyright (c)	2006, Joshua Davey
- *								24 Ridley Gardens, Toronto, Ontario, Canada
+ * Madeam PHP Framework <http://www.madeam.com/>
+ * Copyright (c)	2009, Joshua Davey
+ *								202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright		Copyright (c) 2006, Joshua Davey
+ * @copyright		Copyright (c) 2009, Joshua Davey
  * @link				http://www.madeam.com
  * @package			madeam
  * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -16,15 +16,6 @@
 class Madeam_Router {
 
   public static $routes = array(); // regex, names, params
-
-  // do we really need this
-  public static $actionRequestMethodMap = array(
-  array('_action' => 'index', '_method' => 'get', 'id' => false), 
-  array('_action' => 'read', '_method' => 'get', 'id' => true), 
-  array('_action' => 'delete', '_method' => 'delete', 'id' => true), 
-  array('_action' => 'edit', '_method' => 'put', 'id' => true), 
-  array('_action' => 'edit', '_method' => 'post', 'id' => false), 
-  array('_action' => 'add', '_method' => 'post', 'id' => false));
 
   public static function resource($name) {
     self::connect("$name",            array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
@@ -43,7 +34,7 @@ class Madeam_Router {
    * @param array $params
    * @author Joshua Davey
    */
-  public static function connect($route, $params = array(), $rules = array()) {
+  public static function connect($route, $values = array(), $rules = array()) {
     if (! is_array(self::$routes)) {
       self::$routes = array();
     }
@@ -54,37 +45,31 @@ class Madeam_Router {
       // parse route
     } else {
       // break into pieces/bits
-      //$bits     = preg_explode('/[\/\.]/', $route);
       $bits = explode('/', $route);
-      $mini_exp = $names = array();
-      $bitkey = 0; // key for named bits
+      $regex = null;
 
       // parse each bit into it's regular expression form
       foreach ($bits as $bit) {
         if (preg_match('/^:([a-zA-Z_]+)$/', $bit, $match)) {
           // named parameter
-          $bitkey ++;
           $name = $match[1];
-          if (isset($params[$name])) {
-            //$mini_exp[] = '(?:\\/(?P<' . $name . '>' . $params[$name] . '){1})';
-            //$mini_exp[] = '(?:\\/(' . $params[$name] . '){1})';
-            $mini_exp[] = '(?:\\/(' . $params[$name] . '))';
+          if (isset($rules[$name])) {
+            $regex .= '(?:\\/(?P<' . $name . '>' . $rules[$name] . '))';
+            unset($rules[$name]);
           } else {
-            //$mini_exp[] = '(?:\\/(?P<' . $name . '>' . '[^\/]+))?';
-            $mini_exp[] = '(?:\\/([^\/]+))?';
+            $regex .= '(?:\\/(?P<' . $name . '>' . '[^\/]+))?';
           }
-          $names[$bitkey] = $name;
         } else {
           // a string
-          $mini_exp[] = '\\/' . $bit;
+          $regex .= '\\/' . $bit;
         }
       }
       
       // build route's regexp
-      $regexp = '/^' . implode('', $mini_exp) . '\/?(.*)$/';
+      $regex = '/^' . $regex . '\/?(.*)$/';
       
       // add to routes list
-      self::$routes[] = array($regexp, $names, $params, $rules);
+      self::$routes[] = array($regex, $values, $rules);
     }
   }
 
@@ -108,13 +93,11 @@ class Madeam_Router {
    */
   public static function parse($uri = false, $baseUri, $defaults) {
     // makes sure the first character is "/"
-    if (substr($uri, 0, 1) != '/') {
-      $uri = '/' . $uri;
-    }
+    if (substr($uri, 0, 1) != '/') { $uri = '/' . $uri; }
     
     // parse uri
     $parsedURI = parse_url($uri);
-            
+     
     // set uri
     if (isset($parsedURI['path']) && $baseUri == '/') {
       $uri = $parsedURI['path'];
@@ -129,10 +112,8 @@ class Madeam_Router {
     } else {
       $uri = null;
     }
-    
-    
+        
     $format = false;
-    
     // grab format if it exists in the uri and strip it from the uri
     // index.html => format = 'html' && uri = 'index'
     $dotPosition = (int) strrpos($uri, '.');
@@ -140,17 +121,6 @@ class Madeam_Router {
       $format = substr($uri, $dotPosition + 1);
       $uri    = substr($uri, 0, $dotPosition);
     }
-    
-    
-    // TODO: Benchmark this format and URI code against the code above
-    //$URIAnatomy = explode('.', $uri, 2);
-    //if (count($URIAnatomy) > 1) {
-    //  $format = array_pop($URIAnatomy);
-    //  $uri = implode($URIAnatomy);
-    //} else {
-    //  $uri = $URIAnatomy[0];
-    //}
-   
 
     // set get
     $get = array();
@@ -158,11 +128,7 @@ class Madeam_Router {
       $query = $parsedURI['query'];
       // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
       parse_str($query, $get); // assigns $get array of query params
-      unset($query);
     }
-
-    // define params as array
-    $params = array();
 
     // matchs count
     $matchs = 0;
@@ -171,28 +137,37 @@ class Madeam_Router {
     foreach (self::$routes as $route) {
       if (preg_match($route[0], $uri, $match)) {
         // set default params
-        $params = $route[2]; // default values
+        $params = $route[1]; // default values
+        $rules  = $route[2]; // param rules
         
-        $rules = $route[3];
+        // set _uri param for websites that don't have mod_rewrite
+        // sites with mod_rewrite have _uri assigned automatically in the .htaccess file
+        $params['_uri'] = $match[0];
         
-        // set derived params
-        foreach ($route[1] as $key => $name) {
-          if ($match[$key] != null) {
-            $params[$name] = $match[$key];
+        // clean param matchs by removing nulls and preg_match's numbered results
+        // every other match is a numbered preg_match result
+        $index = 0;
+        foreach ($match as $key => $val) {
+          if ($val == null) {
+            unset($match[$key]); // remove null values in order for the default values to work
+          } elseif (++$index % 2) {
+            unset($match[$key]); // remove preg_match's numbered results
           }
         }
         
+        // merge default param values with matched params
+        $params = array_merge($defaults, $params, $match);
+        
+        // check each rule against its associated param.
+        // if it fails then we break out of this loop and continue to the next route
         $continue = false;
         foreach ($rules as $rule => $val) {
-          if ($params[$rule] !== $val) {
+          if (!isset($params[$rule]) || $params[$rule] !== $val) {
             $continue = true;
             break;
           }
-        }
-        
-        if ($continue === true) {
-          continue;
-        }
+        }        
+        if ($continue === true) { continue; }
         
         // flag as matched
         $matchs++;
