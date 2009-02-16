@@ -25,7 +25,7 @@ class Madeam_Script_Create extends Madeam_Console_Script {
     // default params
     $_params = array(
       'extends' => 'Controller_App', 
-      'actions' => 'index,show,new,create,edit,update,delete'
+      'actions' => 'index,read,new,create,edit,update,delete'
     );
     
     // merge new params with default params
@@ -104,7 +104,7 @@ class Madeam_Script_Create extends Madeam_Console_Script {
     // define model class
     $modelContents = "<?php\nclass $modelClassName extends " . $params['extends'] . " {";
     // close class definition
-    $modelContents .= "\n\n}\n?>";
+    $modelContents .= "\n\n}";
     // save file
     if ($this->createFile($modelName . '.php', Madeam_Framework::$pathToApp . 'Model' . DS, $modelContents) === true) {
       return true;
@@ -215,7 +215,7 @@ class Madeam_Script_Create extends Madeam_Console_Script {
       closedir($dh);
     }
     // close class definition
-    $controllerContents .= "\n\n}\n?>";
+    $controllerContents .= "\n\n}";
     // save file contents to file
     $this->createFile($controllerClassName . '.php', PATH_TO_CONTROLLER, $controllerContents);
     // read scaffold directory for views
