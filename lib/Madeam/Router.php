@@ -27,11 +27,12 @@ class Madeam_Router {
   array('_action' => 'add', '_method' => 'post', 'id' => false));
 
   public static function resource($name) {
-    self::connect("$name",      array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
-    self::connect("$name/:id",  array('_action' => 'show',    '_controller' => $name),  array('_method' => 'get'));
-    self::connect("$name",      array('_action' => 'delete',  '_controller' => $name),  array('_method' => 'delete'));
-    self::connect("$name",      array('_action' => 'update',  '_controller' => $name),  array('_method' => 'put'));
-    self::connect("$name",      array('_action' => 'create',  '_controller' => $name),  array('_method' => 'post'));
+    self::connect("$name",            array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
+    self::connect("$name/:id",        array('_action' => 'show',    '_controller' => $name),  array('_method' => 'get'));
+    self::connect("$name",            array('_action' => 'delete',  '_controller' => $name),  array('_method' => 'delete'));
+    self::connect("$name",            array('_action' => 'update',  '_controller' => $name),  array('_method' => 'put'));
+    self::connect("$name",            array('_action' => 'create',  '_controller' => $name),  array('_method' => 'post'));
+    self::connect("$name/:_action",   array('_controller' => $name));
   }
 
   /**
@@ -171,13 +172,26 @@ class Madeam_Router {
       if (preg_match($route[0], $uri, $match)) {
         // set default params
         $params = $route[2]; // default values
-        //test($match);
+        
+        $rules = $route[3];
         
         // set derived params
         foreach ($route[1] as $key => $name) {
           if ($match[$key] != null) {
             $params[$name] = $match[$key];
           }
+        }
+        
+        $continue = false;
+        foreach ($rules as $rule => $val) {
+          if ($params[$rule] !== $val) {
+            $continue = true;
+            break;
+          }
+        }
+        
+        if ($continue === true) {
+          continue;
         }
         
         // flag as matched
