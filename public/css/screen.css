@@ -15,6 +15,13 @@ body {
 
 /* Typography
 -----------------------------------------------------------------------------*/
+a:active, a:visited {
+  color: #444;
+}
+a:hover {
+  color: #000;
+}
+
 p, h1, h2, h3, h4, h5, ul, ol, table, blockquote, code {
   margin-top: 1em;
 }
