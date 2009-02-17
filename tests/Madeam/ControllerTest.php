@@ -115,6 +115,38 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   }
   
   /**
+   * When implicitly defining data for a view the controller class's member variables
+   * should be passed a long as well.
+   * 
+   * <File tests/data.html>
+   * Data is <?php echo $data; ?>
+   * </File>
+   */
+  public function testRenderMemberDataEvenWhenDataImplicitlyDefined() {
+    $this->controller->data = 'Member';
+    $return = $this->controller->render(array('view' => 'tests/data', 'data' => array()));
+    $this->assertEquals('Data is Member', $return);
+  }
+  
+  /**
+   * This tests to make sure that if you implicitly define the data it should over overide
+   * whatever you defined in the controller class.
+   * 
+   * <File tests/data.html>
+   * Data is <?php echo $data; ?>
+   * </File>
+   */
+  public function testRenderDataOrder() {
+    $this->controller->data = 'Member';
+    $return = $this->controller->render(array('view' => 'tests/data'));
+    $this->assertEquals('Data is Member', $return);
+    
+    $this->controller->data = 'Member';
+    $return = $this->controller->render(array('view' => 'tests/data', 'data' => array('data' => 'Implicit')));
+    $this->assertEquals('Data is Implicit', $return);
+  }
+  
+  /**
    * 
    * <File tests/view.html>
    * View

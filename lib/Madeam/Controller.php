@@ -404,8 +404,7 @@ class Madeam_Controller {
     // if the view doesn't exist we need to serialize it.
     if (file_exists($view)) {
       // extract data to view and layout
-      //extract(array_merge($settings['data'], array('params' => $this->params)));
-      extract(array_merge($settings['data'], (array) $this));
+      extract(array_merge((array) $this->_data, (array) $this, $settings['data']));
       
       // render view's content
       ob_start();
