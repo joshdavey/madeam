@@ -15,42 +15,38 @@
 class Madeam_Controller {
 
   /**
-   * Enter description here...
-   *
+   * Layouts
    * @var string/array
    */
   public $_layout = 'master';
 
   /**
-   * Enter description here...
-   *
+   * Path to view file from View directory including view's name (without file extension)
+   * example: posts/index
    * @var string
    */
   public $_view = null;
 
   /**
-   * Enter description here...
-   *
+   * Data to be sent to view
    * @var array
    */
   public $_data = array();
   
   /**
-   * undocumented 
-   *
-   * @author Joshua Davey
+   * Output of the request 
+   * @var string
    */
   public $_output = null;
   
   /**
-   * 
+   * List of all models used at time of request.
    * @var array
    */
   public $_models = array();
 
   /**
-   * Enter description here...
-   *
+   * Configuration for this controller
    * @var array
    */
   public $_setup = array();
@@ -76,8 +72,7 @@ class Madeam_Controller {
   
   
   /**
-   * undocumented 
-   *
+   * A map of all the file formats to their associated serialization method
    * @author Joshua Davey
    */
   public static $formatMethodMap = array(
@@ -88,7 +83,13 @@ class Madeam_Controller {
   
   
   /**
-   * Enter description here...
+   * Controller __construct. Preps the controller.
+   * - set params
+   * - set flash
+   * - set view
+   * - set layout
+   * - check for setup cache
+   * - load setup (callbacks, etc...)
    *
    * @param array $params
    * @author Joshua Davey
@@ -213,7 +214,6 @@ class Madeam_Controller {
    * 
    * @param string $name
    * @param string $value
-   * @author Joshua Davey
    */
   final public function __set($name, $value) {
     if (!preg_match('/^(?:_[A-Z])/', $name)) {
@@ -225,7 +225,7 @@ class Madeam_Controller {
   /**
    * 
    * @param string $name
-   * @author Joshua Davey
+   * @return boolean
    */
   final public function __isset($name) {
     if (isset($this->_data[$name])) {
@@ -239,7 +239,6 @@ class Madeam_Controller {
   /**
    * 
    * @param string $name
-   * @author Joshua Davey
    */
   final public function __unset($name) {
     unset($this->_data[$name]);
@@ -248,7 +247,7 @@ class Madeam_Controller {
   
   /**
    * 
-   * @author Joshua Davey
+   * @return string
    */
   final public function process() {
 
@@ -301,10 +300,9 @@ class Madeam_Controller {
   
   
   /**
-   * Enter description here...
+   * Perform a callback.
    *
    * @param string $name
-   * @author Joshua Davey
    */
   final public function callback($name) {
     foreach ($this->_setup[$name] as $callback) {
@@ -319,22 +317,33 @@ class Madeam_Controller {
 
 
   /**
-   * Enter description here...
+   * Set the name of the view file (ignoring the file extension) 
    *
    * @param string $view
-   * @author Joshua Davey
+   * @return string
    */
   final public function view($view) {
     $this->_view = $view;
     return $this->_view;
   }
+  
+  /**
+   * Set the format this should be rendered as
+   *
+   * @param string $format 
+   * @return string
+   */
+  final public function format($format) {
+    $this->params['_format'] = $format;
+    return $this->params['_format'];
+  }
 
 
   /**
-   * Enter description here...
+   * Set the layout(s) the layout should be rapped in.
    *
    * @param string/array $layouts
-   * @author Joshua Davey
+   * @return array
    */
   final public function layout($layouts) {
     $this->_layout = array();
@@ -354,8 +363,12 @@ class Madeam_Controller {
 
 
   /**
-   * 
-   * @author Joshua Davey
+   * Renders the output of the request. Can also be used to render partials and other views.
+   * examples: 
+   *  $this->render(array('partial' => 'posts/_comment'));
+   *  $this->render(array('view' => 'posts/read', 'data' => array('post' => $post)));
+   *  $this->render(array('controller' => 'posts', 'action' => 'read'));
+   * @return string
    */
   final public function render($settings) {
     
@@ -385,7 +398,7 @@ class Madeam_Controller {
     }
     
     
-    // set the view file path
+    // set view file name
     if (isset($settings['partial'])) {
       $partial = explode('/', $settings['partial']);
       $partialName = array_pop($partial);
@@ -394,6 +407,7 @@ class Madeam_Controller {
       $viewFile = str_replace('/', DS, strtolower($settings['view'])) . '.' . $this->params['_format'];
     }
     
+    // full path to view
     $view = Madeam_Controller::$viewPath . $viewFile;
     
     if (!isset($settings['data'])) {

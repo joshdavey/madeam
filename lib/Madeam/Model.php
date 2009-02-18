@@ -19,14 +19,14 @@ class Madeam_Model {
    *
    * @var unknown_type
    */
-  public $resourceName = false;
+  protected $resourceName = false;
 
   /**
    * Enter description here...
    *
    * @var unknown_type
    */
-  public $primaryKey = false;
+  protected $primaryKey = false;
   
   /**
    * Enter description here...
