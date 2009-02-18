@@ -3,14 +3,7 @@ require_once 'tests' . DIRECTORY_SEPARATOR . 'Bootstrap.php';
 
 class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   
-  /**
-   * 
-   */
   protected $params;
-  
-  /**
-   * 
-   */
   protected $controller;
   
   /**

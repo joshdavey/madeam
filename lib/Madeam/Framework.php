@@ -1,6 +1,6 @@
 <?php
 /**
- * Madeam PHP Framework <http://www.madeam.com/>
+ * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
  *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
@@ -66,26 +66,6 @@ function test($var = null) {
   } else {
     echo "<br /> [T::" . $tests . "] &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
   }
-}
-
-/**
- * Re-named strtoupper
- *
- * @param string $word
- * @return string
- */
-function up($word) {
-  return strtoupper($word);
-}
-
-/**
- * Re-named strtolower
- *
- * @param string $word
- * @return string
- */
-function low($word) {
-  return strtolower($word);
 }
 
 /**
@@ -169,7 +149,7 @@ require $cd . 'Registry.php';
 
 
 /**
- * Madeam PHP Framework <http://www.madeam.com/>
+ * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
  *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *

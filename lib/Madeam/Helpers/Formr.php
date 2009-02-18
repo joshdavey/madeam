@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Madeam PHP Framework <http://www.madeam.com/>
+ * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
  *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *

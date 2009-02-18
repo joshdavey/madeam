@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Madeam PHP Framework <http://www.madeam.com/>
+ * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
  *                202-212 Adeliade St. W, Toronto, Ontario, Canada
  *
@@ -23,20 +23,20 @@ class Madeam_Inflector {
    * @param string $string
    * @return string
    */
-  public static function pluralize($string) {
-    $lastLetter = substr($string, -1);
-    if (array_key_exists(strtolower($string), self::$irregulars)) {
-      return self::$irregulars[$string];
-    } elseif (in_array($lastLetter, array('s', 'z', 'x')) || in_array(substr($string, -2), array('sh', 'ch'))) {
-      return $string . 'es';
-      } elseif (in_array(substr($string, -2, 1), array('a', 'e', 'i', 'o', 'u')) && $lastLetter == 'y') {
-        return $string . 's';
+  public static function pluralize($word) {
+    $lastLetter = substr($word, -1);
+    if (array_key_exists(strtolower($word), self::$irregulars)) {
+      return self::$irregulars[$word];
+    } elseif (in_array($lastLetter, array('s', 'z', 'x')) || in_array(substr($word, -2), array('sh', 'ch'))) {
+      return $word . 'es';
+      } elseif (in_array(substr($word, -2, 1), array('a', 'e', 'i', 'o', 'u')) && $lastLetter == 'y') {
+        return $word . 's';
     } elseif ($lastLetter == 'y') {
-      return substr_replace($string, 'sei', -1, 1);
-    } elseif ($lastLetter == 'o' && in_array(substr($string, -2, 1), array('b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'))) {
-      return $string . 's';
+      return substr_replace($word, 'ies', -1, 1);
+    } elseif ($lastLetter == 'o' && in_array(substr($word, -2, 1), array('b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'))) {
+      return $word . 'es';
     } else {
-      return $string . 's';
+      return $word . 's';
     }
   }
 
@@ -46,18 +46,18 @@ class Madeam_Inflector {
    * @param string $string
    * @return string
    */
-  public static function singalize($string) {
-    $plural_irregulars = array_flip(self::$irregulars);
-    if (array_key_exists(strtolower($string), $plural_irregulars)) {
-      return $plural_irregulars[$string];
-    } elseif (strtolower($string[strlen($string) - 1]) != 's') {
-      return $string;
-    } elseif (substr(strtolower($string), - 3, 3) == 'ies') {
-      $string = preg_replace('/sei/i', 'y', strrev($string), 1);
-      return strrev($string);
+  public static function singalize($word) {
+    $pluralIrregulars = array_flip(self::$irregulars);
+    if (array_key_exists(strtolower($word), $pluralIrregulars)) {
+      return $pluralIrregulars[$word];
+    } elseif (strtolower($word[strlen($word) - 1]) != 's') {
+      return $word;
+    } elseif (substr(strtolower($word), - 3, 3) == 'ies') {
+      $word = preg_replace('/sei/i', 'y', strrev($word), 1);
+      return strrev($word);
     } else {
-      $string = preg_replace('/s/i', '', strrev($string), 1);
-      return strrev($string);
+      $word = preg_replace('/s/i', '', strrev($word), 1);
+      return strrev($word);
     }
   }
 
@@ -73,13 +73,7 @@ class Madeam_Inflector {
    * @param string $string
    */
   public static function camelize($string) {
-    $matchs = array();
-    preg_match_all('/([\/\-\_\s\\\]{1}.{1})/', $string, $matchs);
-    foreach ($matchs[0] as $match) {
-      $replacement = up(substr($match, 1, 1));
-      $string = str_replace($match, $replacement, $string);
-    }
-    return $string;
+    return preg_replace('/[^a-zA-Z0-9]([a-z]*)/e', "ucfirst('\\1')", $string);
   }
 
   /**
@@ -99,7 +93,7 @@ class Madeam_Inflector {
 
   /**
    * This method is pronounced "dash-ize".
-   * Replaces specific characters with dashes
+   * Replaces special characters with dashes
    *
    * "fooBar"  => "foo-bar"
    * "foo_bar" => "foo-bar"
@@ -111,16 +105,43 @@ class Madeam_Inflector {
     return self::specialize('-', $string);
   }
 
+  /**
+   * Replaces special characters with forward slashes
+   *
+   * "fooBar"  => "foo/bar"
+   * "foo_bar" => "foo/bar"
+   * "foo bar" => "foo/bar"
+   *
+   * @param string $string
+   */
   public static function forwardSlashize($string) {
     return self::specialize('/', $string);
   }
 
-  public static function backstringSlashize($string) {
+  /**
+   * Replaces special characters with back slashes
+   *
+   * "fooBar"  => "foo\bar"
+   * "foo_bar" => "foo\bar"
+   * "foo bar" => "foo\bar"
+   *
+   * @param string $string
+   */
+  public static function backSlashize($string) {
     return self::specialize('\\', $string);
   }
 
+  /**
+   * This method makes strings more readable to human
+   *
+   * "fooBar"  => "Foo Bar"
+   * "foo_bar" => "Foo Bar"
+   * "foo bar" => "Foo Bar"
+   *
+   * @param string $string
+   */
   public static function humanize($string) {
-    return ucfirst(self::specialize(' ', $string));
+    return ucwords(preg_replace('/\s\s+/', ' ', self::specialize(' ', $string)));
   }
 
   public static function modelClassize($string) {
@@ -156,28 +177,27 @@ class Madeam_Inflector {
     return self::singalize(self::underscorize($string)) . '_id';
   }
 
-  /**
-   * undocumented 
-   *
-   * @author Joshua Davey
-   */
   public static function specialize($char, $string) {
-    $matchs = array();
-    preg_match_all('/([\/\-\_\s\\\\.]{1}.{1})||([A-Z])/', $string, $matchs);
-    foreach ($matchs[0] as $match) {
-      if (strlen($match) == 1) {
-        $replacement = $char . strtolower($match);
-        $string = str_replace($match, $replacement, $string);
-      }
-      $replacement = $char . strtolower(substr($match, 1, 1));
-      $string = str_replace($match, $replacement, $string);
-    }
-    return $string;
+    // pad all capitalized strings with replacement character and make the text lowercase.
+    $string = strtolower(preg_replace('/[^a-zA-Z0-9' . preg_quote($char, '/') . ']*([A-Z]+)/', preg_quote($char)  . '${1}', $string));
+    $string = preg_replace('/([^a-z0-9' . preg_quote($char, '/') . ']+)/', $char, $string);
+    
+    // return formatted string
+    return strtolower($string);
   }
 
-  public static function slug($string, $seperator = '-') {
-    $string = strtolower(str_replace(' ', $seperator, trim($string)));
-    $string = preg_replace('/[\$,!\/\?\\\\&\.\#]/', '', $string);
+  /**
+   * This method returns a string formatted so that it is appropriate to
+   * use in a URL.
+   *
+   * @param string $string 
+   * @param string $separator 
+   * @return string
+   * @author Joshua Davey
+   */
+  public static function slug($string, $separator = '-') {
+    $string = strtolower(str_replace(' ', $separator, trim($string)));
+    $string = preg_replace('/[^a-z0-9' . preg_quote($separator) . ']/', '', $string);
     return $string;
   }
   
