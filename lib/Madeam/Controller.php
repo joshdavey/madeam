@@ -63,23 +63,27 @@ class Madeam_Controller {
    * @var array
    */
   public $params = array();
+    
+  /**
+   * List the formats that this controller returns
+   */
+  public $_returns = array('html');
+   
+  /**
+   * A map of all the file formats to their associated serialization method
+   * @author Joshua Davey
+   */
+  public $_formats = array(
+    'xml'   => array('Madeam_Serialize_Xml',  'encode'),
+    'json'  => array('Madeam_Serialize_Json', 'encode'),
+    'sphp'  => array('Madeam_Serialize_Sphp', 'encode')
+  );
   
   /**
    * View directory
    * @var string
    */
   public static $viewPath = null;
-  
-  
-  /**
-   * A map of all the file formats to their associated serialization method
-   * @author Joshua Davey
-   */
-  public static $formatMethodMap = array(
-    'xml'   => array('Madeam_Serialize_Xml',  'encode'),
-    'json'  => array('Madeam_Serialize_Json', 'encode'),
-    'sphp'  => array('Madeam_Serialize_Sphp', 'encode'),
-  );
   
   
   /**
@@ -443,11 +447,14 @@ class Madeam_Controller {
       $format = $this->params['_format'];
       $class = false;
       $method = false;
-      if (isset(self::$formatMethodMap[$format])) {
-        $class  = self::$formatMethodMap[$format][0];
-        $method = self::$formatMethodMap[$format][1];
+      if (isset($this->_formats[$format])) {
+        $class  = $this->_formats[$format][0];
+        $method = $this->_formats[$format][1];
       }
-      if (method_exists($class, $method)) {
+      if (!in_array($format, $this->_returns)) {
+        throw new Madeam_Controller_Exception_MissingView('Unaccepted Format "<strong>' . $format . '</strong>" in the controller <strong>' . get_class($this) . '</strong>.' . "\n
+        Add the following to <strong>" . get_class($this) . "</strong><code>public \$_returns = array('" . implode("', '", array_merge($this->_returns, array($format))) . "');</code>");
+      } elseif (method_exists($class, $method)) {
         $_content = call_user_func($class .'::' . $method, $settings['data']);
       } else {
         throw new Madeam_Controller_Exception_MissingView('Missing View: <strong>' . $viewFile . "</strong> and unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create File: <strong>app/View/" . $viewFile . "</strong>");
