@@ -305,7 +305,6 @@ class Madeam_Controller {
   
   /**
    * Perform a callback.
-   *
    * @param string $name
    */
   final public function callback($name) {
@@ -319,6 +318,27 @@ class Madeam_Controller {
     }
   }
 
+  /**
+   * This is a helper method to help the user accept the formats an action returns.
+   *
+   * @param string $formats 
+   * @return array
+   */
+  final public function returns($formats) {
+    $this->_returns = array();
+    if (func_num_args() < 2) {
+      if (is_string($formats)) {
+        $this->_returns[] = $formats;
+      } elseif (is_array($formats)) {
+        $this->_returns = $formats;
+      } else {
+        $this->_returns = array(); // doens't return anthing
+      }
+    } else {
+      $this->_returns = func_get_args();
+    }
+    return $this->_returns;
+  }
 
   /**
    * Set the name of the view file (ignoring the file extension) 
