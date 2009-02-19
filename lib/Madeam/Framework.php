@@ -87,25 +87,6 @@ function eh($string) {
 }
 
 /**
- * Checks to see if a relative file exists by checking each include path.
- * Special thanks to Ahmad Nassri from PHP-Infinity for the proof of concept.
- *
- * @param string $file
- * @return boolean
- */
-function fileLives($file) {
-  $paths = explode(PATH_SEPARATOR, get_include_path());
-  
-  foreach ($paths as $path) {
-    if (is_file($path . $file)) {
-      return $path . $file;
-    }
-  }
-  
-  return false;
-}
-
-/**
  * Enter description here...
  *
  * @param unknown_type $e
@@ -622,12 +603,13 @@ class Madeam_Framework {
     
     // checks all the include paths to see if the file exist and then returns a
     // full path to the file or false
-    $file = fileLives($file);
-
-    // include class file
-    if (is_string($file)) {
-      require $file;
-    }    
+    $paths = explode(PATH_SEPARATOR, get_include_path());
+    foreach ($paths as $path) {
+      if (file_exists($path . $file)) {
+        require $path . $file;
+        break;
+      }
+    } 
   }
   
 
@@ -639,11 +621,9 @@ class Madeam_Framework {
    * @author Joshua Davey
    */
   public static function autoloadFail($class) {
-    if (! class_exists($class, false) && ! interface_exists($class, false)) {
-      $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
-      eval("class $class {}");
-      throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
-    }
+    $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
+    eval("class $class {}");
+    throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
   }
   
 }
