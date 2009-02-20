@@ -92,7 +92,7 @@ function eh($string) {
  * @param unknown_type $e
  */
 function Madeam_UncaughtException($e) {
-  Madeam_Exception::catchException($e, array('message' => "Uncaught Exception: \n" . $e->getMessage()));
+  Madeam_Framework_Exception::catchException($e, array('message' => "Uncaught Exception: \n" . $e->getMessage()));
   return true;
 }
 
@@ -108,7 +108,7 @@ function Madeam_ErrorHandler($code, $string, $file, $line) {
   // return regular PHP errors when they're non-fatal
   if ($code == 2 || $code == 4 || $code == 8) { return false; }
 
-  throw new Madeam_Exception($string, $code);
+  throw new Madeam_Framework_Exception($string, $code);
   return true;
 }
 
@@ -286,7 +286,7 @@ class Madeam_Framework {
     // check for expected server parameters
     $diff = array_diff(array('DOCUMENT_ROOT', 'REQUEST_URI', 'QUERY_STRING', 'REQUEST_METHOD'), array_keys($server));
     if (!empty($diff)) {
-      throw new Madeam_Exception_MissingExpectedParam('Missing expected server Parameter(s).');
+      throw new Madeam_Framework_Exception_MissingExpectedParam('Missing expected server Parameter(s).');
     }
     
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
@@ -457,7 +457,7 @@ class Madeam_Framework {
     
     try {
       $controller = new $controllerClass($params);
-    } catch(Madeam_Exception_AutoloadFail $e) {
+    } catch(Madeam_Framework_Exception_AutoloadFail $e) {
       if (is_dir(Madeam_Controller::$viewPath . $params['_controller'])) {
         $view = $params['_controller'] . '/' . $params['_action'];
         $params['_controller'] = 'app';
@@ -472,7 +472,7 @@ class Madeam_Framework {
       } else {
         // no controller or view found = critical error.
         header("HTTP/1.1 404 Not Found");
-        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>app/Controller/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . Madeam_Inflector::camelize(lcfirst($params['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
+        Madeam_Framework_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>app/Controller/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . Madeam_Inflector::camelize(lcfirst($params['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
       }
     }
 
@@ -487,10 +487,10 @@ class Madeam_Framework {
       return $response;
     } catch (Madeam_Controller_Exception_MissingAction $e) {
       header("HTTP/1.1 404 Not Found");
-      Madeam_Exception::catchException($e);
+      Madeam_Framework_Exception::catchException($e);
     } catch (Madeam_Controller_Exception_MissingView $e) {
       header("HTTP/1.1 404 Not Found");
-      Madeam_Exception::catchException($e);
+      Madeam_Framework_Exception::catchException($e);
     }
   }
   
@@ -552,7 +552,7 @@ class Madeam_Framework {
         exit();
       }
     } else {
-      throw new Madeam_Exception_HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
+      throw new Madeam_Framework_Exception_HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
     }
   }
 
@@ -623,7 +623,7 @@ class Madeam_Framework {
   public static function autoloadFail($class) {
     $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
     eval("class $class {}");
-    throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
+    throw new Madeam_Framework_Exception_AutoloadFail('Missing Class ' . $class);
   }
   
 }

@@ -1,0 +1,2 @@
+<?php
+class Madeam_Framework_Exception_AutoloadFail extends Madeam_Framework_Exception {}

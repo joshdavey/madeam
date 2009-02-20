@@ -268,6 +268,7 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
     $this->params['_format'] = 'json';
     
     $controller = new Controller_Tests($this->params);
+    $controller->returns('json');
     $return = $controller->process();
     $this->assertEquals('{"data":"True"}', $return);
   }
@@ -283,6 +284,7 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
     $this->params['_format'] = 'json';
     
     $controller = new Controller_Tests($this->params);
+    $controller->returns('json');
     $return = $controller->process();
     $this->assertEquals('{"data":"True"}', $return);
   }
@@ -298,6 +300,7 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
     $this->params['_format'] = 'json';
     
     $controller = new Controller_Tests($this->params);
+    $controller->returns('json');
     $return = $controller->process();
     $this->assertEquals('[]', $return);
   }

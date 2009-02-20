@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey

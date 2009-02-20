@@ -16,7 +16,7 @@ class Madeam_EnvironmentTest extends PHPUnit_Framework_TestCase {
   public function testPHPVersionIs523OrGreater() {
     $version = explode('.', phpversion());
     
-    if ((int) $version[0] == 5 && (int) $version[1] >= 2 && (int) $version[2] >= 3) {
+    if (((int) $version[0] == 5 && (int) $version[1] >= 2 && (int) $version[2] >= 3) || ((int) $version[0] == 5 && (int) $version[1] >= 3)) {
       $this->assertTrue(true);
     } else {
       $this->fail('Invalid version of PHP');

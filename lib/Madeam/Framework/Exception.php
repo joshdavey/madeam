@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -13,7 +12,7 @@
  * @package      madeam
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Exception extends Exception {
+class Madeam_Framework_Exception extends Exception {
 
   private static $funSnippets = array(
     "don't worry, be happy. It could be worse.",
@@ -32,26 +31,6 @@ class Madeam_Exception extends Exception {
     'click "OK" to continue.',
     "this looks ready to launch. /sarcasm"
   );
-
-  /**
-   * Error Codes
-   *
-   * 1      | E_ERROR n
-   * 2      | E_WARNING y
-   * 4      | E_PARSE y
-   * 8      | E_NOTICE y
-   * 16     | E_CORE_ERROR n
-   * 32     | E_CORE_WARNNING y
-   * 64     | E_COMPILE_ERROR n
-   * 128    | E_COMPILE_WARNING y
-   * 256    | E_USER_ERROR n
-   * 512    | E_USER_WARNING y
-   * 1024   | E_USER_NOTICE y
-   * 6143   | E_ALL n
-   * 2048   | E_STRICT y
-   * 4096   | E_RECOVERABLE_ERROR y
-   */
-
   public function __construct($message = null, $code = 1) {
     parent::__construct($message, $code);
   }
