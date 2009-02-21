@@ -22,8 +22,8 @@ spl_autoload_extensions('.php,.inc');
 // idea... use this as a last resort when all autoloads fail.
 // have this one throw an exception or make a last resort to check every path for the file.
 spl_autoload_register('Madeam::autoload');
-
 spl_autoload_register('Madeam::autoloadPackage');
+spl_autoload_register('Madeam::autoloadFunnyPackages');
 
 // move the autoload fail logic into it's own function so that we don't need to do checks
 // every time we attempt to load a file.
@@ -624,7 +624,7 @@ class Madeam {
    * The expected directory structure of a package is a modified version of PEAR2's directory structure
    * @see http://wiki.pear.php.net/index.php/PEAR2_Standards#Directory_structure 
    * The difference is that PEAR assumes pacakges are always within the PEAR directory. This version
-   * only expects the package to be in its on directory within an include path.
+   * only expects the package to be in its on directory within an include path. 
    * 
    * PackageName/
    *  doc/
@@ -653,6 +653,36 @@ class Madeam {
     $paths = explode(PATH_SEPARATOR, get_include_path());
     foreach ($paths as $path) {
       if (file_exists($path . $file)) {
+        require $path . $file;
+        return true;
+      }
+    }
+  }
+  
+  /**
+   * This is a last chance autoloader for package names with odd directory structures
+   *
+   * @package default
+   * @author Joshua Davey
+   */
+  public static function autoloadFunnyPackages($class) {
+    // set class file name)
+    //$file = str_replace('_', DS, str_replace('\\', DS, $class)) . '.php'; // PHP 5.3
+    $file = substr($class, 0, -strlen(strstr($class, '_'))) . DS . str_replace('_', DS, $class) . '.php';
+    $libFile = substr($class, 0, -strlen(strstr($class, '_'))) . DS . 'lib' . DS . str_replace('_', DS, $class) . '.php';
+    $libraryFile = substr($class, 0, -strlen(strstr($class, '_'))) . DS . 'library' . DS . str_replace('_', DS, $class) . '.php';
+    
+    // checks all the include paths to see if the file exist and then returns a
+    // full path to the file or false
+    $paths = explode(PATH_SEPARATOR, get_include_path());
+    foreach ($paths as $path) {
+      if (file_exists($path . $libFile)) {
+        require $path . $libFile;
+        return true;
+      } elseif (file_exists($path . $libraryFile)) {
+        require $path . $libraryFile;
+        return true;
+      } elseif (file_exists($path . $file)) {
         require $path . $file;
         return true;
       }

@@ -17,18 +17,18 @@ error_reporting(E_ALL);
   
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
   $lib = getcwd() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
-  require file_exists($lib . 'Madeam') ? $lib . 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php' : dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php';
+  require file_exists($lib . 'Madeam') ? $lib . 'src' . DIRECTORY_SEPARATOR . 'Madeam.php' : dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'Madeam.php';
   
   $public = realpath('public');
   
   if (!file_exists($public)) {
-    $public = dirname(dirname(dirname(dirname(__FILE__)))) . DIRECTORY_SEPARATOR . 'public';
+    $public = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . DIRECTORY_SEPARATOR . 'public';
   }
   
 // set include paths  
   set_include_path(implode(PATH_SEPARATOR, Madeam::paths($public . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
 
-if (!file_exists($lib . 'Madeam/Console/' . basename(__FILE__))) {
+if (!file_exists($lib . 'Madeam/src/Madeam/Console/' . basename(__FILE__))) {
   $_SERVER['argv'][1] = 'make/app';
 } else {
   // setup madeam
