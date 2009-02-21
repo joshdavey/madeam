@@ -39,6 +39,35 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
   }
   
   /**
+   *  public function paramAction($data) {
+   *    return $data;
+   *  }
+   */
+  public function testActionWithNamedParam() {
+    $params = $this->params;
+    $params['_action'] = 'param';
+    $params['data'] = 'True';
+    $controller = new Controller_Tests($params);
+    $return = $controller->process();
+    $this->assertEquals('True', $return);
+  }
+  
+  /**
+   *  public function paramAction($data) {
+   *    return $data;
+   *  }
+   */
+  public function testActionWithExtraParamsMappedToActionMethod() {
+    $params = $this->params;
+    $params['_action'] = 'param';
+    $params['_extra'] = 'True/Works';
+    $controller = new Controller_Tests($params);
+    $controller->_mapExtras = true;
+    $return = $controller->process();
+    $this->assertEquals('True', $return);
+  }
+  
+  /**
    * 
    * <File tests/_partial.html>
    * Partial

@@ -18,7 +18,7 @@
 
 // set include path
   set_include_path(implode(PATH_SEPARATOR, $paths) . PATH_SEPARATOR . get_include_path());
-  
+
 // include madeam (required for autoloader)
   require_once 'Madeam/src/Madeam.php';
 
