@@ -37,13 +37,13 @@
   
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
   $lib = realpath('..') . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
-  require file_exists($lib . DIRECTORY_SEPARATOR . 'Madeam') ? $lib . DIRECTORY_SEPARATOR . 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php' : 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php';
+  require file_exists($lib . DIRECTORY_SEPARATOR . 'Madeam') ? $lib . DIRECTORY_SEPARATOR . 'Madeam' . DIRECTORY_SEPARATOR . 'src/Madeam.php' : 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php';
   
 // set include paths  
-  set_include_path(implode(PATH_SEPARATOR, Madeam_Framework::paths(getcwd() . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
+  set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
   
 // setup Madeam
-  Madeam_Framework::webSetup(
+  Madeam::webSetup(
     require '../env.php',   // environment
     $_REQUEST,              // params
     $_SERVER                // server
@@ -64,6 +64,6 @@
   }
   
 // dispatch handles the request and returns the output  
-  echo Madeam_Framework::dispatch();
+  echo Madeam::dispatch();
   
   //foreach (get_included_files() as $file) { isset($x) ? ++$x : $x = 1; echo $x . ' ' . $file . '<br />'; }
