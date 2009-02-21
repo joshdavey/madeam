@@ -25,7 +25,8 @@ class Madeam_Script_Create extends Madeam_Console_Script {
     // default params
     $_params = array(
       'extends' => 'Controller_App', 
-      'actions' => 'index,read,new,create,edit,update,delete'
+      'actions' => 'index,read,new,create,edit,update,delete',
+      'views'   => 'index,read,new,edit'
     );
     
     // merge new params with default params
@@ -37,9 +38,9 @@ class Madeam_Script_Create extends Madeam_Console_Script {
       $node = ucfirst($node);
     }
     $controllerClassName      = 'Controller_' . implode('_', $nameNodes);
-    $controllerViewFilePath   = Madeam::$pathToApp . 'View' . DS . strtolower(implode(DS, $nameNodes));
+    $controllerViewFilePath   = Madeam::$pathToApp . 'src' . DS . 'View' . DS . strtolower(implode(DS, $nameNodes));
     $controllerName           = array_pop($nameNodes);
-    $controllerClassFilePath  = Madeam::$pathToApp . 'Controller' . DS . implode(DS, $nameNodes);    
+    $controllerClassFilePath  = Madeam::$pathToApp . 'src' . DS . 'Controller' . DS . implode(DS, $nameNodes);    
     
     
     // Send message to user that we are creating the controller
@@ -53,15 +54,22 @@ class Madeam_Script_Create extends Madeam_Console_Script {
 
     // define controller class in controller file contents
     $controllerContents = "<?php\nclass $controllerClassName extends " . $params['extends'] . " {\n";
-
+    
+    // create action
     if (isset($params['actions']) && $params['actions'] !== true) {
       $actions = preg_split('/[\s\,]/', $params['actions']);
       foreach ($actions as $action) {
         // add action method to class
         $controllerContents .= "\n  public function $action" . "Action() {\n    \n  }\n";
-        
+      }
+    }
+    
+    // create views
+    if (isset($params['views']) && $params['views'] !== true) {
+      $views = preg_split('/[\s\,]/', $params['views']);
+      foreach ($actions as $view) {        
         // create view file
-        $this->createFile(strtolower($action) . '.' . Madeam::defaultFormat, $controllerViewFilePath . DS, "$action action's view");
+        $this->createFile(strtolower($view) . '.' . Madeam::defaultFormat, $controllerViewFilePath . DS, "$view view");
       }
     }
 

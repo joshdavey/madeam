@@ -51,6 +51,8 @@ class Madeam_Controller {
    */
   public $_setup = array();
   
+  public $_mapExtras = false;
+  
   /**
    * This holds the view's final output's content so that it can be included into a layout
    * for example: <?php echo $this->_content; ?>
@@ -268,14 +270,18 @@ class Madeam_Controller {
     if (isset($this->_setup[$action])) {
       foreach ($this->_setup[$action] as $param => $value) {
         if (isset($this->params[$param])) {
-          $params[] = "\$this->params['$param']";
+          $params[] = $this->params[$param];
         } else {
-          $params[] = "\$this->_setup['$action']['$param']";
+          $params[] = $this->_setup[$action][$param];
         }
       }
       
       if (preg_match('/[a-zA-Z_]*/', $action)) {
-        eval('$this->_output = $this->' . $action . "(" . implode(',', $params) . ");");
+        if ($this->_mapExtras === false) {
+          $this->_output = call_user_func_array(array($this, $action), $params);
+        } else {
+          $this->_output = call_user_func_array(array($this, $action), explode('/', $this->params['_extra']));
+        }
       } else {
         exit('Invalid Action Characters');
       }
@@ -477,7 +483,7 @@ class Madeam_Controller {
       } elseif (method_exists($class, $method)) {
         $_content = call_user_func($class .'::' . $method, $settings['data']);
       } else {
-        throw new Madeam_Controller_Exception_MissingView('Missing View: <strong>' . $viewFile . "</strong> and unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create File: <strong>app/View/" . $viewFile . "</strong>");
+        throw new Madeam_Controller_Exception_MissingView('Missing View: <strong>' . $viewFile . "</strong> and unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create File: <strong>app/src/View/" . $viewFile . "</strong>");
       }
     }
     

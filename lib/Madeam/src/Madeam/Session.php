@@ -24,12 +24,26 @@ class Madeam_Session {
 
   public static function start($sess_id = false) {
     // load session by ID
-    if ($sess_id) {
+    if ($sess_id !== false) {
       session_id($sess_id);
     }
+    
+    
+    
     // start session
     if (!isset($_SESSION)) {
       session_start();
+      
+      /*
+      session_set_save_handler(
+        'Madeam_Session::open', 
+        'Madeam_Session::close', 
+        'Madeam_Session::read', 
+        'Madeam_Session::write', 
+        'Madeam_Session::destroy', 
+        'Madeam_Session::gc'
+      );
+      */
       
       // handle flash stuff here...
       if (isset($_SESSION[self::$flashLifeName])) {

@@ -118,7 +118,7 @@ if (function_exists('lcfirst') === false) {
 
 /**
  * Include core files
- * These files will be included an 99% of requests so it is more effecient to include them now
+ * These files will be included in 99% of requests so it is more effecient to include them now
  * than for them to be autoloaded.
  */
 $cd = dirname(__FILE__) . DS . 'Madeam' . DS;

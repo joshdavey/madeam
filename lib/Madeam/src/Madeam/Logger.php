@@ -52,8 +52,7 @@ class Madeam_Logger {
     }
     return self::$_instance;
   }
-
-
+  
   public function log($message, $lvl = 25) {
     $registry = self::getInstance();
 

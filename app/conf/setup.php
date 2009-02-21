@@ -49,6 +49,12 @@ switch (Madeam::$environment) {
  */
 session_save_path(Madeam::$pathToEtc . 'sessions' . DS);
 
+
+/**
+ * Register logger as shutdown function
+ */
+//register_shutdown_function('Madeam_Logger::write');
+
 /**
  * Configure Cache
  */
