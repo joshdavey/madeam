@@ -127,7 +127,6 @@ require $cd . 'Inflector.php';
 require $cd . 'Router.php';
 require $cd . 'Config.php';
 require $cd . 'Cache.php';
-require $cd . 'Registry.php';
 
 
 /**
@@ -646,14 +645,19 @@ class Madeam {
   public static function autoloadPackage($class) {
     // set class file name)
     //$file = str_replace('_', DS, str_replace('\\', DS, $class)) . '.php'; // PHP 5.3
-    $file = substr($class, 0, -strlen(strstr($class, '_'))) . DS . 'src' . DS . str_replace('_', DS, $class) . '.php';
+    $packageNameLength = strlen(strstr($class, '_'));
+    if ($packageNameLength == 0) {
+      $file = $class . DS . 'src' . DS . str_replace('_', DS, $class) . '.php';
+    } else {
+      $file = substr($class, 0, -$packageNameLength) . DS . 'src' . DS . str_replace('_', DS, $class) . '.php';
+    }
     
     // checks all the include paths to see if the file exist and then returns a
     // full path to the file or false
     $paths = explode(PATH_SEPARATOR, get_include_path());
     foreach ($paths as $path) {
-      if (file_exists($path . $file)) {
-        require $path . $file;
+      if (file_exists($path . DS . $file)) {
+        require $path . DS . $file;
         return true;
       }
     }
@@ -668,9 +672,17 @@ class Madeam {
   public static function autoloadFunnyPackages($class) {
     // set class file name)
     //$file = str_replace('_', DS, str_replace('\\', DS, $class)) . '.php'; // PHP 5.3
-    $file = substr($class, 0, -strlen(strstr($class, '_'))) . DS . str_replace('_', DS, $class) . '.php';
-    $libFile = substr($class, 0, -strlen(strstr($class, '_'))) . DS . 'lib' . DS . str_replace('_', DS, $class) . '.php';
-    $libraryFile = substr($class, 0, -strlen(strstr($class, '_'))) . DS . 'library' . DS . str_replace('_', DS, $class) . '.php';
+    $packageNameLength = strlen(strstr($class, '_'));
+    if ($packageNameLength == 0) {
+      $file = $class . DS . str_replace('_', DS, $class) . '.php';
+      $libFile = $class . DS . 'lib' . DS . str_replace('_', DS, $class) . '.php';
+      $libraryFile = $class . DS . 'library' . DS . str_replace('_', DS, $class) . '.php';
+    } else {
+      $file = substr($class, 0, -$packageNameLength) . DS . str_replace('_', DS, $class) . '.php';
+      $libFile = substr($class, 0, -$packageNameLength) . DS . 'lib' . DS . str_replace('_', DS, $class) . '.php';
+      $libraryFile = substr($class, 0, -$packageNameLength) . DS . 'library' . DS . str_replace('_', DS, $class) . '.php';
+    }
+    
     
     // checks all the include paths to see if the file exist and then returns a
     // full path to the file or false

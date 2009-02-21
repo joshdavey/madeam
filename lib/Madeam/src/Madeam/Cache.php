@@ -18,6 +18,8 @@ class Madeam_Cache {
   public static $path = false;
 
   public static $openCaches = array();
+  
+  public static $memory;
 
   /**
    * Enter description here...
@@ -32,8 +34,8 @@ class Madeam_Cache {
     if ($ignore === true) { return false; }
     
     // check registry first
-    if (Madeam_Registry::exists($id)) {
-      return Madeam_Registry::get($id);
+    if (isset(self::$memory[$id])) {
+      return self::$memory[$id];
     }
 
     // set file name
@@ -59,10 +61,10 @@ class Madeam_Cache {
    * @return unknown
    * @author Joshua Davey
    */
-  public static function save($id, $value, $storeInRegistry = false) {
+  public static function save($id, $value, $storeInMemory = false) {
     // store in registry
-    if ($storeInRegistry === true) {
-      Madeam_Registry::set($id, $value);
+    if ($storeInMemory === true) {
+      self::$memory[$id] = $value;
     }
 
     // set file name
@@ -125,6 +127,9 @@ class Madeam_Cache {
   public static function clear($id) {
     // set file name
     $file = self::$path . $id;
+    
+    // remove from memory
+    unset($memory[$id]);
 
     // save serialization to file
     file_put_contents($file, null);
@@ -139,7 +144,7 @@ class Madeam_Cache {
    */
   public static function check($id) {
     // check registry first
-    if (Madeam_Registry::get($id)) {
+    if (isset(self::$memory[$id])) {
       return true;
     }
 
