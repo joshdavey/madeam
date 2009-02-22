@@ -10,7 +10,8 @@
  * your request.
  * 
  * = Production Mode =
- * 
+ * If you make any changes to your routes and they're cached on your production environment 
+ * you'll need to clear your cache before you see the changes take place.
  * 
  * = Route Anatomy =
  * A route consists of a path pattern, default values and rules to match the values against
@@ -31,7 +32,7 @@
  * Madeam_Router::connect("posts",            array('_action' => 'update',  '_controller' => 'posts'),  array('_method' => 'put'));
  * Madeam_Router::connect("posts",            array('_action' => 'create',  '_controller' => 'posts'),  array('_method' => 'post'));
  * 
- * Don't like using an id and would prefer a slug?
+ * Don't like using an id and would prefer a slug? Try this:
  * 
  * Madeam_Router::resource::('posts', array('slug', '[a-z\-]+'));
  * 
