@@ -276,15 +276,12 @@ class Madeam_Controller {
         }
       }
       
-      if (preg_match('/[a-zA-Z_]*/', $action)) {
-        if ($this->_mapExtras === false) {
-          $this->_output = call_user_func_array(array($this, $action), $params);
-        } else {
-          $this->_output = call_user_func_array(array($this, $action), explode('/', $this->params['_extra']));
-        }
+      if ($this->_mapExtras === false) {
+        $this->_output = call_user_func_array(array($this, $action), $params);
       } else {
-        exit('Invalid Action Characters');
+        $this->_output = call_user_func_array(array($this, $action), explode('/', $this->params['_extra']));
       }
+      
     } else {
       if (!file_exists(Madeam_Controller::$viewPath . str_replace('/', DS, strtolower($this->_view)) . '.' . $this->params['_format'])) {
         throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
