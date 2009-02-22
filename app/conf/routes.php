@@ -10,7 +10,7 @@
  * your request.
  * 
  * = Production Mode =
- * If you make any changes to your routes and they're cached on your production environment 
+ * Warning: If you make any changes to your routes and they're cached on your production environment 
  * you'll need to clear your cache before you see the changes take place.
  * 
  * = Route Anatomy =
