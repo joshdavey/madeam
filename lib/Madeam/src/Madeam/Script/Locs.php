@@ -55,12 +55,13 @@ class Madeam_Script_Locs extends Madeam_Console_Script {
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Tests', $testLocs));
     
     $libLocs = (int) $this->_countLOCs(Madeam::$pathToLib, array(
-      Madeam::$pathToMadeam
+      Madeam::$pathToLib . 'Madeam' . DS
     ));
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Library', $libLocs));
     
     $staticLocs = (int) $this->_countLOCs(Madeam::$pathToPublic, array(
+      Madeam::$pathToPublic . 'dispatcher.php',
       Madeam::$pathToPublic . 'index.php'
     ));
     Madeam_Console_CLI::out(sprintf("------------------------------"));
@@ -86,7 +87,7 @@ class Madeam_Script_Locs extends Madeam_Console_Script {
       
       $ext = substr($file->getFilename(), strrpos($file->getFilename(), '.') + 1);
       
-      if (!$file->isLink() && !$file->isDot() && substr(basename($file->getFilename()), 0, 1) != '.' && !in_array($filePath, $ignore)) {
+      if (!$file->isLink() && !$file->isDot() && substr($file->getFilename(), 0, 1) != '.' && !in_array($filePath, $ignore)) {
         if ($file->isDir()) {
           $locs += $this->_countLocs($filePath);
         } elseif (in_array($ext, $exts)) {
