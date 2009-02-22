@@ -13,7 +13,8 @@ class Madeam_Script_Locs extends Madeam_Console_Script {
       Madeam::$pathToProject . 'LICENSE',
       Madeam::$pathToProject . 'index.php',
       Madeam::$pathToProject . 'env.php',
-      Madeam::$pathToPublic . 'index.php'
+      Madeam::$pathToPublic . 'index.php',
+      Madeam::$pathToPublic . 'dispatcher.php'
     ));
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Project', $totalLocs));
