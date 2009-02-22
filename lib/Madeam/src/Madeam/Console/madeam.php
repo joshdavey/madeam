@@ -15,15 +15,11 @@ error_reporting(E_ALL);
 // set default timezone
   date_default_timezone_set('America/Toronto');
   
-  echo getcwd();
-  
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
   $lib = getcwd() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
   require file_exists($lib . 'Madeam') ? $lib . 'Madeam' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Madeam.php' : dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'Madeam.php';
   
   $public = realpath('public');
-  
-  echo $public;
   
   if (!file_exists($public)) {
     $public = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . DIRECTORY_SEPARATOR . 'public';

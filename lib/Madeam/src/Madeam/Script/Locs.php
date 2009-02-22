@@ -30,7 +30,7 @@ class Madeam_Script_Locs extends Madeam_Console_Script {
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Madeam', $madeamLocs));
     
-    $madeamTestLocs = (int) $this->_countLOCs(Madeam::$pathToTests);
+    $madeamTestLocs = (int) $this->_countLOCs(Madeam::$pathToLib . 'Madeam' . DS . 'tests' . DS);
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Madeam Tests', $madeamTestLocs));
     
@@ -49,11 +49,7 @@ class Madeam_Script_Locs extends Madeam_Console_Script {
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Application', $appLocs));
     
-    $testLocs = (int) $this->_countLOCs(Madeam::$pathToTests, array(
-      Madeam::$pathToTests . 'Madeam' . DS,
-      Madeam::$pathToTests . 'AllTests.php',
-      Madeam::$pathToTests . 'Bootstrap.php',
-    ));
+    $testLocs = (int) $this->_countLOCs(Madeam::$pathToApp . 'tests' . DS);
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Tests', $testLocs));
     
