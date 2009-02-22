@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -15,16 +14,7 @@
  */
 class Madeam_Router {
 
-  public static $routes = array(); // regex, names, params
-
-  public static function resource($name) {
-    self::connect("$name",            array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
-    self::connect("$name/:id",        array('_action' => 'show',    '_controller' => $name),  array('_method' => 'get'));
-    self::connect("$name",            array('_action' => 'delete',  '_controller' => $name),  array('_method' => 'delete'));
-    self::connect("$name",            array('_action' => 'update',  '_controller' => $name),  array('_method' => 'put'));
-    self::connect("$name",            array('_action' => 'create',  '_controller' => $name),  array('_method' => 'post'));
-    self::connect("$name/:_action",   array('_controller' => $name));
-  }
+  public static $routes = array(); // regex, values, rules
 
   /**
    * This cool method adds paths by formatting the string the user has entered and turning it into a regular expression
@@ -64,6 +54,27 @@ class Madeam_Router {
     
     // add to routes list
     self::$routes[] = array($regex, $values, $rules);
+  }
+  
+  /**
+   * Default routes for a RESTful resource.
+   * 
+   * To use a slug instead of an id or to simply change the rule for the id the $id param
+   * has a value for the id's name and the id's rule. For example if I wanted to call "id"
+   * "slug" and change the rule to one that matches slugs I could do the following:
+   * 
+   * Madeam_Router::resource::('posts', array('slug', '[a-z\-]+'));
+   *
+   * @param string $name
+   * @param array $id
+   * @author Joshua Davey
+   */
+  public static function resource($name, $id = array('id', '\d+')) {
+    self::connect("$name",            array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
+    self::connect("$name/:$id[0]",    array('_action' => 'show',    '_controller' => $name),  array('_method' => 'get', $id[0] => $id[1]));
+    self::connect("$name",            array('_action' => 'delete',  '_controller' => $name),  array('_method' => 'delete'));
+    self::connect("$name",            array('_action' => 'update',  '_controller' => $name),  array('_method' => 'put'));
+    self::connect("$name",            array('_action' => 'create',  '_controller' => $name),  array('_method' => 'post'));
   }
 
   /**
