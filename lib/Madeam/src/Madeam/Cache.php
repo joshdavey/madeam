@@ -29,9 +29,9 @@ class Madeam_Cache {
    * @return unknown
    * @author Joshua Davey
    */
-  public static function read($id, $lifeTime = 0, $ignore = false) {
+  public static function read($id, $lifeTime = 0, $checkCache = true) {
     
-    if ($ignore === true) { return false; }
+    if ($checkCache === false) { return false; }
     
     // check registry first
     if (isset(self::$memory[$id])) {

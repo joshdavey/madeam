@@ -372,12 +372,12 @@ class Madeam {
     
     // include routes
     // check cache for routes
-    if (! Madeam_Router::$routes = Madeam_Cache::read(self::$environment . '.madeam.routes', - 1, Madeam_Config::get('ignore_routes_cache'))) {
+    if (! Madeam_Router::$routes = Madeam_Cache::read(self::$environment . '.madeam.routes', - 1, Madeam_Config::get('cache_routes'))) {
       // include routes configuration
       require self::$pathToApp . 'conf' . DS . 'routes.php';
     
       // save routes to cache
-      if (Madeam_Config::get('ignore_routes_cache') === false) {
+      if (Madeam_Config::get('cache_routes') === true) {
         Madeam_Cache::save(self::$environment . '.madeam.routes', Madeam_Router::$routes);
       }
     }

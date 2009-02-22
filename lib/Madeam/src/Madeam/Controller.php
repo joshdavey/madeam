@@ -130,7 +130,7 @@ class Madeam_Controller {
     $cacheName = Madeam::$environment . '.madeam.controller.' . strtolower(get_class($this)) . '.setup';
 
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->_setup = Madeam_Cache::read($cacheName, - 1, Madeam_Config::get('ignore_controllers_cache'))) {
+    if (! $this->_setup = Madeam_Cache::read($cacheName, - 1, Madeam_Config::get('cache_controllers'))) {
 
       // define callbacks
       $this->_setup['beforeFilter'] = $this->_setup['beforeRender'] = $this->_setup['afterRender'] = array();
@@ -177,7 +177,7 @@ class Madeam_Controller {
       }
       
       // save cache
-      if (Madeam_Config::get('ignore_controllers_cache') === false) {
+      if (Madeam_Config::get('cache_controllers') === true) {
         Madeam_Cache::save($cacheName, $this->_setup, true);
       }
       
