@@ -5,6 +5,11 @@ if (Madeam_Logger::$path === false) {
 }
 
 /**
+ * Register save as a shutdown function so that the logs are saved.
+ */
+register_shutdown_function(array('Madeam_Logger', 'save'));
+
+/**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
  *                202-212 Adeliade St. W, Toronto, Ontario, Canada
@@ -19,53 +24,21 @@ if (Madeam_Logger::$path === false) {
  */
 class Madeam_Logger {
 
-  public $logs = array();
+  public static $logs = array();
 
   public static $path = false;
   
   public static $fileName = 'Y-m';
 
-  /**
-   * Stores this registry's instance
-   *
-   * @var boolean/madeam_registry object
-   */
-  private static $_instance = array();
-
-  public static function setInstance($instance) {
-    if (! self::$_instance) {
-      self::$_instance = $instance;
-    } else {
-      throw new Madeam_Exception('Registry instance already exists');
-    }
-  }
-
-  /**
-   * Creates a new instance of the registry if it does not exist.
-   * If it does exist then it returns the already existing instance.
-   *
-   * @return madeam_registry object
-   */
-  public static function getInstance() {
-    if (! self::$_instance) {
-      self::$_instance = new Madeam_Logger(array());
-    }
-    return self::$_instance;
-  }
   
-  public function log($message, $lvl = 25) {
-    $registry = self::getInstance();
-
+  public function write($message, $lvl = 25) {
     $date = date("d-m-o H:i:s");
-
-    $registry->logs[] = array('message' => $message, 'datetime' => $date);
+    self::$logs[] = array('message' => $message, 'datetime' => $date);
   }
 
-  public function __destruct() {
-    $registry = self::getInstance();
-
+  public function save() {
     $requestLog = null;
-    foreach ($registry->logs as $log) {
+    foreach (self::$logs as $log) {
       $requestLog .= $log['datetime'] . ' | ' . $log['message'] . "\n";
     }
 

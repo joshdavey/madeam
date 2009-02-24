@@ -77,8 +77,3 @@ switch (Madeam::$environment) {
  * Set session path
  */
 session_save_path(Madeam::$pathToEtc . 'sessions' . DS);
-
-/**
- * Set cache path
- */
-Madeam_Cache::$path = Madeam::$pathToEtc . 'cache' . DS;

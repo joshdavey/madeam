@@ -175,7 +175,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     
     try {
       // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
-      Madeam_Logger::getInstance()->log($sql);
+      Madeam_Logger::write($sql);
 
       // link
       $count = self::$_pdo[$this->_server]->exec($sql);
@@ -194,7 +194,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     
     try {
       // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
-      Madeam_Logger::getInstance()->log($sql);
+      Madeam_Logger::write($sql);
 
       // link
       $link = self::$_pdo[$this->_server]->query($sql, true);

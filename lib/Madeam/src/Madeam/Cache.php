@@ -1,4 +1,10 @@
 <?php
+
+// set cache path if it hasn't been already.
+if (Madeam_Cache::$path === false) {
+  Madeam_Cache::$path  = Madeam::$pathToEtc . 'cache' . DS;
+}
+
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey

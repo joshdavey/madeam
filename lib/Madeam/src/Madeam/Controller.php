@@ -387,6 +387,27 @@ class Madeam_Controller {
     }
     return $this->_layout;
   }
+  
+  /**
+   * Redirect function
+   *
+   * @param string $url 
+   * @param string $exit 
+   * @return void
+   * @author Joshua Davey
+   */
+   /*
+  final public function redirect($url, $exit = true) {
+    if (! headers_sent()) {
+      header('Location:  ' . Madeam::url($url));
+      if ($exit) {
+        exit();
+      }
+    } else {
+      throw new Madeam_Exception_HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
+    }
+  }
+  */
 
 
   /**
