@@ -28,16 +28,9 @@
 // set the public directory as our current working directory
   chdir(dirname(__FILE__));
 
-  /*
-  $path = getcwd() . '/posts/show/32';
-  //mkdir(getcwd() . '/posts/show/32/', 0777, true);
-  file_put_contents($path . '.html', '<?php unlink($_SERVER["SCRIPT_FILENAME"]); ?> tests ' . time());
-  file_put_contents($path . '/index.html', '<?php unlink($_SERVER["SCRIPT_FILENAME"]); ?> tests ' . time());
-  //*/
-  
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
   $lib = realpath('..') . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
-  require file_exists($lib . DIRECTORY_SEPARATOR . 'Madeam') ? $lib . DIRECTORY_SEPARATOR . 'Madeam' . DIRECTORY_SEPARATOR . 'src/Madeam.php' : 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php';
+  require file_exists($lib . DIRECTORY_SEPARATOR . 'Madeam') ? $lib . DIRECTORY_SEPARATOR . 'Madeam' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Madeam.php' : 'Madeam' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Madeam.php';
   
 // set include paths  
   set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
