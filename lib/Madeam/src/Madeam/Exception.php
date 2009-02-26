@@ -25,11 +25,12 @@ class Madeam_Exception extends Exception {
     "is this your idea of web 3.0?",
     "the Quality Assurance team is unimpressed.",
     "maybe you should consider a new profession?",
-    "oopsy",
     "overated PHP software?",
     'is this a candidate for <a href="http://thedailywtf.com">The Daily WTF</a>?',
     'click "OK" to continue.',
-    "this looks ready to launch. /sarcasm"
+    "this looks ready to launch. &lt;/sarcasm&gt;",
+    "choo choo! Here comes the fail train.",
+    "&lt;you&gt;fail&lt;/you&gt;",
   );
   public function __construct($message = null, $code = 1) {
     parent::__construct($message, $code);
