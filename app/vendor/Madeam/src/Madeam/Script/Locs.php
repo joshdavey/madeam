@@ -27,7 +27,7 @@ class Madeam_Script_Locs extends Madeam_Console_Script {
    * @author Joshua Davey
    */
   public function madeam() {
-    $madeamLocs = (int) $this->_countLOCs(Madeam::$pathToMadeam);
+    $madeamLocs = (int) $this->_countLOCs(Madeam::$pathToLib . 'Madeam' . DS . 'src');
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Madeam', $madeamLocs));
     
@@ -46,7 +46,7 @@ class Madeam_Script_Locs extends Madeam_Console_Script {
    * @author Joshua Davey
    */
   public function app() {
-    $appLocs = (int) $this->_countLOCs(Madeam::$pathToApp);
+    $appLocs = (int) $this->_countLOCs(Madeam::$pathToApp . 'src' . DS);
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Application', $appLocs));
     

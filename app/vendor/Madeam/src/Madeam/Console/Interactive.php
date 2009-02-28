@@ -9,8 +9,8 @@
   date_default_timezone_set('America/Toronto');
     
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
-  $lib = getcwd() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
-  require file_exists($lib . 'Madeam') ? $lib . 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php' : 'Madeam' . DIRECTORY_SEPARATOR . 'Framework.php';
+  $lib = getcwd() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR;
+  require file_exists($lib . DIRECTORY_SEPARATOR . 'Madeam') ? $lib . DIRECTORY_SEPARATOR . 'Madeam' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Madeam.php' : 'Madeam' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Madeam.php';
   
 // set include paths  
   set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());

@@ -61,15 +61,6 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
     Madeam::paths(TESTS_MADEAM_PUB_DIRECTORY);
     $this->assertTrue(file_exists(Madeam::$pathToEtc), 'The etc directory should exist');
   }
-  
-  /**
-   * undocumented 
-   * @author Joshua Davey
-   */
-  public function testLibFolderShouldExist() {
-    Madeam::paths(TESTS_MADEAM_PUB_DIRECTORY);
-    $this->assertTrue(file_exists(Madeam::$pathToLib), 'The lib directory should exist');
-  }
     
   /**
    * Relative paths point

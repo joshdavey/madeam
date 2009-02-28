@@ -21,7 +21,7 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
       '_ajax'       => 0
     );
     
-    Madeam_Controller::$viewPath = TESTS_MADEAM_APP_DIRECTORY . 'View' . DIRECTORY_SEPARATOR;
+    Madeam_Controller::$viewPath = TESTS_MADEAM_APPSRC_DIRECTORY . 'View' . DIRECTORY_SEPARATOR;
     
     // create controller instance
     $this->controller = new Controller_Tests($this->params);

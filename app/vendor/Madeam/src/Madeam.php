@@ -213,11 +213,6 @@ class Madeam {
    * undocumented
    */
   public static $pathToPublic       = false;
-  
-  /**
-   * undocumented
-   */
-  public static $pathToMadeam       = false;
 
   /**
    * undocumented
@@ -264,16 +259,16 @@ class Madeam {
     self::$pathToApp      = self::$pathToProject . 'app' . DS;
     
     // set library path
-    self::$pathToLib      = self::$pathToProject . 'lib' . DS;
+    self::$pathToLib      = self::$pathToApp . 'vendor' . DS;
     
     // set etc path
     self::$pathToEtc      = self::$pathToProject . 'etc' . DS;
 
-    // set path to vendor
-    self::$pathToMadeam   = dirname(__FILE__) . DS;
+    // path to helpers
+    $helpers = dirname(__FILE__) . DS . 'Madeam' . DS . 'Helpers' . DS;
     
     // return paths for include path
-    return array(self::$pathToApp . 'src' . DS, self::$pathToLib, self::$pathToMadeam . 'Madeam' . DS . 'Helpers' . DS);
+    return array(self::$pathToApp . 'src' . DS, self::$pathToLib, $helpers);
   }
   
   

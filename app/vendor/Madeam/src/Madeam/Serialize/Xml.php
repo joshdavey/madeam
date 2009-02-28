@@ -5,7 +5,7 @@ class Madeam_Serialize_Xml {
     $xml = new XmlWriter();
     $xml->openMemory();
     $xml->startDocument('1.0', 'UTF-8');
-    $xml->startElement('response');
+    $xml->startElement('data');
     
     self::_array2Xml($data, $xml);
 

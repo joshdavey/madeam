@@ -47,14 +47,14 @@ class Madeam_Console {
     
     // make sure we're pointed at the project's root
     if ($script != 'make') {
-      if (!file_exists(realpath('lib/Madeam/src/Madeam.php'))) {
+      if (!file_exists(realpath('app/vendor/Madeam/src/Madeam.php'))) {
         Madeam_Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
         exit();
       }
     
       // get list of scripts
       $scripts = array();
-      foreach (new DirectoryIterator(realpath('lib/Madeam/src/Madeam/Script')) as $file) {
+      foreach (new DirectoryIterator(realpath('app/vendor/Madeam/src/Madeam/Script')) as $file) {
         if ($file->isFile()) {
           $scripts[] = strtolower(substr($file->getFilename(), 0, -4));
         }
@@ -99,7 +99,7 @@ class Madeam_Console {
       // if the command requires to be in the application's root path then check it.
       // If we aren't in the applicatin's root path then tell the user and exit
       if ($scriptName != 'make') {
-        if (!file_exists(realpath('lib/Madeam.php'))) {
+        if (!file_exists(realpath('app/vendor/Madeam.php'))) {
           Madeam_Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
           exit();
         }
