@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+  Options +FollowSymlinks
+  RewriteEngine On
+
+  RewriteCond $1 !^(index\.html|index\.php|images|css|js|robots\.txt|favicon\.ico)
+  RewriteCond %{REQUEST_FILENAME} public/$ [OR]
+  RewriteCond %{REQUEST_FILENAME} public$
+  RewriteRule ^(.*)$ dispatcher.php?_uri=$1 [QSA,L]
+
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(.*)$ dispatcher.php?_uri=$1 [QSA,L]
+</IfModule>

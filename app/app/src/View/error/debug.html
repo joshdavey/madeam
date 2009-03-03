@@ -1,0 +1,16 @@
+
+    <h1 class="debug  ">Oops, <?php echo $params['snippet']; ?></h1>
+    <h4>Error:</h4>
+    <p><?php echo $params['error']; ?></p>
+    
+    <br />
+    <br />
+    
+    <hr />
+    <p><strong><?php echo $params['file']; ?></strong> on line <strong><?php echo $params['line']; ?></strong></p>
+
+    <h4>Backtrace:</h4>
+    <pre class="backtrace"><?php echo $params['backtrace']; ?></pre>
+  
+    <br />
+    <p><em><strong>Note</strong>: You can disable these error messages in Config/setup.php</em></p>
