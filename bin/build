@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# creates a symfony sandbox for this symfony version
+
+echo $1
+
+exit
+
+echo ">>> initialization"
+DIR=../`dirname $0`
+BUILD=mapp
+PHP=php
+
+echo ">>> project initialization"
+rm -rf ${BUILD_NAME}
+mkdir ${BUILD_NAME}
+cd ${BUILD_NAME}
+
+echo ">>> create a new project and a new app"
+cp 
+${PHP} ${DIR}/../../data/bin/symfony generate:project ${BUILD_NAME}
+${PHP} symfony generate:app ${APP_NAME}
+
+echo ">>> create archive"
+cd ..
+tar --exclude=".svn" -zcpf ${BUILD_NAME}.tgz ${BUILD_NAME}
+zip -rq ${BUILD_NAME}.zip ${BUILD_NAME} -x \*/\*.svn/\*
+
+echo ">>> cleanup"
+rm -rf ${BUILD_NAME}
