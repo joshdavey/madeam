@@ -1,5 +1,5 @@
 <?php
-class Madeam_Script_Make extends Madeam_Console_Script {
+class Madeam_Console_Make extends Madeam_Console {
 
   public function app($options = array('db_name', 'db_user', 'db_pass', 'db_host'), $defaults = array('db_name' => 'madeam', 'db_user' => 'root', 'db_pass' => '', 'db_host' => 'localhost')) {
     if (Madeam_Console_CLI::getYN('Create a Madeam application in "' . getcwd() . '"?')) {

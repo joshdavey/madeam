@@ -1,0 +1,4 @@
+#!/usr/bin/env php
+<?php
+require 'boot.php';
+new Madeam_Console_Create($args);

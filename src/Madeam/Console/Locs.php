@@ -1,5 +1,5 @@
 <?php
-class Madeam_Script_Locs extends Madeam_Console_Script {
+class Madeam_Console_Script_Locs extends Madeam_Console_Script {
   
   /**
    * undocumented 

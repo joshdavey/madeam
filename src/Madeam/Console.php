@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -179,24 +178,29 @@ class Madeam_Console {
     return $params;
   }
 
-  /**
-   * undocumented 
-   *
-   * @author Joshua Davey
-   */
   protected function createFile($file_name, $file_path, $file_content) {
     if (substr($file_path, - 1) !== DS) {
       $file_path = $file_path . DS;
     }
+    
     $file = $file_path . $file_name;
     if (file_exists($file)) {
       if (Madeam_Console_CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
         return false;
       }
     }
+    
     if (file_put_contents($file, $file_content)) {
       Madeam_Console_CLI::outCreate('file ' . $file);
       return true;
     }
   }
+  
+  protected function createDir($dir) {
+    if (!file_exists($dir)) {
+      mkdir($dir, 0777, true);
+      Madeam_Console_CLI::outCreate('directory ' . $dir);
+    }
+  }
+  
 }
