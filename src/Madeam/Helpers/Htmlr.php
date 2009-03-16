@@ -38,7 +38,7 @@ class Htmlr {
     $params['alt'] = Madeam_Inflector::underscorize($src);
     $params['src'] = Madeam::url($src);
     
-    list($width, $height) = getimagesize(Madeam::$pathToPublic . $src);
+    list($width, $height) = getimagesize(Madeam::$pathToPub . $src);
     
     if ($width > $height) {
       $percentage = ($target / $width);

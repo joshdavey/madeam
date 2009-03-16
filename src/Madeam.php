@@ -207,12 +207,12 @@ class Madeam {
   /**
    * undocumented
    */
-  public static $pathToProject      = false;
+  public static $pathToRoot      = false;
   
   /**
    * undocumented
    */
-  public static $pathToPublic       = false;
+  public static $pathToPub       = false;
 
   /**
    * undocumented
@@ -250,19 +250,19 @@ class Madeam {
    */
   public static function paths($publicDirectory) {
     // set public directory path
-    self::$pathToPublic   = $publicDirectory;
+    self::$pathToPub   = $publicDirectory;
     
-    // set path to entire project
-    self::$pathToProject  = dirname(self::$pathToPublic) . DS;
+    // set path to root of madeam application
+    self::$pathToRoot  = dirname(self::$pathToPub) . DS;
     
     // set application path
-    self::$pathToApp      = self::$pathToProject . 'app' . DS;
+    self::$pathToApp      = self::$pathToRoot . 'app' . DS;
     
     // set library path
     self::$pathToLib      = self::$pathToApp . 'vendor' . DS;
     
     // set etc path
-    self::$pathToEtc      = self::$pathToProject . 'etc' . DS;
+    self::$pathToEtc      = self::$pathToRoot . 'etc' . DS;
 
     // path to helpers
     $helpers = dirname(__FILE__) . DS . 'Madeam' . DS . 'Helpers' . DS;
@@ -298,10 +298,10 @@ class Madeam {
       
     // set path to uri based on whether mod_rewrite is turned on or off.
     if (isset(self::$requestParams['_uri'])) {
-      self::$uriAppPath = self::cleanUriPath($server['DOCUMENT_ROOT'], self::$pathToPublic);
+      self::$uriAppPath = self::cleanUriPath($server['DOCUMENT_ROOT'], self::$pathToPub);
       self::$requestUri = self::$requestParams['_uri'] . '?' . $server['QUERY_STRING'];
     } else {
-      self::$uriAppPath = self::dirtyUriPath($server['DOCUMENT_ROOT'], self::$pathToPublic);
+      self::$uriAppPath = self::dirtyUriPath($server['DOCUMENT_ROOT'], self::$pathToPub);
       $url = explode('index.php', $server['REQUEST_URI']);
       // check if it split into 2 peices.
       // If it didn't then there is an ending "index.php" so we assume there is no URI on the end either
@@ -313,7 +313,7 @@ class Madeam {
     }
     
     // determine the relative path to the public directory
-    self::$uriPubPath = self::pubPath($server['DOCUMENT_ROOT'], self::$pathToPublic);    
+    self::$uriPubPath = self::pubPath($server['DOCUMENT_ROOT'], self::$pathToPub);    
     
     // set layout if it hasn't already been set
     if (!isset(self::$requestParams['_layout'])) { self::$requestParams['_layout'] = 1; }

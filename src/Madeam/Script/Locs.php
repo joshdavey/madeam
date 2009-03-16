@@ -7,14 +7,14 @@ class Madeam_Script_Locs extends Madeam_Console_Script {
    * @author Joshua Davey
    */
   public function all() {
-    $totalLocs =  (int) $this->_countLOCs(Madeam::$pathToProject, array(
+    $totalLocs =  (int) $this->_countLOCs(Madeam::$pathToRoot, array(
       Madeam::$pathToEtc,
-      Madeam::$pathToProject . 'README',
-      Madeam::$pathToProject . 'LICENSE',
-      Madeam::$pathToProject . 'index.php',
-      Madeam::$pathToProject . 'env.php',
-      Madeam::$pathToPublic . 'index.php',
-      Madeam::$pathToPublic . 'dispatcher.php'
+      Madeam::$pathToRoot . 'README',
+      Madeam::$pathToRoot . 'LICENSE',
+      Madeam::$pathToRoot . 'index.php',
+      Madeam::$pathToRoot . 'env.php',
+      Madeam::$pathToPub . 'index.php',
+      Madeam::$pathToPub . 'dispatcher.php'
     ));
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Project', $totalLocs));
@@ -60,9 +60,9 @@ class Madeam_Script_Locs extends Madeam_Console_Script {
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Library', $libLocs));
     
-    $staticLocs = (int) $this->_countLOCs(Madeam::$pathToPublic, array(
-      Madeam::$pathToPublic . 'dispatcher.php',
-      Madeam::$pathToPublic . 'index.php'
+    $staticLocs = (int) $this->_countLOCs(Madeam::$pathToPub, array(
+      Madeam::$pathToPub . 'dispatcher.php',
+      Madeam::$pathToPub . 'index.php'
     ));
     Madeam_Console_CLI::out(sprintf("------------------------------"));
     Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Static', $staticLocs));

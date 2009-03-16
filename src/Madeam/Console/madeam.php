@@ -1,6 +1,7 @@
 <?php
 
-error_reporting(E_ALL);
+// set error reporting to all
+  error_reporting(E_ALL);
 
 // really weird bug when I installed zend core made SERVER_NAME inaccessible and threw a notice error
 // this is a simple hack to fix that
@@ -8,9 +9,6 @@ error_reporting(E_ALL);
 
 // use unicode
   if (function_exists('mb_internal_encoding')) { mb_internal_encoding("UTF-8"); }
-
-// set content type to utf8
-  header('Content-type: text/html; charset=utf-8');
 
 // set default timezone
   date_default_timezone_set('America/Toronto');
@@ -22,7 +20,7 @@ error_reporting(E_ALL);
   $public = realpath('public');
   
   if (!file_exists($public)) {
-    $public = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . DIRECTORY_SEPARATOR . 'public';
+    $public = dirname(dirname(dirname(dirname(__FILE__)))) . DIRECTORY_SEPARATOR . 'skel/public';
   }
   
 // set include paths  

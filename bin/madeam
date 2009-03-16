@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+$console = dirname(dirname(__FILE__)) . '/src/Madeam/Console/madeam.php';
+if (!file_exists($console)) {
+  // use php include_path
+  $console = 'Madeam/src/Madeam/Console/madeam.php';
+}
+require $console;
