@@ -23,7 +23,7 @@ class Madeam_Console {
   public function __construct($params = array()) {
     array_shift($params); // remove script path
     
-    $action = explode('/', array_shift($params)); // example: create/controller => Madeam_Console_Script_Create::controller();
+    $action = explode('/', array_shift($params)); // example: create/controller => Madeam_Console_Create::controller();
     
     $script = array_shift($action);
     $method = array_shift($action);
@@ -53,7 +53,7 @@ class Madeam_Console {
     
       // get list of scripts
       $scripts = array();
-      foreach (new DirectoryIterator(realpath('app/vendor/Madeam/src/Madeam/Script')) as $file) {
+      foreach (new DirectoryIterator(realpath('app/vendor/Madeam/src/Madeam/Console')) as $file) {
         if ($file->isFile()) {
           $scripts[] = strtolower(substr($file->getFilename(), 0, -4));
         }
@@ -66,8 +66,7 @@ class Madeam_Console {
       }
     }
     
-    
-    $class = 'Madeam_Script_' . ucfirst($script);
+    $class = 'Madeam_Console_' . ucfirst($script);
     $console = new $class;
     $console->$method($params);
   }
