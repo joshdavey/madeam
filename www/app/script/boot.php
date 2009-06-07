@@ -25,12 +25,11 @@
 // set include paths  
   set_include_path(implode(PATH_SEPARATOR, Madeam::paths($public . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
 
+/*
 if (!file_exists($lib . 'Madeam/src/Madeam/Console/' . basename(__FILE__))) {
   $_SERVER['argv'][1] = 'make/app';
 } else {
   // setup madeam
   Madeam::basicSetup();
 }
-
-// initiated console
-$console = new Madeam_Console($_SERVER['argv']);
+*/

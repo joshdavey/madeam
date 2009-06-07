@@ -18,8 +18,8 @@ cd ${BUILD_NAME}
 
 echo ">>> create a new project and a new app"
 cp 
-${PHP} ${DIR}/../../data/bin/symfony generate:project ${BUILD_NAME}
-${PHP} symfony generate:app ${APP_NAME}
+${PHP} ${DIR}/../../data/bin/madeam generate:project ${BUILD_NAME}
+${PHP} madeam generate:app ${APP_NAME}
 
 echo ">>> create archive"
 cd ..

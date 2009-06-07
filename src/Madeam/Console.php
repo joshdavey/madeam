@@ -23,10 +23,7 @@ class Madeam_Console {
   public function __construct($params = array()) {
     array_shift($params); // remove script path
     
-    $action = explode('/', array_shift($params)); // example: create/controller => Madeam_Console_Create::controller();
-    
-    $script = array_shift($action);
-    $method = array_shift($action);
+    $method = array_shift($params);
     
     // parse POSIX params
     // -name Posts => array('name' => 'Posts')
@@ -45,30 +42,16 @@ class Madeam_Console {
     }
     
     // make sure we're pointed at the project's root
-    if ($script != 'make') {
+    if (get_class($this) != 'Madeam_Console_Make') {
       if (!file_exists(realpath('app/vendor/Madeam/src/Madeam.php'))) {
         Madeam_Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
         exit();
       }
-    
-      // get list of scripts
-      $scripts = array();
-      foreach (new DirectoryIterator(realpath('app/vendor/Madeam/src/Madeam/Console')) as $file) {
-        if ($file->isFile()) {
-          $scripts[] = strtolower(substr($file->getFilename(), 0, -4));
-        }
-      }
-  
-      // make sure script entered exists
-      if (!in_array($script, $scripts)) {
-        Madeam_Console_CLI::outError('Oops. The script ' . $script . ' does not exist.');
-        exit();
-      }
+    } else {
+      $method = 'app';
     }
     
-    $class = 'Madeam_Console_' . ucfirst($script);
-    $console = new $class;
-    $console->$method($params);
+    $this->$method();
   }
 
   /**

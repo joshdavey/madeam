@@ -1,5 +1,4 @@
 <?php
-
 // set error reporting to all
   error_reporting(E_ALL);
 
@@ -20,18 +19,14 @@
   $public = realpath('public');
   
   if (!file_exists($public)) {
-    $public = dirname(dirname(dirname(dirname(__FILE__)))) . DIRECTORY_SEPARATOR . 'skel/public';
+    $public = dirname(dirname(dirname(dirname(__FILE__)))) . DIRECTORY_SEPARATOR . 'www/public';
   }
   
 // set include paths  
   set_include_path(implode(PATH_SEPARATOR, Madeam::paths($public . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
 
-if (!file_exists($lib . 'Madeam/src/Madeam/Console/' . basename(__FILE__))) {
-  $_SERVER['argv'][1] = 'make/app';
-} else {
-  // setup madeam
+// setup madeam
   Madeam::basicSetup();
-}
 
 // initiated console
-$console = new Madeam_Console($_SERVER['argv']);
+new Madeam_Console_Make($_SERVER['argv']);

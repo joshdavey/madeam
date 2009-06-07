@@ -313,7 +313,8 @@ class Madeam {
     }
     
     // determine the relative path to the public directory
-    self::$uriPubPath = self::pubPath($server['DOCUMENT_ROOT'], self::$pathToPub);    
+    self::$uriPubPath = self::pubPath($server['DOCUMENT_ROOT'], self::$pathToPub);  
+    
     
     // set layout if it hasn't already been set
     if (!isset(self::$requestParams['_layout'])) { self::$requestParams['_layout'] = 1; }
