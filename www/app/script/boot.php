@@ -1,5 +1,4 @@
 <?php
-
 // set error reporting to all
   error_reporting(E_ALL);
 

@@ -25,15 +25,19 @@
 // set default timezone
   date_default_timezone_set('America/Toronto');
 
+// set current working directory
+  $cwd = dirname($_SERVER['SCRIPT_FILENAME']); // this is prefered over getcwd() when using symlinks
+  //$cwd = getcwd();
+
 // set the public directory as our current working directory
-  chdir(dirname(__FILE__));
+  chdir($cwd);
 
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
   $lib = realpath('..') . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR;
   require file_exists($lib . DIRECTORY_SEPARATOR . 'Madeam') ? $lib . DIRECTORY_SEPARATOR . 'Madeam' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Madeam.php' : 'Madeam' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Madeam.php';
   
-// set include paths  
-  set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
+// set include paths
+  set_include_path(implode(PATH_SEPARATOR, Madeam::paths($cwd . DIRECTORY_SEPARATOR)) . PATH_SEPARATOR . get_include_path());
   
 // setup Madeam
   Madeam::webSetup(
@@ -41,7 +45,6 @@
     $_REQUEST,              // params
     $_SERVER                // server
   );
-  
   
 // remove _uri from request
   // _uri is defined in the public/.htaccess file. Many developers may not notice it because of
