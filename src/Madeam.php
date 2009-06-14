@@ -601,8 +601,7 @@ class Madeam {
     //$file = str_replace('_', DS, str_replace('\\', DS, $class)) . '.php'; // PHP 5.3
     $file = str_replace('_', DS, $class) . '.php';
     
-    // checks all the include paths to see if the file exist and then returns a
-    // full path to the file or false
+    // checks all the include paths to see if the file exist
     $paths = explode(PATH_SEPARATOR, get_include_path());
     foreach ($paths as $path) {
       if (file_exists($path . $file)) {
@@ -648,8 +647,7 @@ class Madeam {
       $file = substr($class, 0, -$packageNameLength) . DS . 'src' . DS . str_replace('_', DS, $class) . '.php';
     }
     
-    // checks all the include paths to see if the file exist and then returns a
-    // full path to the file or false
+    // checks all the include paths to see if the file exist
     $paths = explode(PATH_SEPARATOR, get_include_path());
     foreach ($paths as $path) {
       if (file_exists($path . DS . $file)) {

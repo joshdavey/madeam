@@ -2,11 +2,11 @@
 class Madeam_Serialize_Sphp {
   
   public static function encode($data) {
-    return serialize($php);
+    return serialize($data);
   }
   
   public static function decode($data) {
-    return unserialize($php);
+    return unserialize($data);
   }
   
 }

@@ -29,4 +29,4 @@
   Madeam::basicSetup();
 
 // initiated console
-new Madeam_Console_Make($_SERVER['argv']);
+  new Madeam_Console_Make($_SERVER['argv']);

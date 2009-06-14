@@ -1,30 +1,30 @@
 #!/bin/sh
 
-# creates a symfony sandbox for this symfony version
+BUILD_NAME=release
 
-echo $1
+rm -rf /tmp/${BUILD_NAME}
 
-exit
+echo "- Creating build directory"
+mkdir /tmp/${BUILD_NAME}
 
-echo ">>> initialization"
-DIR=../`dirname $0`
-BUILD=mapp
-PHP=php
+echo "- Copying www directory into build directory"
+cp -rv ../www/ /tmp/${BUILD_NAME}
 
-echo ">>> project initialization"
-rm -rf ${BUILD_NAME}
-mkdir ${BUILD_NAME}
-cd ${BUILD_NAME}
+echo "- Creating git clone in app/vendor/Madeam"
+git clone -v ../../Madeam/ /tmp/${BUILD_NAME}/app/vendor/Madeam/
 
-echo ">>> create a new project and a new app"
-cp 
-${PHP} ${DIR}/../../data/bin/madeam generate:project ${BUILD_NAME}
-${PHP} madeam generate:app ${APP_NAME}
+echo "- Creating build zip and tgz archives"
+tar -zcpPf /tmp/${BUILD_NAME}.tgz /tmp/${BUILD_NAME}
+#tar zcpf -C /tmp/${BUILD_NAME} > /tmp/${BUILD_NAME}.tgz
+zip -rq /tmp/${BUILD_NAME}.zip /tmp/${BUILD_NAME}
 
-echo ">>> create archive"
-cd ..
-tar --exclude=".svn" -zcpf ${BUILD_NAME}.tgz ${BUILD_NAME}
-zip -rq ${BUILD_NAME}.zip ${BUILD_NAME} -x \*/\*.svn/\*
+echo "- Copying build archives to remote over ssh"
+scp -P 30000 /tmp/${BUILD_NAME}.tgz joshdavey@67.23.30.170:/home/joshdavey/builds/
+scp -P 30000 /tmp/${BUILD_NAME}.zip joshdavey@67.23.30.170:/home/joshdavey/builds/
 
-echo ">>> cleanup"
-rm -rf ${BUILD_NAME}
+echo "- Removing build archives"
+rm /tmp/${BUILD_NAME}.tgz
+rm /tmp/${BUILD_NAME}.zip
+
+echo "- Removing build directory"
+rm -rf /tmp/${BUILD_NAME}
