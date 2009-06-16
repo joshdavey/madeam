@@ -18,44 +18,44 @@
 class Errorr extends Htmlr {
 
   public static function all($errors = array(), $_params = array()) {
-    $errors_box = null;
+    $errorsBox = null;
     if (!empty($errors)) {
       $params['name'] = $name;
       $params['id'] = self::nameToId($name);
       $params['class'] = 'errors';
       // create list
-      $errors_box = self::openTag('div', $params);
-      $errors_box .= self::wrappingTag('h1', 'Errors');
-      $errors_box .= self::openTag('ul');
+      $errorsBox = self::openTag('div', $params);
+      $errorsBox .= self::wrappingTag('h1', 'Errors');
+      $errorsBox .= self::openTag('ul');
       foreach ($errors as $field => $errors) {
-        $errors_box .= self::wrappingTag('li', $field);
-        $errors_box .= self::openTag('ul');
+        $errorsBox .= self::wrappingTag('li', $field);
+        $errorsBox .= self::openTag('ul');
         foreach ($errors as $error) {
-          $errors_box .= self::wrappingTag('li', $error);
+          $errorsBox .= self::wrappingTag('li', $error);
         }
-        $errors_box .= self::closedTag('ul');
+        $errorsBox .= self::closedTag('ul');
       }
-      $errors_box .= self::closedTag('ul');
-      $errors_box .= self::closedTag('div');
-      return $errors_box;
+      $errorsBox .= self::closedTag('ul');
+      $errorsBox .= self::closedTag('div');
+      return $errorsBox;
     } else {
-      return $errors_box;
+      return $errorsBox;
     }
   }
 
   public static function single($name, $errors = array(), $message = false) {
-    $error_tag = null;
+    $errorTag = null;
     if (isset($errors[$name]) && !empty($errors[$name])) {
-      $error_tag .= self::openTag('ul', array('class' => 'error'));
+      $errorTag .= self::openTag('ul', array('class' => 'error'));
       foreach ($errors[$name] as $error) {
         if ($message) {
-          $error_tag .= self::wrappingTag('li', $message);
+          $errorTag .= self::wrappingTag('li', $message);
         } else {
-          $error_tag .= self::wrappingTag('li', $error);
+          $errorTag .= self::wrappingTag('li', $error);
         }
       }
-      $error_tag .= self::closedTag('ul');
+      $errorTag .= self::closedTag('ul');
     }
-    return $error_tag;
+    return $errorTag;
   }
 }

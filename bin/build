@@ -15,7 +15,6 @@ git clone -v ../../Madeam/ /tmp/${BUILD_NAME}/app/vendor/Madeam/
 
 echo "- Creating build zip and tgz archives"
 tar -zcpPf /tmp/${BUILD_NAME}.tgz /tmp/${BUILD_NAME}
-#tar zcpf -C /tmp/${BUILD_NAME} > /tmp/${BUILD_NAME}.tgz
 zip -rq /tmp/${BUILD_NAME}.zip /tmp/${BUILD_NAME}
 
 echo "- Copying build archives to remote over ssh"
