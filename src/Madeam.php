@@ -244,25 +244,25 @@ class Madeam {
    * Madeam application directories.
    * It returns the file paths that should be added to the include_path.
    * 
-   * @param string $publicDirectory -- absolute path to the public directory
+   * @param string $publicDirectory -- full absolute path to the public directory
    * @return array -- list of all paths to be added to the include_path
    * @author Joshua Davey
    */
   public static function paths($publicDirectory) {
     // set public directory path
-    self::$pathToPub   = $publicDirectory;
+    self::$pathToPub    = $publicDirectory;
     
     // set path to root of madeam application
-    self::$pathToRoot  = dirname(self::$pathToPub) . DS;
+    self::$pathToRoot   = dirname(self::$pathToPub) . DS;
     
     // set application path
-    self::$pathToApp      = self::$pathToRoot . 'app' . DS;
+    self::$pathToApp    = self::$pathToRoot . 'app' . DS;
     
     // set library path
-    self::$pathToLib      = self::$pathToApp . 'vendor' . DS;
+    self::$pathToLib    = self::$pathToApp . 'vendor' . DS;
     
     // set etc path
-    self::$pathToEtc      = self::$pathToRoot . 'etc' . DS;
+    self::$pathToEtc    = self::$pathToRoot . 'etc' . DS;
 
     // path to helpers
     $helpers = dirname(__FILE__) . DS . 'Madeam' . DS . 'Helpers' . DS;

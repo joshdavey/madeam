@@ -277,7 +277,7 @@ class Madeam_Model {
    * load a schema
    *
    */
-  final public function loadSchema() {    
+  final public function loadSchema() {
     $this->setup['schema'] = $this->describe();
   }
   

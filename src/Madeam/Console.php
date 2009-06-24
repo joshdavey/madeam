@@ -23,7 +23,7 @@ class Madeam_Console {
   public function __construct($params = array()) {
     array_shift($params); // remove script path
     
-    $method = array_shift($params);
+    $action = array_shift($params);
     
     // parse POSIX params
     // -name Posts => array('name' => 'Posts')
@@ -40,18 +40,35 @@ class Madeam_Console {
         }
       }
     }
-    
-    // make sure we're pointed at the project's root
-    if (get_class($this) != 'Madeam_Console_Make') {
-      if (!file_exists(realpath('app/vendor/Madeam/src/Madeam.php'))) {
-        Madeam_Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
-        exit();
+
+    // reflection
+    $reflection = new ReflectionObject($this);
+
+    // check methods for callbacks
+    $method = $reflection->getMethod($action);
+
+    // 
+    $defaults = array();
+    $parameters = $method->getParameters();
+    foreach ($parameters as $parameter) {
+      // set parameters of callback (parameters in methods act as meta data for callbacks)
+      if ($parameter->isDefaultValueAvailable()) {
+        $defaults[$parameter->getName()] = $parameter->getDefaultValue();
+      } else {
+        $defaults[$parameter->getName()] = null;
       }
-    } else {
-      $method = 'app';
     }
     
-    $this->$method();
+    $args = array();
+    foreach ($defaults as $param => $value) {
+      if (isset($params[$param])) {
+        $args[] = $params[$param];
+      } else {
+        $args[] = $value;
+      }
+    }
+      
+    call_user_func_array(array($this, $action), $args);
   }
 
   /**

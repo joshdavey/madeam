@@ -1,4 +1,3 @@
 #!/usr/bin/env php
 <?php
-require 'boot.php';
-//require 'Madeam/src/Madeam/Console/Interactive.php';
+require '../vendor/Madeam/src/Madeam/Console/Interactive.php';

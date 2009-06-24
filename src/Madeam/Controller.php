@@ -51,6 +51,10 @@ class Madeam_Controller {
    */
   public $_setup = array();
   
+  /**
+   * 
+   * @var boolean
+   */
   public $_mapExtras = false;
   
   /**

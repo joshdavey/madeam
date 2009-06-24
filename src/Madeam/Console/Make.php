@@ -1,11 +1,17 @@
 <?php
 class Madeam_Console_Make extends Madeam_Console {
 
-  public function app($options = array('db_name', 'db_user', 'db_pass', 'db_host'), $defaults = array('db_name' => 'madeam', 'db_user' => 'root', 'db_pass' => '', 'db_host' => 'localhost')) {
+  public function app($path, $name) {
+    test($path);
+    test($name);
+    test('app made');
+  }
+
+  public function app1($options = array('db_name', 'db_user', 'db_pass', 'db_host'), $defaults = array('db_name' => 'madeam', 'db_user' => 'root', 'db_pass' => '', 'db_host' => 'localhost')) {
     if (Madeam_Console_CLI::getYN('Create a Madeam application in "' . getcwd() . '"?')) {
       Madeam_Console_CLI::outCreate('Application in ' . getcwd());
       
-      if ($this->fullCopy(Madeam::$pathToRoot, getcwd())) {
+      if ($this->_fullCopy(Madeam::$pathToRoot, getcwd())) {
         return true;
       } else {
         return false;
@@ -25,7 +31,7 @@ class Madeam_Console_Make extends Madeam_Console {
     }
   }
 
-  private function fullCopy($source, $target) {
+  private function _fullCopy($source, $target) {
     if (is_dir($source)) {
       @mkdir($target);
       $d = dir($source);
@@ -35,7 +41,7 @@ class Madeam_Console_Make extends Madeam_Console {
         }
         $Entry = $source . '/' . $entry;
         if (is_dir($Entry)) {
-          $this->fullCopy($Entry, $target . '/' . $entry);
+          $this->_fullCopy($Entry, $target . '/' . $entry);
           Madeam_Console_CLI::outCreate($target . '/' . $entry);
           continue;
         }

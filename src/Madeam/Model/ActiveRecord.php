@@ -178,17 +178,17 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
       Madeam_Logger::write($sql);
 
       // link
-      $count = self::$_pdo[$this->_server]->exec($sql);
+      //$count = self::$_pdo[$this->_server]->exec($sql);
+      $link = self::$_pdo[$this->_server]->prepare($sql);
+      return $link->execute();
     } catch (PDOException $e) {
       $trace = $e->getTrace();
       $error = self::$_pdo[$this->_server]->errorInfo();
       Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[2]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
     }
-
-    return $count;
   }
   
-  final public function query($sql) {    
+  final public function query($sql) {
     $conns = Madeam_Config::get('connections');
     $this->connect($conns[$this->_server]);
     
@@ -197,14 +197,15 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
       Madeam_Logger::write($sql);
 
       // link
-      $link = self::$_pdo[$this->_server]->query($sql, true);
+      $link = self::$_pdo[$this->_server]->prepare($sql);
+      $link->execute();
 
     } catch (PDOException $e) {
       $trace = $e->getTrace();
       $error = self::$_pdo[$this->_server]->errorInfo();
       Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
     }
-
+    
     return $link;
   }
   
@@ -587,9 +588,9 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
 
     // if the entryId exists and the record exists then it is an update. Otherwise it's an insert
     if ($update === true) {
-      $count = $this->execute($this->buildQueryUpdate($this->_data, $this->setup['resourceName'], $this->_sqlWhere, $this->_sqlStart, $this->_sqlRange, $this->setup['primaryKey']));
+      $success = $this->execute($this->buildQueryUpdate($this->_data, $this->setup['resourceName'], $this->_sqlWhere, $this->_sqlStart, $this->_sqlRange, $this->setup['primaryKey']));
     } else {
-      $count = $this->execute($this->buildQueryInsert($this->_data, $this->setup['resourceName'], $this->setup['primaryKey']));
+      $success = $this->execute($this->buildQueryInsert($this->_data, $this->setup['resourceName'], $this->setup['primaryKey']));
     }
 
     // grab entry id before it's overwritten by something that happens in afterSave()
@@ -597,8 +598,6 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
         
     if ($update === false) {
       $this->_callback('afterCreate');
-    } else {
-      
     }
           
     // after save _callback
@@ -608,8 +607,9 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     $this->reset();
 
     // return data
-    if ($count > 0) {
-      return $count;
+    if ($success === true) {
+      //return $this->findOne($entryId);
+      return $entryId;
     }
 
     // failed to return any rows

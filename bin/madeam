@@ -1,8 +1,14 @@
 #!/usr/bin/env php
 <?php
-$console = dirname(dirname(__FILE__)) . '/src/Madeam/Console/madeam.php';
-if (!file_exists($console)) {
-  // use php include_path
-  $console = 'Madeam/src/Madeam/Console/madeam.php';
-}
-require $console;
+require 'Madeam/src/Madeam/Console/boot.php';
+test($_ENV);
+test(get_include_path());
+$pwd = $_SERVER['argv'][0];
+unset($_SERVER['argv'][0]);
+array_unshift($_SERVER['argv'], '-name');
+array_unshift($_SERVER['argv'], getcwd());
+array_unshift($_SERVER['argv'], '-path');
+array_unshift($_SERVER['argv'], 'app');
+array_unshift($_SERVER['argv'], $pwd);
+test($_SERVER['argv']);
+new Madeam_Console_Make($_SERVER['argv']);
