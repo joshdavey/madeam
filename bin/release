@@ -1,6 +1,6 @@
 #!/bin/sh
 
-RELEASE_NAME=madeam-`git tag`
+RELEASE_NAME=madeam-$1
 
 BIN_DIR=`pwd`
 
