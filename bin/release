@@ -1,0 +1,37 @@
+#!/bin/sh
+
+RELEASE_NAME=madeam-`git tag`
+
+BIN_DIR=`pwd`
+
+rm -rf /tmp/${RELEASE_NAME}
+
+echo "- Creating build directory"
+mkdir /tmp/${RELEASE_NAME}
+
+echo "- CD to /tmp directory"
+cd /tmp
+
+echo "- Copying www directory into build directory"
+cp -rv ${BIN_DIR}/../www/ ${RELEASE_NAME}
+
+echo "- Creating git clone in app/vendor/Madeam"
+git clone -v ${BIN_DIR}/../../Madeam/ ${RELEASE_NAME}/app/vendor/Madeam/
+
+echo "- Removing .git from clone"
+rm -rf ${RELEASE_NAME}/app/vendor/Madeam/.git
+
+echo "- Creating build zip and tgz archives"
+tar -zcpPf ${RELEASE_NAME}.tgz ${RELEASE_NAME}
+zip -rq ${RELEASE_NAME}.zip ${RELEASE_NAME}
+
+echo "- Copying build archives to remote over ssh"
+scp -P 30000 ${RELEASE_NAME}.tgz joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/public/builds/
+scp -P 30000 ${RELEASE_NAME}.zip joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/public/builds/
+
+echo "- Removing build archives"
+rm ${RELEASE_NAME}.tgz
+rm ${RELEASE_NAME}.zip
+
+echo "- Removing build directory"
+rm -rf ${RELEASE_NAME}
