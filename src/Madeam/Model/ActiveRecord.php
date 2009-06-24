@@ -594,12 +594,16 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     }
 
     // grab entry id before it's overwritten by something that happens in afterSave()
-    $entryId = $this->insertId();
+    if (isset($this->_data[$this->setup['primaryKey']])) {
+      $entryId = $this->_data[$this->setup['primaryKey']];
+    } else {
+      $entryId = $this->insertId();
+    }
         
     if ($update === false) {
       $this->_callback('afterCreate');
     }
-          
+    
     // after save _callback
     $this->_callback('afterSave');
 
@@ -608,8 +612,8 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
 
     // return data
     if ($success === true) {
-      //return $this->findOne($entryId);
       return $entryId;
+      return $this->findOne($entryId);
     }
 
     // failed to return any rows

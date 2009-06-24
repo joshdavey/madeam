@@ -37,12 +37,12 @@ class Madeam_Cache {
    */
   public static function read($id, $lifeTime = 0, $checkCache = true) {
     
-    if ($checkCache === false) { return false; }
-    
     // check registry first
     if (isset(self::$memory[$id])) {
       return self::$memory[$id];
     }
+    
+    if ($checkCache === false) { return false; }
 
     // set file name
     $file = self::$path . $id;

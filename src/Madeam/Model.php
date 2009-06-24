@@ -144,10 +144,10 @@ class Madeam_Model {
     }
 
     // set cache name
-    $this->cacheName.= Madeam::$environment . '.' . $this->cacheName . strtolower($this->modelName) . '.setup';
+    $this->cacheName = Madeam::$environment . '.' . $this->cacheName . strtolower($this->modelName) . '.setup';
     
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->setup = Madeam_Cache::read($this->cacheName, - 1, Madeam_Config::get('cache_models'))) {
+    if (! $this->setup = Madeam_Cache::read($this->cacheName, -1, Madeam_Config::get('cache_models'))) {
       
       // pre-load a reflection of this class for use in parseing the meta data and methods
       $reflection = new ReflectionClass(get_class($this));
@@ -157,9 +157,7 @@ class Madeam_Model {
       unset($reflection);
 
       // save cache
-      if (Madeam_Config::get('cache_models') === true) {
-        Madeam_Cache::save($this->cacheName, $this->setup, true);
-      }
+      Madeam_Cache::save($this->cacheName, $this->setup, true);
     }
   }
   
