@@ -315,6 +315,18 @@ class Madeam {
     // determine the relative path to the public directory
     self::$uriPubPath = self::pubPath($server['DOCUMENT_ROOT'], self::$pathToPub);  
     
+    // if the absolute path to the public directory can't be established based on the uriPubPath
+    // we've derived then it's likely the developer is using symlinks to point to their project.
+    // In this case we can't determine the paths.
+    // Most likely the user has advanced priveledges and is able to set the DocumentRoot in the apache
+    // config to point to "path/to/project/public/" and therefore all of our relative paths can be
+    // set to "/".
+    // Therefore if the developer is using symlinks they must point their DocumentRoot to Madeam's public
+    // directory or everything will explode.
+    if (!file_exists($server['DOCUMENT_ROOT'] . self::$uriPubPath)) {
+      self::$uriPubPath = '/';
+      self::$uriAppPath = '/';
+    }
     
     // set layout if it hasn't already been set
     if (!isset(self::$requestParams['_layout'])) { self::$requestParams['_layout'] = 1; }
