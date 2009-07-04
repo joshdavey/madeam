@@ -6,7 +6,7 @@
   define('TESTS_MADEAM_PUB_DIRECTORY',    realpath('Madeam/_application/public') . DIRECTORY_SEPARATOR);
   define('TESTS_MADEAM_APPSRC_DIRECTORY', realpath('Madeam/_application/app/src') . DIRECTORY_SEPARATOR);
   define('TESTS_MADEAM_ETC_DIRECTORY',    realpath('Madeam/_application/etc') . DIRECTORY_SEPARATOR);
-  define('TESTS_MADEAM_LIB_DIRECTORY',    realpath('../..') . DIRECTORY_SEPARATOR);
+  define('TESTS_MADEAM_LIB_DIRECTORY',    realpath('../src') . DIRECTORY_SEPARATOR);
   define('TESTS_MADEAM_TESTS_DIRECTORY',  realpath('.') . DIRECTORY_SEPARATOR);
 
 // configure Madeam paths  
