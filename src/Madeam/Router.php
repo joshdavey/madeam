@@ -133,6 +133,17 @@ class Madeam_Router {
       // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
       parse_str($query, $get); // assigns $get array of query params
     }
+    
+    
+    // add query to params
+    if (isset($query)) {
+      $defaults['_query'] = $query;
+    }
+    
+    // set format
+    if ($format !== false) {
+      $defaults['_format'] = $format;
+    }
 
     // matchs count
     $matchs = 0;
@@ -198,16 +209,6 @@ class Madeam_Router {
       $params['_layout'] = 0;
     } elseif (!isset($params['_layout'])) {
       $params['_layout'] = 1;
-    }
-    
-    // add query to params
-    if (isset($query)) {
-      $params['_query'] = $query;
-    }
-    
-    // set format
-    if ($format !== false) {
-      $params['_format'] = $format;
     }
     
     return $params;
