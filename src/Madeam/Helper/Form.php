@@ -15,7 +15,7 @@
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class Formr extends Htmlr {
+class Madeam_Helper_Form extends Madeam_Helper_Html {
   
   public static function open($action = null, $_params = array()) {
     $params = array();

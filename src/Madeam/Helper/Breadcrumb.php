@@ -1,5 +1,5 @@
 <?php
-class Breadcrumbr extends Htmlr {
+class Madeam_Helper_Breadcrumb extends Madeam_Helper_Html {
 
   static $breadcrumbs = array();
 

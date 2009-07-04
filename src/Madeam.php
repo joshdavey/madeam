@@ -263,12 +263,9 @@ class Madeam {
     
     // set etc path
     self::$pathToEtc    = self::$pathToRoot . 'etc' . DS;
-
-    // path to helpers
-    $helpers = dirname(__FILE__) . DS . 'Madeam' . DS . 'Helpers' . DS;
     
     // return paths for include path
-    return array(self::$pathToApp . 'src' . DS, self::$pathToLib, $helpers);
+    return array(self::$pathToApp . 'src' . DS, self::$pathToLib);
   }
   
   

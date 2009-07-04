@@ -15,7 +15,7 @@
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class Htmlr {
+class Madeam_Helper_Html {
 
   public static function link($label, $link = null, $_params = array()) {
     $params = array();

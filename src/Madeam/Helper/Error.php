@@ -15,7 +15,7 @@
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class Errorr extends Htmlr {
+class Madeam_Helper_Error extends Madeam_Helper_Html {
 
   public static function all($errors = array(), $_params = array()) {
     $errorsBox = null;
