@@ -95,7 +95,6 @@ class Madeam_Controller {
   /**
    * Controller __construct. Preps the controller.
    * - set params
-   * - set flash
    * - set view
    * - set layout
    * - check for setup cache
@@ -113,11 +112,6 @@ class Madeam_Controller {
     
     // set params
     $this->params = $params;
-    
-    if (isset($params['_flash'])) {
-      $this->flash = $params['_flash'];
-      unset($params['_flash']);
-    }
     
     // set view
     $this->view($this->params['_controller'] . '/' . $this->params['_action']);
