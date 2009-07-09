@@ -20,7 +20,6 @@ class Madeam_Helper_Html {
   public static function link($label, $link = null, $_params = array()) {
     $params = array();
     $params['href'] = Madeam::url($link);
-    $params['id'] = Madeam_Inflector::underscorize(strtolower(strip_tags($label))) . '_link';
     $params = array_merge($params, $_params);
     return self::wrappingTag('a', $label, $params);
   }
