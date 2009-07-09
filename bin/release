@@ -32,10 +32,10 @@ tar -zcpPf ${LATEST_NAME}.tgz ${RELEASE_NAME}
 zip -rq ${LATEST_NAME}.zip ${RELEASE_NAME}
 
 echo "- Copying release archives to remote over ssh"
-scp -P 30000 ${RELEASE_NAME}.tgz joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/public/releases/
-scp -P 30000 ${RELEASE_NAME}.zip joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/public/releases/
-scp -P 30000 ${LATEST_NAME}.tgz joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/public/releases/
-scp -P 30000 ${LATEST_NAME}.zip joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/public/releases/
+scp -P 30000 ${RELEASE_NAME}.tgz joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/shared/releases
+scp -P 30000 ${RELEASE_NAME}.zip joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/shared/releases
+scp -P 30000 ${LATEST_NAME}.tgz joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/shared/releases
+scp -P 30000 ${LATEST_NAME}.zip joshdavey@67.23.30.170:/home/joshdavey/public_html/madeam.com/shared/releases
 
 echo "- Removing release archives"
 rm ${RELEASE_NAME}.tgz

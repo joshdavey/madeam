@@ -12,7 +12,7 @@
 // set default timezone
   date_default_timezone_set('America/Toronto');
   
-// inlude Madeam
+// include Madeam
   require 'Madeam/src/Madeam.php';
   
 // set include paths  

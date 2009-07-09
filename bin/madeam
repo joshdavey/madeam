@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
-require 'Madeam/src/Madeam/Console/boot.php';
+set_include_path('.');
+require realpath(dirname(__FILE__) . '/..') . '/src/Madeam/Console/boot.php';
+test(__FILE__);
 test($_ENV);
 test(get_include_path());
 $pwd = $_SERVER['argv'][0];
