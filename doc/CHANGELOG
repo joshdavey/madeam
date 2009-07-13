@@ -1,0 +1,13 @@
+Version 1.1.0
+- Added CHANGELOG
+- Madeam script now works for creating new Madeam projects
+- Scripts now called Madeam.php instead of boot.php
+- New dispatcher.php
+- Can now use MADEAM_ENV apache environment variable instead of env.php
+- fixed htmlentities wrapper h()
+
+Version 1.0.1
+- Helpers are now placed in src/Madeam/Helper directory and referenced from app/vendor/
+
+Version 1.0.0
+- Initial Public Release

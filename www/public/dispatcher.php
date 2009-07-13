@@ -36,12 +36,14 @@
 // the development of a project based on madeam. Madeam should always be in the vendor directory
   require 'app/vendor/Madeam/src/Madeam.php'; 
   
+// set environment
+  $environemnt = apache_getenv('MADEAM_ENV');
+  if ($environemnt === false) {
+    $environemnt = require 'env.php';
+  }
+  
 // setup Madeam
-  Madeam::webSetup(
-    require 'env.php',  // environment
-    $_REQUEST,          // params
-    $_SERVER            // server
-  );
+  Madeam::webSetup($environemnt, $_REQUEST, $_SERVER);
   
 // remove _uri from request
 // _uri is defined in the public/.htaccess file. Many developers may not notice it because of
