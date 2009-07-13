@@ -84,7 +84,7 @@ function test($var = null) {
  * @param string $string
  */
 function h($string) {
-  return htmlentities(iconv('UTF-8', 'UTF-8//IGNORE'), $string, ENT_QUOTES, 'UTF-8');
+  return htmlentities(iconv('UTF-8', 'UTF-8//IGNORE', $string), ENT_QUOTES, 'UTF-8');
 }
 
 /**
