@@ -265,7 +265,7 @@ class Madeam {
    */
   public static function paths($appRoot, $publicDir = 'public') {
     // set public directory path
-    self::$pathToPub    = $appRoot . $publicDir;
+    self::$pathToPub    = $appRoot . $publicDir . '/';
     
     // set path to root of madeam application
     self::$pathToRoot   = $appRoot;

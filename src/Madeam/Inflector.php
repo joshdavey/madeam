@@ -196,7 +196,7 @@ class Madeam_Inflector {
    */
   public static function slug($string, $separator = '-') {
     $string = strtolower(str_replace(' ', $separator, trim($string)));
-    $string = preg_replace('/[^a-z0-9' . preg_quote($separator) . ']/', '', $string);
+    $string = preg_replace('/[^a-z0-9' . preg_quote($separator) . '_]/', '', $string);
     return $string;
   }
   

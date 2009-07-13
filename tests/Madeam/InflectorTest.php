@@ -129,11 +129,11 @@ class Madeam_InflectorTest extends PHPUnit_Framework_TestCase {
   }
   
   /**
-   * All characters except alpha numeric characters and the seperator chracter should be removed
+   * All characters except alpha numeric characters, underscores and the seperator chracter should be removed
    */
-  public function testSlugSpecialCharactersAreRemovedExceptSeparator() {
+  public function testSlugSpecialCharactersAreRemovedExceptSeparatorAndUnderscores() {
     $separator = '-';
-    $this->assertEquals($separator, Madeam_Inflector::slug('$,!/?\\&.#[]()+=-_\'/<>{}|%^*~`', $separator));
+    $this->assertEquals($separator, Madeam_Inflector::slug('$,!/?\\&.#[]()+=-\'/<>{}|%^*~`', $separator));
   }
   
   /**
