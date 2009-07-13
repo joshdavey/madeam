@@ -1,4 +1,4 @@
 #!/usr/bin/env php
 <?php
-require '../vendor/Madeam/src/Madeam/Console/boot.php';
-new Madeam_Console_Create($args);
+require 'app/vendor/Madeam/src/Madeam.php';
+new Madeam_Console_Create($_SERVER['argv']);

@@ -1,16 +1,9 @@
 #!/usr/bin/env php
 <?php
-set_include_path('.');
-require realpath(dirname(__FILE__) . '/..') . '/src/Madeam/Console/boot.php';
-test(__FILE__);
-test($_ENV);
-test(get_include_path());
+require realpath(dirname(__FILE__) . '/..') . '/src/Madeam.php';
 $pwd = $_SERVER['argv'][0];
 unset($_SERVER['argv'][0]);
 array_unshift($_SERVER['argv'], '-name');
-array_unshift($_SERVER['argv'], getcwd());
-array_unshift($_SERVER['argv'], '-path');
 array_unshift($_SERVER['argv'], 'app');
 array_unshift($_SERVER['argv'], $pwd);
-test($_SERVER['argv']);
 new Madeam_Console_Make($_SERVER['argv']);

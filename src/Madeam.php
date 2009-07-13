@@ -53,10 +53,18 @@ function test($var = null) {
     $tests = '0' . $tests;
   }
   
+  if (!isset($_SERVER['SHELL'])) {
+    $header = '<br /><pre>[T::' . $tests . '] &nbsp;&nbsp;' . "\n";
+    $footer = ' &nbsp;&nbsp;</pre>' . "\n";
+  } else {
+    $header = null;
+    $footer = "\n";
+  }
+  
   if (is_array($var) || is_object($var)) {
-    echo '<br /><pre>[T::' . $tests . '] &nbsp;&nbsp;' . "\n";
+    echo $header;
     print_r($var);
-    echo ' &nbsp;&nbsp;</pre>' . "\n";
+    echo $footer;
   } elseif (is_bool($var)) {
     if ($var === true) {
       $var = 'TRUE';
@@ -64,9 +72,9 @@ function test($var = null) {
       $var = 'FALSE';
     }
     
-    echo "<br /> [T::" . $tests . "] &nbsp;&nbsp;" . (string) $var . "&nbsp;&nbsp;  \n";
+    echo $header . (string) $var . $footer;
   } else {
-    echo "<br /> [T::" . $tests . "] &nbsp;&nbsp;" . $var . "&nbsp;&nbsp;  \n";
+    echo $header . $var . $footer;
   }
 }
 
@@ -128,6 +136,8 @@ require $cd . 'Router.php';
 require $cd . 'Config.php';
 require $cd . 'Cache.php';
 
+// set include paths
+set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR, 'public')) . PATH_SEPARATOR . get_include_path());
 
 /**
  * Madeam PHP Framework <http://madeam.com>
@@ -205,29 +215,34 @@ class Madeam {
   public static $environment        = 'development';
   
   /**
-   * undocumented
+   * 
    */
   public static $pathToRoot      = false;
   
   /**
-   * undocumented
+   * 
    */
   public static $pathToPub       = false;
 
   /**
-   * undocumented
+   * 
    */
   public static $pathToApp          = false;
   
   /**
-   * undocumented
+   * 
    */
   public static $pathToLib          = false;
 
   /**
-   * undocumented
+   * 
    */
   public static $pathToEtc          = false;
+  
+  /**
+   * 
+   */
+  public static $pathToInc          = false;
   
   /**
    * @var string 
@@ -248,12 +263,12 @@ class Madeam {
    * @return array -- list of all paths to be added to the include_path
    * @author Joshua Davey
    */
-  public static function paths($publicDirectory) {
+  public static function paths($appRoot, $publicDir = 'public') {
     // set public directory path
-    self::$pathToPub    = $publicDirectory;
+    self::$pathToPub    = $appRoot . $publicDir;
     
     // set path to root of madeam application
-    self::$pathToRoot   = dirname(self::$pathToPub) . DS;
+    self::$pathToRoot   = $appRoot;
     
     // set application path
     self::$pathToApp    = self::$pathToRoot . 'app' . DS;
@@ -264,8 +279,11 @@ class Madeam {
     // set etc path
     self::$pathToEtc    = self::$pathToRoot . 'etc' . DS;
     
+    // path to the directory madeam is stored in
+    self::$pathToInc    = dirname(dirname(dirname(__FILE__))) . DS;
+    
     // return paths for include path
-    return array(self::$pathToApp . 'src' . DS, self::$pathToLib);
+    return array(self::$pathToApp . 'src' . DS, self::$pathToLib, self::$pathToInc);
   }
   
   

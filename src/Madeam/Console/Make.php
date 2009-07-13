@@ -1,62 +1,30 @@
 <?php
 class Madeam_Console_Make extends Madeam_Console {
 
-  public function app($path, $name) {
-    test($path);
-    test($name);
-    test('app made');
-  }
-
-  public function app1($options = array('db_name', 'db_user', 'db_pass', 'db_host'), $defaults = array('db_name' => 'madeam', 'db_user' => 'root', 'db_pass' => '', 'db_host' => 'localhost')) {
-    if (Madeam_Console_CLI::getYN('Create a Madeam application in "' . getcwd() . '"?')) {
-      Madeam_Console_CLI::outCreate('Application in ' . getcwd());
-      
-      if ($this->_fullCopy(Madeam::$pathToRoot, getcwd())) {
-        return true;
-      } else {
-        return false;
-      }
+  public function app($name, $clone = false, $symlink = false) {
+    
+    $path = trim(`pwd`);
+    
+    // add app name to path
+    if ($name !== true) { 
+      $path .= '/' . $name;
+    }
+    
+    // create full path to application
+    if (!file_exists($path)) { `mkdir -p $path`; }    
+    
+    $madeam = Madeam::$pathToInc;
+    echo `cp -rpv {$madeam}Madeam/www/ {$path}`;
+    
+    if ($clone === true) {
+      // clone madeam from remote
+      echo `git clone -v git://github.com/joshdavey/madeam {$path}/app/vendor/Madeam`;
+    } elseif ($symlink === true) {
+      echo `ln -s {$madeam}Madeam {$path}/app/vendor/Madeam`;
     } else {
-      return false;
+      // copy local madeam copy
+      echo `cp -rpv {$madeam}Madeam {$path}/app/vendor`;
     }
   }
   
-  public function app2() {
-    if (Madeam_Console_CLI::getYN('Create a Madeam application in "' . getcwd() . '"?')) {
-      $path = dirname(__FILE__);
-      $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-      foreach($objects as $name => $object) {
-        echo "$name\n";
-      }
-    }
-  }
-
-  private function _fullCopy($source, $target) {
-    if (is_dir($source)) {
-      @mkdir($target);
-      $d = dir($source);
-      while(FALSE !== ($entry = $d->read())) {
-        if ($entry == '.' || $entry == '..' || $entry == '.svn' || $entry == '.git') {
-          continue;
-        }
-        $Entry = $source . '/' . $entry;
-        if (is_dir($Entry)) {
-          $this->_fullCopy($Entry, $target . '/' . $entry);
-          Madeam_Console_CLI::outCreate($target . '/' . $entry);
-          continue;
-        }
-        Madeam_Console_CLI::outCreate($target . '/' . $entry);
-        if (! copy($Entry, $target . '/' . $entry)) {
-          return false;
-        }
-      }
-      $d->close();
-    } else {
-      Madeam_Console_CLI::outCreate($source);
-      if (! copy($source, $target)) {
-        return false;
-      }
-    }
-    return true;
-  }
 }
