@@ -24,7 +24,7 @@ class madeam\Console_Create extends madeam\Console {
     
     
     // Send message to user that we are creating the controller
-    madeam\Console_CLI::outCreate('Controller ' . $controllerClassName);
+    madeam\console\CLI::outCreate('Controller ' . $controllerClassName);
     
     // Create Class directory
     $this->createDir($controllerClassFilePath);
@@ -125,7 +125,7 @@ class madeam\Console_Create extends madeam\Console {
     $controllerClassName = 'Controller_' . $controllerName;
     
     // Send message to user that we are creating the controller
-    madeam\Console_CLI::outCreate('Controller ' . $controllerName);
+    madeam\console\CLI::outCreate('Controller ' . $controllerName);
     
     // determine scaffold directory
     $dir = PATH_TO_ANTHOLOGY . SCAFFOLD_PATH . $scaffold . DS;
@@ -163,7 +163,7 @@ class madeam\Console_Create extends madeam\Console {
               $function_code = str_replace('{$this->represent}', $model_name, $function_code);
               $function_code = str_replace('$this->represent', "'$model_name'", $function_code);
             } else {
-              madeam\Console_CLI::outError('This scaffold requires that it represents a model');
+              madeam\console\CLI::outError('This scaffold requires that it represents a model');
               return false;
             }
           }
@@ -173,7 +173,7 @@ class madeam\Console_Create extends madeam\Console {
           $controllerContents .= "\n\n\n  function $function_name() {";
           $controllerContents .= "\n    $function_code";
           $controllerContents .= "\n  }";
-          madeam\Console_CLI::outCreate('action ' . $function_name);
+          madeam\console\CLI::outCreate('action ' . $function_name);
         }
       }
       
@@ -206,14 +206,14 @@ class madeam\Console_Create extends madeam\Console {
               $view_code = str_replace('{$this->represent}', $model_name, $view_code);
               $view_code = str_replace('$this->represent', "'$model_name'", $view_code);
             } else {
-              madeam\Console_CLI::outError('This scaffold requires that it represents a model');
+              madeam\console\CLI::outError('This scaffold requires that it represents a model');
               return false;
             }
           }
           // remove extension
           $ext = '.' . substr($file, strrpos($file, '.') + 1);
           $view_name = substr($file, 0, - strlen($ext));
-          madeam\Console_CLI::outCreate('view ' . $view_name);
+          madeam\console\CLI::outCreate('view ' . $view_name);
           // make controller directory if it does not already exist
           if (! file_exists(PATH_TO_VIEW . $controller_name)) {
             mkdir(PATH_TO_VIEW . $controller_name);

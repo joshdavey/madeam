@@ -13,7 +13,7 @@ namespace madeam;
  * @package      madeam
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Exception extends Exception {
+class Exception extends \Exception {
 
   private static $funSnippets = array(
     "don't worry, be happy. It could be worse.",
@@ -64,7 +64,7 @@ class Exception extends Exception {
     }
 
     // check if inline errors are enabled and the error is not fatal
-    if (madeam\Config::get('inline_errors') === true && in_array($code, array(2, 4, 8, 32, 128, 256, 1024, 2048, 4096, 8192, 16384))) {
+    if (Config::get('inline_errors') === true && in_array($code, array(2, 4, 8, 32, 128, 256, 1024, 2048, 4096, 8192, 16384))) {
       echo nl2br($message);
       echo '<br />' . $file . ' on line ' . $line;
       return;
@@ -74,13 +74,13 @@ class Exception extends Exception {
     // clean output buffer
     if (ob_get_level() > 0) { ob_clean(); }
 
-    if (madeam\Config::get('enable_debug') == true) {
+    if (Config::get('enable_debug') == true) {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
       
       // call error controller and pass information
       $params = array(
-        '_controller' => Madeam::errorController, 
+        '_controller' => \Madeam::errorController, 
         '_action'     => 'debug',
         '_method'     => 'get',
         '_layout'     => 1,
@@ -92,20 +92,21 @@ class Exception extends Exception {
         'code'        => $code,
         'file'        => $file
       );
-      
-      echo Madeam::control($params);
+      test($params);
+      //echo \Madeam::control($params);
       exit();
     } else {
       // return 404 error page
       $params = array(
-        '_controller' => Madeam::errorController, 
+        '_controller' => \Madeam::errorController, 
         '_action'     => 'http404',
         '_method'     => 'get',
         '_layout'     => 1,
         '_format'     => 'html'
       );
       
-      echo Madeam::control($params);
+      test($params);
+      //echo \Madeam::control($params);
       exit();
     }
   }

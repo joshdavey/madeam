@@ -43,7 +43,7 @@ class Console {
     }
 
     // reflection
-    $reflection = new ReflectionObject($this);
+    $reflection = new \ReflectionObject($this);
 
     // check methods for callbacks
     $method = $reflection->getMethod($action);
@@ -99,7 +99,7 @@ class Console {
       // If we aren't in the applicatin's root path then tell the user and exit
       if ($scriptName != 'make') {
         if (!file_exists(realpath('app/vendor/Madeam.php'))) {
-          madeam\Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
+          madeam\console\CLI::outError('Please point Madeam Console to the root directory of your application.');
           exit();
         }
       }
@@ -108,25 +108,25 @@ class Console {
         $scriptClassName = 'madeam\Console_Script_' . ucfirst($scriptName);
         $script = new $scriptClassName;
         break;
-      } catch (madeam\Exception_AutoloadFail $e) {
+      } catch (madeam\exception\AutoloadFail $e) {
         if ($scriptName === false) {
           // ask them for the script of the console they'd like to use
-          madeam\Console_CLI::outMenu('Scripts', $scriptNames);
-          $scriptName = madeam\Console_CLI::getCommand('script');
+          madeam\console\CLI::outMenu('Scripts', $scriptNames);
+          $scriptName = madeam\console\CLI::getCommand('script');
         }
 
         // by entering a console name at this point it means they've tried entering one that doesn't exist.
         // prompt them with an saying please try again.
         if ($scriptName !== false) {
-          madeam\Console_CLI::outError("Sorry the script you entered does not exist.");
+          madeam\console\CLI::outError("Sorry the script you entered does not exist.");
         }
       }
     }
 
     // get list of commands for this script
     $commandNames = array();
-    $classReflection = new ReflectionClass($script);
-    foreach ($classReflection->getMethods(ReflectionMethod::IS_PUBLIC) as $mehodReflection) {
+    $classReflection = new \ReflectionClass($script);
+    foreach ($classReflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $mehodReflection) {
       $commandNames[] = $mehodReflection->getName();
     }
 
@@ -134,7 +134,7 @@ class Console {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
       if ($commandName !== false) {
-        madeam\Console_CLI::outError("Sorry the command you entered does not exist.");
+        madeam\console\CLI::outError("Sorry the command you entered does not exist.");
       }
 
       // reset command
@@ -146,8 +146,8 @@ class Console {
       }
 
       if ($commandName == null) {
-        madeam\Console_CLI::outMenu('Commands', $commandNames);
-        $commandName = madeam\Console_CLI::getCommand('command');
+        madeam\console\CLI::outMenu('Commands', $commandNames);
+        $commandName = madeam\console\CLI::getCommand('command');
       }
 
     } while(! in_array($commandName, $commandNames));
@@ -185,13 +185,13 @@ class Console {
     
     $file = $file_path . $file_name;
     if (file_exists($file)) {
-      if (madeam\Console_CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
+      if (madeam\console\CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
         return false;
       }
     }
     
     if (file_put_contents($file, $file_content)) {
-      madeam\Console_CLI::outCreate('file ' . $file);
+      madeam\console\CLI::outCreate('file ' . $file);
       return true;
     }
   }
@@ -199,7 +199,7 @@ class Console {
   protected function createDir($dir) {
     if (!file_exists($dir)) {
       mkdir($dir, 0777, true);
-      madeam\Console_CLI::outCreate('directory ' . $dir);
+      madeam\console\CLI::outCreate('directory ' . $dir);
     }
   }
   

@@ -129,12 +129,13 @@ if (function_exists('lcfirst') === false) {
  * These files will be included in 99% of requests so it is more effecient to include them now
  * than for them to be autoloaded.
  */
-$cd = dirname(__FILE__) . DS . 'Madeam' . DS;
+$cd = dirname(__FILE__) . DS . 'madeam' . DS;
 require $cd . 'Controller.php';
 require $cd . 'Inflector.php';
 require $cd . 'Router.php';
 require $cd . 'Config.php';
 require $cd . 'Cache.php';
+
 
 // set include paths
 set_include_path(implode(PATH_SEPARATOR, Madeam::paths(getcwd() . DIRECTORY_SEPARATOR, 'public')) . PATH_SEPARATOR . get_include_path());
@@ -283,7 +284,7 @@ class Madeam {
     self::$pathToInc    = dirname(dirname(dirname(__FILE__))) . DS;
     
     // return paths for include path
-    return array(self::$pathToApp . 'src' . DS, self::$pathToLib, self::$pathToInc);
+    return array(self::$pathToApp . 'models' . DS, self::$pathToApp . 'controllers' . DS, self::$pathToLib, self::$pathToInc);
   }
   
   
@@ -382,7 +383,7 @@ class Madeam {
     unset($cfg);
     
     // set controller's view directory
-    madeam\Controller::$viewPath = Madeam::$pathToApp . 'src' . DS . 'View' . DS;
+    madeam\Controller::$viewPath = Madeam::$pathToApp . 'views' . DS;
   }
 
   /**
@@ -480,7 +481,7 @@ class Madeam {
     }
     
     // set controller class
-    $controllerClass = 'Controller_' . implode('_', $controllerClassNodes);
+    $controllerClass = implode('\\', $controllerClassNodes) . 'Controller';
     
     try {
       $controller = new $controllerClass($params);
@@ -488,13 +489,13 @@ class Madeam {
       if (is_dir(madeam\Controller::$viewPath . $params['_controller'])) {
         $view = $params['_controller'] . '/' . $params['_action'];
         $params['_controller'] = 'app';
-        $controller = new Controller_App($params);
+        $controller = new \AppController($params);
         $controller->view($view);
       } elseif (is_file(madeam\Controller::$viewPath . $params['_controller'] . DS . $params['_action'] . '.' . $params['_format'])) {
         $view = $params['_controller'];
         $params['_action'] = $params['_controller'];
         $params['_controller'] = 'app';
-        $controller = new Controller_App($params);
+        $controller = new \AppController($params);
         $controller->view($view);
       } else {
         // no controller or view found = critical error.
@@ -662,9 +663,9 @@ class Madeam {
    *    PackageName/
    * 
    * Here are some example classes and their location
-   *  Madeam                => Madeam/src/Madeam.php
-   *  madeam\Controller     => Madeam/src/Madeam/Controller.php
-   *  madeam\Serialize_Json => Madeam/src/Madeam/Serialize/Json.php
+   *  madeam                => madeam/src/Madeam.php
+   *  madeam\Controller     => madeam/src/madeam/Controller.php
+   *  madeam\Serialize_Json => madeam/src/madeam/Serialize/Json.php
    * 
    * @param string $class
    * @author Joshua Davey

@@ -1,4 +1,4 @@
 <?php 
-class Htmlr extends madeam\Helper_Html {
+class Htmlr extends \madeam\helper\Html  {
   
 }

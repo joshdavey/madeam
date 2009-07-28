@@ -1,2 +1,3 @@
 <?php
-class madeam\Exception_HeadersSent extends madeam\Exception {}
+namespace madeam\exception;
+class HeadersSent extends \madeam\Exception { }

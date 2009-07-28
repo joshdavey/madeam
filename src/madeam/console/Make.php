@@ -1,5 +1,6 @@
 <?php
-class madeam\Console_Make extends madeam\Console {
+namespace madeam\console;
+class Make extends \madeam\Console {
 
   public function app($name, $clone = false, $symlink = false) {
     
@@ -13,14 +14,14 @@ class madeam\Console_Make extends madeam\Console {
     // create full path to application
     if (!file_exists($path)) { `mkdir -p $path`; }    
     
-    $madeam = Madeam::$pathToInc;
+    $madeam = \Madeam::$pathToInc;
     echo `cp -rpv {$madeam}Madeam/www/ {$path}`;
     
     if ($clone === true) {
       // clone madeam from remote
-      echo `git clone -v git://github.com/joshdavey/madeam {$path}/app/vendor/Madeam`;
+      echo `git clone -v git://github.com/joshdavey/madeam {$path}/app/vendor/madeam`;
     } elseif ($symlink === true) {
-      echo `ln -s {$madeam}Madeam {$path}/app/vendor/Madeam`;
+      echo `ln -s {$madeam}Madeam/ {$path}/app/vendor/madeam`;
     } else {
       // copy local madeam copy
       echo `cp -rpv {$madeam}Madeam {$path}/app/vendor`;

@@ -1,4 +1,4 @@
 <?php 
-class Errorr extends madeam\Helper_Error {
+class Errorr extends \madeam\helper\Error {
   
 }

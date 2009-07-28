@@ -1,10 +1,5 @@
 <?php
 namespace madeam;
-// set cache path if it hasn't been already.
-if (Cache::$path === false) {
-  Cache::$path  = Madeam::$pathToEtc . 'cache' . DS;
-}
-
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -26,6 +21,10 @@ class Cache {
   public static $openCaches = array();
   
   public static $memory;
+  
+  public static function __init__() {
+    
+  }
 
   /**
    * Enter description here...

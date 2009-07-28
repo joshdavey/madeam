@@ -108,7 +108,7 @@ class Controller {
     // check for expected params
     $diff = array_diff(array('_controller', '_action', '_format', '_layout', '_method'), array_keys($params));
     if (!empty($diff)) {
-      throw new madeam\Controller_Exception_MissingExpectedParam('Missing expected Request Parameter(s): ' . implode(', ', $diff));
+      throw new madeam\controller\exception\MissingExpectedParam('Missing expected Request Parameter(s): ' . implode(', ', $diff));
     }
     
     // set params
@@ -126,19 +126,19 @@ class Controller {
     }
 
     // set cache name
-    $cacheName = Madeam::$environment . '.madeam.controller.' . strtolower(get_class($this)) . '.setup';
+    $cacheName = \Madeam::$environment . '.madeam.controller.' . strtolower(get_class($this)) . '.setup';
 
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->_setup = madeam\Cache::read($cacheName, - 1, madeam\Config::get('cache_controllers'))) {
+    if (! $this->_setup = Cache::read($cacheName, - 1, Config::get('cache_controllers'))) {
 
       // define callbacks
       $this->_setup['beforeFilter'] = $this->_setup['beforeRender'] = $this->_setup['afterRender'] = array();
 
       // reflection
-      $reflection = new ReflectionObject($this);
+      $reflection = new \ReflectionObject($this);
 
       // check methods for callbacks
-      $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC | !ReflectionMethod::IS_FINAL);
+      $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC | !\ReflectionMethod::IS_FINAL);
       foreach ($methods as $method) {
         $matches = array();
         if (preg_match('/^(beforeFilter|beforeRender|afterRender)(?:_[a-zA-Z0-9]*)?/', $method->getName(), $matches)) {
@@ -176,8 +176,8 @@ class Controller {
       }
       
       // save cache
-      if (madeam\Config::get('cache_controllers') === true) {
-        madeam\Cache::save($cacheName, $this->_setup, true);
+      if (Config::get('cache_controllers') === true) {
+        Cache::save($cacheName, $this->_setup, true);
       }
       
       // we should be done with the reflection at this point so let's kill it to save memory
@@ -192,20 +192,6 @@ class Controller {
    * @author Joshua Davey
    */
   final public function &__get($name) {
-    $match = array();
-    
-    if (array_key_exists($name, $this->_models)) {
-      return $this->_models[$name];
-    } elseif (preg_match("/^[A-Z]{1}/", $name, $match)) {
-      // set model class name
-      $modelClassName = 'Model_' . $name;
-
-      // create model instance
-      $model = new $modelClassName();
-      $this->_models[$name] = $model;
-      return $this->_models[$name];
-    }
-    
     if (array_key_exists($name, $this->_data)) {
       return $this->_data[$name];
     } else {
@@ -221,9 +207,7 @@ class Controller {
    * @param string $value
    */
   final public function __set($name, $value) {
-    if (!preg_match('/^(?:_[A-Z])/', $name)) {
-      $this->_data[$name] = $value;
-    }
+    $this->_data[$name] = $value;
   }
 
   
@@ -262,7 +246,7 @@ class Controller {
     $this->callback('beforeFilter');
     
     // action
-    $action = madeam\Inflector::camelize($this->params['_action']) . 'Action';
+    $action = Inflector::camelize($this->params['_action']) . 'Action';
     
     $params = array();
     // check to see if method/action exists
@@ -282,9 +266,9 @@ class Controller {
       }
       
     } else {
-      if (!file_exists(madeam\Controller::$viewPath . str_replace('/', DS, strtolower($this->_view)) . '.' . $this->params['_format'])) {
-        throw new madeam\Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
-        . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . madeam\Inflector::dashize(lcfirst(substr($action, 0, -6))) . '.' . $this->params['_format'] . "</strong> OR Create a method called <strong>" . lcfirst($action) . "</strong> in <strong>" . get_class($this) . "</strong> class."
+      if (!file_exists(Controller::$viewPath . str_replace('/', DS, strtolower($this->_view)) . '.' . $this->params['_format'])) {
+        throw new controller\exception\MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
+        . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . Inflector::dashize(lcfirst(substr($action, 0, -6))) . '.' . $this->params['_format'] . "</strong> OR Create a method called <strong>" . lcfirst($action) . "</strong> in <strong>" . get_class($this) . "</strong> class."
         . " \n <code>public function " . lcfirst($action) . "() {\n\n}</code>");
       }
     }
@@ -441,7 +425,7 @@ class Controller {
       $params['_action']      = $settings['action'];
       $params['_controller']  = $settings['controller'];
       
-      return Madeam::control($params);
+      return \Madeam::control($params);
     }
     
     
@@ -455,7 +439,7 @@ class Controller {
     }
     
     // full path to view
-    $view = madeam\Controller::$viewPath . $viewFile;
+    $view = Controller::$viewPath . $viewFile;
     
     if (!isset($settings['data'])) {
       $settings['data'] = array();
@@ -476,7 +460,7 @@ class Controller {
       // apply layout to view's content
       if (!isset($settings['partial']) && $settings['layout'] !== false && isset($settings['layout'])) {
         foreach ($settings['layout'] as $_layout) {
-          $_layout = madeam\Controller::$viewPath . $_layout . '.layout.' . $this->params['_format'];
+          $_layout = Controller::$viewPath . $_layout . '.layout.' . $this->params['_format'];
           
           // render layouts with builder
           ob_start();
@@ -495,12 +479,12 @@ class Controller {
         $method = $this->_formats[$format][1];
       }
       if (!in_array($format, $this->_returns)) {
-        throw new madeam\Controller_Exception_MissingView('Unaccepted Format "<strong>' . $format . '</strong>" in the controller <strong>' . get_class($this) . '</strong>.' . "\n
+        throw new controller\exception\MissingView('Unaccepted Format "<strong>' . $format . '</strong>" in the controller <strong>' . get_class($this) . '</strong>.' . "\n
         Add the following to <strong>" . get_class($this) . "</strong><code>public \$_returns = array('" . implode("', '", array_merge($this->_returns, array($format))) . "');</code>");
       } elseif (method_exists($class, $method)) {
         $_content = call_user_func($class .'::' . $method, $settings['data']);
       } else {
-        throw new madeam\Controller_Exception_MissingView('Missing View: <strong>' . $viewFile . "</strong> and unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create File: <strong>app/src/View/" . $viewFile . "</strong>");
+        throw new controller\exception\MissingView('Missing View: <strong>' . $viewFile . "</strong> and unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create File: <strong>app/src/View/" . $viewFile . "</strong>");
       }
     }
     

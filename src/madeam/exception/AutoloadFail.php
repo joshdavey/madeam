@@ -1,3 +1,3 @@
 <?php
 namespace madeam\exception;
-class AutoloadFail extends madeam\Exception {}
+class AutoloadFail extends \madeam\Exception {}

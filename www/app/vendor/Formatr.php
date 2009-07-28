@@ -1,4 +1,4 @@
 <?php 
-class Formatr extends madeam\Helper_Format {
+class Formatr extends \madeam\helper\Format {
   
 }
