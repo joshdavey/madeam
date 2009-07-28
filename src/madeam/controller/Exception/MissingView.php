@@ -1,2 +1,2 @@
 <?php
-class Madeam_Controller_Exception_MissingView extends Madeam_Exception {}
+class madeam\Controller_Exception_MissingView extends madeam\Exception {}

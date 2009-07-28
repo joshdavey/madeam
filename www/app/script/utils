@@ -1,4 +1,4 @@
 #!/usr/bin/env php
 <?php
 require 'app/vendor/Madeam/src/Madeam.php';
-new Madeam_Console_Utils($_SERVER['argv']);
+new madeam\Console_Utils($_SERVER['argv']);

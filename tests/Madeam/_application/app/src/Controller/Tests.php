@@ -1,6 +1,6 @@
 <?php
 
-class Controller_Tests extends Madeam_Controller {
+class Controller_Tests extends madeam\Controller {
   
   public $include = 'False';
   public $exclude = 'False';

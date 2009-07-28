@@ -1,5 +1,5 @@
 <?php
-class Madeam_Serialize_Xml {
+class madeam\Serialize_Xml {
   
   public static function encode($data) {
     $xml = new XmlWriter();

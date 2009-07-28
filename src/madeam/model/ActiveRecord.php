@@ -1,8 +1,8 @@
 <?php
 
 // configure class
-if (Madeam_Config::exists('Madeam_Model_ActiveRecord')) {
-  Madeam_Model_ActiveRecord::configure(Madeam_Config::get('Madeam_Model_ActiveRecord'));
+if (madeam\Config::exists('madeam\Model_ActiveRecord')) {
+  madeam\Model_ActiveRecord::configure(madeam\Config::get('madeam\Model_ActiveRecord'));
 }
 
 /**
@@ -18,7 +18,7 @@ if (Madeam_Config::exists('Madeam_Model_ActiveRecord')) {
  * @package      madeam
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Model_ActiveRecord extends Madeam_Model {
+class madeam\Model_ActiveRecord extends madeam\Model {
 
 
   public static function _configure($config) {
@@ -131,7 +131,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
       $this->delete();
     } else {
       $backtrace = debug_backtrace();
-      throw new Madeam_Exception_MissingMethod("See line <strong>" . $backtrace[1]['line'] . "</strong> in <strong>" . $backtrace[1]['file'] . "</strong> \n Unknown method " . $name . ' in ' . get_class($this) . " model.");
+      throw new madeam\Exception_MissingMethod("See line <strong>" . $backtrace[1]['line'] . "</strong> in <strong>" . $backtrace[1]['file'] . "</strong> \n Unknown method " . $name . ' in ' . get_class($this) . " model.");
     }
 
     return false;
@@ -170,12 +170,12 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
    */
   final public function execute($sql) {
     $count = 0;
-    $_servers = Madeam_Config::get('connections');
+    $_servers = madeam\Config::get('connections');
     $this->connect($_servers[$this->_server]);
     
     try {
-      // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
-      Madeam_Logger::write($sql);
+      // log -- I hate using madeam\Logger for this stuff... can't we catch it all somewhere?
+      madeam\Logger::write($sql);
 
       // link
       //$count = self::$_pdo[$this->_server]->exec($sql);
@@ -184,17 +184,17 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     } catch (PDOException $e) {
       $trace = $e->getTrace();
       $error = self::$_pdo[$this->_server]->errorInfo();
-      Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[2]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
+      madeam\Exception::catchException($e, array('message' => 'See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[2]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
     }
   }
   
   final public function query($sql) {
-    $conns = Madeam_Config::get('connections');
+    $conns = madeam\Config::get('connections');
     $this->connect($conns[$this->_server]);
     
     try {
-      // log -- I hate using Madeam_Logger for this stuff... can't we catch it all somewhere?
-      Madeam_Logger::write($sql);
+      // log -- I hate using madeam\Logger for this stuff... can't we catch it all somewhere?
+      madeam\Logger::write($sql);
 
       // link
       $link = self::$_pdo[$this->_server]->prepare($sql);
@@ -203,7 +203,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     } catch (PDOException $e) {
       $trace = $e->getTrace();
       $error = self::$_pdo[$this->_server]->errorInfo();
-      Madeam_Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
+      madeam\Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
     }
     
     return $link;
@@ -229,7 +229,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     } catch (PDOException $e) {
       if (!isset(self::$_pdo[$this->_server]) || !is_object(self::$_pdo[$this->_server])) {
         // if the _pdo variable isn't an object it means it failed to connected
-        Madeam_Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
+        madeam\Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
       }
     }
     
@@ -237,7 +237,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
   }
   
   final public function escape($string) {
-    $_servers = Madeam_Config::get('connections');
+    $_servers = madeam\Config::get('connections');
     $this->connect($_servers[$this->_server]);
     return self::$_pdo[$this->_server]->quote($string);
   }
@@ -312,7 +312,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
           unset($tempmodel);
           
           if ($hasOne !== false) {
-            $this->_combineSingleDataOnKeys($results, $this->setup['primaryKey'], $hasOne, $params['foreignKey'], Madeam_Inflector::singalize($model));
+            $this->_combineSingleDataOnKeys($results, $this->setup['primaryKey'], $hasOne, $params['foreignKey'], madeam\Inflector::singalize($model));
           }
         }
       }
@@ -330,7 +330,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
           unset($tempmodel);
           
           if ($belongTo !== false) {
-            $this->_combineSingleDataOnKeys($results, $params['foreignKey'], $belongTo, $params['primaryKey'], Madeam_Inflector::singalize($model)); 
+            $this->_combineSingleDataOnKeys($results, $params['foreignKey'], $belongTo, $params['primaryKey'], madeam\Inflector::singalize($model)); 
           }
         }
       }
@@ -346,7 +346,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
           unset($tempmodel);
           
           if ($hasMany !== false) {
-            $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $hasMany, $params['foreignKey'], Madeam_Inflector::pluralize($model)); 
+            $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $hasMany, $params['foreignKey'], madeam\Inflector::pluralize($model)); 
           }
         }
       }      
@@ -359,7 +359,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
           unset($tempmodel);
           
           if ($habtm !== false) {
-            $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $habtm, $params['foreignKey'], Madeam_Inflector::pluralize($model));
+            $this->_combineDataOnKeys($results, $this->setup['primaryKey'], $habtm, $params['foreignKey'], madeam\Inflector::pluralize($model));
           }
         }
       }
@@ -550,7 +550,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     // validate data
     $errors = $this->validateEntry($update);
     if (!empty($errors)) {
-      throw Madeam_Model_Exception($errors);
+      throw madeam\Model_Exception($errors);
     }
 
 
@@ -633,8 +633,8 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     // set table name
     $class->resourceName = $this->modelHabtm($model, $this->modelName);
     $class->primaryKey = false;
-    $this_key = Madeam_Inflector::modelForeignKey($this->modelName);
-    $relation_key = Madeam_Inflector::modelForeignKey($model);
+    $this_key = madeam\Inflector::modelForeignKey($this->modelName);
+    $relation_key = madeam\Inflector::modelForeignKey($model);
 
     //$this->ItemStore->findOne(1,2);
     foreach ($assoc as $val) {
@@ -657,10 +657,10 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->modelName);
+    $class->resourceName = madeam\Inflector::modelHabtm($model, $this->modelName);
     $class->primaryKey = false;
-    $this_key = Madeam_Inflector::modelForeignKey($this->modelName);
-    $relation_key = Madeam_Inflector::modelForeignKey($model);
+    $this_key = madeam\Inflector::modelForeignKey($this->modelName);
+    $relation_key = madeam\Inflector::modelForeignKey($model);
 
     foreach ($assoc as $val) {
       $class->data = array($this_key => $id, $relation_key => $val);
@@ -780,7 +780,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     
     foreach ($data as &$d) {
       //$d = $this->escape($d);
-      $d = Madeam_Sanitize::escape($d);
+      $d = madeam\Sanitize::escape($d);
     }
     
     // add table name
@@ -811,12 +811,12 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     if (empty($this->fields)) {
       $sets = array();
       foreach ($data as $field => $value) {
-        $sets[] = "$field = " . Madeam_Sanitize::escape($value);
+        $sets[] = "$field = " . madeam\Sanitize::escape($value);
         //$sets[] = "$field = " . $this->escape($value);
       }
     } else {
       foreach ($this->fields as $field) {
-        $sets[] = "$field = " . Madeam_Sanitize::escape($data[$field]);
+        $sets[] = "$field = " . madeam\Sanitize::escape($data[$field]);
         //$sets[] = "$field = " . $this->escape($data[$field]);
       }
     }
@@ -828,7 +828,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     if ($where != false) {
       $sql[] = 'WHERE ' . $where;
     } elseif ($this->entryId != - 1) {
-      $sql[] = 'WHERE ' . $primaryKey . ' = ' . Madeam_Sanitize::escape($data[$primaryKey]);
+      $sql[] = 'WHERE ' . $primaryKey . ' = ' . madeam\Sanitize::escape($data[$primaryKey]);
       //$sql[] = 'WHERE ' . $primaryKey . ' = ' . $this->escape($data[$primaryKey]);      
     }
     
@@ -860,7 +860,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     if ($where != 1) {
       $sql[] = 'WHERE ' . $where;
     } elseif ($this->entryId != - 1) {
-      $sql[] = 'WHERE ' . $primaryKey . ' = ' . Madeam_Sanitize::escape($data[$primaryKey]);
+      $sql[] = 'WHERE ' . $primaryKey . ' = ' . madeam\Sanitize::escape($data[$primaryKey]);
       //$sql[] = 'WHERE ' . $primaryKey . ' = ' . $this->escape($data[$primaryKey]);
     } else {
       return false;
@@ -934,14 +934,14 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
           if (!empty($value)) {
             // when the value is an array we assume the user is trying to do an "IN" comparison
             foreach ($value as &$v) {
-              $v = Madeam_Sanitize::escape($v);
+              $v = madeam\Sanitize::escape($v);
             }
             $condition .= ' in (' . implode(',', $value) . ')';
           }
         } else {
           // if the value didn't match any of the above conditions then it must be a string
           // and therefore needs quotes
-          $condition .= Madeam_Sanitize::escape($value);
+          $condition .= madeam\Sanitize::escape($value);
           //$condition .= $this->escape($value);
         }
       }
@@ -1005,7 +1005,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
   }
 
   final public function join($model, $on = false) {
-    $model = Madeam_Inflector::modelNameize($model);
+    $model = madeam\Inflector::modelNameize($model);
     $table = $this->setup['resourceName'];
     if ($on === false) {
       if (in_array($model, array_keys($this->setup['hasAndBelongsToMany']))) {

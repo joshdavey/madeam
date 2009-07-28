@@ -1,5 +1,5 @@
 <?php
-class Controller_Error extends Madeam_Controller {
+class ErrorController extends madeam\Controller {
 
   public $_layout = 'error/error';
   

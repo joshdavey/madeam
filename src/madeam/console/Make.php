@@ -1,5 +1,5 @@
 <?php
-class Madeam_Console_Make extends Madeam_Console {
+class madeam\Console_Make extends madeam\Console {
 
   public function app($name, $clone = false, $symlink = false) {
     

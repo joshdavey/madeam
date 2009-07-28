@@ -1,4 +1,5 @@
 <?php
+namespace madeam;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -12,7 +13,7 @@
  * @package      madeam
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Controller {
+class Controller {
 
   /**
    * Layouts
@@ -80,9 +81,9 @@ class Madeam_Controller {
    * @author Joshua Davey
    */
   public $_formats = array(
-    'xml'   => array('Madeam_Serialize_Xml',  'encode'),
-    'json'  => array('Madeam_Serialize_Json', 'encode'),
-    'sphp'  => array('Madeam_Serialize_Sphp', 'encode')
+    'xml'   => array('madeam\Serialize_Xml',  'encode'),
+    'json'  => array('madeam\Serialize_Json', 'encode'),
+    'sphp'  => array('madeam\Serialize_Sphp', 'encode')
   );
   
   /**
@@ -107,7 +108,7 @@ class Madeam_Controller {
     // check for expected params
     $diff = array_diff(array('_controller', '_action', '_format', '_layout', '_method'), array_keys($params));
     if (!empty($diff)) {
-      throw new Madeam_Controller_Exception_MissingExpectedParam('Missing expected Request Parameter(s): ' . implode(', ', $diff));
+      throw new madeam\Controller_Exception_MissingExpectedParam('Missing expected Request Parameter(s): ' . implode(', ', $diff));
     }
     
     // set params
@@ -128,7 +129,7 @@ class Madeam_Controller {
     $cacheName = Madeam::$environment . '.madeam.controller.' . strtolower(get_class($this)) . '.setup';
 
     // check cache for setup. if cache doesn't exist define it and then save it
-    if (! $this->_setup = Madeam_Cache::read($cacheName, - 1, Madeam_Config::get('cache_controllers'))) {
+    if (! $this->_setup = madeam\Cache::read($cacheName, - 1, madeam\Config::get('cache_controllers'))) {
 
       // define callbacks
       $this->_setup['beforeFilter'] = $this->_setup['beforeRender'] = $this->_setup['afterRender'] = array();
@@ -175,8 +176,8 @@ class Madeam_Controller {
       }
       
       // save cache
-      if (Madeam_Config::get('cache_controllers') === true) {
-        Madeam_Cache::save($cacheName, $this->_setup, true);
+      if (madeam\Config::get('cache_controllers') === true) {
+        madeam\Cache::save($cacheName, $this->_setup, true);
       }
       
       // we should be done with the reflection at this point so let's kill it to save memory
@@ -261,7 +262,7 @@ class Madeam_Controller {
     $this->callback('beforeFilter');
     
     // action
-    $action = Madeam_Inflector::camelize($this->params['_action']) . 'Action';
+    $action = madeam\Inflector::camelize($this->params['_action']) . 'Action';
     
     $params = array();
     // check to see if method/action exists
@@ -281,9 +282,9 @@ class Madeam_Controller {
       }
       
     } else {
-      if (!file_exists(Madeam_Controller::$viewPath . str_replace('/', DS, strtolower($this->_view)) . '.' . $this->params['_format'])) {
-        throw new Madeam_Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
-        . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . Madeam_Inflector::dashize(lcfirst(substr($action, 0, -6))) . '.' . $this->params['_format'] . "</strong> OR Create a method called <strong>" . lcfirst($action) . "</strong> in <strong>" . get_class($this) . "</strong> class."
+      if (!file_exists(madeam\Controller::$viewPath . str_replace('/', DS, strtolower($this->_view)) . '.' . $this->params['_format'])) {
+        throw new madeam\Controller_Exception_MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
+        . "\n Create the view <strong>View/" . $this->params['_controller'] . '/' . madeam\Inflector::dashize(lcfirst(substr($action, 0, -6))) . '.' . $this->params['_format'] . "</strong> OR Create a method called <strong>" . lcfirst($action) . "</strong> in <strong>" . get_class($this) . "</strong> class."
         . " \n <code>public function " . lcfirst($action) . "() {\n\n}</code>");
       }
     }
@@ -402,7 +403,7 @@ class Madeam_Controller {
         exit();
       }
     } else {
-      throw new Madeam_Exception_HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
+      throw new madeam\Exception_HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
     }
   }
   */
@@ -454,7 +455,7 @@ class Madeam_Controller {
     }
     
     // full path to view
-    $view = Madeam_Controller::$viewPath . $viewFile;
+    $view = madeam\Controller::$viewPath . $viewFile;
     
     if (!isset($settings['data'])) {
       $settings['data'] = array();
@@ -475,7 +476,7 @@ class Madeam_Controller {
       // apply layout to view's content
       if (!isset($settings['partial']) && $settings['layout'] !== false && isset($settings['layout'])) {
         foreach ($settings['layout'] as $_layout) {
-          $_layout = Madeam_Controller::$viewPath . $_layout . '.layout.' . $this->params['_format'];
+          $_layout = madeam\Controller::$viewPath . $_layout . '.layout.' . $this->params['_format'];
           
           // render layouts with builder
           ob_start();
@@ -494,12 +495,12 @@ class Madeam_Controller {
         $method = $this->_formats[$format][1];
       }
       if (!in_array($format, $this->_returns)) {
-        throw new Madeam_Controller_Exception_MissingView('Unaccepted Format "<strong>' . $format . '</strong>" in the controller <strong>' . get_class($this) . '</strong>.' . "\n
+        throw new madeam\Controller_Exception_MissingView('Unaccepted Format "<strong>' . $format . '</strong>" in the controller <strong>' . get_class($this) . '</strong>.' . "\n
         Add the following to <strong>" . get_class($this) . "</strong><code>public \$_returns = array('" . implode("', '", array_merge($this->_returns, array($format))) . "');</code>");
       } elseif (method_exists($class, $method)) {
         $_content = call_user_func($class .'::' . $method, $settings['data']);
       } else {
-        throw new Madeam_Controller_Exception_MissingView('Missing View: <strong>' . $viewFile . "</strong> and unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create File: <strong>app/src/View/" . $viewFile . "</strong>");
+        throw new madeam\Controller_Exception_MissingView('Missing View: <strong>' . $viewFile . "</strong> and unknown serialization format \"<strong>" . $this->params['_format'] . '</strong>"' . "\n Create File: <strong>app/src/View/" . $viewFile . "</strong>");
       }
     }
     

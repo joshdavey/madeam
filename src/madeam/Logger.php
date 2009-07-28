@@ -1,13 +1,14 @@
 <?php
+namespace madeam;
 
-if (Madeam_Logger::$path === false) {
-  Madeam_Logger::$path  = Madeam::$pathToEtc . 'log' . DS;
+if (Logger::$path === false) {
+  Logger::$path  = Madeam::$pathToEtc . 'log' . DS;
 }
 
 /**
  * Register save as a shutdown function so that the logs are saved.
  */
-register_shutdown_function(array('Madeam_Logger', 'save'));
+register_shutdown_function(array('madeam\Logger', 'save'));
 
 /**
  * Madeam PHP Framework <http://madeam.com>
@@ -22,7 +23,7 @@ register_shutdown_function(array('Madeam_Logger', 'save'));
  * @package      madeam
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Logger {
+class Logger {
 
   public static $logs = array();
 
@@ -42,7 +43,7 @@ class Madeam_Logger {
       $requestLog .= $log['datetime'] . ' | ' . $log['message'] . "\n";
     }
 
-    if (Madeam_Config::get('enable_logger') == true && $requestLog != null) {
+    if (madeam\Config::get('enable_logger') == true && $requestLog != null) {
       $requestLog .= '------------------' . "\n";
       file_put_contents(self::$path . date(self::$fileName) . '.txt',  $requestLog, FILE_APPEND | LOCK_EX);
     }

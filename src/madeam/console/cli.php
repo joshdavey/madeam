@@ -13,7 +13,7 @@
  * @package      madeam
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Console_CLI {
+class madeam\console\CLI {
 
   static public function outMenu($label, $options = array()) {
     self::out();

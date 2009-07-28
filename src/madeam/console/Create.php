@@ -1,5 +1,5 @@
 <?php
-class Madeam_Console_Create extends Madeam_Console {
+class madeam\Console_Create extends madeam\Console {
 
   public $description = 'The create console allows you to generate models, views and controllers';
 
@@ -24,7 +24,7 @@ class Madeam_Console_Create extends Madeam_Console {
     
     
     // Send message to user that we are creating the controller
-    Madeam_Console_CLI::outCreate('Controller ' . $controllerClassName);
+    madeam\Console_CLI::outCreate('Controller ' . $controllerClassName);
     
     // Create Class directory
     $this->createDir($controllerClassFilePath);
@@ -67,10 +67,10 @@ class Madeam_Console_Create extends Madeam_Console {
    * @param array $params
    * @return boolean
    */
-  public function model($name, $extends = 'Madeam_Model_ActiveRecord') {
+  public function model($name, $extends = 'madeam\Model_ActiveRecord') {
     // set model name and class name
-    $modelName = Madeam_Inflector::modelNameize($name);
-    $modelClassName = Madeam_Inflector::modelClassize($modelName);
+    $modelName = madeam\Inflector::modelNameize($name);
+    $modelClassName = madeam\Inflector::modelClassize($modelName);
     // define model class
     $modelContents = "<?php\nclass $modelClassName extends " . $extends . " {";
     // close class definition
@@ -121,11 +121,11 @@ class Madeam_Console_Create extends Madeam_Console {
     }
     
     // set controller name and class name
-    $controllerName = Madeam_Inflector::underscorize(strtolower($params['name']));
+    $controllerName = madeam\Inflector::underscorize(strtolower($params['name']));
     $controllerClassName = 'Controller_' . $controllerName;
     
     // Send message to user that we are creating the controller
-    Madeam_Console_CLI::outCreate('Controller ' . $controllerName);
+    madeam\Console_CLI::outCreate('Controller ' . $controllerName);
     
     // determine scaffold directory
     $dir = PATH_TO_ANTHOLOGY . SCAFFOLD_PATH . $scaffold . DS;
@@ -150,8 +150,8 @@ class Madeam_Console_Create extends Madeam_Console {
           if (substr_count($function_code, '$this->represent') > 0) {
             if (isset($params['represent'])) {
               // set model name and class name
-              $model_name = Madeam_Inflector::modelNameize($params['represent']);
-              $model_class_name = Madeam_Inflector::modelClassize($model_name);
+              $model_name = madeam\Inflector::modelNameize($params['represent']);
+              $model_class_name = madeam\Inflector::modelClassize($model_name);
               // determine scaffolding key
               $model = new $model_class_name();
               $scaffold_key = $model->get_primary_key();
@@ -159,11 +159,11 @@ class Madeam_Console_Create extends Madeam_Console {
               // replace $this->scaffold_controller with controller name
               $function_code = str_replace('$this->scaffold_controller', "'$controllerName'", $function_code);
               // replace $this->represent with model name
-              $function_code = str_replace('Madeam_Inflector::pluralize($this->represent)', "'" . Madeam_Inflector::pluralize($model_name) . "'", $function_code);
+              $function_code = str_replace('madeam\Inflector::pluralize($this->represent)', "'" . madeam\Inflector::pluralize($model_name) . "'", $function_code);
               $function_code = str_replace('{$this->represent}', $model_name, $function_code);
               $function_code = str_replace('$this->represent', "'$model_name'", $function_code);
             } else {
-              Madeam_Console_CLI::outError('This scaffold requires that it represents a model');
+              madeam\Console_CLI::outError('This scaffold requires that it represents a model');
               return false;
             }
           }
@@ -173,7 +173,7 @@ class Madeam_Console_Create extends Madeam_Console {
           $controllerContents .= "\n\n\n  function $function_name() {";
           $controllerContents .= "\n    $function_code";
           $controllerContents .= "\n  }";
-          Madeam_Console_CLI::outCreate('action ' . $function_name);
+          madeam\Console_CLI::outCreate('action ' . $function_name);
         }
       }
       
@@ -193,8 +193,8 @@ class Madeam_Console_Create extends Madeam_Console {
           if (substr_count($function_code, '$this->represent') > 0) {
             if (isset($params['represent'])) {
               // set model name and class name
-              $model_name = Madeam_Inflector::modelNameize($params['represent']);
-              $model_class_name = Madeam_Inflector::modelClassize($model_name);
+              $model_name = madeam\Inflector::modelNameize($params['represent']);
+              $model_class_name = madeam\Inflector::modelClassize($model_name);
               // determine scaffolding key
               $model = new $model_class_name();
               $scaffold_key = $model->get_primary_key();
@@ -202,18 +202,18 @@ class Madeam_Console_Create extends Madeam_Console {
               // replace $this->scaffold_controller with controller name
               $view_code = str_replace('$this->scaffold_controller', "'$controller_name'", $function_code);
               // replace $this->represent with model name
-              $view_code = str_replace('Madeam_Inflector::pluralize($this->represent)', "'" . Madeam_Inflector::pluralize($model_name) . "'", $view_code);
+              $view_code = str_replace('madeam\Inflector::pluralize($this->represent)', "'" . madeam\Inflector::pluralize($model_name) . "'", $view_code);
               $view_code = str_replace('{$this->represent}', $model_name, $view_code);
               $view_code = str_replace('$this->represent', "'$model_name'", $view_code);
             } else {
-              Madeam_Console_CLI::outError('This scaffold requires that it represents a model');
+              madeam\Console_CLI::outError('This scaffold requires that it represents a model');
               return false;
             }
           }
           // remove extension
           $ext = '.' . substr($file, strrpos($file, '.') + 1);
           $view_name = substr($file, 0, - strlen($ext));
-          Madeam_Console_CLI::outCreate('view ' . $view_name);
+          madeam\Console_CLI::outCreate('view ' . $view_name);
           // make controller directory if it does not already exist
           if (! file_exists(PATH_TO_VIEW . $controller_name)) {
             mkdir(PATH_TO_VIEW . $controller_name);

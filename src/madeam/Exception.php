@@ -1,4 +1,5 @@
 <?php
+namespace madeam;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -12,7 +13,7 @@
  * @package      madeam
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Exception extends Exception {
+class Exception extends Exception {
 
   private static $funSnippets = array(
     "don't worry, be happy. It could be worse.",
@@ -63,7 +64,7 @@ class Madeam_Exception extends Exception {
     }
 
     // check if inline errors are enabled and the error is not fatal
-    if (Madeam_Config::get('inline_errors') === true && in_array($code, array(2, 4, 8, 32, 128, 256, 1024, 2048, 4096, 8192, 16384))) {
+    if (madeam\Config::get('inline_errors') === true && in_array($code, array(2, 4, 8, 32, 128, 256, 1024, 2048, 4096, 8192, 16384))) {
       echo nl2br($message);
       echo '<br />' . $file . ' on line ' . $line;
       return;
@@ -73,7 +74,7 @@ class Madeam_Exception extends Exception {
     // clean output buffer
     if (ob_get_level() > 0) { ob_clean(); }
 
-    if (Madeam_Config::get('enable_debug') == true) {
+    if (madeam\Config::get('enable_debug') == true) {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
       

@@ -1,6 +1,6 @@
 <?php
 
-class Model_Model extends Madeam_Model {
+class Model_Model extends madeam\Model {
   
   
   

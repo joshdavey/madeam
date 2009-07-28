@@ -1,5 +1,5 @@
 <?php
-
+namespace madeam\helper;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -15,7 +15,7 @@
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class Madeam_Helper_Form extends Madeam_Helper_Html {
+class Breadcrumb extends madeam\helper\Html {
   
   public static function open($action = null, $_params = array()) {
     $params = array();
@@ -30,7 +30,7 @@ class Madeam_Helper_Form extends Madeam_Helper_Html {
     }
     
     $params['action'] = Madeam::url($action);
-    $params['id'] = 'form_' . Madeam_Inflector::underscorize(Madeam_Inflector::slug($params['action']));
+    $params['id'] = 'form_' . Inflector::underscorize(madeam\Inflector::slug($params['action']));
     
     $params = array_merge($params, $_params);
     
@@ -358,15 +358,6 @@ class Madeam_Helper_Form extends Madeam_Helper_Html {
     return implode($returned);
   }
   
-  
-  public static function timeBox($name, $value, $_params) {
-    test(strtotime('9:30pm'));
-  }
-  
-  public static function dateBox($name, $value, $_params) {
-    
-  }
-  
 
   public static function dropdown($name, $selected, $values = array(), $_params = array()) {
     $params         = array();
@@ -392,7 +383,7 @@ class Madeam_Helper_Form extends Madeam_Helper_Html {
     // output definition
     $output = null;
     // create model instance
-    $modelname = Madeam_Inflector::model_classize($model);
+    $modelname = madeam\Inflector::model_classize($model);
     $inst = new $modelname(1);
     // get fields
     // don't use this! use $Model->describe(); instead!
@@ -412,7 +403,7 @@ class Madeam_Helper_Form extends Madeam_Helper_Html {
       if ($settings['label']) {
         $field_label = $settings['label'];
       } else {
-        $field_label = Madeam_Inflector::sentencize($field_name);
+        $field_label = madeam\Inflector::sentencize($field_name);
       }
       // field parameters
       $params = array();

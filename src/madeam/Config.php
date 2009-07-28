@@ -1,4 +1,5 @@
 <?php
+namespace madeam;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -13,7 +14,7 @@
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class Madeam_Config {
+class Config {
 
   /**
    * undocumented 

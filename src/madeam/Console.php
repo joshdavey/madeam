@@ -1,4 +1,5 @@
 <?php
+namespace madeam;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -13,7 +14,7 @@
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class Madeam_Console {
+class Console {
 
   /**
    * undocumented 
@@ -98,26 +99,26 @@ class Madeam_Console {
       // If we aren't in the applicatin's root path then tell the user and exit
       if ($scriptName != 'make') {
         if (!file_exists(realpath('app/vendor/Madeam.php'))) {
-          Madeam_Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
+          madeam\Console_CLI::outError('Please point Madeam Console to the root directory of your application.');
           exit();
         }
       }
 
       try {
-        $scriptClassName = 'Madeam_Console_Script_' . ucfirst($scriptName);
+        $scriptClassName = 'madeam\Console_Script_' . ucfirst($scriptName);
         $script = new $scriptClassName;
         break;
-      } catch (Madeam_Exception_AutoloadFail $e) {
+      } catch (madeam\Exception_AutoloadFail $e) {
         if ($scriptName === false) {
           // ask them for the script of the console they'd like to use
-          Madeam_Console_CLI::outMenu('Scripts', $scriptNames);
-          $scriptName = Madeam_Console_CLI::getCommand('script');
+          madeam\Console_CLI::outMenu('Scripts', $scriptNames);
+          $scriptName = madeam\Console_CLI::getCommand('script');
         }
 
         // by entering a console name at this point it means they've tried entering one that doesn't exist.
         // prompt them with an saying please try again.
         if ($scriptName !== false) {
-          Madeam_Console_CLI::outError("Sorry the script you entered does not exist.");
+          madeam\Console_CLI::outError("Sorry the script you entered does not exist.");
         }
       }
     }
@@ -133,7 +134,7 @@ class Madeam_Console {
       // by entering a console name at this point it means they've tried entering one that doesn't exist.
       // prompt them with an saying please try again.
       if ($commandName !== false) {
-        Madeam_Console_CLI::outError("Sorry the command you entered does not exist.");
+        madeam\Console_CLI::outError("Sorry the command you entered does not exist.");
       }
 
       // reset command
@@ -145,16 +146,16 @@ class Madeam_Console {
       }
 
       if ($commandName == null) {
-        Madeam_Console_CLI::outMenu('Commands', $commandNames);
-        $commandName = Madeam_Console_CLI::getCommand('command');
+        madeam\Console_CLI::outMenu('Commands', $commandNames);
+        $commandName = madeam\Console_CLI::getCommand('command');
       }
 
     } while(! in_array($commandName, $commandNames));
 
     try {
       return $script->$commandName($this->parseArguments($args));
-    } catch (Madeam_Exception $e) {
-      Madeam_Exception::catchException($e);
+    } catch (madeam\Exception $e) {
+      madeam\Exception::catchException($e);
     }
 
     // unset arguments -- they are only for first time use
@@ -184,13 +185,13 @@ class Madeam_Console {
     
     $file = $file_path . $file_name;
     if (file_exists($file)) {
-      if (Madeam_Console_CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
+      if (madeam\Console_CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
         return false;
       }
     }
     
     if (file_put_contents($file, $file_content)) {
-      Madeam_Console_CLI::outCreate('file ' . $file);
+      madeam\Console_CLI::outCreate('file ' . $file);
       return true;
     }
   }
@@ -198,7 +199,7 @@ class Madeam_Console {
   protected function createDir($dir) {
     if (!file_exists($dir)) {
       mkdir($dir, 0777, true);
-      Madeam_Console_CLI::outCreate('directory ' . $dir);
+      madeam\Console_CLI::outCreate('directory ' . $dir);
     }
   }
   

@@ -1,5 +1,6 @@
 <?php
-class Madeam_Sanitize {
+namespace madeam;
+class Sanitize {
   
   public static function html($string) {
     

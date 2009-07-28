@@ -1,7 +1,7 @@
 <?php
 require_once 'Bootstrap.php';
 
-class Madeam_RouterTest extends PHPUnit_Framework_TestCase {
+class madeam\RouterTest extends PHPUnit_Framework_TestCase {
   
   protected $defaults;
   protected $baseUri;
@@ -24,14 +24,14 @@ class Madeam_RouterTest extends PHPUnit_Framework_TestCase {
    * 
    */
   public function tearDown() {
-    Madeam_Router::$routes = array();
+    madeam\Router::$routes = array();
   }
   
   public function testConnectionOrder() {
-    Madeam_Router::connect(':one');
-    Madeam_Router::connect(':two');
+    madeam\Router::connect(':one');
+    madeam\Router::connect(':two');
     
-    $params = Madeam_Router::parse('url');
+    $params = madeam\Router::parse('url');
     
     if (isset($params['one'])) {
       $this->assertTrue(true);
@@ -41,64 +41,64 @@ class Madeam_RouterTest extends PHPUnit_Framework_TestCase {
   }
   
   public function testDefaultParamValue() {
-    Madeam_Router::connect(':param', array('param' => 'def'));
-    $params = Madeam_Router::parse('');
+    madeam\Router::connect(':param', array('param' => 'def'));
+    $params = madeam\Router::parse('');
     $this->assertEquals('def', $params['param']);
   }
   
   public function testRuleFails() {
-    Madeam_Router::connect(':rule', array(), array('rule' => '\d'));
-    Madeam_Router::connect(':fail');
-    $params = Madeam_Router::parse('string');
+    madeam\Router::connect(':rule', array(), array('rule' => '\d'));
+    madeam\Router::connect(':fail');
+    $params = madeam\Router::parse('string');
     $this->assertEquals('string', $params['fail']);
   }
   
   public function testRulePasses() {
-    Madeam_Router::connect(':rule', array(), array('rule' => '\d'));
-    Madeam_Router::connect(':fail');
-    $params = Madeam_Router::parse('9');
+    madeam\Router::connect(':rule', array(), array('rule' => '\d'));
+    madeam\Router::connect(':fail');
+    $params = madeam\Router::parse('9');
     $this->assertEquals('9', $params['rule']);
   }
   
   public function testBlankURIGetsReturnedAsAForwardSlash() {
-    Madeam_Router::connect('');
-    $params = Madeam_Router::parse('');
+    madeam\Router::connect('');
+    $params = madeam\Router::parse('');
     $this->assertEquals('/', $params['_uri']);
   }
   
   public function testURIGetsReturnedWithAForwardSlash() {
-    Madeam_Router::connect('');
-    $params = Madeam_Router::parse('someuri');
+    madeam\Router::connect('');
+    $params = madeam\Router::parse('someuri');
     $this->assertEquals('/someuri', $params['_uri']);
   }
   
   public function testBaseURI() {
-    Madeam_Router::connect('');
-    $params = Madeam_Router::parse('base/test', 'base');
+    madeam\Router::connect('');
+    $params = madeam\Router::parse('base/test', 'base');
     $this->assertEquals('/test', $params['_uri']);
   }
   
   public function testFormatIsParsed() {
-    Madeam_Router::connect('');
-    $params = Madeam_Router::parse('uri.json');
+    madeam\Router::connect('');
+    $params = madeam\Router::parse('uri.json');
     $this->assertEquals('json', $params['_format']);
   }
   
   public function testQueryIsAParam() {
-    Madeam_Router::connect('');
-    $params = Madeam_Router::parse('uri?test=cool');
+    madeam\Router::connect('');
+    $params = madeam\Router::parse('uri?test=cool');
     $this->assertEquals('test=cool', $params['_query']);
   }
   
   public function testQueryIsParsed() {
-    Madeam_Router::connect('');
-    $params = Madeam_Router::parse('uri?test=cool');
+    madeam\Router::connect('');
+    $params = madeam\Router::parse('uri?test=cool');
     $this->assertEquals('cool', $params['test']);
   }
   
   public function testExtraIsReturned() {
-    Madeam_Router::connect('');
-    $params = Madeam_Router::parse('extra/stuff');
+    madeam\Router::connect('');
+    $params = madeam\Router::parse('extra/stuff');
     $this->assertEquals('extra/stuff', $params['_extra']);
   }
   

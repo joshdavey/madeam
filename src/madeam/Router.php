@@ -1,4 +1,5 @@
 <?php
+namespace madeam;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -12,7 +13,7 @@
  * @package      madeam
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class Madeam_Router {
+class Router {
 
   public static $routes = array(); // regex, values, rules
 
@@ -63,7 +64,7 @@ class Madeam_Router {
    * has a value for the id's name and the id's rule. For example if I wanted to call "id"
    * "slug" and change the rule to one that matches slugs I could do the following:
    * 
-   * Madeam_Router::resource::('posts', array('slug', '[a-z\-]+'));
+   * madeam\Router::resource::('posts', array('slug', '[a-z\-]+'));
    *
    * @param string $name
    * @param array $id
@@ -195,7 +196,7 @@ class Madeam_Router {
       // this is lame and needs to be done better
       //header("HTTP/1.1 404 Not Found");
       //ob_clean();
-      throw new Madeam_Exception('Unable to find page');
+      throw new madeam\Exception('Unable to find page');
       // but what about returning the params if we throw an error?
       return $params;
     }

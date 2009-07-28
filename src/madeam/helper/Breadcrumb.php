@@ -1,5 +1,6 @@
 <?php
-class Madeam_Helper_Breadcrumb extends Madeam_Helper_Html {
+namespace madeam\helper;
+class Breadcrumb extends madeam\helper\Html {
 
   static $breadcrumbs = array();
 

@@ -1,4 +1,5 @@
 <?php
+namespace madeam;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -14,7 +15,7 @@
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class Madeam_Session {
+class Session {
 
   public static $driver;
   
@@ -36,12 +37,12 @@ class Madeam_Session {
       
       /*
       session_set_save_handler(
-        'Madeam_Session::open', 
-        'Madeam_Session::close', 
-        'Madeam_Session::read', 
-        'Madeam_Session::write', 
-        'Madeam_Session::destroy', 
-        'Madeam_Session::gc'
+        'madeam\Session::open', 
+        'madeam\Session::close', 
+        'madeam\Session::read', 
+        'madeam\Session::write', 
+        'madeam\Session::destroy', 
+        'madeam\Session::gc'
       );
       */
       

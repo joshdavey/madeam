@@ -1,4 +1,4 @@
 <?php
-class Madeam_Console_Cache extends Madeam_Console {
+class madeam\Console_Cache extends madeam\Console {
   
 }

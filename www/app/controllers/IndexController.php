@@ -1,5 +1,5 @@
 <?php 
-class Controller_Index extends Controller_App {
+class IndexController extends AppController {
   
   public function indexAction() {
     // welcome to the Index Controller's index action;

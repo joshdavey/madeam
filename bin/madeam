@@ -6,4 +6,4 @@ unset($_SERVER['argv'][0]);
 array_unshift($_SERVER['argv'], '-name');
 array_unshift($_SERVER['argv'], 'app');
 array_unshift($_SERVER['argv'], $pwd);
-new Madeam_Console_Make($_SERVER['argv']);
+new madeam\console\Make($_SERVER['argv']);

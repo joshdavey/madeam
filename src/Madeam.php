@@ -32,12 +32,12 @@ spl_autoload_register('Madeam::autoloadFail');
 /**
  * Set exception handler
  */
-//set_exception_handler('Madeam_UncaughtException');
+//set_exception_handler('madeam\UncaughtException');
 
 /**
  * Set error handler
  */
-//set_error_handler('Madeam_ErrorHandler');
+//set_error_handler('madeam\ErrorHandler');
 
 
 // function library
@@ -92,8 +92,8 @@ function h($string) {
  *
  * @param exception $e
  */
-function Madeam_UncaughtException($e) {
-  Madeam_Exception::catchException($e, array('message' => "Uncaught Exception: \n" . $e->getMessage()));
+function UncaughtException($e) {
+  madeam\Exception::catchException($e, array('message' => "Uncaught Exception: \n" . $e->getMessage()));
   return true;
 }
 
@@ -105,11 +105,11 @@ function Madeam_UncaughtException($e) {
  * @param unknown_type $file
  * @param unknown_type $line
  */
-function Madeam_ErrorHandler($code, $string, $file, $line) {
+function ErrorHandler($code, $string, $file, $line) {
   // return regular PHP errors when they're non-fatal
   if ($code == 2 || $code == 4 || $code == 8) { return false; }
 
-  throw new Madeam_Exception($string, $code);
+  throw new madeam\Exception($string, $code);
   return true;
 }
 
@@ -298,7 +298,7 @@ class Madeam {
     // check for expected server parameters
     $diff = array_diff(array('DOCUMENT_ROOT', 'REQUEST_URI', 'QUERY_STRING', 'REQUEST_METHOD'), array_keys($server));
     if (!empty($diff)) {
-      throw new Madeam_Exception_MissingExpectedParam('Missing expected server Parameter(s).');
+      throw new madeam\exception\MissingExpectedParam('Missing expected server Parameter(s).');
     }
     
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
@@ -378,11 +378,11 @@ class Madeam {
     }
 
     // save configuration
-    Madeam_Config::set($cfg);
+    madeam\Config::set($cfg);
     unset($cfg);
     
     // set controller's view directory
-    Madeam_Controller::$viewPath = Madeam::$pathToApp . 'src' . DS . 'View' . DS;
+    madeam\Controller::$viewPath = Madeam::$pathToApp . 'src' . DS . 'View' . DS;
   }
 
   /**
@@ -395,13 +395,13 @@ class Madeam {
     
     // include routes
     // check cache for routes
-    if (! Madeam_Router::$routes = Madeam_Cache::read(self::$environment . '.madeam.routes', - 1, Madeam_Config::get('cache_routes'))) {
+    if (! madeam\Router::$routes = madeam\Cache::read(self::$environment . '.madeam.routes', - 1, madeam\Config::get('cache_routes'))) {
       // include routes configuration
       require self::$pathToApp . 'conf' . DS . 'routes.php';
     
       // save routes to cache
-      if (Madeam_Config::get('cache_routes') === true) {
-        Madeam_Cache::save(self::$environment . '.madeam.routes', Madeam_Router::$routes);
+      if (madeam\Config::get('cache_routes') === true) {
+        madeam\Cache::save(self::$environment . '.madeam.routes', madeam\Router::$routes);
       }
     }
     
@@ -442,7 +442,7 @@ class Madeam {
    * @author Joshua Davey
    */
   public static function request($uri, $params = array()) {
-    $params = Madeam_Router::parse($uri, self::$uriAppPath, $params + array(
+    $params = madeam\Router::parse($uri, self::$uriAppPath, $params + array(
       '_controller' => self::defaultController,
       '_action'     => self::defaultAction,
       '_format'     => self::defaultFormat
@@ -475,7 +475,7 @@ class Madeam {
     $params['_controller'] = preg_replace("/[^A-Za-z0-9_\-\/]/", null, $params['_controller']); // strip off the dirt
     $controllerClassNodes = explode('/', $params['_controller']);
     foreach ($controllerClassNodes as &$node) {
-      $node = Madeam_Inflector::camelize($node);
+      $node = madeam\Inflector::camelize($node);
       $node = ucfirst($node);
     }
     
@@ -484,13 +484,13 @@ class Madeam {
     
     try {
       $controller = new $controllerClass($params);
-    } catch(Madeam_Exception_AutoloadFail $e) {
-      if (is_dir(Madeam_Controller::$viewPath . $params['_controller'])) {
+    } catch (madeam\exception\AutoloadFail $e) {
+      if (is_dir(madeam\Controller::$viewPath . $params['_controller'])) {
         $view = $params['_controller'] . '/' . $params['_action'];
         $params['_controller'] = 'app';
         $controller = new Controller_App($params);
         $controller->view($view);
-      } elseif (is_file(Madeam_Controller::$viewPath . $params['_controller'] . DS . $params['_action'] . '.' . $params['_format'])) {
+      } elseif (is_file(madeam\Controller::$viewPath . $params['_controller'] . DS . $params['_action'] . '.' . $params['_format'])) {
         $view = $params['_controller'];
         $params['_action'] = $params['_controller'];
         $params['_controller'] = 'app';
@@ -499,7 +499,7 @@ class Madeam {
       } else {
         // no controller or view found = critical error.
         header("HTTP/1.1 404 Not Found");
-        Madeam_Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>app/Controller/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . Madeam_Inflector::camelize(lcfirst($params['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
+        madeam\Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>app/Controller/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . madeam\Inflector::camelize(lcfirst($params['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
       }
     }
 
@@ -512,12 +512,12 @@ class Madeam {
 
       // return response
       return $response;
-    } catch (Madeam_Controller_Exception_MissingAction $e) {
+    } catch (madeam\controller\exception\MissingAction $e) {
       header("HTTP/1.1 404 Not Found");
-      Madeam_Exception::catchException($e);
-    } catch (Madeam_Controller_Exception_MissingView $e) {
+      madeam\Exception::catchException($e);
+    } catch (madeam\controller\exception\MissingView $e) {
       header("HTTP/1.1 404 Not Found");
-      Madeam_Exception::catchException($e);
+      madeam\Exception::catchException($e);
     }
   }
   
@@ -579,7 +579,7 @@ class Madeam {
         exit();
       }
     } else {
-      throw new Madeam_Exception_HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
+      throw new madeam\Exception_HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
     }
   }
 
@@ -663,20 +663,20 @@ class Madeam {
    * 
    * Here are some example classes and their location
    *  Madeam                => Madeam/src/Madeam.php
-   *  Madeam_Controller     => Madeam/src/Madeam/Controller.php
-   *  Madeam_Serialize_Json => Madeam/src/Madeam/Serialize/Json.php
+   *  madeam\Controller     => Madeam/src/Madeam/Controller.php
+   *  madeam\Serialize_Json => Madeam/src/Madeam/Serialize/Json.php
    * 
    * @param string $class
    * @author Joshua Davey
    */
   public static function autoloadPackage($class) {
     // set class file name)
-    //$file = str_replace('_', DS, str_replace('\\', DS, $class)) . '.php'; // PHP 5.3
-    $packageNameLength = strlen(strstr($class, '_'));
+    $file = str_replace('\\', DS, $class) . '.php'; // PHP 5.3
+    $packageNameLength = strlen(strstr($class, '\\'));
     if ($packageNameLength == 0) {
       $file = $class . DS . 'src' . DS . str_replace('_', DS, $class) . '.php';
     } else {
-      $file = substr($class, 0, -$packageNameLength) . DS . 'src' . DS . str_replace('_', DS, $class) . '.php';
+      $file = substr($class, 0, -$packageNameLength) . DS . 'src' . DS . str_replace('\\', DS, $class) . '.php';
     }
     
     // checks all the include paths to see if the file exist
@@ -738,7 +738,7 @@ class Madeam {
   public static function autoloadFail($class) {
     $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
     eval("class $class {}");
-    throw new Madeam_Exception_AutoloadFail('Missing Class ' . $class);
+    throw new madeam\exception\AutoloadFail('Missing Class ' . $class);
   }
   
 }

@@ -1,5 +1,5 @@
 <?php
-class Madeam_Serialize_Json {
+class madeam\Serialize_Json {
   
   public static function encode($data) {
     return json_encode($data);

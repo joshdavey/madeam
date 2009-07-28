@@ -1,2 +1,2 @@
 <?php
-class Madeam_Exception_MissingMethod extends Madeam_Exception { }
+class madeam\Exception_MissingMethod extends madeam\Exception { }

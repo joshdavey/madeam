@@ -1,4 +1,4 @@
 <?php 
-class Breadcrumbr extends Madeam_Helper_Breadcrumb {
+class Breadcrumbr extends madeam\Helper_Breadcrumb {
   
 }

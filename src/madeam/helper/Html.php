@@ -1,5 +1,5 @@
 <?php
-
+namespace madeam\helper;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -15,7 +15,7 @@
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class Madeam_Helper_Html {
+class Html {
 
   public static function link($label, $link = null, $_params = array()) {
     $params = array();
@@ -26,7 +26,7 @@ class Madeam_Helper_Html {
 
   public static function img($src, $_params = array()) {
     $params = array();
-    $params['alt'] = Madeam_Inflector::underscorize($src);
+    $params['alt'] = madeam\Inflector::underscorize($src);
     $params['src'] = Madeam::url($src);
     $params = array_merge($params, $_params);
     return self::tag('img', $params);
@@ -34,7 +34,7 @@ class Madeam_Helper_Html {
 
   public static function imgResize($src, $target = 0, $_params = array()) {
     $params = array();
-    $params['alt'] = Madeam_Inflector::underscorize($src);
+    $params['alt'] = madeam\Inflector::underscorize($src);
     $params['src'] = Madeam::url($src);
     
     list($width, $height) = getimagesize(Madeam::$pathToPub . $src);

@@ -1,7 +1,7 @@
 <?php
 require_once 'Bootstrap.php';
 
-class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
+class madeam\ControllerTest extends PHPUnit_Framework_TestCase {
   
   protected $params;
   protected $controller;
@@ -21,7 +21,7 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
       '_ajax'       => 0
     );
     
-    Madeam_Controller::$viewPath = TESTS_MADEAM_APPSRC_DIRECTORY . 'View' . DIRECTORY_SEPARATOR;
+    madeam\Controller::$viewPath = TESTS_MADEAM_APPSRC_DIRECTORY . 'View' . DIRECTORY_SEPARATOR;
     
     // create controller instance
     $this->controller = new Controller_Tests($this->params);
@@ -32,7 +32,7 @@ class Madeam_ControllerTest extends PHPUnit_Framework_TestCase {
    */
   public function tearDown() {
     // reset view path
-    Madeam_Controller::$viewPath = false;
+    madeam\Controller::$viewPath = false;
     
     // reset controller
     unset($this->controller);

@@ -6,7 +6,7 @@ require_once 'Bootstrap.php';
  *
  * @author Joshua Davey
  */
-class Madeam_EnvironmentTest extends PHPUnit_Framework_TestCase {
+class madeam\EnvironmentTest extends PHPUnit_Framework_TestCase {
  
   /**
    * Madeam Requires that version 5.2.3 or greater of PHP be running. 

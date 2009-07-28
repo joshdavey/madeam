@@ -1,4 +1,4 @@
 <?php
-class Madeam_Console_Delete extends Madeam_Console {
+class madeam\Console_Delete extends madeam\Console {
   
 }

@@ -1,4 +1,4 @@
 <?php 
-class Formr extends Madeam_Helper_Form {
+class Formr extends madeam\Helper_Form {
   
 }

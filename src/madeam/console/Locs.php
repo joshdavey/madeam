@@ -1,5 +1,5 @@
 <?php
-class Madeam_Console_Script_Locs extends Madeam_Console_Script {
+class madeam\Console_Script_Locs extends madeam\Console_Script {
   
   /**
    * undocumented 
@@ -16,9 +16,9 @@ class Madeam_Console_Script_Locs extends Madeam_Console_Script {
       Madeam::$pathToPub . 'index.php',
       Madeam::$pathToPub . 'dispatcher.php'
     ));
-    Madeam_Console_CLI::out(sprintf("------------------------------"));
-    Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Project', $totalLocs));
-    Madeam_Console_CLI::out(sprintf("------------------------------"));
+    madeam\Console_CLI::out(sprintf("------------------------------"));
+    madeam\Console_CLI::out(sprintf("%-20s%10d", 'Project', $totalLocs));
+    madeam\Console_CLI::out(sprintf("------------------------------"));
   }
   
   /**
@@ -28,16 +28,16 @@ class Madeam_Console_Script_Locs extends Madeam_Console_Script {
    */
   public function madeam() {
     $madeamLocs = (int) $this->_countLOCs(Madeam::$pathToLib . 'Madeam' . DS . 'src');
-    Madeam_Console_CLI::out(sprintf("------------------------------"));
-    Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Madeam', $madeamLocs));
+    madeam\Console_CLI::out(sprintf("------------------------------"));
+    madeam\Console_CLI::out(sprintf("%-20s%10d", 'Madeam', $madeamLocs));
     
     $madeamTestLocs = (int) $this->_countLOCs(Madeam::$pathToLib . 'Madeam' . DS . 'tests' . DS);
-    Madeam_Console_CLI::out(sprintf("------------------------------"));
-    Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Madeam Tests', $madeamTestLocs));
+    madeam\Console_CLI::out(sprintf("------------------------------"));
+    madeam\Console_CLI::out(sprintf("%-20s%10d", 'Madeam Tests', $madeamTestLocs));
     
     $totalLocs = $madeamLocs + $madeamTestLocs;
-    Madeam_Console_CLI::out(sprintf("=============================="));
-    Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Total', $totalLocs));
+    madeam\Console_CLI::out(sprintf("=============================="));
+    madeam\Console_CLI::out(sprintf("%-20s%10d", 'Total', $totalLocs));
   }
   
   /**
@@ -47,29 +47,29 @@ class Madeam_Console_Script_Locs extends Madeam_Console_Script {
    */
   public function app() {
     $appLocs = (int) $this->_countLOCs(Madeam::$pathToApp . 'src' . DS);
-    Madeam_Console_CLI::out(sprintf("------------------------------"));
-    Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Application', $appLocs));
+    madeam\Console_CLI::out(sprintf("------------------------------"));
+    madeam\Console_CLI::out(sprintf("%-20s%10d", 'Application', $appLocs));
     
     $testLocs = (int) $this->_countLOCs(Madeam::$pathToApp . 'tests' . DS);
-    Madeam_Console_CLI::out(sprintf("------------------------------"));
-    Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Tests', $testLocs));
+    madeam\Console_CLI::out(sprintf("------------------------------"));
+    madeam\Console_CLI::out(sprintf("%-20s%10d", 'Tests', $testLocs));
     
     $libLocs = (int) $this->_countLOCs(Madeam::$pathToLib, array(
       Madeam::$pathToLib . 'Madeam' . DS
     ));
-    Madeam_Console_CLI::out(sprintf("------------------------------"));
-    Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Library', $libLocs));
+    madeam\Console_CLI::out(sprintf("------------------------------"));
+    madeam\Console_CLI::out(sprintf("%-20s%10d", 'Library', $libLocs));
     
     $staticLocs = (int) $this->_countLOCs(Madeam::$pathToPub, array(
       Madeam::$pathToPub . 'dispatcher.php',
       Madeam::$pathToPub . 'index.php'
     ));
-    Madeam_Console_CLI::out(sprintf("------------------------------"));
-    Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Static', $staticLocs));
+    madeam\Console_CLI::out(sprintf("------------------------------"));
+    madeam\Console_CLI::out(sprintf("%-20s%10d", 'Static', $staticLocs));
     
     $totalLocs = $appLocs + $testLocs + $libLocs + $staticLocs;
-    Madeam_Console_CLI::out(sprintf("=============================="));
-    Madeam_Console_CLI::out(sprintf("%-20s%10d", 'Total', $totalLocs));
+    madeam\Console_CLI::out(sprintf("=============================="));
+    madeam\Console_CLI::out(sprintf("%-20s%10d", 'Total', $totalLocs));
   }
     
   /**

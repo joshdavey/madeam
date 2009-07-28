@@ -1,5 +1,5 @@
 <?php
-class Madeam_Console_Module extends Madeam_Console {
+class madeam\Console_Module extends madeam\Console {
   
   public function create() {
     

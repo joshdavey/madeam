@@ -1,8 +1,8 @@
 <?php
-
+namespace madeam;
 // set cache path if it hasn't been already.
-if (Madeam_Cache::$path === false) {
-  Madeam_Cache::$path  = Madeam::$pathToEtc . 'cache' . DS;
+if (Cache::$path === false) {
+  Cache::$path  = Madeam::$pathToEtc . 'cache' . DS;
 }
 
 /**
@@ -19,7 +19,7 @@ if (Madeam_Cache::$path === false) {
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
-class Madeam_Cache {
+class Cache {
 
   public static $path = false;
 
@@ -90,7 +90,7 @@ class Madeam_Cache {
    */
   public static function start($id, $lifeTime = 0) {
     // check if inline cache is enabled
-    if (Madeam_Config::get('cache_inline') === false) {
+    if (madeam\Config::get('cache_inline') === false) {
       return false;
     }
 
@@ -112,7 +112,7 @@ class Madeam_Cache {
    */
   public static function stop() {
     // check if inline cache is enabled
-    if (Madeam_Config::get('cache_inline') === false) {
+    if (madeam\Config::get('cache_inline') === false) {
       return false;
     }
 

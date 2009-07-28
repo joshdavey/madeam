@@ -1,7 +1,7 @@
 <?php
 require_once 'Bootstrap.php';
 
-class Madeam_AllTests {
+class madeam\AllTests {
   
   public static function main() {
     PHPUnit_TextUI_TestRunner::run(self::suite());
@@ -11,12 +11,12 @@ class Madeam_AllTests {
     $suite = new PHPUnit_Framework_TestSuite('Madeam Framework');
 
     $suite->addTestSuite('MadeamTest');
-    $suite->addTestSuite('Madeam_EnvironmentTest');
-    $suite->addTestSuite('Madeam_ControllerTest');
-    $suite->addTestSuite('Madeam_RouterTest');
-    $suite->addTestSuite('Madeam_InflectorTest');
-    $suite->addTestSuite('Madeam_ModelTest');
-    $suite->addTestSuite('Madeam_Model_ActiveRecordTest');
+    $suite->addTestSuite('madeam\EnvironmentTest');
+    $suite->addTestSuite('madeam\ControllerTest');
+    $suite->addTestSuite('madeam\RouterTest');
+    $suite->addTestSuite('madeam\InflectorTest');
+    $suite->addTestSuite('madeam\ModelTest');
+    $suite->addTestSuite('madeam\Model_ActiveRecordTest');
 
     return $suite;
   }

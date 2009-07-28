@@ -1,6 +1,6 @@
 <?php
 
-class Madeam_Helper_Format {
+class madeam\Helper_Format {
 
   public static $dateFormat = 'd F o';
 
