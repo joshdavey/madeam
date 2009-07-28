@@ -3,10 +3,6 @@ class Madeam_Console_Create extends Madeam_Console {
 
   public $description = 'The create console allows you to generate models, views and controllers';
 
-  public $required = array('controller' => array('name' => 'Please enter a name for this controller'), 'model' => array('name' => 'Please enter a name for this model'), 'view' => array('name' => 'Please enter a name for this view'), 'scaffold' => array('controller' => 'Please enter the name of the controller', 'represent' => 'Please enter a name of the model this controller will represent', 'from' => 'Please enter from which scaffold pattern you would like to build from'));
-
-  public $validate = array('controller' => array('name' => '/[a-z\/]/', 'model' => '/[a-z\/]/', 'scaffold' => '/[a-z]/'));
-
   /**
    * Creates a controller
    *
@@ -81,7 +77,7 @@ class Madeam_Console_Create extends Madeam_Console {
     $modelContents .= "\n\n}";
     
     // save file
-    if ($this->createFile($modelName . '.php', Madeam::$pathToApp . 'Model' . DS, $modelContents) === true) {
+    if ($this->createFile($modelName . '.php', Madeam::$pathToApp . 'src' . DS . 'Model' . DS, $modelContents) === true) {
       return true;
     }
     
@@ -100,11 +96,11 @@ class Madeam_Console_Create extends Madeam_Console {
     
     // this needs a re-write because it should allow depth greater than 1 directory
     // make controller directory if it does not already exist
-    if (! file_exists(Madeam::$pathToApp . 'View' . DS . dirname($name))) {
+    if (! file_exists(Madeam::$pathToApp . 'src' . DS . 'View' . DS . dirname($name))) {
       mkdir(Madeam::$pathToApp . 'View' . DS . dirname($name));
     }
     // save contents to new view file
-    if ($this->createFile($name . '.' . $format, Madeam::$pathToApp . 'View' . DS, $viewContents) === true) {
+    if ($this->createFile($name . '.' . $format, Madeam::$pathToApp . 'src' . DS . 'View' . DS, $viewContents) === true) {
       return true;
     }
     return false;

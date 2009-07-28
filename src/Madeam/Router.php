@@ -88,7 +88,6 @@ class Madeam_Router {
    *
    * This method excepts URIs in anyformat.
    * Examples:
-   *  http://localhost/website/index?foo=bar
    *  index/test?blah=nah
    *
    * @param string $uri

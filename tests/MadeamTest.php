@@ -40,7 +40,7 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
    * @author Joshua Davey
    */
   public function testPublicFolderShouldExist() {
-    Madeam::paths(TESTS_MADEAM_PUB_DIRECTORY);
+    Madeam::paths(TESTS_MADEAM_APP_DIRECTORY);
     $this->assertTrue(file_exists(Madeam::$pathToPub), 'The public directory should exist');
   }
   
@@ -49,7 +49,7 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
    * @author Joshua Davey
    */
   public function testAppFolderShouldExist() {
-    Madeam::paths(TESTS_MADEAM_PUB_DIRECTORY);
+    Madeam::paths(TESTS_MADEAM_APP_DIRECTORY, 'public');
     $this->assertTrue(file_exists(Madeam::$pathToApp), 'The app directory should exist');
   }
   
@@ -58,7 +58,7 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
    * @author Joshua Davey
    */
   public function testEtcFolderShouldExist() {
-    Madeam::paths(TESTS_MADEAM_PUB_DIRECTORY);
+    Madeam::paths(TESTS_MADEAM_APP_DIRECTORY);
     $this->assertTrue(file_exists(Madeam::$pathToEtc), 'The etc directory should exist');
   }
     

@@ -628,6 +628,11 @@ class Madeam {
     //$file = str_replace('_', DS, str_replace('\\', DS, $class)) . '.php'; // PHP 5.3
     $file = str_replace('_', DS, $class) . '.php';
     
+    // idea...
+    // if (method_exists($class, '__init')) {
+    //   $class::__init(); // config
+    // }
+    
     // checks all the include paths to see if the file exist
     $paths = explode(PATH_SEPARATOR, get_include_path());
     foreach ($paths as $path) {

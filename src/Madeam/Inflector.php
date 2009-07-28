@@ -177,9 +177,10 @@ class Madeam_Inflector {
   }
 
   public static function specialize($char, $string) {
+    $escapedChar = preg_quote($char, '/');
     // pad all capitalized strings with replacement character and make the text lowercase.
-    $string = strtolower(preg_replace('/[^a-zA-Z0-9' . preg_quote($char, '/') . ']*([A-Z]+)/', preg_quote($char)  . '${1}', $string));
-    $string = preg_replace('/([^a-z0-9' . preg_quote($char, '/') . ']+)/', $char, $string);
+    $string = strtolower(preg_replace('/[^a-zA-Z0-9' . $escapedChar . ']*([A-Z]+)/', preg_quote($char)  . '${1}', $string));
+    $string = preg_replace('/([^a-z0-9' . $escapedChar . ']+)/', $char, $string);
     
     // return formatted string
     return strtolower($string);

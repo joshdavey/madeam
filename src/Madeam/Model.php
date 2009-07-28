@@ -526,6 +526,23 @@ class Madeam_Model {
   protected function describe() {
     return array();
   }
+  
+  protected function createForeignKey() {
+    $this->modelName[0] = strtolower($this->modelName[0]);
+    return Madeam_Inflector::singalize(Madeam_Inflector::underscorize($this->modelName)) . '_id';
+  }
+  
+  protected function createHABTMTable($table1, $table2) {
+    $models = array($this->modelTableize($table1), $this->modelTableize($table2));
+    asort($models);
+    $models = array_values($models);
+    return $models[0] . '_' . $models[1];
+  }
+  
+  protected function modelTableize($string) {
+    $string[0] = strtolower($string[0]);
+    return Madeam_Inflector::underscorize((Madeam_Inflector::pluralize($string)));
+  }
 
   /**
    * Query Methods

@@ -631,7 +631,7 @@ class Madeam_Model_ActiveRecord extends Madeam_Model {
     $class = clone $this;
 
     // set table name
-    $class->resourceName = Madeam_Inflector::modelHabtm($model, $this->modelName);
+    $class->resourceName = $this->modelHabtm($model, $this->modelName);
     $class->primaryKey = false;
     $this_key = Madeam_Inflector::modelForeignKey($this->modelName);
     $relation_key = Madeam_Inflector::modelForeignKey($model);
