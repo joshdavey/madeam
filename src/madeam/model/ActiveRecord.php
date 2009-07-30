@@ -1,9 +1,5 @@
 <?php
-
-// configure class
-if (madeam\Config::exists('madeam\Model_ActiveRecord')) {
-  madeam\Model_ActiveRecord::configure(madeam\Config::get('madeam\Model_ActiveRecord'));
-}
+namespace madeam\model;
 
 /**
  * Madeam PHP Framework <http://madeam.com>
@@ -18,11 +14,11 @@ if (madeam\Config::exists('madeam\Model_ActiveRecord')) {
  * @package      madeam
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class madeam\Model_ActiveRecord extends madeam\Model {
+class ActiveRecord extends \madeam\Model {
 
 
-  public static function _configure($config) {
-    
+  public static function __init__() {
+     
   }
 
   /**
