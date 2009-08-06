@@ -7,14 +7,14 @@ class madeam\Console_Script_Locs extends madeam\Console_Script {
    * @author Joshua Davey
    */
   public function all() {
-    $totalLocs =  (int) $this->_countLOCs(Madeam::$pathToRoot, array(
-      Madeam::$pathToEtc,
-      Madeam::$pathToRoot . 'README',
-      Madeam::$pathToRoot . 'LICENSE',
-      Madeam::$pathToRoot . 'index.php',
-      Madeam::$pathToRoot . 'env.php',
-      Madeam::$pathToPub . 'index.php',
-      Madeam::$pathToPub . 'dispatcher.php'
+    $totalLocs =  (int) $this->_countLOCs(Framework::$pathToRoot, array(
+      Framework::$pathToEtc,
+      Framework::$pathToRoot . 'README',
+      Framework::$pathToRoot . 'LICENSE',
+      Framework::$pathToRoot . 'index.php',
+      Framework::$pathToRoot . 'env.php',
+      Framework::$pathToPub . 'index.php',
+      Framework::$pathToPub . 'dispatcher.php'
     ));
     madeam\console\CLI::out(sprintf("------------------------------"));
     madeam\console\CLI::out(sprintf("%-20s%10d", 'Project', $totalLocs));
@@ -27,11 +27,11 @@ class madeam\Console_Script_Locs extends madeam\Console_Script {
    * @author Joshua Davey
    */
   public function madeam() {
-    $madeamLocs = (int) $this->_countLOCs(Madeam::$pathToLib . 'Madeam' . DS . 'src');
+    $madeamLocs = (int) $this->_countLOCs(Framework::$pathToLib . 'Madeam' . DS . 'src');
     madeam\console\CLI::out(sprintf("------------------------------"));
     madeam\console\CLI::out(sprintf("%-20s%10d", 'Madeam', $madeamLocs));
     
-    $madeamTestLocs = (int) $this->_countLOCs(Madeam::$pathToLib . 'Madeam' . DS . 'tests' . DS);
+    $madeamTestLocs = (int) $this->_countLOCs(Framework::$pathToLib . 'Madeam' . DS . 'tests' . DS);
     madeam\console\CLI::out(sprintf("------------------------------"));
     madeam\console\CLI::out(sprintf("%-20s%10d", 'Madeam Tests', $madeamTestLocs));
     
@@ -46,23 +46,23 @@ class madeam\Console_Script_Locs extends madeam\Console_Script {
    * @author Joshua Davey
    */
   public function app() {
-    $appLocs = (int) $this->_countLOCs(Madeam::$pathToApp . 'src' . DS);
+    $appLocs = (int) $this->_countLOCs(Framework::$pathToApp . 'src' . DS);
     madeam\console\CLI::out(sprintf("------------------------------"));
     madeam\console\CLI::out(sprintf("%-20s%10d", 'Application', $appLocs));
     
-    $testLocs = (int) $this->_countLOCs(Madeam::$pathToApp . 'tests' . DS);
+    $testLocs = (int) $this->_countLOCs(Framework::$pathToApp . 'tests' . DS);
     madeam\console\CLI::out(sprintf("------------------------------"));
     madeam\console\CLI::out(sprintf("%-20s%10d", 'Tests', $testLocs));
     
-    $libLocs = (int) $this->_countLOCs(Madeam::$pathToLib, array(
-      Madeam::$pathToLib . 'Madeam' . DS
+    $libLocs = (int) $this->_countLOCs(Framework::$pathToLib, array(
+      Framework::$pathToLib . 'Madeam' . DS
     ));
     madeam\console\CLI::out(sprintf("------------------------------"));
     madeam\console\CLI::out(sprintf("%-20s%10d", 'Library', $libLocs));
     
-    $staticLocs = (int) $this->_countLOCs(Madeam::$pathToPub, array(
-      Madeam::$pathToPub . 'dispatcher.php',
-      Madeam::$pathToPub . 'index.php'
+    $staticLocs = (int) $this->_countLOCs(Framework::$pathToPub, array(
+      Framework::$pathToPub . 'dispatcher.php',
+      Framework::$pathToPub . 'index.php'
     ));
     madeam\console\CLI::out(sprintf("------------------------------"));
     madeam\console\CLI::out(sprintf("%-20s%10d", 'Static', $staticLocs));

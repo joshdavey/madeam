@@ -18,9 +18,9 @@ class madeam\Console_Create extends madeam\Console {
     }
     
     $controllerClassName      = 'Controller_' . implode('_', $nameNodes);
-    $controllerViewFilePath   = Madeam::$pathToApp . 'src' . DS . 'View' . DS . strtolower(implode(DS, $nameNodes));
+    $controllerViewFilePath   = Framework::$pathToApp . 'src' . DS . 'View' . DS . strtolower(implode(DS, $nameNodes));
     $controllerName           = array_pop($nameNodes);
-    $controllerClassFilePath  = Madeam::$pathToApp . 'src' . DS . 'Controller' . DS . implode(DS, $nameNodes);    
+    $controllerClassFilePath  = Framework::$pathToApp . 'src' . DS . 'Controller' . DS . implode(DS, $nameNodes);    
     
     
     // Send message to user that we are creating the controller
@@ -48,7 +48,7 @@ class madeam\Console_Create extends madeam\Console {
     foreach ($actions as $view) {        
       $view = trim($view);
       // create view file
-      $this->createFile(strtolower($view) . '.' . Madeam::defaultFormat, $controllerViewFilePath . DS, "$view view");
+      $this->createFile(strtolower($view) . '.' . Framework::defaultFormat, $controllerViewFilePath . DS, "$view view");
     }
 
     // close class definition
@@ -77,7 +77,7 @@ class madeam\Console_Create extends madeam\Console {
     $modelContents .= "\n\n}";
     
     // save file
-    if ($this->createFile($modelName . '.php', Madeam::$pathToApp . 'src' . DS . 'Model' . DS, $modelContents) === true) {
+    if ($this->createFile($modelName . '.php', Framework::$pathToApp . 'src' . DS . 'Model' . DS, $modelContents) === true) {
       return true;
     }
     
@@ -96,11 +96,11 @@ class madeam\Console_Create extends madeam\Console {
     
     // this needs a re-write because it should allow depth greater than 1 directory
     // make controller directory if it does not already exist
-    if (! file_exists(Madeam::$pathToApp . 'src' . DS . 'View' . DS . dirname($name))) {
-      mkdir(Madeam::$pathToApp . 'View' . DS . dirname($name));
+    if (! file_exists(Framework::$pathToApp . 'src' . DS . 'View' . DS . dirname($name))) {
+      mkdir(Framework::$pathToApp . 'View' . DS . dirname($name));
     }
     // save contents to new view file
-    if ($this->createFile($name . '.' . $format, Madeam::$pathToApp . 'src' . DS . 'View' . DS, $viewContents) === true) {
+    if ($this->createFile($name . '.' . $format, Framework::$pathToApp . 'src' . DS . 'View' . DS, $viewContents) === true) {
       return true;
     }
     return false;

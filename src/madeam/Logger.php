@@ -1,10 +1,6 @@
 <?php
 namespace madeam;
 
-if (Logger::$path === false) {
-  Logger::$path  = Madeam::$pathToEtc . 'log' . DS;
-}
-
 /**
  * Register save as a shutdown function so that the logs are saved.
  */
@@ -43,7 +39,7 @@ class Logger {
       $requestLog .= $log['datetime'] . ' | ' . $log['message'] . "\n";
     }
 
-    if (madeam\Config::get('enable_logger') == true && $requestLog != null) {
+    if (Config::get('enable_logger') == true && $requestLog != null) {
       $requestLog .= '------------------' . "\n";
       file_put_contents(self::$path . date(self::$fileName) . '.txt',  $requestLog, FILE_APPEND | LOCK_EX);
     }

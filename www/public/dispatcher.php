@@ -1,4 +1,5 @@
 <?php
+namespace madeam;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -15,9 +16,8 @@
  * @author      Joshua Davey
  */
 
-
 // use unicode
-  if (function_exists('mb_internal_encoding')) { mb_internal_encoding("UTF-8"); }
+  mb_internal_encoding("UTF-8");
 
 // content type to utf8
   header('Content-type: text/html; charset=utf-8');
@@ -39,11 +39,16 @@
 // set environment
   $environemnt = apache_getenv('MADEAM_ENV');
   if ($environemnt === false) {
-    $environemnt = require 'env.php';
+    define('ENV', require PROJECT_PATH . 'env.php');
+  } else {
+    define('ENV', $environemnt);
   }
   
+  require PROJECT_PATH . 'app/conf/setup.php';
+  require PROJECT_PATH . 'app/conf/routes.php';
+  
 // setup Madeam
-  Madeam::webSetup($environemnt, $_REQUEST, $_SERVER);
+  madeam\Framework::setup($environemnt, $_REQUEST, $_SERVER);
   
 // remove _uri from request
 // _uri is defined in the public/.htaccess file. Many developers may not notice it because of
@@ -59,4 +64,4 @@
   }
   
 // dispatch handles the request and returns the output  
-  echo Madeam::dispatch();
+  echo madeam\Framework::dispatch();

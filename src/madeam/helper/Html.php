@@ -19,7 +19,7 @@ class Html {
 
   public static function link($label, $link = null, $_params = array()) {
     $params = array();
-    $params['href'] = \Madeam::url($link);
+    $params['href'] = \madeam\Framework::url($link);
     $params = array_merge($params, $_params);
     return self::wrappingTag('a', $label, $params);
   }
@@ -27,41 +27,17 @@ class Html {
   public static function img($src, $_params = array()) {
     $params = array();
     $params['alt'] = \madeam\Inflector::underscorize($src);
-    $params['src'] = \Madeam::url($src);
-    $params = array_merge($params, $_params);
-    return self::tag('img', $params);
-  }
-
-  public static function imgResize($src, $target = 0, $_params = array()) {
-    $params = array();
-    $params['alt'] = \madeam\Inflector::underscorize($src);
-    $params['src'] = \Madeam::url($src);
-    
-    list($width, $height) = getimagesize(\Madeam::$pathToPub . $src);
-    
-    if ($width > $height) {
-      $percentage = ($target / $width);
-    } else {
-      $percentage = ($target / $height);
-    }
-
-    //gets the new value and applies the percentage, then rounds the value
-    $width = round($width * $percentage);
-    $height = round($height * $percentage);
-    
-    $params['width'] = $width . 'px';
-    $params['height'] = $height . 'px';
-    
+    $params['src'] = \madeam\Framework::url($src);
     $params = array_merge($params, $_params);
     return self::tag('img', $params);
   }
 
   public static function css($src, $_params = array()) {
-    return '<link rel="stylesheet" href="' . \Madeam::url($src) . '.css" type="text/css" media="screen" />';
+    return '<link rel="stylesheet" href="' . \madeam\Framework::url($src) . '.css" type="text/css" media="screen" />';
   }
 
   public static function js($src, $_params = array()) {
-    return '<script src="' . \Madeam::url($src) . '.js" type="text/javascript"></script>';
+    return '<script src="' . \madeam\Framework::url($src) . '.js" type="text/javascript"></script>';
   }
   
   public static function gjs($library, $version) {
@@ -108,7 +84,7 @@ class Html {
    * @param string $name
    */
   protected static function nameToId($name) {
-    return str_replace(\Madeam::associationJoint, '_', strtolower($name));
+    return str_replace(\Framework::associationJoint, '_', strtolower($name));
   }
 
   /**

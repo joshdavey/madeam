@@ -1,4 +1,5 @@
 <?php
+namespace madeam;
 /**
  * Welcome to Madeam PHP Framework!
  * 
@@ -44,36 +45,30 @@
  */
 
 $cfg = array();
-switch (Madeam::$environment) {
+switch (ENV) {
   case 'development' :
   
     error_reporting(E_ALL);
-  
-    $cfg['connections'][]       = 'mysql://username:password@localhost?name=madeam_development';
-    $cfg['cache_controllers']   = false;
-    $cfg['cache_models']        = false;
-    $cfg['cache_routes']        = false;
-    $cfg['cache_inline']        = false;
-    $cfg['enable_debug']        = true;
-    $cfg['enable_logger']       = true;
-    $cfg['inline_errors']       = true;
+    Config::set('connections', array(
+      'mysql://username:password@localhost?name=madeam_development'
+    ));
+    Config::set('inline_errors', true);
+    Config::set('debug_mode', true);
+    
     break;  
   case 'production' :
     
     error_reporting(0);
-  
-    $cfg['connections'][]       = 'mysql://username:password@localhost?name=madeam_production';
-    $cfg['cache_controllers']   = true;
-    $cfg['cache_models']        = true;
-    $cfg['cache_routes']        = true;
-    $cfg['cache_inline']        = true;
-    $cfg['enable_debug']        = false;
-    $cfg['enable_logger']       = true;
-    $cfg['inline_errors']       = false;
+    Config::set('connections', array(
+      'mysql://username:password@localhost?name=madeam_production'
+    ));
+    Config::set('inline_errors', false);
+    Config::set('debug_mode', false);
+    
     break;
 }
 
 /**
  * Set session path
  */
-session_save_path(Madeam::$pathToEtc . 'sessions' . DS);
+//session_save_path(Framework::$pathToEtc . 'sessions' . DS);

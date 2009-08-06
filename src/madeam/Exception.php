@@ -33,11 +33,12 @@ class Exception extends \Exception {
     "choo choo! Here comes the fail train.",
     "&lt;you&gt;fail&lt;/you&gt;",
   );
+  
   public function __construct($message = null, $code = 1) {
     parent::__construct($message, $code);
   }
 
-  public static function catchException(Exception $e, $override = array()) {
+  public static function catchException($e, $override = array()) {
 
     if (isset($override['message'])) {
       $message = $override['message'];
@@ -80,7 +81,7 @@ class Exception extends \Exception {
       
       // call error controller and pass information
       $params = array(
-        '_controller' => \Madeam::errorController, 
+        '_controller' => 'error', 
         '_action'     => 'debug',
         '_method'     => 'get',
         '_layout'     => 1,
@@ -92,22 +93,19 @@ class Exception extends \Exception {
         'code'        => $code,
         'file'        => $file
       );
-      test($params);
-      //echo \Madeam::control($params);
-      exit();
+      
+      echo Framework::control($params);
     } else {
       // return 404 error page
       $params = array(
-        '_controller' => \Madeam::errorController, 
+        '_controller' => 'error', 
         '_action'     => 'http404',
         '_method'     => 'get',
         '_layout'     => 1,
         '_format'     => 'html'
       );
       
-      test($params);
-      //echo \Madeam::control($params);
-      exit();
+      echo Framework::control($params);
     }
   }
 }

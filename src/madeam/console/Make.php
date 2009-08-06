@@ -14,7 +14,7 @@ class Make extends \madeam\Console {
     // create full path to application
     if (!file_exists($path)) { `mkdir -p $path`; }    
     
-    $madeam = \Madeam::$pathToInc;
+    $madeam = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/';
     echo `cp -rpv {$madeam}Madeam/www/ {$path}`;
     
     if ($clone === true) {

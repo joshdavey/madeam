@@ -31,8 +31,8 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
    * @author Joshua Davey
    */
   public function tearDown() {
-    Madeam::$uriAppPath = false;
-    Madeam::$uriPubPath = false;
+    Framework::$uriAppPath = false;
+    Framework::$uriPubPath = false;
   }
   
   /**
@@ -40,8 +40,8 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
    * @author Joshua Davey
    */
   public function testPublicFolderShouldExist() {
-    Madeam::paths(TESTS_MADEAM_APP_DIRECTORY);
-    $this->assertTrue(file_exists(Madeam::$pathToPub), 'The public directory should exist');
+    Framework::paths(TESTS_MADEAM_APP_DIRECTORY);
+    $this->assertTrue(file_exists(Framework::$pathToPub), 'The public directory should exist');
   }
   
   /**
@@ -49,8 +49,8 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
    * @author Joshua Davey
    */
   public function testAppFolderShouldExist() {
-    Madeam::paths(TESTS_MADEAM_APP_DIRECTORY, 'public');
-    $this->assertTrue(file_exists(Madeam::$pathToApp), 'The app directory should exist');
+    Framework::paths(TESTS_MADEAM_APP_DIRECTORY, 'public');
+    $this->assertTrue(file_exists(Framework::$pathToApp), 'The app directory should exist');
   }
   
   /**
@@ -58,8 +58,8 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
    * @author Joshua Davey
    */
   public function testEtcFolderShouldExist() {
-    Madeam::paths(TESTS_MADEAM_APP_DIRECTORY);
-    $this->assertTrue(file_exists(Madeam::$pathToEtc), 'The etc directory should exist');
+    Framework::paths(TESTS_MADEAM_APP_DIRECTORY);
+    $this->assertTrue(file_exists(Framework::$pathToEtc), 'The etc directory should exist');
   }
     
   /**
@@ -70,7 +70,7 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
     $docRoot  = '/Apache/htdocs/';
     $pubDir   = '/Apache/htdocs/madeam/public/';
     
-    $this->assertEquals('/madeam/public/', Madeam::pubPath($docRoot, $pubDir));
+    $this->assertEquals('/madeam/public/', Framework::pubPath($docRoot, $pubDir));
   }
   
   /**
@@ -83,7 +83,7 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
     $pubDir   = '/Apache/htdocs/madeam/public/';
     
     // clean uris
-    $this->assertEquals('/madeam/', Madeam::cleanUriPath($docRoot, $pubDir));
+    $this->assertEquals('/madeam/', Framework::cleanUriPath($docRoot, $pubDir));
   }
   
   /**
@@ -96,7 +96,7 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
     $pubDir   = '/Apache/htdocs/madeam/public/';
     
     // dirty uris
-    $this->assertEquals('/madeam/index.php/', Madeam::dirtyUriPath($docRoot, $pubDir));
+    $this->assertEquals('/madeam/index.php/', Framework::dirtyUriPath($docRoot, $pubDir));
   }
   
   /**
@@ -104,11 +104,11 @@ class MadeamTest extends PHPUnit_Framework_TestCase {
    * @author Joshua Davey
    */
   public function testUrl() {
-    Madeam::$uriAppPath = '/madeam/';
-    Madeam::$uriPubPath = '/madeam/index.php/';
+    Framework::$uriAppPath = '/madeam/';
+    Framework::$uriPubPath = '/madeam/index.php/';
     
-    $this->assertEquals('/madeam/test', Madeam::url('test'));
-    $this->assertEquals('/madeam/index.php/test', Madeam::url('/test'));
+    $this->assertEquals('/madeam/test', Framework::url('test'));
+    $this->assertEquals('/madeam/index.php/test', Framework::url('/test'));
   }
   
 }

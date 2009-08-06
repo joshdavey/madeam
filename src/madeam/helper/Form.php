@@ -29,7 +29,7 @@ class Breadcrumb extends madeam\helper\Html {
       $_params['method'] = 'post';
     }
     
-    $params['action'] = Madeam::url($action);
+    $params['action'] = Framework::url($action);
     $params['id'] = 'form_' . Inflector::underscorize(madeam\Inflector::slug($params['action']));
     
     $params = array_merge($params, $_params);
@@ -250,13 +250,13 @@ class Breadcrumb extends madeam\helper\Html {
     if ($value == null) { $value = time(); }
     
     // day
-    $returned[] = self::day($name . Madeam::associationJoint . 'day', $value);
+    $returned[] = self::day($name . Framework::associationJoint . 'day', $value);
     
     // month
-    $returned[] = self::month($name . Madeam::associationJoint . 'month', $value);
+    $returned[] = self::month($name . Framework::associationJoint . 'month', $value);
     
     // year
-    $returned[] = self::year($name . Madeam::associationJoint . 'year', $value);
+    $returned[] = self::year($name . Framework::associationJoint . 'year', $value);
     
     return implode($returned);
   }
@@ -333,13 +333,13 @@ class Breadcrumb extends madeam\helper\Html {
     if ($value == null) { $value = time(); }
     
     // hour
-    $returned[] = self::hour($name . Madeam::associationJoint . 'hour', $value);
+    $returned[] = self::hour($name . Framework::associationJoint . 'hour', $value);
     
     // minute
-    $returned[] = self::minute($name . Madeam::associationJoint . 'minute', $value);
+    $returned[] = self::minute($name . Framework::associationJoint . 'minute', $value);
     
     // second
-    $returned[] = self::second($name . Madeam::associationJoint . 'second', $value);
+    $returned[] = self::second($name . Framework::associationJoint . 'second', $value);
     
     return implode($returned);
   }
@@ -463,7 +463,7 @@ class Breadcrumb extends madeam\helper\Html {
    * =======================================================================
    */
   protected static function fieldName($fieldName) {
-    $nodes = explode(Madeam::associationJoint, $fieldName);
+    $nodes = explode(Framework::associationJoint, $fieldName);
     $name = array_shift($nodes);
     if (! empty($nodes)) {
       $name .= '[' . implode('][', $nodes) . ']';
@@ -473,7 +473,7 @@ class Breadcrumb extends madeam\helper\Html {
 
   protected static function fieldValue($fieldName, $setValue) {
     // get nodes of field name to identify it's value
-    $nodes = explode(Madeam::associationJoint, $fieldName);
+    $nodes = explode(Framework::associationJoint, $fieldName);
     // get root of value
     $value = $_POST;
     foreach ($nodes as $node) {
