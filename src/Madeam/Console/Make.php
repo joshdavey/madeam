@@ -13,17 +13,17 @@ class Madeam_Console_Make extends Madeam_Console {
     // create full path to application
     if (!file_exists($path)) { `mkdir -p $path`; }    
     
-    $madeam = Madeam::$pathToInc;
-    echo `cp -rpv {$madeam}Madeam/www/ {$path}`;
+    $madeam = dirname(dirname(dirname(dirname(__FILE__))));
+    echo `cp -rpv {$madeam}/www/ {$path}`;
     
     if ($clone === true) {
       // clone madeam from remote
       echo `git clone -v git://github.com/joshdavey/madeam {$path}/app/vendor/Madeam`;
     } elseif ($symlink === true) {
-      echo `ln -s {$madeam}Madeam {$path}/app/vendor/Madeam`;
+      echo `ln -s {$madeam}/ {$path}/app/vendor/Madeam`;
     } else {
       // copy local madeam copy
-      echo `cp -rpv {$madeam}Madeam {$path}/app/vendor`;
+      echo `cp -rpv {$madeam} {$path}/app/vendor`;
     }
   }
   

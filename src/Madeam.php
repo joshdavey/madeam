@@ -240,11 +240,6 @@ class Madeam {
   public static $pathToEtc          = false;
   
   /**
-   * 
-   */
-  public static $pathToInc          = false;
-  
-  /**
    * @var string 
    */
   public static $uriAppPath          = '/';
@@ -279,11 +274,8 @@ class Madeam {
     // set etc path
     self::$pathToEtc    = self::$pathToRoot . 'etc' . DS;
     
-    // path to the directory madeam is stored in
-    self::$pathToInc    = dirname(dirname(dirname(__FILE__))) . DS;
-    
     // return paths for include path
-    return array(self::$pathToApp . 'src' . DS, self::$pathToLib, self::$pathToInc);
+    return array(self::$pathToApp . 'src' . DS, self::$pathToLib, dirname(dirname(dirname(__FILE__))) . DS);
   }
   
   
@@ -310,7 +302,6 @@ class Madeam {
     // set request params
     self::$requestParams = $params;
     
-      
     // set path to uri based on whether mod_rewrite is turned on or off.
     if (isset(self::$requestParams['_uri'])) {
       self::$uriAppPath = self::cleanUriPath($server['DOCUMENT_ROOT'], self::$pathToPub);

@@ -1,7 +1,7 @@
 Version 1.1.0
 - Added CHANGELOG
 - Madeam script now works for creating new Madeam projects
-- Scripts now called Madeam.php instead of boot.php
+- Scripts now call Madeam.php instead of boot.php
 - New dispatcher.php
 - Can now use MADEAM_ENV apache environment variable instead of env.php
 - fixed htmlentities wrapper h()
