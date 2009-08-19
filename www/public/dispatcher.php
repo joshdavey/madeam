@@ -1,5 +1,4 @@
 <?php
-namespace madeam;
 /**
  * Madeam PHP Framework <http://madeam.com>
  * Copyright (c)  2009, Joshua Davey
@@ -11,7 +10,7 @@ namespace madeam;
  * @copyright    Copyright (c) 2009, Joshua Davey
  * @link        http://www.madeam.com
  * @package      madeam
- * @version      0.1.0
+ * @version      2.0.0
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
@@ -34,21 +33,29 @@ namespace madeam;
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
 // note: the library in the PHP include path should only be used for Madeam development and never
 // the development of a project based on madeam. Madeam should always be in the vendor directory
-  require 'app/vendor/Madeam/src/Madeam.php'; 
+  require 'app/vendor/Madeam/src/Madeam.php';
   
 // set environment
   $environemnt = apache_getenv('MADEAM_ENV');
   if ($environemnt === false) {
-    define('ENV', require PROJECT_PATH . 'env.php');
+    define('MADEAM_ENV', require 'env.php');
   } else {
-    define('ENV', $environemnt);
+    define('MADEAM_ENV', $environemnt);
   }
   
-  require PROJECT_PATH . 'app/conf/setup.php';
-  require PROJECT_PATH . 'app/conf/routes.php';
+  require 'app/conf/setup.php';
+  require 'app/conf/routes.php';
   
 // setup Madeam
-  madeam\Framework::setup($environemnt, $_REQUEST, $_SERVER);
+  madeam\Framework::setup(
+    $_REQUEST, 
+    $_SERVER['DOCUMENT_ROOT'],    // example: /Users/batman/Sites
+    $_SERVER['REQUEST_URI'],      // example: /myblog/ (sub-directory of document root)
+    $_SERVER['QUERY_STRING'],     // example: _uri=&blah=testing
+    $_SERVER['REQUEST_METHOD']    // example: GET
+  );
+  
+  madeam\debug($_SERVER);
   
 // remove _uri from request
 // _uri is defined in the public/.htaccess file. Many developers may not notice it because of

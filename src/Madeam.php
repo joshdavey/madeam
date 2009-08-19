@@ -26,6 +26,7 @@ spl_autoload_register('madeam\autoloadFail');
  * than for them to be autoloaded.
  */
 $madeamLibrary = dirname(__FILE__) . DS . 'madeam' . DS;
+require $madeamLibrary . 'Framework.php';
 require $madeamLibrary . 'Controller.php';
 require $madeamLibrary . 'Inflector.php';
 require $madeamLibrary . 'Router.php';
@@ -36,13 +37,14 @@ require $madeamLibrary . 'Cache.php';
 /**
  * Define include paths
  */
-define('PROJECT_PATH', getcwd() . DS);
+
+Framework::$pathToProject = getcwd() . DS;
 
 set_include_path(
-  PROJECT_PATH . 'app' . DS . 'models' . DS . PATH_SEPARATOR . 
-  PROJECT_PATH . 'app' . DS . 'controllers' . DS . PATH_SEPARATOR . 
-  PROJECT_PATH . 'app' . DS . PATH_SEPARATOR .
-  PROJECT_PATH . 'app' . DS . 'vendor' . DS . PATH_SEPARATOR .
+  Framework::$pathToProject . 'app' . DS . 'models' . DS . PATH_SEPARATOR . 
+  Framework::$pathToProject . 'app' . DS . 'controllers' . DS . PATH_SEPARATOR . 
+  Framework::$pathToProject . 'app' . DS . PATH_SEPARATOR .
+  Framework::$pathToProject . 'app' . DS . 'vendor' . DS . PATH_SEPARATOR .
   get_include_path() . PATH_SEPARATOR . 
   dirname(dirname(dirname(__FILE__))) . DS
 );

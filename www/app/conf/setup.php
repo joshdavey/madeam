@@ -45,7 +45,7 @@ namespace madeam;
  */
 
 $cfg = array();
-switch (ENV) {
+switch (MADEAM_ENV) {
   case 'development' :
   
     error_reporting(E_ALL);

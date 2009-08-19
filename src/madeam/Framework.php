@@ -14,26 +14,20 @@ namespace madeam;
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Framework {
-
   
-  /**
-   * @var string
-   */
   public static $requestUri = '/';
   
-  /**
-   * default request request
-   * @var array
-   */
-  public static $requestrequest = array();
+  public static $requestParams = array();
   
-  public static $uriAppPath = '/';
+  public static $environment = 'development';
   
-  public static $uriPubPath = '/public/';
+  public static $uriPathRoot = '/';
   
-  public static $environment = false;
+  public static $uriPathPublic = '/public/';
   
-  public static $pathToPub = false;
+  public static $pathToPublic = false;
+  
+  public static $pathToProject = '/';
   
   
   /**
@@ -43,26 +37,21 @@ class Framework {
    * @param array $request
    * @param array $server
    */
-  public static function setup($environment, $request, $server) {    
-    // check for expected server parameters
-    $diff = array_diff(array('DOCUMENT_ROOT', 'REQUEST_URI', 'QUERY_STRING', 'REQUEST_METHOD'), array_keys($server));
-    if (!empty($diff)) {
-      throw new exception\MissingExpectedParam('Missing expected server Parameter(s).');
-    }
+  public static function setup($request, $server_document_root, $server_request_uri, $server_query_string, $server_request_method) {
     
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
-    if (substr($server['DOCUMENT_ROOT'], - 1) != '/') { $server['DOCUMENT_ROOT'] .= '/'; }
+    if (substr($server_document_root, - 1) != '/') { $server_document_root .= '/'; }
     
     // set request request
-    self::$requestrequest = $request;
+    self::$requestParams = $request;
       
     // set path to uri based on whether mod_rewrite is turned on or off.
-    if (isset(self::$requestrequest['_uri'])) {
-      self::$uriAppPath = self::cleanUriPath($server['DOCUMENT_ROOT'], self::$pathToPub);
-      self::$requestUri = self::$requestrequest['_uri'] . '?' . $server['QUERY_STRING'];
+    if (isset(self::$requestParams['_uri'])) {
+      self::$uriPathRoot = self::cleanUriPath($server_document_root, self::$pathToPublic);
+      self::$requestUri = self::$requestParams['_uri'] . '?' . $server_query_string;
     } else {
-      self::$uriAppPath = self::dirtyUriPath($server['DOCUMENT_ROOT'], self::$pathToPub);
-      $url = explode('index.php', $server['REQUEST_URI']);
+      self::$uriPathRoot = self::dirtyUriPath($server_document_root, self::$pathToPublic);
+      $url = explode('index.php', $server_request_uri);
       // check if it split into 2 peices.
       // If it didn't then there is an ending "index.php" so we assume there is no URI on the end either
       if (isset($url[1])) {
@@ -73,9 +62,9 @@ class Framework {
     }
     
     // determine the relative path to the public directory
-    self::$uriPubPath = self::pubPath($server['DOCUMENT_ROOT'], self::$pathToPub);  
+    self::$uriPathPublic = self::pubPath($server_document_root, self::$pathToPublic);  
     
-    // if the absolute path to the public directory can't be established based on the uriPubPath
+    // if the absolute path to the public directory can't be established based on the uriPathPublic
     // we've derived then it's likely the developer is using symlinks to point to their project.
     // In this case we can't determine the paths.
     // Most likely the user has advanced priveledges and is able to set the DocumentRoot in the apache
@@ -84,28 +73,28 @@ class Framework {
     // 
     // Therefore if the developer is using symlinks they must point their DocumentRoot to Madeam's public
     // directory or everything will explode.
-    if (!file_exists($server['DOCUMENT_ROOT'] . self::$uriPubPath)) {
-      self::$uriPubPath = '/';
-      self::$uriAppPath = '/';
+    if (!file_exists($server_document_root . self::$uriPathPublic)) {
+      self::$uriPathPublic = '/';
+      self::$uriPathRoot = '/';
     }
     
     // set layout if it hasn't already been set
-    if (!isset(self::$requestrequest['_layout'])) { self::$requestrequest['_layout'] = 1; }
+    if (!isset(self::$requestParams['_layout'])) { self::$requestParams['_layout'] = 1; }
     
     // set overriding request method -- note: we need to get rid of all the $_SERVER references for testing purposes
     if (isset($server['X_HTTP_METHOD_OVERRIDE'])) {
-      self::$requestrequest['_method'] = strtolower($server['X_HTTP_METHOD_OVERRIDE']);
-    } elseif (isset(self::$requestrequest['_method']) && $server['REQUEST_METHOD'] == 'POST') {
-      self::$requestrequest['_method'] = strtolower($request['_method']);
+      self::$requestParams['_method'] = strtolower($server['X_HTTP_METHOD_OVERRIDE']);
+    } elseif (isset(self::$requestParams['_method']) && $server_request_method == 'POST') {
+      self::$requestParams['_method'] = strtolower($request['_method']);
     } else {
-      self::$requestrequest['_method'] = strtolower($server['REQUEST_METHOD']);
+      self::$requestParams['_method'] = strtolower($server_request_method);
     }
     
     // check if this is an ajax call
     if (isset($server['HTTP_X_REQUESTED_WITH']) && $server['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
-      self::$requestrequest['_ajax'] = 1;
+      self::$requestParams['_ajax'] = 1;
     } else {
-      self::$requestrequest['_ajax']  = 0;
+      self::$requestParams['_ajax'] = 0;
     }
   }
 
@@ -116,9 +105,6 @@ class Framework {
    * @author Joshua Davey
    */
   public static function dispatch() {
-    
-    // include routes
-    require 'conf/routes.php';
     
     /**
      * This is messed up. I hate the way PHP handles the $_FILES array when using multidimensional arrays in your HTML forms
@@ -139,10 +125,10 @@ class Framework {
       }
     }
     
-    self::$requestrequest = array_merge_recursive(self::$requestrequest, $_files);
+    self::$requestParams = array_merge_recursive(self::$requestParams, $_files);
     
     // make request
-    $output = self::request(self::$requestUri, self::$requestrequest);
+    $output = self::request(self::$requestUri, self::$requestParams);
     
     // return output
     return $output;
@@ -157,7 +143,7 @@ class Framework {
    * @author Joshua Davey
    */
   public static function request($uri, $request = array()) {
-    $request = Router::parse($uri, self::$uriAppPath, $request + array(
+    $request = Router::parse($uri, self::$uriPathRoot, $request + array(
       '_controller' => 'index',
       '_action'     => 'index',
       '_format'     => 'html'
@@ -244,11 +230,11 @@ class Framework {
    * /apache/document_root/          => /
    * 
    * @param $docRoot 
-   * @param $publicPath
+   * @param $pathToPublic
    * @author Joshua Davey
    */
-  public static function cleanUriPath($docRoot, $publicPath) {
-    return '/' . substr(str_replace(DS, '/', substr($publicPath, strlen($docRoot), -strlen(basename($publicPath)))), 0, -1);
+  public static function cleanUriPath($docRoot, $pathToPublic) {
+    return '/' . substr(str_replace(DS, '/', substr($pathToPublic, strlen($docRoot), -strlen(basename($pathToPublic)))), 0, -1);
   }
   
   /**
@@ -259,11 +245,11 @@ class Framework {
    * /apache/document_root/          => /index.php/
    * 
    * @param $docRoot 
-   * @param $publicPath
+   * @param $pathToPublic
    * @author Joshua Davey
    */
-  public static function dirtyUriPath($docRoot, $publicPath) {
-    return '/' . str_replace(DS, '/', substr(substr($publicPath, strlen($docRoot)), 0, -strlen(DS . basename($publicPath)))) . 'index.php/';
+  public static function dirtyUriPath($docRoot, $pathToPublic) {
+    return '/' . str_replace(DS, '/', substr(substr($pathToPublic, strlen($docRoot)), 0, -strlen(DS . basename($pathToPublic)))) . 'index.php/';
   }
   
   /**
@@ -272,12 +258,12 @@ class Framework {
    * /apache/document_root/website/  => /website/public/
    * /apache/document_root/          => /public/
    * 
-   * @param $docRoot 
-   * @param $publicPath
+   * @param $docRoot
+   * @param $pathToPublic
    * @author Joshua Davey
    */
-  public static function pubPath($docRoot, $publicPath) {
-    return '/' . str_replace(DS, '/', substr($publicPath, strlen($docRoot)));
+  public static function pubPath($docRoot, $pathToPublic) {
+    return '/' . str_replace(DS, '/', substr($pathToPublic, strlen($docRoot)));
   }
 
   /**
@@ -317,14 +303,14 @@ class Framework {
    */
   public static function url($url) {
     if ($url == null || $url == '/') {
-      return self::$uriAppPath;
+      return self::$uriPathRoot;
     }
 
     if (substr($url, 0, 1) != "#") {
       if (substr($url, 0, 1) == '/') {
-        $url = self::$uriPubPath . substr($url, 1, strlen($url));
+        $url = self::$uriPathPublic . substr($url, 1, strlen($url));
       } elseif (! preg_match('/^[a-z]+:/', $url, $matchs)) {
-        $url = self::$uriAppPath . $url;
+        $url = self::$uriPathRoot . $url;
       }
     }
     return $url;

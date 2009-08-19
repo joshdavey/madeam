@@ -27,12 +27,6 @@ class Controller {
    * @var string
    */
   public $_output = null;
-  
-  /**
-   * List of all models used at time of request.
-   * @var array
-   */
-  public $_models = array();
 
   /**
    * Configuration for this controller
@@ -404,7 +398,7 @@ class Controller {
     }
     
     // full path to view
-    $view = PROJECT_PATH . 'app/views/' . $viewFile;
+    $view = Framework::$pathToProject . 'app/views/' . $viewFile;
     
     if (!isset($settings['data'])) {
       $settings['data'] = array();
@@ -426,7 +420,7 @@ class Controller {
       // apply layout to view's content
       if (!isset($settings['partial']) && $settings['layout'] !== false && isset($settings['layout'])) {
         foreach ($settings['layout'] as $_layout) {
-          $_layout = PROJECT_PATH . 'app/views/' . $_layout . '.layout.' . $this->request['_format'];
+          $_layout = Framework::$pathToProject . 'app/views/' . $_layout . '.layout.' . $this->request['_format'];
           
           // render layouts with builder
           ob_start();
