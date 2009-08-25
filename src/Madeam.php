@@ -4,9 +4,6 @@ namespace madeam;
 // Madeam version
 const VERSION = '2.0.0 Alpha';
 
-// directory splitter
-define('DS', DIRECTORY_SEPARATOR);
-
 // .php should be first
 spl_autoload_extensions('.php');
 
@@ -25,7 +22,7 @@ spl_autoload_register('madeam\autoloadFail');
  * These files will be included in 99% of requests so it is more effecient to include them now
  * than for them to be autoloaded.
  */
-$madeamLibrary = dirname(__FILE__) . DS . 'madeam' . DS;
+$madeamLibrary = dirname(__FILE__) . '/madeam/';
 require $madeamLibrary . 'Framework.php';
 require $madeamLibrary . 'Controller.php';
 require $madeamLibrary . 'Inflector.php';
@@ -38,15 +35,15 @@ require $madeamLibrary . 'Cache.php';
  * Define include paths
  */
 
-Framework::$pathToProject = getcwd() . DS;
+Framework::$pathToProject = getcwd() . '/';
 
 set_include_path(
-  Framework::$pathToProject . 'app' . DS . 'models' . DS . PATH_SEPARATOR . 
-  Framework::$pathToProject . 'app' . DS . 'controllers' . DS . PATH_SEPARATOR . 
-  Framework::$pathToProject . 'app' . DS . PATH_SEPARATOR .
-  Framework::$pathToProject . 'app' . DS . 'vendor' . DS . PATH_SEPARATOR .
+  Framework::$pathToProject . 'app/models/' . PATH_SEPARATOR . 
+  Framework::$pathToProject . 'app/controllers/' . PATH_SEPARATOR . 
+  Framework::$pathToProject . 'app/' . PATH_SEPARATOR .
+  Framework::$pathToProject . 'app/vendor/' . PATH_SEPARATOR .
   get_include_path() . PATH_SEPARATOR . 
-  dirname(dirname(dirname(__FILE__))) . DS
+  dirname(dirname(dirname(__FILE__))) . '/'
 );
 
 
@@ -59,7 +56,7 @@ set_include_path(
  */
 function autoload($class) {
   // set class file name)
-  $file = str_replace('_', DS, str_replace('\\', DS, $class)) . '.php'; // PHP 5.3
+  $file = str_replace('_', '/', str_replace('\\', '/', $class)) . '.php'; // PHP 5.3
   
   // checks all the include paths to see if the file exist
   $paths = explode(PATH_SEPARATOR, get_include_path());
@@ -99,19 +96,19 @@ function autoload($class) {
  */
 function autoloadPackage($class) {
   // set class file name)
-  $file = str_replace('_', DS, str_replace('\\', DS, $class)) . '.php'; // PHP 5.3
+  $file = str_replace('_', '/', str_replace('\\', '/', $class)) . '.php'; // PHP 5.3
   $packageNameLength = strlen(strstr($class, '\\'));
   if ($packageNameLength == 0) {
-    $file = $class . DS . 'src' . DS . str_replace('_', DS, $class) . '.php';
+    $file = $class . '/src/' . str_replace('_', '/', $class) . '.php';
   } else {
-    $file = substr($class, 0, -$packageNameLength) . DS . 'src' . DS . str_replace('\\', DS, $class) . '.php';
+    $file = substr($class, 0, -$packageNameLength) . '/src/' . str_replace('\\', '/', $class) . '.php';
   }
   
   // checks all the include paths to see if the file exist
   $paths = explode(PATH_SEPARATOR, get_include_path());
   foreach ($paths as $path) {
-    if (file_exists($path . DS . $file)) {
-      require $path . DS . $file;
+    if (file_exists($path . '/' . $file)) {
+      require $path . '/' . $file;
       return true;
     }
   }
