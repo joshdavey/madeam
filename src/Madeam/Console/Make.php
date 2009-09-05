@@ -11,7 +11,7 @@ class Madeam_Console_Make extends Madeam_Console {
     }
     
     // create full path to application
-    if (!file_exists($path)) { `mkdir -p $path`; }    
+    if (!file_exists($path)) { `mkdir -p $path`; }
     
     $madeam = dirname(dirname(dirname(dirname(__FILE__))));
     echo `cp -rpv {$madeam}/www/ {$path}`;
