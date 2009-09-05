@@ -1,8 +1,10 @@
 <?php
-class madeam\Serialize_Xml {
+namespace madeam\serialize;
+
+class Xml {
   
   public static function encode($data) {
-    $xml = new XmlWriter();
+    $xml = new \XmlWriter();
     $xml->openMemory();
     $xml->startDocument('1.0', 'UTF-8');
     $xml->startElement('data');
@@ -18,7 +20,7 @@ class madeam\Serialize_Xml {
     
   }
   
-  private static function _array2Xml($array, XmlWriter &$xml) {
+  private static function _array2Xml($array, \XmlWriter &$xml) {
     foreach($array as $key => $value) {
       $key = str_replace(" ", '_', $key);
       if(is_array($value)){

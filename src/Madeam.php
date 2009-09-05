@@ -124,11 +124,7 @@ function autoloadPackage($class) {
 function autoloadFail($class) {
   $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
   eval("class $class {}");
-  try {
-    throw new Exception\AutoloadFail('Missing Class ' . $class);
-  } catch (Exception\AutoloadFail $e) {
-    debug($e);
-  }
+  throw new Exception\AutoloadFail('Missing Class ' . $class);
 }
 
 

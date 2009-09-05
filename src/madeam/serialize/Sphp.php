@@ -1,5 +1,7 @@
 <?php
-class madeam\Serialize_Sphp {
+namespace madeam\serialize;
+
+class Sphp {
   
   public static function encode($data) {
     return serialize($data);

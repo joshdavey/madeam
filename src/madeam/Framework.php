@@ -184,29 +184,30 @@ class Framework {
     $controllerClass = implode('\\', $controllerClassNodes) . 'Controller';
     
     try {
-      $controller = new $controllerClass($request);
+      $controller = new $controllerClass();
     } catch (Exception\AutoloadFail $e) {
       if (is_dir(PROJECT_PATH . 'app/views/' . $request['_controller'])) {
         $view = $request['_controller'] . '/' . $request['_action'];
         $request['_controller'] = 'app';
-        $controller = new \AppController($request);
+        $controller = new \AppController();
         $controller->view($view);
-      } elseif (is_file(PROJECT_PATH . 'app/views/' . $request['_controller'] . DS . $request['_action'] . '.' . $request['_format'])) {
+      } elseif (is_file(PROJECT_PATH . 'app/views/' . $request['_controller'] . '/' . $request['_action'] . '.' . $request['_format'])) {
         $view = $request['_controller'];
         $request['_action'] = $request['_controller'];
         $request['_controller'] = 'app';
-        $controller = new \AppController($request);
+        $controller = new \AppController();
         $controller->view($view);
       } else {
         // no controller or view found = critical error.
         header("HTTP/1.1 404 Not Found");
-        Exception::catchException($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>app/Controller/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . Inflector::camelize(lcfirst($request['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
+        Exception::handle($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>app/Controller/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . Inflector::camelize(lcfirst($request['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
+        return;
       }
     }
 
     try {
       // process request
-      $response = $controller->process();
+      $response = $controller->process($request);
       
       // delete controller
       unset($controller);
@@ -215,10 +216,12 @@ class Framework {
       return $response;
     } catch (controller\exception\MissingAction $e) {
       header("HTTP/1.1 404 Not Found");
-      Exception::catchException($e);
+      Exception::handle($e);
+      return;
     } catch (controller\exception\MissingView $e) {
       header("HTTP/1.1 404 Not Found");
-      Exception::catchException($e);
+      Exception::handle($e);
+      return;
     }
   }
   
@@ -234,7 +237,7 @@ class Framework {
    * @author Joshua Davey
    */
   public static function cleanUriPath($docRoot, $pathToPublic) {
-    return '/' . substr(str_replace(DS, '/', substr($pathToPublic, strlen($docRoot), -strlen(basename($pathToPublic)))), 0, -1);
+    return '/' . substr(str_replace(DIRECTORY_SEPARATOR, '/', substr($pathToPublic, strlen($docRoot), -strlen(basename($pathToPublic)))), 0, -1);
   }
   
   /**
@@ -249,7 +252,7 @@ class Framework {
    * @author Joshua Davey
    */
   public static function dirtyUriPath($docRoot, $pathToPublic) {
-    return '/' . str_replace(DS, '/', substr(substr($pathToPublic, strlen($docRoot)), 0, -strlen(DS . basename($pathToPublic)))) . 'index.php/';
+    return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr(substr($pathToPublic, strlen($docRoot)), 0, -strlen(DIRECTORY_SEPARATOR . basename($pathToPublic)))) . 'index.php/';
   }
   
   /**
@@ -263,7 +266,7 @@ class Framework {
    * @author Joshua Davey
    */
   public static function pubPath($docRoot, $pathToPublic) {
-    return '/' . str_replace(DS, '/', substr($pathToPublic, strlen($docRoot)));
+    return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr($pathToPublic, strlen($docRoot)));
   }
 
   /**

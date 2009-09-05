@@ -38,7 +38,7 @@ class Exception extends \Exception {
     parent::__construct($message, $code);
   }
 
-  public static function catchException($e, $override = array()) {
+  public static function handle($e, $override = array()) {
 
     if (isset($override['message'])) {
       $message = $override['message'];
@@ -75,7 +75,7 @@ class Exception extends \Exception {
     // clean output buffer
     if (ob_get_level() > 0) { ob_clean(); }
 
-    if (Config::get('enable_debug') == true) {
+    if (Config::get('debug_mode') == true) {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
       

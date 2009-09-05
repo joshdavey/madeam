@@ -16,7 +16,7 @@
  */
 
 // use unicode
-  mb_internal_encoding("UTF-8");
+  // mb_internal_encoding("UTF-8");
 
 // content type to utf8
   header('Content-type: text/html; charset=utf-8');
@@ -43,8 +43,8 @@
     define('MADEAM_ENV', $environemnt);
   }
   
-  require 'app/conf/setup.php';
-  require 'app/conf/routes.php';
+  require 'app/config/setup.php';
+  require 'app/config/routes.php';
   
 // setup Madeam
   madeam\Framework::setup(
@@ -54,8 +54,6 @@
     $_SERVER['QUERY_STRING'],     // example: _uri=&blah=testing
     $_SERVER['REQUEST_METHOD']    // example: GET
   );
-  
-  madeam\debug($_SERVER);
   
 // remove _uri from request
 // _uri is defined in the public/.htaccess file. Many developers may not notice it because of
