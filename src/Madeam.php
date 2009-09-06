@@ -26,6 +26,7 @@ $madeamLibrary = dirname(__FILE__) . '/madeam/';
 require $madeamLibrary . 'Framework.php';
 require $madeamLibrary . 'Controller.php';
 require $madeamLibrary . 'Inflector.php';
+require $madeamLibrary . 'Middleware.php';
 require $madeamLibrary . 'Router.php';
 require $madeamLibrary . 'Config.php';
 require $madeamLibrary . 'Cache.php';
@@ -41,15 +42,16 @@ Framework::$pathToProject = getcwd() . '/';
 set_include_path(
   Framework::$pathToProject . 'app/models/' . PATH_SEPARATOR . 
   Framework::$pathToProject . 'app/controllers/' . PATH_SEPARATOR . 
-  Framework::$pathToProject . 'app/' . PATH_SEPARATOR .
+  Framework::$pathToProject . 'app/middleware/' . PATH_SEPARATOR .
   Framework::$pathToProject . 'app/vendor/' . PATH_SEPARATOR .
+  Framework::$pathToProject . 'app/' . PATH_SEPARATOR .
   get_include_path() . PATH_SEPARATOR . 
   dirname(dirname(dirname(__FILE__))) . '/'
 );
 
 /**
  * Madeam's class Autoloader. This method should be used for autoloading by loading it with spl.
- * Example: spl_autoload_register('madeam\autoloadClass');
+ * Example: spl_autoload_register('madeam\autoload');
  * 
  * @param string $class
  * @author Joshua Davey
@@ -57,7 +59,7 @@ set_include_path(
 function autoload($class) {
   // set class file name)
   $file = str_replace('_', '/', str_replace('\\', '/', $class)) . '.php'; // PHP 5.3
-  
+
   // checks all the include paths to see if the file exist
   $paths = explode(PATH_SEPARATOR, get_include_path());
   foreach ($paths as $path) {

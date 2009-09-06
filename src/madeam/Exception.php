@@ -33,10 +33,6 @@ class Exception extends \Exception {
     "choo choo! Here comes the fail train.",
     "&lt;you&gt;fail&lt;/you&gt;",
   );
-  
-  public function __construct($message = null, $code = 1) {
-    parent::__construct($message, $code);
-  }
 
   public static function handle($e, $override = array()) {
 
@@ -65,11 +61,11 @@ class Exception extends \Exception {
     }
 
     // check if inline errors are enabled and the error is not fatal
-    if (Config::get('inline_errors') === true && in_array($code, array(2, 4, 8, 32, 128, 256, 1024, 2048, 4096, 8192, 16384))) {
-      echo nl2br($message);
-      echo '<br />' . $file . ' on line ' . $line;
-      return;
-    }
+    // if (Config::get('inline_errors') === true && in_array($code, array(2, 4, 8, 32, 128, 256, 1024, 2048, 4096, 8192, 16384))) {
+    //   echo nl2br($message);
+    //   echo '<br />' . $file . ' on line ' . $line;
+    //   return;
+    // }
     
 
     // clean output buffer
@@ -80,12 +76,7 @@ class Exception extends \Exception {
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
       
       // call error controller and pass information
-      $params = array(
-        '_controller' => 'error', 
-        '_action'     => 'debug',
-        '_method'     => 'get',
-        '_layout'     => 1,
-        '_format'     => 'html',
+      $message = array(
         'error'       => nl2br($message),
         'backtrace'   => $e->getTraceAsString(),
         'snippet'     => $snippet,
@@ -94,7 +85,8 @@ class Exception extends \Exception {
         'file'        => $file
       );
       
-      echo Framework::control($params);
+      include 'madeam/src/madeam/exception/template.html.php';
+      exit();
     } else {
       // return 404 error page
       $params = array(

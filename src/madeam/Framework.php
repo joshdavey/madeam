@@ -15,19 +15,14 @@ namespace madeam;
  */
 class Framework {
   
-  public static $requestUri = '/';
-  
-  public static $requestParams = array();
-  
-  public static $environment = 'development';
-  
-  public static $uriPathRoot = '/';
-  
-  public static $uriPathPublic = '/public/';
-  
-  public static $pathToPublic = false;
-  
-  public static $pathToProject = '/';
+  static public $requestUri = '/';
+  static public $requestParams = array();
+  static public $environment = 'development';
+  static public $uriPathRoot = '/';
+  static public $uriPathPublic = '/public/';
+  static public $pathToPublic = false;
+  static public $pathToProject = '/';
+  static public $middleware = array();
   
   
   /**
@@ -37,7 +32,7 @@ class Framework {
    * @param array $request
    * @param array $server
    */
-  public static function setup($request, $server_document_root, $server_request_uri, $server_query_string, $server_request_method) {
+  static public function setup($request, $server_document_root, $server_request_uri, $server_query_string, $server_request_method) {
     
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
     if (substr($server_document_root, - 1) != '/') { $server_document_root .= '/'; }
@@ -108,7 +103,7 @@ class Framework {
    * @return boolean
    * @author Joshua Davey
    */
-  public static function dispatch() {
+  static public function dispatch() {
     
     /**
      * This is messed up. I hate the way PHP handles the $_FILES array when using multidimensional arrays in your HTML forms
@@ -131,11 +126,23 @@ class Framework {
     
     self::$requestParams = array_merge_recursive(self::$requestParams, $_files);
     
+    $request = self::$requestParams;
+    
+    // begin middleware
+    foreach (self::$middleware as $class) {
+      $request = $class::beforeRequest($request);
+    }
+    
     // make request
-    $output = self::request(self::$requestUri, self::$requestParams);
+    $response = self::request(self::$requestUri, $request);
+    
+    // end middleware
+    foreach (self::$middleware as $class) {
+      $response = $class::beforeResponse($response);
+    }
     
     // return output
-    return $output;
+    return $response;
   }
 
   /**
@@ -146,7 +153,7 @@ class Framework {
    * @return string
    * @author Joshua Davey
    */
-  public static function request($uri, $request = array()) {
+  static public function request($uri, $request = array()) {
     $request = Router::parse($uri, self::$uriPathRoot, $request + array(
       '_controller' => 'index',
       '_action'     => 'index',
@@ -163,7 +170,7 @@ class Framework {
    * @author Joshua Davey
    * @param array $request
    */
-  public static function control($request) {    
+  static public function control($request) {    
     // because we allow controllers to be grouped into sub folders we need to recognize this when
     // someone tries to access them. For example if someone wants to access the 'admin/index' controller
     // they should be able to just type in 'admin' because 'index' is the default controller in that
@@ -190,12 +197,12 @@ class Framework {
     try {
       $controller = new $controllerClass();
     } catch (Exception\AutoloadFail $e) {
-      if (is_dir(PROJECT_PATH . 'app/views/' . $request['_controller'])) {
+      if (is_dir(self::$pathToProject . 'app/views/' . $request['_controller'])) {
         $view = $request['_controller'] . '/' . $request['_action'];
         $request['_controller'] = 'app';
         $controller = new \AppController();
         $controller->view($view);
-      } elseif (is_file(PROJECT_PATH . 'app/views/' . $request['_controller'] . '/' . $request['_action'] . '.' . $request['_format'])) {
+      } elseif (is_file(self::$pathToProject . 'app/views/' . $request['_controller'] . '/' . $request['_action'] . '.' . $request['_format'])) {
         $view = $request['_controller'];
         $request['_action'] = $request['_controller'];
         $request['_controller'] = 'app';
@@ -203,7 +210,7 @@ class Framework {
         $controller->view($view);
       } else {
         // no controller or view found = critical error.
-        header("HTTP/1.1 404 Not Found");
+        //header("HTTP/1.1 404 Not Found");
         Exception::handle($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>app/Controller/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends Controller_App {\n\n  &nbsp; public function " . Inflector::camelize(lcfirst($request['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
         return;
       }
@@ -219,7 +226,7 @@ class Framework {
       // return response
       return $response;
     } catch (controller\exception\MissingAction $e) {
-      header("HTTP/1.1 404 Not Found");
+      //header("HTTP/1.1 404 Not Found");
       Exception::handle($e);
       return;
     } catch (controller\exception\MissingView $e) {
@@ -240,7 +247,7 @@ class Framework {
    * @param $pathToPublic
    * @author Joshua Davey
    */
-  public static function cleanUriPath($docRoot, $pathToPublic) {
+  static public function cleanUriPath($docRoot, $pathToPublic) {
     return '/' . substr(str_replace(DIRECTORY_SEPARATOR, '/', substr($pathToPublic, strlen($docRoot), -strlen(basename($pathToPublic)))), 0, -1);
   }
   
@@ -255,7 +262,7 @@ class Framework {
    * @param $pathToPublic
    * @author Joshua Davey
    */
-  public static function dirtyUriPath($docRoot, $pathToPublic) {
+  static public function dirtyUriPath($docRoot, $pathToPublic) {
     return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr(substr($pathToPublic, strlen($docRoot)), 0, -strlen(DIRECTORY_SEPARATOR . basename($pathToPublic)))) . 'index.php/';
   }
   
@@ -269,7 +276,7 @@ class Framework {
    * @param $pathToPublic
    * @author Joshua Davey
    */
-  public static function pubPath($docRoot, $pathToPublic) {
+  static public function pubPath($docRoot, $pathToPublic) {
     return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr($pathToPublic, strlen($docRoot)));
   }
 
@@ -280,7 +287,7 @@ class Framework {
    * @param boolean $exit
    * @author Joshua Davey
    */
-  public static function redirect($url, $exit = true) {
+  static public function redirect($url, $exit = true) {
     if (! headers_sent()) {
       header('Location:  ' . self::url($url));
       if ($exit) {
@@ -308,7 +315,7 @@ class Framework {
    * @return string
    * @author Joshua Davey
    */
-  public static function url($url) {
+  static public function url($url) {
     if ($url == null || $url == '/') {
       return self::$uriPathRoot;
     }

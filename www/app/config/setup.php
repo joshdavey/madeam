@@ -68,6 +68,10 @@ switch (MADEAM_ENV) {
     break;
 }
 
+Framework::$middleware = array(
+  'SessionsMiddleware'
+);
+
 /**
  * Set session path
  */

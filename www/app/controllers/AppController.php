@@ -3,8 +3,7 @@
 class AppController extends madeam\Controller {
   
   protected $beforeAction_setup;
-  
-  protected $afterRender_tidyhtml;
+  //protected $afterRender_tidyhtml;
   
   protected function setup() {
     $this->title = 'Powered By Madeam PHP Framework';

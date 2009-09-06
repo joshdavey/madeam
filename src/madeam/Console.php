@@ -155,7 +155,7 @@ class Console {
     try {
       return $script->$commandName($this->parseArguments($args));
     } catch (Exception $e) {
-      Exception::catchException($e);
+      Exception::handle($e);
     }
 
     // unset arguments -- they are only for first time use

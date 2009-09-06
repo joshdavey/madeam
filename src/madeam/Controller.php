@@ -29,12 +29,6 @@ class Controller {
   public $_output = null;
   
   /**
-   * Configuration for this controller
-   * @var array
-   */
-  public $_setup = array();
-  
-  /**
    * 
    */
   public $_callbacks = array();

@@ -180,7 +180,7 @@ class ActiveRecord extends \madeam\Model {
     } catch (PDOException $e) {
       $trace = $e->getTrace();
       $error = self::$_pdo[$this->_server]->errorInfo();
-      madeam\Exception::catchException($e, array('message' => 'See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[2]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
+      madeam\Exception::handle($e, array('message' => 'See line <strong>' . $trace[2]['line'] . '</strong> in <strong>' . $trace[2]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
     }
   }
   
@@ -199,7 +199,7 @@ class ActiveRecord extends \madeam\Model {
     } catch (PDOException $e) {
       $trace = $e->getTrace();
       $error = self::$_pdo[$this->_server]->errorInfo();
-      madeam\Exception::catchException($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
+      madeam\Exception::handle($e, array('message' => 'See line <strong>' . $trace[3]['line'] . '</strong> in <strong>' . $trace[4]['class'] . "</strong> \n" . $error[2] . "\n" . $sql));
     }
     
     return $link;
@@ -225,7 +225,7 @@ class ActiveRecord extends \madeam\Model {
     } catch (PDOException $e) {
       if (!isset(self::$_pdo[$this->_server]) || !is_object(self::$_pdo[$this->_server])) {
         // if the _pdo variable isn't an object it means it failed to connected
-        madeam\Exception::catchException($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
+        madeam\Exception::handle($e, array('message' => $e->getMessage() . '. Check connection string in setup file.'));
       }
     }
     
