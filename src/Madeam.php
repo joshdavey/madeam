@@ -29,6 +29,7 @@ require $madeamLibrary . 'Inflector.php';
 require $madeamLibrary . 'Router.php';
 require $madeamLibrary . 'Config.php';
 require $madeamLibrary . 'Cache.php';
+require $madeamLibrary . 'View.php';
 
 
 /**
@@ -45,7 +46,6 @@ set_include_path(
   get_include_path() . PATH_SEPARATOR . 
   dirname(dirname(dirname(__FILE__))) . '/'
 );
-
 
 /**
  * Madeam's class Autoloader. This method should be used for autoloading by loading it with spl.

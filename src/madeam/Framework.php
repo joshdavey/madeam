@@ -44,6 +44,10 @@ class Framework {
     
     // set request request
     self::$requestParams = $request;
+    
+    
+    // set views directory -- does this belong here?...
+    View::$path = self::$pathToProject . 'app/views/';
       
     // set path to uri based on whether mod_rewrite is turned on or off.
     if (isset(self::$requestParams['_uri'])) {

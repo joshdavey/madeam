@@ -19,7 +19,7 @@
   // mb_internal_encoding("UTF-8");
 
 // content type to utf8
-  header('Content-type: text/html; charset=utf-8');
+  // header('Content-type: text/html; charset=utf-8');
 
 // set default timezone
   date_default_timezone_set('America/Toronto');
@@ -38,13 +38,13 @@
 // set environment
   $environemnt = apache_getenv('MADEAM_ENV');
   if ($environemnt === false) {
-    define('MADEAM_ENV', require 'env.php');
+    define('MADEAM_ENV', require './env.php');
   } else {
     define('MADEAM_ENV', $environemnt);
   }
   
-  require 'app/config/setup.php';
-  require 'app/config/routes.php';
+  require './app/config/setup.php';
+  require './app/config/routes.php';
   
 // setup Madeam
   madeam\Framework::setup(
