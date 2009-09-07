@@ -126,19 +126,17 @@ class Framework {
     
     self::$requestParams = array_merge_recursive(self::$requestParams, $_files);
     
-    $request = self::$requestParams;
-    
-    // begin middleware
+    // execute beforeRequest middleware
     foreach (self::$middleware as $class) {
-      $request = $class::beforeRequest($request);
+      self::$requestParams = $class::beforeRequest(self::$requestParams);
     }
     
     // make request
-    $response = self::request(self::$requestUri, $request);
+    $response = self::request(self::$requestUri, self::$requestParams);
     
-    // end middleware
+    // execute beforeResponse middleware
     foreach (self::$middleware as $class) {
-      $response = $class::beforeResponse($response);
+      $response = $class::beforeResponse(self::$requestParams, $response);
     }
     
     // return output
@@ -184,7 +182,6 @@ class Framework {
     }
     
     // set controller's class
-    $request['_controller'] = preg_replace("/[^A-Za-z0-9_\-\/]/", null, $request['_controller']); // strip off the dirt
     $controllerClassNodes = explode('/', $request['_controller']);
     foreach ($controllerClassNodes as &$node) {
       $node = Inflector::camelize($node);

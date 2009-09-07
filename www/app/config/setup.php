@@ -69,7 +69,8 @@ switch (MADEAM_ENV) {
 }
 
 Framework::$middleware = array(
-  'SessionsMiddleware'
+  // 'SessionsMiddleware',
+  // 'TidyHtmlMiddleware'
 );
 
 /**

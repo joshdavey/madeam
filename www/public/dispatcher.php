@@ -48,7 +48,7 @@
   
 // setup Madeam
   madeam\Framework::setup(
-    $_REQUEST, 
+    $_GET + $_POST + $_COOKIE,
     $_SERVER['DOCUMENT_ROOT'],    // example: /Users/batman/Sites
     $_SERVER['REQUEST_URI'],      // example: /myblog/ (sub-directory of document root)
     $_SERVER['QUERY_STRING'],     // example: _uri=&blah=testing

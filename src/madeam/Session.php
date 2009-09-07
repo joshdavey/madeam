@@ -11,98 +11,73 @@ namespace madeam;
  * @copyright    Copyright (c) 2009, Joshua Davey
  * @link        http://www.self.com
  * @package      self
- * @version      0.0.6
+ * @version      2.0.0
  * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
 class Session {
 
-  public static $driver;
+  static public $driver = 'madeam\session\PHP';
   
-  public static $flashDataName = '_flash';
-  
-  public static $flashLifeName = '_flashData';
+  static public $flashKey = '_flash';
 
-  public static function start($sess_id = false) {
-    // load session by ID
-    if ($sess_id !== false) {
-      session_id($sess_id);
-    }
+  static public function start($sessionId = false) {
+    $driver = self::$driver;
+    $driver::start($sessionId);
     
-    
-    
-    // start session
-    if (!isset($_SESSION)) {
-      session_start();
-      
-      /*
-      session_set_save_handler(
-        'madeam\Session::open', 
-        'madeam\Session::close', 
-        'madeam\Session::read', 
-        'madeam\Session::write', 
-        'madeam\Session::destroy', 
-        'madeam\Session::gc'
-      );
-      */
-      
-      // handle flash stuff here...
-      if (isset($_SESSION[self::$flashLifeName])) {
-        if (--$_SESSION[self::$flashLifeName] == 0) {
-          unset($_SESSION[self::$flashLifeName]);
-          if (isset($_SESSION[self::$flashDataName])) {
-            unset($_SESSION[self::$flashDataName]);
-          }
+    // flashy
+    $flashes = self::get(self::$flashKey);
+    if (!empty($flashes)) {
+      foreach ($flashes as $key => $pages) {
+        --$flashes[$key];
+        if ($pages == 0) {
+          unset($flashes[$key]);
+          self::delete($key);
         }
       }
-      
+      self::set(self::$flashKey, $flashes);
     }
   }
 
-  public static function destroy() {
-    session_destroy();
+  static public function destroy() {
+    $driver = self::$driver;
+    $driver::destroy();
+  }
+  
+  static public function key() {
+    return sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR'] . time());
   }
 
-  public static function flash($name, $data) {
-    self::flashSet($name, $data);
-  }
-
-  public static function flashSet($name, $data) {
-    if (!isset($_SESSION[self::$flashLifeName])) {
-      $_SESSION[self::$flashLifeName] = 1;
+  static public function set($key, $value, $flash = 0) {
+    $driver = self::$driver;
+    
+    if ($flash != 0) {
+      echo 'flash';
+      $flashes = $driver::get(self::$flashKey);
+      $flashes[$key] = $flash + 1;
+      $driver::set(self::$flashKey, $flashes);
     }
-    $_SESSION[self::$flashDataName][$name] = $data;
+    
+    $driver::set($key, $value);
+  }
+  
+  static public function exists($key) {
+    $driver = self::$driver;
+    return $driver::exists($key);
+  }
+  
+  static public function delete($key) {
+    $driver = self::$driver;
+    $driver::delete($key);
   }
 
-  public static function flashGet($name) {
-    if (isset($_SESSION[self::$flashDataName][$name])) {
-      return $_SESSION[self::$flashDataName][$name];
+  static public function get($key) {
+    $driver = self::$driver;
+    if ($driver::exists($key)) {
+      return $driver::get($key);
     } else {
-      return false;
+      return null;
     }
   }
 
-  public static function flashDestroy($name = false) {
-    if ($name === false) {
-      unset($_SESSION[self::$flashDataName]);
-    } else {
-      unset($_SESSION[self::$flashDataName][$name]);
-    }
-  }
-
-  public static function flashLife($pagesToLive = 1) {
-    $_SESSION[self::$flashLifeName] = $pagesToLive;
-  }
-
-  public static function set($name, $value) {
-    $_SESSION[$name] = $value;
-  }
-
-  public static function get($name) {
-    if (isset($_SESSION[$name])) {
-      return $_SESSION[$name];
-    } else {
-      return false;
-    }
-  }
 }

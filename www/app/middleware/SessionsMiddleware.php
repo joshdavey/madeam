@@ -2,12 +2,22 @@
 class SessionsMiddleware extends madeam\Middleware {
   
   static public function beforeRequest($request) {
-    madeam\Session::start();
+    
+    // check if _sessionid exists. If it doesn't set it.
+    if (!isset($request['_sessionid'])) {
+      $request['_sessionid'] = madeam\Session::key();
+      setcookie('_sessionid', $request['_sessionid']);
+    }
+    
+    echo $request['_sessionid'];
+    
+    // initiate session
+    madeam\Session::start($request['_sessionid']);
     
     return $request;
   }
   
-  static public function beforeResponse($response) {
+  static public function beforeResponse($request, $response) {
     return $response;
   }
   

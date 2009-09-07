@@ -95,9 +95,10 @@ class Router {
    * @return array
    * @author Joshua Davey
    */
-  public static function parse($uri = false, $baseUri = '/', $defaults = array()) {
+  public static function parse($uri = false, $baseUri = '/', $defaults = array()) {    
     // makes sure the first character is "/"
-    if (substr($uri, 0, 1) != '/') { $uri = '/' . $uri; }
+    // if (substr($uri, 0, 1) != '/') { $uri = '/' . $uri; }
+    substr($uri, 0, 1) == '/' ?: $uri = '/' . $uri;
     
     // parse uri
     $parsedURI = parse_url($uri);
@@ -136,14 +137,10 @@ class Router {
     
     
     // add query to params
-    if (isset($query)) {
-      $defaults['_query'] = $query;
-    }
+    !isset($query) ?: $defaults['_query'] = $query;
     
-    // set format
-    if ($format !== false) {
-      $defaults['_format'] = $format;
-    }
+    // set default format
+    $format === false ?: $defaults['_format'] = $format;
 
     // matchs count
     $matchs = 0;

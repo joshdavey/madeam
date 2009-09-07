@@ -132,7 +132,7 @@ class Controller {
     }
     
     // beforeFilter callbacks
-    $this->callback('beforeAction');
+    $this->callback('beforeAction', $request);
     
     // action
     $action = Inflector::camelize($request['_action']) . 'Action';
@@ -176,7 +176,7 @@ class Controller {
     // render
     if ($this->_output === null) {
       // beforeRender callbacks
-      $this->callback('beforeRender');
+      $this->callback('beforeRender', $request);
       
       if (!in_array($request['_format'], $this->_returns)) {
         throw new controller\exception\MissingView('Unaccepted Format "<strong>' . $request['_format'] . '</strong>" in the controller <strong>' . get_class($this) . '</strong>.' . "\n
@@ -188,7 +188,7 @@ class Controller {
     }
     
     // afterRender callbacks
-    $this->callback('afterRender');
+    $this->callback('afterRender', $request);
     
     // return response
     return $this->_output;
@@ -199,13 +199,13 @@ class Controller {
    * Perform a callback.
    * @param string $name
    */
-  public function callback($name, $controller = null, $action = null) {
+  public function callback($name, $request) {
     if (!isset($this->_callbacks[$name])) { return; }    
     foreach ($this->_callbacks[$name] as $callback => $exceptions) {
       // there has to be a better algorithm for this....
-      if (empty($exceptions['only']) || (in_array($controller . '/' . $action, $exceptions['only']) || in_array($controller, $exceptions['only']))) {
-        if (empty($exceptions['except']) || (!in_array($controller . '/' . $action, $exceptions['except']) && !in_array($controller, $exceptions['except']))) {
-          $this->{$callback}();
+      if (empty($exceptions['only']) || (in_array($request['_controller'] . '/' . $request['_action'], $exceptions['only']) || in_array($request['_controller'], $exceptions['only']))) {
+        if (empty($exceptions['except']) || (!in_array($request['_controller'] . '/' . $request['_action'], $exceptions['except']) && !in_array($request['_controller'], $exceptions['except']))) {
+          $this->{$callback}($request);
         }
       }
     }

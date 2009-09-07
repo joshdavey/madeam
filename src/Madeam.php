@@ -50,6 +50,12 @@ set_include_path(
 );
 
 /**
+ * Set global exception handler when an exception isn't caught
+ */
+set_exception_handler('madeam\Exception::handle');
+
+
+/**
  * Madeam's class Autoloader. This method should be used for autoloading by loading it with spl.
  * Example: spl_autoload_register('madeam\autoload');
  * 
