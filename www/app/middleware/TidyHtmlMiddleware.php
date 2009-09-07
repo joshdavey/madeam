@@ -3,7 +3,7 @@ class TidyHtmlMiddleware extends madeam\Middleware {
   
   static public function beforeResponse($request, $response) {
     
-    if ($request['_method'] == 'html') {
+    if ($request['_format'] == 'html') {
       $tidy = new Tidy;
       $tidy->parseString($response, array(
         'wrap'  => 200,

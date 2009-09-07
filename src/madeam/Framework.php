@@ -37,17 +37,13 @@ class Framework {
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
     if (substr($server_document_root, - 1) != '/') { $server_document_root .= '/'; }
     
-    // set request request
-    self::$requestParams = $request;
-    
-    
     // set views directory -- does this belong here?...
     View::$path = self::$pathToProject . 'app/views/';
       
     // set path to uri based on whether mod_rewrite is turned on or off.
-    if (isset(self::$requestParams['_uri'])) {
+    if (isset($request['_uri'])) {
       self::$uriPathRoot = self::cleanUriPath($server_document_root, self::$pathToPublic);
-      self::$requestUri = self::$requestParams['_uri'] . '?' . $server_query_string;
+      self::$requestUri = $request['_uri'] . '?' . $server_query_string;
     } else {
       self::$uriPathRoot = self::dirtyUriPath($server_document_root, self::$pathToPublic);
       $url = explode('index.php', $server_request_uri);
@@ -78,23 +74,25 @@ class Framework {
     }
     
     // set layout if it hasn't already been set
-    if (!isset(self::$requestParams['_layout'])) { self::$requestParams['_layout'] = 1; }
+    isset($request['_layout']) ?: $request['_layout'] = 1;
     
     // set overriding request method -- note: we need to get rid of all the $_SERVER references for testing purposes
     if (isset($server['X_HTTP_METHOD_OVERRIDE'])) {
-      self::$requestParams['_method'] = strtolower($server['X_HTTP_METHOD_OVERRIDE']);
-    } elseif (isset(self::$requestParams['_method']) && $server_request_method == 'POST') {
-      self::$requestParams['_method'] = strtolower($request['_method']);
+      $request['_method'] = strtolower($server['X_HTTP_METHOD_OVERRIDE']);
+    } elseif (isset($request['_method']) && $server_request_method == 'POST') {
+      $request['_method'] = strtolower($request['_method']);
     } else {
-      self::$requestParams['_method'] = strtolower($server_request_method);
+      $request['_method'] = strtolower($server_request_method);
     }
     
     // check if this is an ajax call
     if (isset($server['HTTP_X_REQUESTED_WITH']) && $server['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
-      self::$requestParams['_ajax'] = 1;
+      $request['_ajax'] = 1;
     } else {
-      self::$requestParams['_ajax'] = 0;
+      $request['_ajax'] = 0;
     }
+    
+    return $request;
   }
 
   /**
@@ -103,64 +101,53 @@ class Framework {
    * @return boolean
    * @author Joshua Davey
    */
-  static public function dispatch() {
+  static public function dispatch($request) {
     
     /**
      * This is messed up. I hate the way PHP handles the $_FILES array when using multidimensional arrays in your HTML forms
      */    
-    if (isset($_FILES)) {
-      $_files = array();
-      foreach ($_FILES as $key => $fields) {
-        $_files[$key] = array();
-        foreach ($fields as $field => $files) {
-          if (is_array($files)) {
-            foreach ($files as $file => $value) {
-              $_files[$key][$file][$field] = $value;
-            }
-          } else {
-            $_files[$key] = $fields;
-          }
-        }
-      }
-    }
+    // if (isset($_FILES)) {
+    //       $_files = array();
+    //       foreach ($_FILES as $key => $fields) {
+    //         $_files[$key] = array();
+    //         foreach ($fields as $field => $files) {
+    //           if (is_array($files)) {
+    //             foreach ($files as $file => $value) {
+    //               $_files[$key][$file][$field] = $value;
+    //             }
+    //           } else {
+    //             $_files[$key] = $fields;
+    //           }
+    //         }
+    //       }
+    //     }
+    //     
+    //     $request = array_merge_recursive($request, $_files);
     
-    self::$requestParams = array_merge_recursive(self::$requestParams, $_files);
+    // parse request with router
+    $request = Router::parse(self::$requestUri, self::$uriPathRoot, $request + array(
+      '_controller' => 'index',
+      '_action'     => 'index',
+      '_format'     => 'html'
+    ));
     
     // execute beforeRequest middleware
     foreach (self::$middleware as $class) {
-      self::$requestParams = $class::beforeRequest(self::$requestParams);
+      $request = $class::beforeRequest($request);
     }
     
     // make request
-    $response = self::request(self::$requestUri, self::$requestParams);
+    $response = self::control($request);
     
     // execute beforeResponse middleware
     foreach (self::$middleware as $class) {
-      $response = $class::beforeResponse(self::$requestParams, $response);
+      $response = $class::beforeResponse($request, $response);
     }
     
     // return output
     return $response;
   }
 
-  /**
-   * This is where all the magic starts.
-   *
-   * @param string $uri -- example: controller/action/32?foo=bar
-   * @param array $request
-   * @return string
-   * @author Joshua Davey
-   */
-  static public function request($uri, $request = array()) {
-    $request = Router::parse($uri, self::$uriPathRoot, $request + array(
-      '_controller' => 'index',
-      '_action'     => 'index',
-      '_format'     => 'html'
-    ));
-    
-    return self::control($request);
-  }
-  
   
   /**
    * undocumented 

@@ -21,10 +21,6 @@ class Cache {
   public static $openCaches = array();
   
   public static $memory;
-  
-  public static function __init__() {
-    
-  }
 
   /**
    * Enter description here...

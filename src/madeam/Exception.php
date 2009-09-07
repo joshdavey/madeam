@@ -15,6 +15,9 @@ namespace madeam;
  */
 class Exception extends \Exception {
 
+  static public $inlineErrors = false;
+  static public $debugMode    = false;
+
   private static $funSnippets = array(
     "don't worry, be happy. It could be worse.",
     "did someone make a boo boo?",
@@ -61,7 +64,7 @@ class Exception extends \Exception {
     }
 
     // check if inline errors are enabled and the error is not fatal
-    // if (Config::get('inline_errors') === true && in_array($code, array(2, 4, 8, 32, 128, 256, 1024, 2048, 4096, 8192, 16384))) {
+    // if (self::$inlineErrors === true && in_array($code, array(2, 4, 8, 32, 128, 256, 1024, 2048, 4096, 8192, 16384))) {
     //   echo nl2br($message);
     //   echo '<br />' . $file . ' on line ' . $line;
     //   return;
@@ -71,7 +74,7 @@ class Exception extends \Exception {
     // clean output buffer
     if (ob_get_level() > 0) { ob_clean(); }
 
-    if (Config::get('debug_mode') == true) {
+    if (self::$debugMode === true) {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
       

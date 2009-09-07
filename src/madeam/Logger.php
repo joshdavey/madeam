@@ -21,16 +21,14 @@ register_shutdown_function(array('madeam\Logger', 'save'));
  */
 class Logger {
 
-  public static $logs = array();
-
-  public static $path = false;
+  static public $logs     = array();
+  static public $path     = '/var/log';
+  static public $enable   = false;
+  static public $fileName = 'Y-m';
   
-  public static $fileName = 'Y-m';
-
-  
-  public function write($message, $lvl = 25) {
+  public function write($message, $data = null) {
     $date = date("d-m-o H:i:s");
-    self::$logs[] = array('message' => $message, 'datetime' => $date);
+    self::$logs[] = array('message' => $message, 'datetime' => $date, 'data' => json_encode($data));
   }
 
   public function save() {
@@ -39,7 +37,7 @@ class Logger {
       $requestLog .= $log['datetime'] . ' | ' . $log['message'] . "\n";
     }
 
-    if (Config::get('enable_logger') == true && $requestLog != null) {
+    if (self::$enable == true && $requestLog != null) {
       $requestLog .= '------------------' . "\n";
       file_put_contents(self::$path . date(self::$fileName) . '.txt',  $requestLog, FILE_APPEND | LOCK_EX);
     }

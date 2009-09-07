@@ -26,17 +26,15 @@ $madeamLibrary = dirname(__FILE__) . '/madeam/';
 require $madeamLibrary . 'Framework.php';
 require $madeamLibrary . 'Controller.php';
 require $madeamLibrary . 'Inflector.php';
+require $madeamLibrary . 'Exception.php';
 require $madeamLibrary . 'Middleware.php';
 require $madeamLibrary . 'Router.php';
-require $madeamLibrary . 'Config.php';
-require $madeamLibrary . 'Cache.php';
 require $madeamLibrary . 'View.php';
 
 
 /**
  * Define include paths
  */
-
 Framework::$pathToProject = getcwd() . '/';
 
 set_include_path(

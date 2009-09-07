@@ -15,15 +15,6 @@
  * @author      Joshua Davey
  */
 
-// use unicode
-  // mb_internal_encoding("UTF-8");
-
-// content type to utf8
-  // header('Content-type: text/html; charset=utf-8');
-
-// set default timezone
-  date_default_timezone_set('America/Toronto');
-
 // set current working directory
   $cwd = dirname(dirname($_SERVER['SCRIPT_FILENAME'])); // this is prefered over getcwd() when using symlinks
 
@@ -38,17 +29,17 @@
 // set environment
   $environemnt = apache_getenv('MADEAM_ENV');
   if ($environemnt === false) {
-    define('MADEAM_ENV', require './env.php');
+    madeam\Framework::$environment = require './env.php';
   } else {
-    define('MADEAM_ENV', $environemnt);
+    madeam\Framework::$environment = $environemnt;
   }
   
   require './app/config/setup.php';
   require './app/config/routes.php';
   
 // setup Madeam
-  madeam\Framework::setup(
-    $_GET + $_POST + $_COOKIE,
+  $request = madeam\Framework::setup(
+    $_GET + $_POST + $_COOKIE,    // not always the same as $_REQUEST depending on the php.ini configuration
     $_SERVER['DOCUMENT_ROOT'],    // example: /Users/batman/Sites
     $_SERVER['REQUEST_URI'],      // example: /myblog/ (sub-directory of document root)
     $_SERVER['QUERY_STRING'],     // example: _uri=&blah=testing
@@ -69,4 +60,4 @@
   }
   
 // dispatch handles the request and returns the output  
-  echo madeam\Framework::dispatch();
+  echo madeam\Framework::dispatch($request);
