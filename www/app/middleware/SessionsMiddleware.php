@@ -9,16 +9,10 @@ class SessionsMiddleware extends madeam\Middleware {
       setcookie('_sessionid', $request['_sessionid']);
     }
     
-    echo $request['_sessionid'];
-    
     // initiate session
     madeam\Session::start($request['_sessionid']);
     
     return $request;
-  }
-  
-  static public function beforeResponse($request, $response) {
-    return $response;
   }
   
 }

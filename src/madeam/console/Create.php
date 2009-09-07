@@ -9,7 +9,7 @@ class madeam\Console_Create extends madeam\Console {
    * @param array $params
    * @return boolean
    */
-  public function controller($name, $extends = 'Controller_App', $views = 'index,read,new,edit', $actions = 'index,read,new,create,edit,update,delete', $scaffold = false) {
+  public function controller($name, $extends = 'AppController', $views = 'index,read,new,edit', $actions = 'index,read,new,create,edit,update,delete', $scaffold = false) {
     
     // set controller name and class name
     $nameNodes = explode('/', $name);
@@ -133,7 +133,7 @@ class madeam\Console_Create extends madeam\Console {
     $views_dir = $dir . 'view' . DS;
     
     // define controller class in controller file contents
-    $controllerContents = "<?php\nclass $controllerClassName extends controller_app {";
+    $controllerContents = "<?php\nclass $controllerClassName extends AppController {";
     
     // read scaffold directory for actions
     if ($dh = opendir($actions_dir)) {
