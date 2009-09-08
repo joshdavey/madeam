@@ -39,27 +39,14 @@
   require './app/config/routes.php';
   
 // setup Madeam
-  $request = madeam\Framework::setup(
-    $_GET + $_POST + $_COOKIE,                  // not always the same as $_REQUEST depending on the php.ini configuration
+  madeam\Framework::setup(
     dirname($_SERVER['SCRIPT_FILENAME']) . '/', // example: /Users/batman/Sites/myblog/
-    $_SERVER['DOCUMENT_ROOT'],                  // example: /Users/batman/Sites/
-    $_SERVER['REQUEST_URI'],                    // example: /myblog/ (sub-directory of document root)
-    $_SERVER['QUERY_STRING'],                   // example: _uri=&blah=testing
-    $_SERVER['REQUEST_METHOD']                  // example: GET
+    $_SERVER['DOCUMENT_ROOT']                   // example: /Users/batman/Sites/
   );
   
-// remove _uri from request
-// _uri is defined in the public/.htaccess file. Many developers may not notice it because of
-// it's transparency during development. We unset it here incase developers are using the query string
-// for any reason. An example of where it might be an unexpected problem is when taking the hash of the query
-// string to identify the page. This problem was first noticed in some OpenID libraries
-  unset($_GET['_uri']);
-  unset($_REQUEST['_uri']);
-
-  // remove it from the query string as well
-  if (isset($_SERVER['QUERY_STRING'])) {
-    $_SERVER['QUERY_STRING'] = preg_replace('/&?_uri=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
-  }
-  
 // dispatch handles the request and returns the output  
-  echo madeam\Framework::dispatch($request);
+  echo madeam\Framework::dispatch(
+    $_GET + $_POST + $_COOKIE,  // not always the same as $_REQUEST depending on the php.ini configuration
+    $_SERVER['QUERY_STRING'],   // example: _uri=&blah=testing
+    $_SERVER['REQUEST_METHOD']  // example: GET
+  );

@@ -8,10 +8,10 @@ namespace madeam;
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright    Copyright (c) 2009, Joshua Davey
+ * @copyright   Copyright (c) 2009, Joshua Davey
  * @link        http://www.madeam.com
- * @package      madeam
- * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @package     madeam
+ * @license     http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Inflector {
 
@@ -132,51 +132,8 @@ class Inflector {
   }
 
   /**
-   * This method makes strings more readable to human
-   *
-   * "fooBar"  => "Foo Bar"
-   * "foo_bar" => "Foo Bar"
-   * "foo bar" => "Foo Bar"
-   *
-   * @param string $string
+   * 
    */
-  public static function humanize($string) {
-    return ucwords(preg_replace('/\s\s+/', ' ', self::specialize(' ', $string)));
-  }
-
-  public static function modelClassize($string) {
-    return 'Model_' . self::camelize(self::singalize($string));
-  }
-
-  public static function modelTableize($string) {
-    $string[0] = strtolower($string[0]);
-    return self::underscorize((self::pluralize($string)));
-  }
-
-  public static function modelNameize($string) {
-    $string[0] = strtolower($string[0]);
-    return ucfirst(self::camelize((self::singalize($string))));
-  }
-
-  /**
-   * Takes 2 tables and determine's their has and belongs to many table name
-   *
-   * @param string $table1
-   * @param string $table2
-   * @return string
-   */
-  public static function modelHabtm($table1, $table2) {
-    $models = array(self::modelTableize($table1), self::modelTableize($table2));
-    asort($models);
-    $models = array_values($models);
-    return $models[0] . '_' . $models[1];
-  }
-
-  public static function modelForeignKey($string) {
-    $string[0] = strtolower($string[0]);
-    return self::singalize(self::underscorize($string)) . '_id';
-  }
-
   public static function specialize($char, $string) {
     $escapedChar = preg_quote($char, '/');
     // pad all capitalized strings with replacement character and make the text lowercase.

@@ -30,6 +30,7 @@ switch (madeam\Framework::$environment) {
 
 // add middleware
 madeam\Framework::$middleware = array(
+  'madeam\middleware\Common'
   // 'SessionsMiddleware',
   // 'TidyHtmlMiddleware'
 );

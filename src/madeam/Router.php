@@ -8,10 +8,10 @@ namespace madeam;
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright    Copyright (c) 2009, Joshua Davey
+ * @copyright   Copyright (c) 2009, Joshua Davey
  * @link        http://www.madeam.com
- * @package      madeam
- * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @package     madeam
+ * @license     http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class Router {
 

@@ -29,7 +29,7 @@ class Framework {
    * @param array $request
    * @param array $server
    */
-  static public function setup($request, $application_document_root, $server_document_root, $server_request_uri, $server_query_string, $server_request_method) {
+  static public function setup($application_document_root, $server_document_root) {
     
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
     if (substr($server_document_root, - 1) != '/') { $server_document_root .= '/'; }
@@ -37,26 +37,11 @@ class Framework {
     // set views directory -- does this belong here?...
     View::$path = self::$pathToProject . 'app/views/';
     
-    // set query string
-    $request['_query'] = $server_query_string;
-    
-    // set path to uri based on whether mod_rewrite is turned on or off.
-    if (isset($request['_uri'])) {
-      self::$uriPathDynamic = self::cleanUriPath($server_document_root, $application_document_root);
-    } else {
-      self::$uriPathDynamic = self::dirtyUriPath($server_document_root, $application_document_root);
-      $url = explode('index.php', $server_request_uri);
-      // check if it split into 2 peices.
-      // If it didn't then there is an ending "index.php" so we assume there is no URI on the end either
-      if (isset($url[1])) {
-        $request['_uri'] = $url[1];
-      } else {
-        $request['_uri'] = '/';
-      }
-    }
+    // determine dynamic uri path
+    self::$uriPathDynamic = self::parseDynamicUri($server_document_root, $application_document_root);
     
     // determine the relative path to the public directory
-    self::$uriPathStatic = self::staticPath($server_document_root, $application_document_root);
+    self::$uriPathStatic = self::parseStaticUri($server_document_root, $application_document_root);
     
     // if the absolute path to the public directory can't be established based on the uriPathStatic
     // we've derived then it's likely the developer is using symlinks to point to their project.
@@ -71,6 +56,23 @@ class Framework {
       self::$uriPathStatic = '/';
       self::$uriPathDynamic = '/';
     }
+  }
+
+  /**
+   * dispatches all operations to controller specified by uri
+   *
+   * @return boolean
+   * @author Joshua Davey
+   */
+  static public function dispatch($request, $server_query_string, $server_request_method) {
+    
+    // set path to uri based on whether mod_rewrite is turned on or off.
+    if (!isset($request['_uri'])) {
+      throw new Exception('URLs not being re-written properly');
+    }
+    
+    // set query string
+    $request['_query'] = $server_query_string;
     
     // set layout if it hasn't already been set
     isset($request['_layout']) ?: $request['_layout'] = 1;
@@ -90,17 +92,6 @@ class Framework {
     } else {
       $request['_ajax'] = 0;
     }
-    
-    return $request;
-  }
-
-  /**
-   * dispatches all operations to controller specified by uri
-   *
-   * @return boolean
-   * @author Joshua Davey
-   */
-  static public function dispatch($request) {
     
     // parse request with router
     $request = Router::parse($request['_uri'] . '?' . $request['_query'], self::$uriPathDynamic, $request + array(
@@ -209,23 +200,8 @@ class Framework {
    * @param $applicationDocumentRoot
    * @author Joshua Davey
    */
-  static public function cleanUriPath($serverDocumentRoot, $applicationDocumentRoot) {
+  static public function parseDynamicUri($serverDocumentRoot, $applicationDocumentRoot) {
     return '/' . substr(str_replace(DIRECTORY_SEPARATOR, '/', substr($applicationDocumentRoot, strlen($serverDocumentRoot), -strlen(basename($applicationDocumentRoot)))), 0, -1) . '/';
-  }
-  
-  /**
-   * This method returns a base uri path but includes the "index.php" at the end, hence the dirty part. This is used
-   * for sites that don't have mod_rewrite enabled and required the "index.php" at the end.
-   * 
-   * /apache/document_root/website/  => /website/index.php/
-   * /apache/document_root/          => /index.php/
-   * 
-   * @param $serverDocumentRoot 
-   * @param $applicationDocumentRoot
-   * @author Joshua Davey
-   */
-  static public function dirtyUriPath($serverDocumentRoot, $applicationDocumentRoot) {
-    return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr(substr($applicationDocumentRoot, strlen($serverDocumentRoot)), 0, -strlen(DIRECTORY_SEPARATOR . basename($applicationDocumentRoot)))) . 'index.php/';
   }
   
   /**
@@ -238,7 +214,7 @@ class Framework {
    * @param $applicationDocumentRoot
    * @author Joshua Davey
    */
-  static public function staticPath($serverDocumentRoot, $applicationDocumentRoot) {
+  static public function parseStaticUri($serverDocumentRoot, $applicationDocumentRoot) {
     return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr($applicationDocumentRoot, strlen($serverDocumentRoot)));
   }
 

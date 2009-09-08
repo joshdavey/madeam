@@ -101,7 +101,7 @@ function autoload($class) {
  * @author Joshua Davey
  */
 function autoloadPackage($class) {
-  // set class file name)
+  // set class file name
   $file = str_replace('_', '/', str_replace('\\', '/', $class)) . '.php'; // PHP 5.3
   $packageNameLength = strlen(strstr($class, '\\'));
   if ($packageNameLength == 0) {
@@ -128,9 +128,9 @@ function autoloadPackage($class) {
  * @author Joshua Davey
  */
 function autoloadFail($class) {
-  $class = preg_replace("/[^A-Za-z0-9_]/", null, $class); // clean the dirt
+  $class = preg_replace("/[^A-Za-z0-9_\\\]/", null, $class); // clean the dirt
   eval("class $class {}");
-  throw new Exception\AutoloadFail('Missing Class ' . $class);
+  //throw new Exception\AutoloadFail('Missing Class ' . $class);
 }
 
 
