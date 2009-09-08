@@ -16,8 +16,8 @@ namespace madeam;
 class Framework {
   
   static public $environment = 'development';
-  static public $uriPathRoot = '/';
-  static public $uriPathPublic = '/public/';
+  static public $uriPathDynamic = '/';
+  static public $uriPathStatic = '/public/';
   static public $pathToProject = '/';
   static public $middleware = array();
   
@@ -42,9 +42,9 @@ class Framework {
     
     // set path to uri based on whether mod_rewrite is turned on or off.
     if (isset($request['_uri'])) {
-      self::$uriPathRoot = self::cleanUriPath($server_document_root, $application_document_root);
+      self::$uriPathDynamic = self::cleanUriPath($server_document_root, $application_document_root);
     } else {
-      self::$uriPathRoot = self::dirtyUriPath($server_document_root, $application_document_root);
+      self::$uriPathDynamic = self::dirtyUriPath($server_document_root, $application_document_root);
       $url = explode('index.php', $server_request_uri);
       // check if it split into 2 peices.
       // If it didn't then there is an ending "index.php" so we assume there is no URI on the end either
@@ -56,9 +56,9 @@ class Framework {
     }
     
     // determine the relative path to the public directory
-    self::$uriPathPublic = self::pubPath($server_document_root, $application_document_root);
+    self::$uriPathStatic = self::staticPath($server_document_root, $application_document_root);
     
-    // if the absolute path to the public directory can't be established based on the uriPathPublic
+    // if the absolute path to the public directory can't be established based on the uriPathStatic
     // we've derived then it's likely the developer is using symlinks to point to their project.
     // In this case we can't determine the paths.
     // Most likely the user has advanced priveledges and is able to set the DocumentRoot in the apache
@@ -67,9 +67,9 @@ class Framework {
     // 
     // Therefore if the developer is using symlinks they must point their DocumentRoot to Madeam's public
     // directory or everything will explode.
-    if (!file_exists($server_document_root . self::$uriPathPublic)) {
-      self::$uriPathPublic = '/';
-      self::$uriPathRoot = '/';
+    if (!file_exists($server_document_root . self::$uriPathStatic)) {
+      self::$uriPathStatic = '/';
+      self::$uriPathDynamic = '/';
     }
     
     // set layout if it hasn't already been set
@@ -103,7 +103,7 @@ class Framework {
   static public function dispatch($request) {
     
     // parse request with router
-    $request = Router::parse($request['_uri'] . '?' . $request['_query'], self::$uriPathRoot, $request + array(
+    $request = Router::parse($request['_uri'] . '?' . $request['_query'], self::$uriPathDynamic, $request + array(
       '_controller' => 'index',
       '_action'     => 'index',
       '_format'     => 'html'
@@ -238,7 +238,7 @@ class Framework {
    * @param $pathToPublic
    * @author Joshua Davey
    */
-  static public function pubPath($docRoot, $pathToPublic) {
+  static public function staticPath($docRoot, $pathToPublic) {
     return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr($pathToPublic, strlen($docRoot)));
   }
 
@@ -279,14 +279,14 @@ class Framework {
    */
   static public function url($url) {
     if ($url == null || $url == '/') {
-      return self::$uriPathRoot;
+      return self::$uriPathDynamic;
     }
 
     if (substr($url, 0, 1) != "#") {
       if (substr($url, 0, 1) == '/') {
-        $url = self::$uriPathPublic . substr($url, 1, strlen($url));
+        $url = self::$uriPathStatic . substr($url, 1, strlen($url));
       } elseif (! preg_match('/^[a-z]+:/', $url, $matchs)) {
-        $url = self::$uriPathRoot . $url;
+        $url = self::$uriPathDynamic . $url;
       }
     }
     return $url;
