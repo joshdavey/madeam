@@ -205,12 +205,12 @@ class Framework {
    * /apache/document_root/website/  => /website/
    * /apache/document_root/          => /
    * 
-   * @param $docRoot 
-   * @param $pathToPublic
+   * @param $serverDocumentRoot 
+   * @param $applicationDocumentRoot
    * @author Joshua Davey
    */
-  static public function cleanUriPath($docRoot, $pathToPublic) {
-    return '/' . substr(str_replace(DIRECTORY_SEPARATOR, '/', substr($pathToPublic, strlen($docRoot), -strlen(basename($pathToPublic)))), 0, -1) . '/';
+  static public function cleanUriPath($serverDocumentRoot, $applicationDocumentRoot) {
+    return '/' . substr(str_replace(DIRECTORY_SEPARATOR, '/', substr($applicationDocumentRoot, strlen($serverDocumentRoot), -strlen(basename($applicationDocumentRoot)))), 0, -1) . '/';
   }
   
   /**
@@ -220,12 +220,12 @@ class Framework {
    * /apache/document_root/website/  => /website/index.php/
    * /apache/document_root/          => /index.php/
    * 
-   * @param $docRoot 
-   * @param $pathToPublic
+   * @param $serverDocumentRoot 
+   * @param $applicationDocumentRoot
    * @author Joshua Davey
    */
-  static public function dirtyUriPath($docRoot, $pathToPublic) {
-    return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr(substr($pathToPublic, strlen($docRoot)), 0, -strlen(DIRECTORY_SEPARATOR . basename($pathToPublic)))) . 'index.php/';
+  static public function dirtyUriPath($serverDocumentRoot, $applicationDocumentRoot) {
+    return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr(substr($applicationDocumentRoot, strlen($serverDocumentRoot)), 0, -strlen(DIRECTORY_SEPARATOR . basename($applicationDocumentRoot)))) . 'index.php/';
   }
   
   /**
@@ -234,12 +234,12 @@ class Framework {
    * /apache/document_root/website/  => /website/public/
    * /apache/document_root/          => /public/
    * 
-   * @param $docRoot
-   * @param $pathToPublic
+   * @param $serverDocumentRoot
+   * @param $applicationDocumentRoot
    * @author Joshua Davey
    */
-  static public function staticPath($docRoot, $pathToPublic) {
-    return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr($pathToPublic, strlen($docRoot)));
+  static public function staticPath($serverDocumentRoot, $applicationDocumentRoot) {
+    return '/' . str_replace(DIRECTORY_SEPARATOR, '/', substr($applicationDocumentRoot, strlen($serverDocumentRoot)));
   }
 
   /**
