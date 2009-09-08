@@ -34,16 +34,18 @@
     madeam\Framework::$environment = $environemnt;
   }
   
+// include config files
   require './app/config/setup.php';
   require './app/config/routes.php';
   
 // setup Madeam
   $request = madeam\Framework::setup(
-    $_GET + $_POST + $_COOKIE,    // not always the same as $_REQUEST depending on the php.ini configuration
-    $_SERVER['DOCUMENT_ROOT'],    // example: /Users/batman/Sites
-    $_SERVER['REQUEST_URI'],      // example: /myblog/ (sub-directory of document root)
-    $_SERVER['QUERY_STRING'],     // example: _uri=&blah=testing
-    $_SERVER['REQUEST_METHOD']    // example: GET
+    $_GET + $_POST + $_COOKIE,                  // not always the same as $_REQUEST depending on the php.ini configuration
+    dirname($_SERVER['SCRIPT_FILENAME']) . '/', // example: /Users/batman/Sites/myblog/
+    $_SERVER['DOCUMENT_ROOT'],                  // example: /Users/batman/Sites/
+    $_SERVER['REQUEST_URI'],                    // example: /myblog/ (sub-directory of document root)
+    $_SERVER['QUERY_STRING'],                   // example: _uri=&blah=testing
+    $_SERVER['REQUEST_METHOD']                  // example: GET
   );
   
 // remove _uri from request

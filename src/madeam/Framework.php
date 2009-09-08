@@ -15,12 +15,9 @@ namespace madeam;
  */
 class Framework {
   
-  static public $requestUri = '/';
-  static public $requestParams = array();
   static public $environment = 'development';
   static public $uriPathRoot = '/';
   static public $uriPathPublic = '/public/';
-  static public $pathToPublic = false;
   static public $pathToProject = '/';
   static public $middleware = array();
   
@@ -32,32 +29,34 @@ class Framework {
    * @param array $request
    * @param array $server
    */
-  static public function setup($request, $server_document_root, $server_request_uri, $server_query_string, $server_request_method) {
+  static public function setup($request, $application_document_root, $server_document_root, $server_request_uri, $server_query_string, $server_request_method) {
     
     // add ending / to document root if it doesn't exist -- important because it differs from unix to windows (or I think that's what it is)
     if (substr($server_document_root, - 1) != '/') { $server_document_root .= '/'; }
     
     // set views directory -- does this belong here?...
     View::$path = self::$pathToProject . 'app/views/';
-      
+    
+    // set query string
+    $request['_query'] = $server_query_string;
+    
     // set path to uri based on whether mod_rewrite is turned on or off.
     if (isset($request['_uri'])) {
-      self::$uriPathRoot = self::cleanUriPath($server_document_root, self::$pathToPublic);
-      self::$requestUri = $request['_uri'] . '?' . $server_query_string;
+      self::$uriPathRoot = self::cleanUriPath($server_document_root, $application_document_root);
     } else {
-      self::$uriPathRoot = self::dirtyUriPath($server_document_root, self::$pathToPublic);
+      self::$uriPathRoot = self::dirtyUriPath($server_document_root, $application_document_root);
       $url = explode('index.php', $server_request_uri);
       // check if it split into 2 peices.
       // If it didn't then there is an ending "index.php" so we assume there is no URI on the end either
       if (isset($url[1])) {
-        self::$requestUri = $url[1];
+        $request['_uri'] = $url[1];
       } else {
-        self::$requestUri = '/';
+        $request['_uri'] = '/';
       }
     }
     
     // determine the relative path to the public directory
-    self::$uriPathPublic = self::pubPath($server_document_root, self::$pathToPublic);  
+    self::$uriPathPublic = self::pubPath($server_document_root, $application_document_root);
     
     // if the absolute path to the public directory can't be established based on the uriPathPublic
     // we've derived then it's likely the developer is using symlinks to point to their project.
@@ -103,29 +102,8 @@ class Framework {
    */
   static public function dispatch($request) {
     
-    /**
-     * This is messed up. I hate the way PHP handles the $_FILES array when using multidimensional arrays in your HTML forms
-     */    
-    // if (isset($_FILES)) {
-    //       $_files = array();
-    //       foreach ($_FILES as $key => $fields) {
-    //         $_files[$key] = array();
-    //         foreach ($fields as $field => $files) {
-    //           if (is_array($files)) {
-    //             foreach ($files as $file => $value) {
-    //               $_files[$key][$file][$field] = $value;
-    //             }
-    //           } else {
-    //             $_files[$key] = $fields;
-    //           }
-    //         }
-    //       }
-    //     }
-    //     
-    //     $request = array_merge_recursive($request, $_files);
-    
     // parse request with router
-    $request = Router::parse(self::$requestUri, self::$uriPathRoot, $request + array(
+    $request = Router::parse($request['_uri'] . '?' . $request['_query'], self::$uriPathRoot, $request + array(
       '_controller' => 'index',
       '_action'     => 'index',
       '_format'     => 'html'
@@ -232,7 +210,7 @@ class Framework {
    * @author Joshua Davey
    */
   static public function cleanUriPath($docRoot, $pathToPublic) {
-    return '/' . substr(str_replace(DIRECTORY_SEPARATOR, '/', substr($pathToPublic, strlen($docRoot), -strlen(basename($pathToPublic)))), 0, -1);
+    return '/' . substr(str_replace(DIRECTORY_SEPARATOR, '/', substr($pathToPublic, strlen($docRoot), -strlen(basename($pathToPublic)))), 0, -1) . '/';
   }
   
   /**
