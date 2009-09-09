@@ -1,5 +1,6 @@
 <?php
-class SessionsMiddleware extends madeam\Middleware {
+namespace madeam\middleware;
+class Sessions extends \madeam\Middleware {
   
   static public function beforeRequest($request) {
     
@@ -8,15 +9,15 @@ class SessionsMiddleware extends madeam\Middleware {
     
     // check if _sessionid exists. If it doesn't set it.
     if (!isset($request['_sessionid'])) {
-      $request['_sessionid'] = madeam\Session::key();
+      $request['_sessionid'] = \madeam\Session::key();
       setcookie('_sessionid', $request['_sessionid']);
     }
     
     // configure sessions
-    session_save_path(madeam\Framework::$pathToProject . 'etc/session');
+    session_save_path(\madeam\Framework::$pathToProject . 'etc/session');
     
     // initiate session
-    madeam\Session::start($request['_sessionid']);
+    \madeam\Session::start($request['_sessionid']);
     
     return $request;
   }

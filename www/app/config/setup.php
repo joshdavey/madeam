@@ -4,35 +4,37 @@ switch (madeam\Framework::$environment) {
     madeam\Exception::$inlineErrors  = true;
     madeam\Exception::$debugMode     = true;
     
-    activerecord\Configure::$connections = array(
-      'default' => array(
-        'master' => "mysql://username:password@localhost?name=madeam_development",
-        'slaves' => array(
-          "mysql://username:password@localhost?name=madeam_development",
-          "mysql://username:password@localhost?name=madeam_development"
-        )
-      )
-    );
+    // activerecord\Configure::$connections = array(
+    //   'default' => array(
+    //     'master' => "mysql://username:password@localhost?name=madeam_development",
+    //     'slaves' => array(
+    //       "mysql://username:password@localhost?name=madeam_development",
+    //       "mysql://username:password@localhost?name=madeam_development"
+    //     )
+    //   )
+    // );
   break;  
   case 'production' :
     madeam\Exception::$inlineErrors  = false;
     madeam\Exception::$debugMode     = false;
     
-    activerecord\Configure::$connections = array(
-      'master' => "mysql://username:password@localhost?name=madeam_production",
-      'slaves' => array(
-        "mysql://username:password@localhost?name=madeam_production",
-        "mysql://username:password@localhost?name=madeam_production"
-      )
-    );
+    // activerecord\Configure::$connections = array(
+    //   'default' => array(
+    //     'master' => "mysql://username:password@localhost?name=madeam_production",
+    //     'slaves' => array(
+    //       "mysql://username:password@localhost?name=madeam_production",
+    //       "mysql://username:password@localhost?name=madeam_production"
+    //     )
+    //   )
+    // );
   break;
 }
 
 // add middleware
 madeam\Framework::$middleware = array(
-  'madeam\middleware\Common'
-  // 'SessionsMiddleware',
-  // 'TidyHtmlMiddleware'
+  // 'madeam\middleware\Common',
+  // 'madeam\middleware\Sessions',
+  // 'madeam\middleware\Tidy',
 );
 
 // set default timezone

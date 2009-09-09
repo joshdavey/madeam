@@ -1,5 +1,6 @@
 <?php
-class TidyHtmlMiddleware extends madeam\Middleware {
+namespace madeam\middleware;
+class Tidy extends \madeam\Middleware {
   
   static public function beforeResponse($request, $response) {
     
