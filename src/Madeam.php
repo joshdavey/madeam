@@ -83,19 +83,19 @@ function autoload($class) {
  * The difference is that PEAR assumes pacakges are always within the PEAR directory. This version
  * only expects the package to be in its on directory within an include path. 
  * 
- * PackageName/
+ * packagename/
  *  doc/
  *  src/
  *    PackageName.php
- *    PackageName/
+ *    packagename/
  *  tests/
  *    PackageNameTest.php
- *    PackageName/
+ *    packagename/
  * 
  * Here are some example classes and their location
  *  madeam                => madeam/src/Madeam.php
  *  madeam\Controller     => madeam/src/madeam/Controller.php
- *  madeam\Serialize_Json => madeam/src/madeam/Serialize/Json.php
+ *  madeam\serialize\Json => madeam/src/madeam/serialize/Json.php
  * 
  * @param string $class
  * @author Joshua Davey
