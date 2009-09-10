@@ -7,11 +7,11 @@
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright    Copyright (c) 2009, Joshua Davey
+ * @copyright   Copyright (c) 2009, Joshua Davey
  * @link        http://www.madeam.com
- * @package      madeam
- * @version      2.0.0
- * @license      http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @package     madeam
+ * @version     2.0.0
+ * @license     http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author      Joshua Davey
  */
 

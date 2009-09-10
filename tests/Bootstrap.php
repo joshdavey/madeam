@@ -3,26 +3,21 @@
   error_reporting(E_ALL);
 
 // define test constants
-  define('TESTS_MADEAM_APP_DIRECTORY',    realpath('Madeam/_application/') . DIRECTORY_SEPARATOR);
-  define('TESTS_MADEAM_APPSRC_DIRECTORY', realpath('Madeam/_application/app/src') . DIRECTORY_SEPARATOR);
-  define('TESTS_MADEAM_ETC_DIRECTORY',    realpath('Madeam/_application/etc') . DIRECTORY_SEPARATOR);
-  define('TESTS_MADEAM_LIB_DIRECTORY',    realpath('../..') . DIRECTORY_SEPARATOR);
-  define('TESTS_MADEAM_TESTS_DIRECTORY',  realpath('.') . DIRECTORY_SEPARATOR);
-
-// configure Madeam paths  
-  $paths = array(
-    TESTS_MADEAM_APPSRC_DIRECTORY,  // application src path
-    TESTS_MADEAM_LIB_DIRECTORY,     // lib path
-    TESTS_MADEAM_TESTS_DIRECTORY    // tests path
-  );
-  
-// set include path
-  set_include_path(implode(PATH_SEPARATOR, $paths) . PATH_SEPARATOR . get_include_path());
+  define('TESTS_MADEAM_PROJECT_DIRECTORY', __DIR__ . '/madeam/_www/');
 
 // include madeam (required for autoloader)
-  require_once '../src/Madeam.php';
+  require_once dirname(__DIR__) . '/src/Madeam.php';
   
-  echo get_include_path();
+// set include path  
+  set_include_path(
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/models/' . PATH_SEPARATOR . 
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/controllers/' . PATH_SEPARATOR . 
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/middleware/' . PATH_SEPARATOR .
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/vendor/' . PATH_SEPARATOR .
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/' . PATH_SEPARATOR .
+    get_include_path() . PATH_SEPARATOR . 
+    __DIR__ . '/' 
+  );
 
 // reset error and exception handlers
   restore_error_handler();

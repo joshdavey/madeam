@@ -16,7 +16,7 @@ namespace madeam;
  */
 class Session {
 
-  static public $driver = 'madeam\session\PHP';  
+  static public $driver   = 'madeam\session\PHP';  
   static public $flashKey = '_flash';
 
   static public function start($sessionId = false) {
@@ -50,7 +50,6 @@ class Session {
     $driver = self::$driver;
     
     if ($flash != 0) {
-      echo 'flash';
       $flashes = $driver::get(self::$flashKey);
       $flashes[$key] = $flash + 1;
       $driver::set(self::$flashKey, $flashes);

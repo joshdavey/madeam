@@ -4,9 +4,6 @@ namespace madeam;
 // Madeam version
 const VERSION = '2.0.0 Alpha';
 
-// .php should be first
-spl_autoload_extensions('.php');
-
 // idea... use this as a last resort when all autoloads fail.
 // have this one throw an exception or make a last resort to check every path for the file.
 spl_autoload_register('madeam\autoload');
@@ -147,8 +144,7 @@ function autoloadFail($class) {
 
 
 /**
- * This function exists as a quick tool for developers to test
- * if a function executes and how many times.
+ * Debug tool for developers
  */
 function debug($var = null) {
   static $tests;
@@ -184,7 +180,6 @@ function debug($var = null) {
 
 /**
  * Wrapper for htmlentities
- * @author Joshua Davey
  * @param string $string
  */
 function h($string) {

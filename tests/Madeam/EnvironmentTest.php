@@ -1,22 +1,16 @@
 <?php
+namespace madeam;
 require_once 'Bootstrap.php';
-
-/**
- * undocumented 
- *
- * @author Joshua Davey
- */
-class madeam\EnvironmentTest extends PHPUnit_Framework_TestCase {
+class EnvironmentTest extends \PHPUnit_Framework_TestCase {
  
   /**
-   * Madeam Requires that version 5.2.3 or greater of PHP be running. 
-   * Features such as call_user_func with dynamic class static method calls are only possibly as of 5.2.3
+   * Madeam Requires that version 5.3.0 or greater of PHP be running.
    * @author Joshua Davey
    */
-  public function testPHPVersionIs523OrGreater() {
+  public function testPHPVersionIs53OrGreater() {
     $version = explode('.', phpversion());
     
-    if (((int) $version[0] == 5 && (int) $version[1] >= 2 && (int) $version[2] >= 3) || ((int) $version[0] == 5 && (int) $version[1] >= 3)) {
+    if (((int) $version[0] == 5 && (int) $version[1] >= 3)) {
       $this->assertTrue(true);
     } else {
       $this->fail('Invalid version of PHP');
@@ -29,8 +23,8 @@ class madeam\EnvironmentTest extends PHPUnit_Framework_TestCase {
    * @author Joshua Davey
    */
   public function testRequestOrderIsEGPCS() {
-    //$this->assertEquals('EGPCS', ini_get('request_order')); // PHP 5.3
-    $this->assertEquals('EGPCS', ini_get('variables_order'));
+    $this->assertEquals('EGPCS', ini_get('request_order')); // PHP 5.3
+    //$this->assertEquals('EGPCS', ini_get('variables_order'));
   }
   
   

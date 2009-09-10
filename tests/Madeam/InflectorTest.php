@@ -1,37 +1,37 @@
 <?php
+namespace madeam;
 require_once 'Bootstrap.php';
-
-class madeam\InflectorTest extends PHPUnit_Framework_TestCase {
+class InflectorTest extends \PHPUnit_Framework_TestCase {
   
   public function testSingalizeIrregular() {
-    $this->assertEquals('person', madeam\Inflector::singalize('people'));
+    $this->assertEquals('person', Inflector::singalize('people'));
   }
   
   public function testSingalizeRegular() {
-    $this->assertEquals('test', madeam\Inflector::singalize('tests'));
+    $this->assertEquals('test', Inflector::singalize('tests'));
   }
   
   public function testPluralizeIrregular() {
-    $this->assertEquals('people', madeam\Inflector::pluralize('person'));
+    $this->assertEquals('people', Inflector::pluralize('person'));
   }
   
   public function testPluralizeRegular() {
-    $this->assertEquals('tests', madeam\Inflector::pluralize('test'));
+    $this->assertEquals('tests', Inflector::pluralize('test'));
   }
   
   public function testPluralizeEndingWithYPreceededByAVowel() {
-    $this->assertEquals('boys', madeam\Inflector::pluralize('boy'));
+    $this->assertEquals('boys', Inflector::pluralize('boy'));
   }
   
   public function testPluralizeEndingWithYPreceededByAConsonant() {
-    $this->assertEquals('ladies', madeam\Inflector::pluralize('lady'));
+    $this->assertEquals('ladies', Inflector::pluralize('lady'));
   }
   
   /**
    * Words ending with "s" should end with "ses"
    */
   public function testPluralizeEndingWithS() {
-    $this->assertEquals('messes', madeam\Inflector::pluralize('mess'));
+    $this->assertEquals('messes', Inflector::pluralize('mess'));
   }
   
   /**
@@ -66,66 +66,66 @@ class madeam\InflectorTest extends PHPUnit_Framework_TestCase {
    * Words ending with "o" should end with "oes"
    */
   public function testPluralizeEndingWithO() {
-    $this->assertEquals('heroes', madeam\Inflector::pluralize('hero'));
+    $this->assertEquals('heroes', Inflector::pluralize('hero'));
   }
   
   public function testCamelize() {
-    $this->assertEquals('fooBar',     madeam\Inflector::camelize('fooBar'),         'fooBar');
-    $this->assertEquals('fooBar',     madeam\Inflector::camelize('foo\bar'),        'foo\bar');
-    $this->assertEquals('fooBar',     madeam\Inflector::camelize('foo  Bar'),       'foo  Bar');
-    $this->assertEquals('fooBar',     madeam\Inflector::camelize('foo\Bar'),        'foo\Bar');
-    $this->assertEquals('fooBarBar',  madeam\Inflector::camelize('foo\Bar\Bar'),    'foo\Bar\Bar');
-    $this->assertEquals('fooBarBar',  madeam\Inflector::camelize('foo\bar\bar'),    'foo\bar\bar');
+    $this->assertEquals('fooBar',     Inflector::camelize('fooBar'),         'fooBar');
+    $this->assertEquals('fooBar',     Inflector::camelize('foo\bar'),        'foo\bar');
+    $this->assertEquals('fooBar',     Inflector::camelize('foo  Bar'),       'foo  Bar');
+    $this->assertEquals('fooBar',     Inflector::camelize('foo\Bar'),        'foo\Bar');
+    $this->assertEquals('fooBarBar',  Inflector::camelize('foo\Bar\Bar'),    'foo\Bar\Bar');
+    $this->assertEquals('fooBarBar',  Inflector::camelize('foo\bar\bar'),    'foo\bar\bar');
   }
   
   public function testDashize() {
-    $this->assertEquals('foo-bar',      madeam\Inflector::dashize('fooBar'),      'fooBar');
-    $this->assertEquals('foo-bar',      madeam\Inflector::dashize('foo\bar'),     'foo\bar');
-    $this->assertEquals('foo-bar',      madeam\Inflector::dashize('foo Bar'),     'foo Bar');
-    $this->assertEquals('foo-bar',      madeam\Inflector::dashize('foo\Bar'),     'foo\Bar');
-    $this->assertEquals('foo-bar-bar',  madeam\Inflector::dashize('fooBarBar'),   'fooBarBar');
-    $this->assertEquals('foo-barbar',   madeam\Inflector::dashize('fooBARBAR'),   'fooBARBAR');
-    $this->assertEquals('foo-bar',      madeam\Inflector::dashize('fooBAR'),      'fooBAR');
+    $this->assertEquals('foo-bar',      Inflector::dashize('fooBar'),      'fooBar');
+    $this->assertEquals('foo-bar',      Inflector::dashize('foo\bar'),     'foo\bar');
+    $this->assertEquals('foo-bar',      Inflector::dashize('foo Bar'),     'foo Bar');
+    $this->assertEquals('foo-bar',      Inflector::dashize('foo\Bar'),     'foo\Bar');
+    $this->assertEquals('foo-bar-bar',  Inflector::dashize('fooBarBar'),   'fooBarBar');
+    $this->assertEquals('foo-barbar',   Inflector::dashize('fooBARBAR'),   'fooBARBAR');
+    $this->assertEquals('foo-bar',      Inflector::dashize('fooBAR'),      'fooBAR');
   }
   
   public function testUnderscorize() {
-    $this->assertEquals('foo_bar',      madeam\Inflector::underscorize('fooBar'),      'fooBar');
-    $this->assertEquals('foo_bar',      madeam\Inflector::underscorize('foo\bar'),     'foo\bar');
-    $this->assertEquals('foo_bar',      madeam\Inflector::underscorize('foo Bar'),     'foo Bar');
-    $this->assertEquals('foo_bar',      madeam\Inflector::underscorize('foo\Bar'),     'foo\Bar');
-    $this->assertEquals('foo_bar_bar',  madeam\Inflector::underscorize('fooBarBar'),   'fooBarBar');
-    $this->assertEquals('foo_barbar',   madeam\Inflector::underscorize('fooBARBAR'),   'fooBARBAR');
-    $this->assertEquals('foo_bar',      madeam\Inflector::underscorize('fooBAR'),      'fooBAR');
+    $this->assertEquals('foo_bar',      Inflector::underscorize('fooBar'),      'fooBar');
+    $this->assertEquals('foo_bar',      Inflector::underscorize('foo\bar'),     'foo\bar');
+    $this->assertEquals('foo_bar',      Inflector::underscorize('foo Bar'),     'foo Bar');
+    $this->assertEquals('foo_bar',      Inflector::underscorize('foo\Bar'),     'foo\Bar');
+    $this->assertEquals('foo_bar_bar',  Inflector::underscorize('fooBarBar'),   'fooBarBar');
+    $this->assertEquals('foo_barbar',   Inflector::underscorize('fooBARBAR'),   'fooBARBAR');
+    $this->assertEquals('foo_bar',      Inflector::underscorize('fooBAR'),      'fooBAR');
   }
   
   public function testForwardSlashize() {
-    $this->assertEquals('foo/bar',      madeam\Inflector::forwardSlashize('fooBar'),      'fooBar');
-    $this->assertEquals('foo/bar',      madeam\Inflector::forwardSlashize('foo\bar'),     'foo\bar');
-    $this->assertEquals('foo/bar',      madeam\Inflector::forwardSlashize('foo Bar'),     'foo Bar');
-    $this->assertEquals('foo/bar',      madeam\Inflector::forwardSlashize('foo\Bar'),     'foo\Bar');
-    $this->assertEquals('foo/bar/bar',  madeam\Inflector::forwardSlashize('fooBarBar'),   'fooBarBar');
-    $this->assertEquals('foo/barbar',   madeam\Inflector::forwardSlashize('fooBARBAR'),   'fooBARBAR');
-    $this->assertEquals('foo/bar',      madeam\Inflector::forwardSlashize('fooBAR'),      'fooBAR');
+    $this->assertEquals('foo/bar',      Inflector::forwardSlashize('fooBar'),      'fooBar');
+    $this->assertEquals('foo/bar',      Inflector::forwardSlashize('foo\bar'),     'foo\bar');
+    $this->assertEquals('foo/bar',      Inflector::forwardSlashize('foo Bar'),     'foo Bar');
+    $this->assertEquals('foo/bar',      Inflector::forwardSlashize('foo\Bar'),     'foo\Bar');
+    $this->assertEquals('foo/bar/bar',  Inflector::forwardSlashize('fooBarBar'),   'fooBarBar');
+    $this->assertEquals('foo/barbar',   Inflector::forwardSlashize('fooBARBAR'),   'fooBARBAR');
+    $this->assertEquals('foo/bar',      Inflector::forwardSlashize('fooBAR'),      'fooBAR');
   }
   
   public function testBackwardSlashize() {
-    $this->assertEquals('foo\bar',      madeam\Inflector::backSlashize('fooBar'),      'fooBar');
-    $this->assertEquals('foo\\bar',     madeam\Inflector::backSlashize('foo\bar'),     'foo\bar');
-    $this->assertEquals('foo\bar',      madeam\Inflector::backSlashize('foo Bar'),     'foo Bar');
-    $this->assertEquals('foo\\\bar',    madeam\Inflector::backSlashize('foo\Bar'),     'foo\Bar');
-    $this->assertEquals('foo\bar\bar',  madeam\Inflector::backSlashize('fooBarBar'),   'fooBarBar');
-    $this->assertEquals('foo\barbar',   madeam\Inflector::backSlashize('fooBARBAR'),   'fooBARBAR');
-    $this->assertEquals('foo\bar',      madeam\Inflector::backSlashize('fooBAR'),      'fooBAR');
+    $this->assertEquals('foo\bar',      Inflector::backSlashize('fooBar'),      'fooBar');
+    $this->assertEquals('foo\\bar',     Inflector::backSlashize('foo\bar'),     'foo\bar');
+    $this->assertEquals('foo\bar',      Inflector::backSlashize('foo Bar'),     'foo Bar');
+    $this->assertEquals('foo\\\bar',    Inflector::backSlashize('foo\Bar'),     'foo\Bar');
+    $this->assertEquals('foo\bar\bar',  Inflector::backSlashize('fooBarBar'),   'fooBarBar');
+    $this->assertEquals('foo\barbar',   Inflector::backSlashize('fooBARBAR'),   'fooBARBAR');
+    $this->assertEquals('foo\bar',      Inflector::backSlashize('fooBAR'),      'fooBAR');
   }
   
   public function testHumanize() {
-    $this->assertEquals('Foo Bar',      madeam\Inflector::humanize('fooBar'),      'fooBar');
-    $this->assertEquals('Foo Bar',      madeam\Inflector::humanize('foo\bar'),     'foo\bar');
-    $this->assertEquals('Foo Bar',      madeam\Inflector::humanize('foo Bar'),     'foo Bar');
-    $this->assertEquals('Foo Bar',      madeam\Inflector::humanize('foo\Bar'),     'foo\Bar');
-    $this->assertEquals('Foo Bar Bar',  madeam\Inflector::humanize('fooBarBar'),   'fooBarBar');
-    $this->assertEquals('Foo Barbar',   madeam\Inflector::humanize('fooBARBAR'),   'fooBARBAR');
-    $this->assertEquals('Foo Bar',      madeam\Inflector::humanize('fooBAR'),      'fooBAR');
+    $this->assertEquals('Foo Bar',      Inflector::humanize('fooBar'),      'fooBar');
+    $this->assertEquals('Foo Bar',      Inflector::humanize('foo\bar'),     'foo\bar');
+    $this->assertEquals('Foo Bar',      Inflector::humanize('foo Bar'),     'foo Bar');
+    $this->assertEquals('Foo Bar',      Inflector::humanize('foo\Bar'),     'foo\Bar');
+    $this->assertEquals('Foo Bar Bar',  Inflector::humanize('fooBarBar'),   'fooBarBar');
+    $this->assertEquals('Foo Barbar',   Inflector::humanize('fooBARBAR'),   'fooBARBAR');
+    $this->assertEquals('Foo Bar',      Inflector::humanize('fooBAR'),      'fooBAR');
   }
   
   /**
@@ -133,7 +133,7 @@ class madeam\InflectorTest extends PHPUnit_Framework_TestCase {
    */
   public function testSlugSpecialCharactersAreRemovedExceptSeparatorAndUnderscores() {
     $separator = '-';
-    $this->assertEquals($separator, madeam\Inflector::slug('$,!/?\\&.#[]()+=-\'/<>{}|%^*~`', $separator));
+    $this->assertEquals($separator, Inflector::slug('$,!/?\\&.#[]()+=-\'/<>{}|%^*~`', $separator));
   }
   
   /**
@@ -142,7 +142,7 @@ class madeam\InflectorTest extends PHPUnit_Framework_TestCase {
    */
   public function testSlugSpacesAreReplacedWithSeparator() {
     $separator = '-';
-    $this->assertEquals('it' . $separator . 'works', madeam\Inflector::slug('it works!', $separator));
+    $this->assertEquals('it' . $separator . 'works', Inflector::slug('it works!', $separator));
   }
 
 }

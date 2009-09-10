@@ -130,6 +130,19 @@ class Inflector {
   public static function backSlashize($string) {
     return self::specialize('\\', $string);
   }
+  
+  /**
+     * This method makes strings more readable to human
+     *
+     * "fooBar"  => "Foo Bar"
+     * "foo_bar" => "Foo Bar"
+     * "foo bar" => "Foo Bar"
+     *
+     * @param string $string
+     */
+    public static function humanize($string) {
+      return ucwords(preg_replace('/\s\s+/', ' ', self::specialize(' ', $string)));
+    }
 
   /**
    * 
