@@ -68,7 +68,7 @@ class Console {
         $args[] = $value;
       }
     }
-      
+    
     call_user_func_array(array($this, $action), $args);
   }
 

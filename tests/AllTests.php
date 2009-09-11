@@ -14,6 +14,7 @@ class AllTests {
     $suite->addTestSuite('madeam\ControllerTest');
     $suite->addTestSuite('madeam\RouterTest');
     $suite->addTestSuite('madeam\InflectorTest');
+    $suite->addTestSuite('madeam\ViewTest');
 
     return $suite;
   }

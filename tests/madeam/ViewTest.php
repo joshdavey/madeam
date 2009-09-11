@@ -1,7 +1,7 @@
 <?php
 namespace madeam;
 require_once 'Bootstrap.php';
-class ControllerTest extends \PHPUnit_Framework_TestCase {
+class ViewTest extends \PHPUnit_Framework_TestCase {
   
   /**
    * 
@@ -36,7 +36,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderPartialWithData() {
-    $return = View::render(array('partial' => 'tests/_partial-data', 'data' => array('data' => 'True')));
+    $return = View::render(array('template' => 'tests/_partial-data', 'data' => array('data' => 'True'), 'format' => 'html'));
     $this->assertEquals('Partial Data is True', $return);
   }
   
@@ -47,7 +47,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderData() {
-    $return = View::render(array('view' => 'tests/data', 'data' => array('data' => 'True')));
+    $return = View::render(array('template' => 'tests/data', 'data' => array('data' => 'True'), 'format' => 'html'));
     $this->assertEquals('Data is True', $return);
   }
   
@@ -61,7 +61,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderViewWithActionMethod() {
-    $return = View::render(array('view' => 'tests/action'));
+    $return = View::render(array('template' => 'tests/action', 'format' => 'html'));
     $this->assertEquals('Action View', $return);
   }
   
@@ -72,7 +72,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderViewWhenActionMethodMissing() {
-    $return = View::render(array('view' => 'tests/view'));
+    $return = View::render(array('template' => 'tests/view', 'format' => 'html'));
     $this->assertEquals('View', $return);
   }
   
@@ -83,7 +83,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderViewData() {
-    $return = View::render(array('view' => 'tests/data', 'data' => array('data' => 'True')));
+    $return = View::render(array('template' => 'tests/data', 'data' => array('data' => 'True'), 'format' => 'html'));
     $this->assertEquals('Data is True', $return);
   }
   
@@ -97,7 +97,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
    */
   public function testRenderMemberDataEvenWhenDataImplicitlyDefined() {
     $this->controller->data = 'Member';
-    $return = View::render(array('view' => 'tests/data', 'data' => array()));
+    $return = View::render(array('template' => 'tests/data', 'data' => array(), 'format' => 'html'));
     $this->assertEquals('Data is Member', $return);
   }
   
@@ -111,11 +111,11 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
    */
   public function testRenderDataOrder() {
     $this->controller->data = 'Member';
-    $return = View::render(array('view' => 'tests/data'));
+    $return = View::render(array('template' => 'tests/data'));
     $this->assertEquals('Data is Member', $return);
     
     $this->controller->data = 'Member';
-    $return = View::render(array('view' => 'tests/data', 'data' => array('data' => 'Implicit')));
+    $return = View::render(array('template' => 'tests/data.html', 'data' => array('data' => 'Implicit')));
     $this->assertEquals('Data is Implicit', $return);
   }
   
@@ -130,7 +130,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderLayout() {
-    $return = View::render(array('view' => 'tests/view', 'layout' => 'layout'));
+    $return = View::render(array('template' => 'tests/view.html', 'layout' => 'layout'));
     $this->assertEquals('Layout View', $return);
   }
   
@@ -141,7 +141,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderNoLayout() {
-    $return = View::render(array('view' => 'tests/view', 'layout' => false));
+    $return = View::render(array('template' => 'tests/view', 'layout' => false, 'format' => 'html'));
     $this->assertEquals('View', $return);
   }
   
