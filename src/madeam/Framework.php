@@ -201,7 +201,7 @@ class Framework {
    * @author Joshua Davey
    */
   static public function parseDynamicUri($serverDocumentRoot, $applicationDocumentRoot) {
-    return '/' . substr(str_replace(DIRECTORY_SEPARATOR, '/', substr($applicationDocumentRoot, strlen($serverDocumentRoot), -strlen(basename($applicationDocumentRoot)))), 0, -1) . '/';
+    return '/' . substr(str_replace(DIRECTORY_SEPARATOR, '/', substr($applicationDocumentRoot, strlen($serverDocumentRoot), -strlen(basename($applicationDocumentRoot)))), 0, -1);
   }
   
   /**
@@ -228,9 +228,7 @@ class Framework {
   static public function redirect($url, $exit = true) {
     if (! headers_sent()) {
       header('Location:  ' . self::url($url));
-      if ($exit) {
-        exit();
-      }
+      $exit ?: exit();
     } else {
       throw new Exception\HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
     }

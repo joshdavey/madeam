@@ -25,7 +25,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderPartial() {
-    $return = View::render(array('template' => 'tests/_partial'));
+    $return = View::render(array('template' => 'tests/_partial', 'format' => 'html'));
     $this->assertEquals('Partial', $return);
   }
   
@@ -111,11 +111,11 @@ class ViewTest extends \PHPUnit_Framework_TestCase {
    */
   public function testRenderDataOrder() {
     $this->controller->data = 'Member';
-    $return = View::render(array('template' => 'tests/data'));
+    $return = View::render(array('template' => 'tests/data', 'format' => 'html'));
     $this->assertEquals('Data is Member', $return);
     
     $this->controller->data = 'Member';
-    $return = View::render(array('template' => 'tests/data.html', 'data' => array('data' => 'Implicit')));
+    $return = View::render(array('template' => 'tests/data', 'data' => array('data' => 'Implicit'), 'format' => 'html'));
     $this->assertEquals('Data is Implicit', $return);
   }
   
@@ -130,7 +130,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderLayout() {
-    $return = View::render(array('template' => 'tests/view.html', 'layout' => 'layout'));
+    $return = View::render(array('template' => 'tests/view', 'layout' => array('layout'), 'format' => 'html'));
     $this->assertEquals('Layout View', $return);
   }
   
@@ -141,7 +141,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase {
    * </File>
    */
   public function testRenderNoLayout() {
-    $return = View::render(array('template' => 'tests/view', 'layout' => false, 'format' => 'html'));
+    $return = View::render(array('template' => 'tests/view', 'format' => 'html'));
     $this->assertEquals('View', $return);
   }
   

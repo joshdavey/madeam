@@ -5,12 +5,14 @@ class Tidy extends \madeam\Middleware {
   static public function beforeResponse($request, $response) {
     
     if ($request['_format'] == 'html') {
-      $tidy = new Tidy;
+      $tidy = new \Tidy;
       $tidy->parseString($response, array(
         'wrap'  => 200,
-        'indet' => true
+        'indent' => true
       ), 'utf8');
-      $response = $tidy->cleanRepair();
+      $tidy->cleanRepair();
+      $html = $tidy->html();
+      $response = $html->value;
     }
     
     return $response;

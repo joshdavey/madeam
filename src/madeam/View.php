@@ -34,14 +34,17 @@ class View {
    * @return string
    */
   static public function render($_settings) {
-    // set template
-    $_template = self::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($_settings['template'])) . '.' . $_settings['format'];
+    // set format
+    $_format = isset($_settings['format']) ? '.' . $_settings['format'] : $_settings['format'] =  null;
     
     // set layout
-    !isset($_settings['layout']) ?: 
+    isset($_settings['layout']) ?: $_settings['layout'] = array();
     
     // set default value for data
     isset($_settings['data']) ?: $_settings['data'] = array();
+    
+    // set template
+    $_template = self::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($_settings['template'])) . $_format;
     
     // check if the view exists
     // if the view doesn't exist we need to serialize it.
@@ -58,7 +61,10 @@ class View {
       // apply layout to view's content
       if (isset($_settings['layout'])) {
         foreach ($_settings['layout'] as $_layout) {
-          $_layout = self::$path . $_layout . '.layout.' . $_settings['format'];
+          if ($_format != null) {
+            $_format = '.layout' . $_format;
+          }
+          $_layout = self::$path . $_layout . $_format;
           
           // render layouts
           ob_start();

@@ -192,7 +192,7 @@ class Controller {
       $this->_output = View::render(array(
         'template'  => $this->_view, 
         'layout'    => $this->_layout, 
-        'data'      => $this->_data, 
+        'data'      => $this->_data,
         'format'    => $request['_format']
       ));
     }

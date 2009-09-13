@@ -40,7 +40,7 @@ class Create extends \madeam\Console {
     foreach ($actions as $action) {
       $action = trim($action);
       // add action method to class
-      $controllerContents .= "\n  public function $action" . "Action() {\n    \n  }\n";
+      $controllerContents .= "\n  public function $action" . "Action($request) {\n    \n  }\n";
     }
     
     // create views
