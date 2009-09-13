@@ -167,10 +167,15 @@ class Controller {
       // an _output value of anything other than NULL will skip rendering the view and return the _output as is
       $this->_output = call_user_func_array(array($this, $action), $params);
       
-    } elseif (!file_exists(View::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($this->_view)) . '.' . $request['_format'])) {
-      throw new controller\exception\MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
-      . "\n Create the view <strong>app/views/" . $request['_controller'] . '/' . Inflector::dashize(substr($action, 0, -6)) . '.' . $request['_format'] . "</strong> OR Create a method called <strong>" . $action . "</strong> in <strong>" . get_class($this) . "</strong> class."
-      . " \n <code>public function " . $action . "() {\n\n}</code>");
+    } else {
+      if (!file_exists(View::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($this->_view)) . '.' . $request['_format'])) {
+        throw new controller\exception\MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
+        . "\n Create the view <strong>app/views/" . $request['_controller'] . '/' . Inflector::dashize(substr($action, 0, -6)) . '.' . $request['_format'] . "</strong> OR Create a method called <strong>" . $action . "</strong> in <strong>" . get_class($this) . "</strong> class."
+        . " \n <code>public function " . $action . "() {\n\n}</code>");
+      } else {
+        // set data as $request data...? This way we can access partials
+        $this->_data = $request;
+      }
     }
     
     // render
@@ -184,7 +189,12 @@ class Controller {
       }
       
       // render view
-      $this->_output = View::render(array('template' => $this->_view, 'layout' => $this->_layout, 'data' => $this->_data, 'format' => $request['_format']));
+      $this->_output = View::render(array(
+        'template'  => $this->_view, 
+        'layout'    => $this->_layout, 
+        'data'      => $this->_data, 
+        'format'    => $request['_format']
+      ));
     }
     
     // afterRender callbacks
