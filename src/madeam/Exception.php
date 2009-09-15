@@ -80,6 +80,7 @@ class Exception extends \Exception {
       
       // call error controller and pass information
       $message = array(
+        'exception'   => get_class($e),
         'error'       => nl2br($message),
         'backtrace'   => $e->getTraceAsString(),
         'snippet'     => $snippet,

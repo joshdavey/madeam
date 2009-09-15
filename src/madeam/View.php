@@ -33,52 +33,52 @@ class View {
    *  madeam\Framework::request('posts/read/32');
    * @return string
    */
-  static public function render($_settings) {
+  static public function render($__settings) {
     // set format
-    $_format = isset($_settings['format']) ? '.' . $_settings['format'] : $_settings['format'] =  null;
+    $__format = isset($__settings['format']) ? '.' . $__settings['format'] : $__settings['format'] =  null;
     
     // set layout
-    isset($_settings['layout']) ?: $_settings['layout'] = array();
+    isset($__settings['layout']) ?: $__settings['layout'] = array();
     
     // set default value for data
-    isset($_settings['data']) ?: $_settings['data'] = array();
+    isset($__settings['data']) ?: $__settings['data'] = array();
     
     // set template
-    $_template = self::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($_settings['template'])) . $_format;
+    $__template = self::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($__settings['template'])) . $__format;
     
     // check if the view exists
     // if the view doesn't exist we need to serialize it.
-    if (file_exists($_template)) {
+    if (file_exists($__template)) {
       // extract data to view and layout
-      extract($_settings['data']);
+      extract($__settings['data']);
       
       // render view's content
       ob_start();
-        include($_template);
+        include($__template);
         $_content = ob_get_contents();
       ob_end_clean();
       
       // apply layout to view's content
-      if (isset($_settings['layout'])) {
-        foreach ($_settings['layout'] as $_layout) {
-          if ($_format != null) {
-            $_format = '.layout' . $_format;
+      if (isset($__settings['layout'])) {
+        foreach ($__settings['layout'] as $__layout) {
+          if ($__format != null) {
+            $__format = '.layout' . $__format;
           }
-          $_layout = self::$path . $_layout . $_format;
+          $__layout = self::$path . $__layout . $__format;
           
           // render layouts
           ob_start();
-            include($_layout);
+            include($__layout);
             $_content = ob_get_contents();
           ob_clean();
         }
       }
     } else {
       // serialize output
-      if (isset(self::$formats[$_settings['format']]) && method_exists(self::$formats[$_settings['format']][0], self::$formats[$_settings['format']][1])) {
-        $_content = call_user_func(self::$formats[$_settings['format']], $_settings['data']);
+      if (isset(self::$formats[$__settings['format']]) && method_exists(self::$formats[$__settings['format']][0], self::$formats[$__settings['format']][1])) {
+        $_content = call_user_func(self::$formats[$__settings['format']], $__settings['data']);
       } else {
-        throw new controller\exception\MissingView('Missing View: <strong>' . $_template . "</strong> and unknown serialization format \"<strong>" . $_settings['format'] . '</strong>"' . "\n Create File: <strong>" . $_template . "</strong>");
+        throw new controller\exception\MissingView('Missing View: <strong>' . $__template . "</strong> and unknown serialization format \"<strong>" . $__settings['format'] . '</strong>"' . "\n Create File: <strong>" . $__template . "</strong>");
       }
     }
     

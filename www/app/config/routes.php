@@ -34,7 +34,7 @@
  * 
  * Don't like using an id and would prefer a slug? Try this:
  * 
- * madeam\Router::resource::('posts', array('slug', '[a-z\-]+'));
+ * madeam\Router::resource::('posts', array('id' => 'slug', 'pattern' => '[a-z\-]+'));
  * 
  * 
  * = Sub Directory Routes =

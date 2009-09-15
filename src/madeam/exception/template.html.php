@@ -119,7 +119,7 @@ code {
   <div id="content" class="fullspan debug">    
 
     <h1 class="debug">Oops, <?php echo $message['snippet']; ?></h1>
-    <h4>Error:</h4>
+    <h4><?php echo $message['exception']; ?> Exception:</h4>
     <p><?php echo $message['error']; ?></p>
   
     <br />

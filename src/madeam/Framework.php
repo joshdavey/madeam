@@ -141,12 +141,12 @@ class Framework {
     $controllerClassNodes = explode('/', $request['_controller']);
     foreach ($controllerClassNodes as &$node) {
       $node = Inflector::camelize($node);
-      $node = ucfirst($node);
     }
+    $controllerClassNodes[count($controllerClassNodes) - 1] = ucfirst($controllerClassNodes[count($controllerClassNodes) - 1]);
     
     // set controller class
     $controllerClass = implode('\\', $controllerClassNodes) . 'Controller';
-    
+
     try {
       $controller = new $controllerClass();
     } catch (Exception\AutoloadFail $e) {

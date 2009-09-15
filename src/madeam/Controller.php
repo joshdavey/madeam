@@ -136,7 +136,7 @@ class Controller {
     
     // action
     $action = Inflector::camelize($request['_action']) . 'Action';
-    
+
     $params = array();
     // check to see if method/action exists
     if (method_exists($this, $action)) {
@@ -174,7 +174,7 @@ class Controller {
         . " \n <code>public function " . $action . "() {\n\n}</code>");
       } else {
         // set data as $request data...? This way we can access partials
-        $this->_data = $request;
+        $this->_data += $request;
       }
     }
     

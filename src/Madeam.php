@@ -60,7 +60,7 @@ set_exception_handler('madeam\Exception::handle');
 function autoload($class) {
   // set class file name)
   $file = str_replace('_', '/', str_replace('\\', '/', $class)) . '.php'; // PHP 5.3
-
+  
   // checks all the include paths to see if the file exist
   $paths = explode(PATH_SEPARATOR, get_include_path());
   foreach ($paths as $path) {

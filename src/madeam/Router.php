@@ -64,18 +64,26 @@ class Router {
    * has a value for the id's name and the id's rule. For example if I wanted to call "id"
    * "slug" and change the rule to one that matches slugs I could do the following:
    * 
-   * madeam\Router::resource::('posts', array('slug', '[a-z\-]+'));
+   * madeam\Router::resource::('posts', array('id' => 'slug', 'pattern' => '[a-z\-]+'));
    *
    * @param string $name
-   * @param array $id
+   * @param array $options
+   *    @param string controller
+   *    @param string id
+   *    @param string pattern
    * @author Joshua Davey
    */
-  public static function resource($name, $id = array('id', '\d+')) {
-    self::connect("$name",            array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
-    self::connect("$name/:$id[0]",    array('_action' => 'show',    '_controller' => $name),  array('_method' => 'get', $id[0] => $id[1]));
-    self::connect("$name",            array('_action' => 'delete',  '_controller' => $name),  array('_method' => 'delete'));
-    self::connect("$name",            array('_action' => 'update',  '_controller' => $name),  array('_method' => 'put'));
-    self::connect("$name",            array('_action' => 'create',  '_controller' => $name),  array('_method' => 'post'));
+  public static function resource($name, $options = array()) {
+    
+    $controller = isset($options['controller']) ? $options['controller'] : $name;
+    $id         = isset($options['id']) ? $options['id'] : 'id';
+    $pattern    = isset($options['pattern']) ? $options['pattern'] : '\d+';
+    
+    self::connect("$name",            array('_action' => 'index',   '_controller' => $controller),  array('_method' => 'get'));
+    self::connect("$name/:$id",       array('_action' => 'read',    '_controller' => $controller),  array('_method' => 'get', $id => $pattern));
+    self::connect("$name",            array('_action' => 'delete',  '_controller' => $controller),  array('_method' => 'delete'));
+    self::connect("$name/$id",        array('_action' => 'update',  '_controller' => $controller),  array('_method' => 'put', $id => $pattern));
+    self::connect("$name",            array('_action' => 'create',  '_controller' => $controller),  array('_method' => 'post'));
   }
 
   /**
