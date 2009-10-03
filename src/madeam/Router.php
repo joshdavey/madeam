@@ -16,6 +16,15 @@ namespace madeam;
 class Router {
 
   public static $routes = array(); // regex, values, rules
+  
+  static public $defaults = array(
+    '_controller' => 'index',
+    '_action'     => 'index',
+    '_format'     => 'html',
+    '_method'     => 'get',
+    '_layout'     => '0',
+    '_ajax'       => '0'
+  );
 
   /**
    * This cool method adds paths by formatting the string the user has entered and turning it into a regular expression
@@ -103,10 +112,12 @@ class Router {
    * @return array
    * @author Joshua Davey
    */
-  public static function parse($uri = false, $baseUri = '/', $defaults = array()) {    
+  public static function parse($uri = false, $baseUri = '/') {    
     // makes sure the first character is "/"
     // if (substr($uri, 0, 1) != '/') { $uri = '/' . $uri; }
     substr($uri, 0, 1) == '/' ?: $uri = '/' . $uri;
+    
+    $defaults = self::$defaults;
     
     // parse uri
     $parsedURI = parse_url($uri);
@@ -143,12 +154,14 @@ class Router {
       parse_str($query, $get); // assigns $get array of query params
     }
     
+    // set default format
+    // !$format ?: $defaults['_format'] = $format; // for some reason this line of code will work for a few requests and then crash... replaced with the code below
+    if ($format !== false) {
+      $defaults['_format'] = $format;
+    }
     
     // add query to params
     !isset($query) ?: $defaults['_query'] = $query;
-    
-    // set default format
-    $format === false ?: $defaults['_format'] = $format;
 
     // matchs count
     $matchs = 0;
@@ -201,11 +214,11 @@ class Router {
       // this is lame and needs to be done better
       //header("HTTP/1.1 404 Not Found");
       //ob_clean();
-      throw new madeam\Exception('Unable to find page');
+      throw new Exception('Unable to find page');
       // but what about returning the params if we throw an error?
       return $params;
     }
-
+    
     // get params from uri
     $params = array_merge($defaults, $params, $get);
     

@@ -13,7 +13,6 @@ spl_autoload_register('madeam\autoloadPackage');
 // every time we attempt to load a file.
 spl_autoload_register('madeam\autoloadFail');
 
-
 /**
  * Include core files
  * These files will be included in 99% of requests so it is more effecient to include them now
@@ -134,9 +133,11 @@ function autoloadFail($class) {
 
 
 
+function throwExceptionErrorHandler($errno, $errstr, $errfile, $errline) {
+  return true;
+}
 
-
-
+set_error_handler("madeam\\throwExceptionErrorHandler");
 
 
 

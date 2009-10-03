@@ -78,8 +78,8 @@ class Framework {
     isset($request['_layout']) ?: $request['_layout'] = 1;
     
     // set overriding request method -- note: we need to get rid of all the $_SERVER references for testing purposes
-    if (isset($server['X_HTTP_METHOD_OVERRIDE'])) {
-      $request['_method'] = strtolower($server['X_HTTP_METHOD_OVERRIDE']);
+    if (isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
+      $request['_method'] = strtolower($_SERVER['X_HTTP_METHOD_OVERRIDE']);
     } elseif (isset($request['_method']) && $server_request_method == 'POST') {
       $request['_method'] = strtolower($request['_method']);
     } else {
@@ -87,18 +87,15 @@ class Framework {
     }
     
     // check if this is an ajax call
-    if (isset($server['HTTP_X_REQUESTED_WITH']) && $server['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
       $request['_ajax'] = 1;
+      // $request['_layout'] = 0;
     } else {
       $request['_ajax'] = 0;
     }
     
     // parse request with router
-    $request = Router::parse($request['_uri'] . '?' . $request['_query'], self::$uriPathDynamic, $request + array(
-      '_controller' => 'index',
-      '_action'     => 'index',
-      '_format'     => 'html'
-    ));
+    $request += Router::parse($request['_uri'] . '?' . $request['_query'], self::$uriPathDynamic);
     
     // execute beforeRequest middleware
     foreach (self::$middleware as $class) {
@@ -228,7 +225,7 @@ class Framework {
   static public function redirect($url, $exit = true) {
     if (! headers_sent()) {
       header('Location:  ' . self::url($url));
-      $exit ?: exit();
+      !$exit ?: exit();
     } else {
       throw new Exception\HeadersSent('Tried redirecting when headers already sent. (Check for echos before redirects)');
     }

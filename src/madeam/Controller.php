@@ -115,17 +115,23 @@ class Controller {
     unset($reflection);
     
     // check for expected params
-    $diff = array_diff(array('_controller', '_action', '_format', '_layout', '_method'), array_keys($request));
+    $diff = array_diff(array('_controller', '_action'), array_keys($request));
     if (!empty($diff)) {
       throw new controller\exception\MissingExpectedRequestParameter('Missing expected Request Parameter(s): ' . implode(', ', $diff));
     }
+    
+    // set format if not set
+    isset($request['_format']) ?: $request['_format'] = $this->_returns[0];
+    
+    // set method if no set
+    isset($request['_method']) ?: $request['_method'] = 'get';
     
     // set view
     $this->view($request['_controller'] . '/' . $request['_action']);
     
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
-    if (isset($request['_layout']) && $request['_layout'] == 0) {
+    if (isset($request['_layout']) && $request['_layout'] == '0') {
       $this->layout(false);
     } else {
       $this->layout($this->_layout);
@@ -187,7 +193,7 @@ class Controller {
         throw new controller\exception\MissingView('Unaccepted Format "<strong>' . $request['_format'] . '</strong>" in the controller <strong>' . get_class($this) . '</strong>.' . "\n
         Add the following to <strong>" . get_class($this) . "</strong><code>public \$_returns = array('" . implode("', '", array_merge($this->_returns, array($request['_format']))) . "');</code>");
       }
-      
+
       // render view
       $this->_output = View::render(array(
         'template'  => $this->_view, 

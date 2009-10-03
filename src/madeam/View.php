@@ -54,7 +54,7 @@ class View {
       
       // render view's content
       ob_start();
-        include($__template);
+        require($__template);
         $_content = ob_get_contents();
       ob_end_clean();
       
@@ -68,7 +68,7 @@ class View {
           
           // render layouts
           ob_start();
-            include($__layout);
+            require($__layout);
             $_content = ob_get_contents();
           ob_clean();
         }

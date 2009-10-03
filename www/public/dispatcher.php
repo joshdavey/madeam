@@ -47,6 +47,6 @@
 // dispatch handles the request and returns the output  
   echo madeam\Framework::dispatch(
     $_GET + $_POST + $_COOKIE,  // not always the same as $_REQUEST depending on the php.ini configuration
-    $_SERVER['QUERY_STRING'],   // example: _uri=&blah=testing
+    $_SERVER['QUERY_STRING'],   // example: _uri=posts/view/32&blah=testing
     $_SERVER['REQUEST_METHOD']  // example: GET
   );
