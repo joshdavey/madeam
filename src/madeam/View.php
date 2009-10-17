@@ -4,10 +4,10 @@ namespace madeam;
 class View {
   
   
-   /**
-    * A map of all the file formats to their associated serialization method
-    * @author Joshua Davey
-    */
+  /**
+   * A map of all the file formats to their associated serialization method
+   * @author Joshua Davey
+   */
   static public $formats = array(
     'xml'   => array('madeam\serialize\Xml',  'encode'),
     'json'  => array('madeam\serialize\Json', 'encode'),
@@ -74,12 +74,7 @@ class View {
         }
       }
     } else {
-      // serialize output
-      if (isset(self::$formats[$__settings['format']]) && method_exists(self::$formats[$__settings['format']][0], self::$formats[$__settings['format']][1])) {
-        $_content = call_user_func(self::$formats[$__settings['format']], $__settings['data']);
-      } else {
-        throw new controller\exception\MissingView('Missing View: <strong>' . $__template . "</strong> and unknown serialization format \"<strong>" . $__settings['format'] . '</strong>"' . "\n Create File: <strong>" . $__template . "</strong>");
-      }
+      throw new controller\exception\MissingView('Missing View: <strong>' . $__template . "</strong> and unknown serialization format \"<strong>" . $__settings['format'] . '</strong>"' . "\n Create File: <strong>" . $__template . "</strong>");
     }
     
     return $_content;

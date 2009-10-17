@@ -2,7 +2,7 @@
 namespace madeam;
 
 class Controller {
-
+  
   /**
    * Layouts
    * @var string/array
@@ -44,7 +44,16 @@ class Controller {
    * List the formats that this controller returns
    */
   public $_returns = array('html');
-
+  
+  /**
+   * A map of all the file formats to their associated serialization method
+   * @author Joshua Davey
+   */
+  static public $formats = array(
+    'xml'   => array('madeam\serialize\Xml',  'encode'),
+    'json'  => array('madeam\serialize\Json', 'encode'),
+    'sphp'  => array('madeam\serialize\Sphp', 'encode')
+  );
 
   /**
    * 
@@ -52,12 +61,13 @@ class Controller {
    * @author Joshua Davey
    */
   public function &__get($name) {
-    if (array_key_exists($name, $this->_data)) {
-      return $this->_data[$name];
-    } else {
-      $this->_data[$name] = null;
-      return $this->_data[$name];
-    }
+    return $this->_data[$name];
+    // if (array_key_exists($name, $this->_data)) {
+    //   return $this->_data[$name];
+    // } else {
+    //   $this->_data[$name] = null;
+    //   return $this->_data[$name];
+    // }
   }
 
 
@@ -194,13 +204,22 @@ class Controller {
         Add the following to <strong>" . get_class($this) . "</strong><code>public \$_returns = array('" . implode("', '", array_merge($this->_returns, array($request['_format']))) . "');</code>");
       }
 
-      // render view
-      $this->_output = View::render(array(
-        'template'  => $this->_view, 
-        'layout'    => $this->_layout, 
-        'data'      => $this->_data,
-        'format'    => $request['_format']
-      ));
+      try {
+        // render view
+        $this->_output = View::render(array(
+          'template'  => $this->_view,
+          'layout'    => $this->_layout,
+          'data'      => $this->_data + (array) $this,
+          'format'    => $request['_format']
+        ));
+      } catch (controller\exception\MissingView $e) {
+        // serialize output
+        if (isset(self::$formats[$request['_format']]) && method_exists(self::$formats[$request['_format']][0], self::$formats[$request['_format']][1])) {
+          $this->_output = call_user_func(self::$formats[$request['_format']], $this->_data);
+        } else {
+          throw $e;
+        }
+      }
     }
     
     // afterRender callbacks

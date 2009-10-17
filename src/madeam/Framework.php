@@ -89,7 +89,7 @@ class Framework {
     // check if this is an ajax call
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
       $request['_ajax'] = 1;
-      // $request['_layout'] = 0;
+      $request['_layout'] = 0;
     } else {
       $request['_ajax'] = 0;
     }
