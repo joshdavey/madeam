@@ -134,7 +134,7 @@ function autoloadFail($class) {
   }
 
   eval("$namespace class $class {}");
-  throw new Exception\AutoloadFail('Missing Class ' . $fullClass);
+  throw new exception\AutoloadFail('Missing Class ' . $fullClass);
 }
 
 
