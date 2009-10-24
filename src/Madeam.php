@@ -124,9 +124,17 @@ function autoloadPackage($class) {
  * @author Joshua Davey
  */
 function autoloadFail($class) {
-  $class = preg_replace("/[^A-Za-z0-9_\\\]/", null, $class); // clean the dirt
-  eval("class $class {}");
-  throw new Exception\AutoloadFail('Missing Class ' . $class);
+  $fullClass = preg_replace("/[^A-Za-z0-9_\\\]/", null, $class); // clean the dirt
+  
+  $namespace = substr($fullClass, 0, strrpos($class, '\\'));
+  $class = substr($fullClass, strrpos($class, '\\') + 1, strlen($class));
+  
+  if ($namespace != null) {
+    $namespace = 'namespace ' . $namespace . ';';
+  }
+
+  eval("$namespace class $class {}");
+  throw new Exception\AutoloadFail('Missing Class ' . $fullClass);
 }
 
 

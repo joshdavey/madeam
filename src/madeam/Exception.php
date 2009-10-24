@@ -89,7 +89,11 @@ class Exception extends \Exception {
         'file'        => $file
       );
       
-      include 'madeam/src/madeam/exception/template.html.php';
+      if (!isset($_SERVER['SHELL'])) {
+        require 'madeam/src/madeam/exception/template.html.php';
+      } else {
+        require 'madeam/src/madeam/exception/template.shell.php';
+      }
       exit();
     } else {
       // return 404 error page

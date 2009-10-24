@@ -1,12 +1,12 @@
 <?php
-
-class madeam\Helper_Format {
+namespace madeam\helper;
+class Format {
 
   public static $dateFormat = 'd F o';
 
   public static $datetimeFormat = 'd F o \a\t g:i:s a';
 
-  public static $moneyFormat = '%';
+  public static $moneyFormat = '%n';
 
   public static $numberThousands = ',';
 
@@ -113,9 +113,9 @@ class madeam\Helper_Format {
       $format = self::$moneyFormat;
     }
     if (function_exists('money_format')) {
-      return money_format($format, (int) $number);
+      return money_format($format, (float) $number);
     } else {
-      return number_format((int) $number, 2, '.', ',');
+      return number_format((float) $number, 2, '.', ',');
     }
   }
 
