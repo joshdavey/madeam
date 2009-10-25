@@ -70,11 +70,11 @@ class Madeam_Router {
    * @author Joshua Davey
    */
   public static function resource($name, $id = array('id', '\d+')) {
-    self::connect("$name",            array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
     self::connect("$name/:$id[0]",    array('_action' => 'show',    '_controller' => $name),  array('_method' => 'get', $id[0] => $id[1]));
     self::connect("$name",            array('_action' => 'delete',  '_controller' => $name),  array('_method' => 'delete'));
     self::connect("$name",            array('_action' => 'update',  '_controller' => $name),  array('_method' => 'put'));
     self::connect("$name",            array('_action' => 'create',  '_controller' => $name),  array('_method' => 'post'));
+    self::connect("$name",            array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
   }
 
   /**
