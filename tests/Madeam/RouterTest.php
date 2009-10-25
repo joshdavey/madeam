@@ -106,4 +106,28 @@ class Madeam_RouterTest extends PHPUnit_Framework_TestCase {
     
   }
 
+  public function testResourceRoute() {
+    Madeam_Router::resource('posts');
+      
+    $params = Madeam_Router::parse('posts', '/', array('_method' => 'get'));
+    $this->assertEquals('index', $params['_action']);
+
+    $params = Madeam_Router::parse('posts/1', '/', array('_method' => 'get'));
+    $this->assertEquals('show', $params['_action']);
+
+    $params = Madeam_Router::parse('posts/new', '/', array('_method' => 'get'));
+    $this->assertEquals('new', $params['_action']);
+
+    $params = Madeam_Router::parse('posts/edit/1', '/', array('_method' => 'get'));
+    $this->assertEquals('edit', $params['_action']);
+
+    $params = Madeam_Router::parse('posts/1', '/', array('_method' => 'put'));
+    $this->assertEquals('update', $params['_action']);
+
+    $params = Madeam_Router::parse('posts/1', '/', array('_method' => 'delete'));
+    $this->assertEquals('delete', $params['_action']);
+
+    $params = Madeam_Router::parse('posts', '/', array('_method' => 'post'));
+    $this->assertEquals('create', $params['_action']);
+  }
 }
