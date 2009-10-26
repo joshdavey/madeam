@@ -194,6 +194,11 @@ class Controller {
       }
     }
     
+    if (is_array($this->_output) || is_object($this->_output)) {
+      $this->_data = $this->_output;
+      $this->_output = null;
+    }
+    
     // render
     if ($this->_output === null) {
       // beforeRender callbacks

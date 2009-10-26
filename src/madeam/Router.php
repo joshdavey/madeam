@@ -88,11 +88,13 @@ class Router {
     $id         = isset($options['id']) ? $options['id'] : 'id';
     $pattern    = isset($options['pattern']) ? $options['pattern'] : '\d+';
     
-    self::connect("$name/:$id",       array('_action' => 'read',    '_controller' => $controller),  array('_method' => 'get', $id => $pattern));
-    self::connect("$name",            array('_action' => 'delete',  '_controller' => $controller),  array('_method' => 'delete'));
-    self::connect("$name/$id",        array('_action' => 'update',  '_controller' => $controller),  array('_method' => 'put', $id => $pattern));
-    self::connect("$name",            array('_action' => 'create',  '_controller' => $controller),  array('_method' => 'post'));
-    self::connect("$name",            array('_action' => 'index',   '_controller' => $controller),  array('_method' => 'get'));
+    self::connect("$name/:$id[0]",      array('_action' => 'show',    '_controller' => $name),  array('_method' => 'get', $id[0] => $id[1]));
+    self::connect("$name/edit/:$id[0]", array('_action' => 'edit',    '_controller' => $name),  array('_method' => 'get', $id[0] => $id[1]));
+    self::connect("$name/new",          array('_action' => 'new',     '_controller' => $name),  array('_method' => 'get'));
+    self::connect("$name",              array('_action' => 'delete',  '_controller' => $name),  array('_method' => 'delete'));
+    self::connect("$name",              array('_action' => 'update',  '_controller' => $name),  array('_method' => 'put'));
+    self::connect("$name",              array('_action' => 'create',  '_controller' => $name),  array('_method' => 'post'));
+    self::connect("$name",              array('_action' => 'index',   '_controller' => $name),  array('_method' => 'get'));
   }
 
   /**
