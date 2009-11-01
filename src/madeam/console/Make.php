@@ -2,7 +2,7 @@
 namespace madeam\console;
 class Make extends \madeam\Console {
 
-  public function app($name, $clone = false, $symlink = false) {
+  public function app($name, $clone = false, $symlink = false, $branch = 'master') {
     
     $path = trim(`pwd`);
     
@@ -19,7 +19,7 @@ class Make extends \madeam\Console {
     
     if ($clone === true) {
       // clone madeam from remote
-      echo `git clone git://github.com/joshdavey/madeam {$path}/application/vendor/madeam`;
+      echo `git clone -b {$branch} git://github.com/joshdavey/madeam {$path}/application/vendor/madeam`;
     } elseif ($symlink === true) {
       echo `ln -s {$madeam}madeam/. {$path}/application/vendor/madeam`;
     } else {
