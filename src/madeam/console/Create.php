@@ -18,12 +18,12 @@ class Create extends \madeam\Console {
     $controllerName           = $names[count($names) - 1];
     $controllerClassName      = ucfirst($controllerName) . 'Controller';
     $controllerNamespace      = implode('\\', $names);
-    $controllerViewFilePath   = getcwd() . '/app/views/' . strtolower(implode(DIRECTORY_SEPARATOR, $names)) . '/';
+    $controllerViewFilePath   = getcwd() . '/application/views/' . strtolower(implode(DIRECTORY_SEPARATOR, $names)) . '/';
     array_pop($names);
     if (count($names) == 0) {
-      $controllerClassFilePath  = getcwd() . '/app/controllers/';
+      $controllerClassFilePath  = getcwd() . '/application/controllers/';
     } else {
-      $controllerClassFilePath  = getcwd() . '/app/controllers/' . implode(DIRECTORY_SEPARATOR, $names) . '/';
+      $controllerClassFilePath  = getcwd() . '/application/controllers/' . implode(DIRECTORY_SEPARATOR, $names) . '/';
     }
     
     // Create Class directory
@@ -77,7 +77,7 @@ class Create extends \madeam\Console {
     $viewFileName = strtolower(array_pop($nodes)) . '.' . $format;
     
     // create view directory
-    $viewPath = getcwd() . '/app/views/' . implode('/', $nodes) . '/';
+    $viewPath = getcwd() . '/application/views/' . implode('/', $nodes) . '/';
     `mkdir -p $viewPath`;
     
     $viewFile = $viewPath . $viewFileName;

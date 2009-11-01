@@ -7,7 +7,7 @@ Version 1.1.0
 - fixed htmlentities wrapper h()
 
 Version 1.0.1
-- Helpers are now placed in src/Madeam/Helper directory and referenced from app/vendor/
+- Helpers are now placed in src/Madeam/Helper directory and referenced from application/vendor/
 
 Version 1.0.0
 - Initial Public Release

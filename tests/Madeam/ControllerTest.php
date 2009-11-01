@@ -21,7 +21,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
       '_ajax'       => 0
     );
     
-    View::$path = TESTS_MADEAM_PROJECT_DIRECTORY . 'app/views' . DIRECTORY_SEPARATOR;
+    View::$path = TESTS_MADEAM_PROJECT_DIRECTORY . 'application/views' . DIRECTORY_SEPARATOR;
     
     // create controller instance
     $this->controller = new \TestsController();

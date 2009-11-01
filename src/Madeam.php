@@ -34,13 +34,13 @@ require $madeamLibrary . 'View.php';
 Framework::$pathToProject = getcwd() . '/';
 
 set_include_path(
-  Framework::$pathToProject . 'app/models/' . PATH_SEPARATOR . 
-  Framework::$pathToProject . 'app/controllers/' . PATH_SEPARATOR . 
-  Framework::$pathToProject . 'app/middleware/' . PATH_SEPARATOR .
-  Framework::$pathToProject . 'app/vendor/' . PATH_SEPARATOR .
-  Framework::$pathToProject . 'app/' . PATH_SEPARATOR .
+  Framework::$pathToProject . 'application/models' . PATH_SEPARATOR . 
+  Framework::$pathToProject . 'application/controllers' . PATH_SEPARATOR . 
+  Framework::$pathToProject . 'application/middleware' . PATH_SEPARATOR .
+  Framework::$pathToProject . 'application/vendor' . PATH_SEPARATOR .
+  Framework::$pathToProject . 'application' . PATH_SEPARATOR .
   get_include_path() . PATH_SEPARATOR . 
-  dirname(dirname(dirname(__FILE__))) . '/'
+  dirname(dirname(dirname(__FILE__))) . ''
 );
 
 /**
@@ -63,8 +63,8 @@ function autoload($class) {
   // checks all the include paths to see if the file exist
   $paths = explode(PATH_SEPARATOR, get_include_path());
   foreach ($paths as $path) {
-    if (file_exists($path . $file)) {
-      require $path . $file;
+    if (file_exists($path . '/' . $file)) {
+      require $path . '/' . $file;
       return true;
     }
   }

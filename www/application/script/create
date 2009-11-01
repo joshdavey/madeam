@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
 // boot.php should always set up the include paths to point to the copy of Madeam 
-// in the app/vendor directory
-require 'app/vendor/madeam/src/madeam.php';
+// in the application/vendor directory
+require 'application/vendor/madeam/src/madeam.php';
 new madeam\console\Create($_SERVER['argv']);

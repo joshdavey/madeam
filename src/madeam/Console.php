@@ -98,7 +98,7 @@ class Console {
       // if the command requires to be in the application's root path then check it.
       // If we aren't in the applicatin's root path then tell the user and exit
       if ($scriptName != 'make') {
-        if (!file_exists(realpath('app/vendor/Madeam.php'))) {
+        if (!file_exists(realpath('application/vendor/Madeam.php'))) {
           console\CLI::outError('Please point Madeam Console to the root directory of your application.');
           exit();
         }

@@ -16,7 +16,7 @@ class View {
   
   /**
    * Full path to templates directory
-   *  example: /var/www/project/app/views/
+   *  example: /var/www/project/application/views/
    */
   static public $path = null;
   

@@ -7,7 +7,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase {
    * 
    */
   public function setUp() {
-    View::$path = TESTS_MADEAM_PROJECT_DIRECTORY . 'app/views' . DIRECTORY_SEPARATOR;
+    View::$path = TESTS_MADEAM_PROJECT_DIRECTORY . 'application/views' . DIRECTORY_SEPARATOR;
   }
   
   /**

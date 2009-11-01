@@ -186,7 +186,7 @@ class Controller {
     } else {
       if (!file_exists(View::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($this->_view)) . '.' . $request['_format'])) {
         throw new controller\exception\MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
-        . "\n Create the view <strong>app/views/" . $request['_controller'] . '/' . Inflector::dashize(substr($action, 0, -6)) . '.' . $request['_format'] . "</strong> OR Create a method called <strong>" . $action . "</strong> in <strong>" . get_class($this) . "</strong> class."
+        . "\n Create the view <strong>application/views/" . $request['_controller'] . '/' . Inflector::dashize(substr($action, 0, -6)) . '.' . $request['_format'] . "</strong> OR Create a method called <strong>" . $action . "</strong> in <strong>" . get_class($this) . "</strong> class."
         . " \n <code>public function " . $action . "() {\n\n}</code>");
       } else {
         // set data as $request data...? This way we can access partials

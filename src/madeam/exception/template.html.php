@@ -132,7 +132,7 @@ code {
     <pre class="backtrace"><?php echo $message['backtrace']; ?></pre>
 
     <br />
-    <p><em><strong>Note</strong>: You can disable these error messages in app/config/setup.php</em></p>
+    <p><em><strong>Note</strong>: You can disable these error messages in application/config/setup.php</em></p>
 
   </div>
 

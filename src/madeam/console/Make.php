@@ -19,12 +19,12 @@ class Make extends \madeam\Console {
     
     if ($clone === true) {
       // clone madeam from remote
-      echo `git clone -v git://github.com/joshdavey/madeam {$path}/app/vendor/madeam`;
+      echo `git clone git://github.com/joshdavey/madeam {$path}/application/vendor/madeam`;
     } elseif ($symlink === true) {
-      echo `ln -s {$madeam}madeam/ {$path}/app/vendor/madeam`;
+      echo `ln -s {$madeam}madeam/. {$path}/application/vendor/madeam`;
     } else {
       // copy local madeam copy
-      echo `cp -rpv {$madeam}madeam {$path}/app/vendor`;
+      echo `cp -rpv {$madeam}madeam/. {$path}/application/vendor/madeam`;
     }
   }
   

@@ -1,0 +1,3 @@
+#!/usr/bin/env php
+<?php
+require 'application/vendor/Madeam/src/Madeam/Console/Interactive.php';

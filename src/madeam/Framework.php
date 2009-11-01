@@ -35,7 +35,7 @@ class Framework {
     if (substr($server_document_root, - 1) != '/') { $server_document_root .= '/'; }
     
     // set views directory -- does this belong here?...
-    View::$path = self::$pathToProject . 'app/views/';
+    View::$path = self::$pathToProject . 'application/views/';
     
     // determine dynamic uri path
     self::$uriPathDynamic = self::parseDynamicUri($server_document_root, $application_document_root);
@@ -125,7 +125,7 @@ class Framework {
     // so 'admin' becomes 'admin/index' if the admin directory exists.
     // note: there is a consequence for this feature which means if you have a directory named 'admin'
     // you can't have a controller named 'Controller_Admin'
-    if (is_dir('app/src/Controller/' . ucfirst($request['_controller']))) {
+    if (is_dir('application/controllers/' . ucfirst($request['_controller']))) {
       $request['_controller'] .= '/' . 'index';
     }
     
@@ -142,12 +142,12 @@ class Framework {
     try {
       $controller = new $controllerClass();
     } catch (Exception\AutoloadFail $e) {
-      if (is_dir(self::$pathToProject . 'app/views/' . $request['_controller'])) {
+      if (is_dir(self::$pathToProject . 'application/views/' . $request['_controller'])) {
         $view = $request['_controller'] . '/' . $request['_action'];
         $request['_controller'] = 'app';
         $controller = new \AppController();
         $controller->view($view);
-      } elseif (is_file(self::$pathToProject . 'app/views/' . $request['_controller'] . '/' . $request['_action'] . '.' . $request['_format'])) {
+      } elseif (is_file(self::$pathToProject . 'application/views/' . $request['_controller'] . '/' . $request['_action'] . '.' . $request['_format'])) {
         $view = $request['_controller'];
         $request['_action'] = $request['_controller'];
         $request['_controller'] = 'app';
@@ -156,7 +156,7 @@ class Framework {
       } else {
         // no controller or view found = critical error.
         //header("HTTP/1.1 404 Not Found");
-        Exception::handle($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>app/Controller/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends AppController {\n\n  &nbsp; public function " . Inflector::camelize(lcfirst($request['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
+        Exception::handle($e, array('message' => 'Missing Controller <strong>' . $controllerClass . "</strong> \n Create File: <strong>application/controllers/" . str_replace('_', DS, $controllerClass) . ".php</strong> \n <code>&lt;?php \n class $controllerClass extends AppController {\n\n  &nbsp; public function " . Inflector::camelize(lcfirst($request['_action'])) . "Action() {\n &nbsp;&nbsp;&nbsp; \n &nbsp; }\n\n   }</code>"));
         return;
       }
     }

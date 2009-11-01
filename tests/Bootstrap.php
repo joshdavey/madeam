@@ -10,11 +10,11 @@
   
 // set include path  
   set_include_path(
-    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/models/' . PATH_SEPARATOR . 
-    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/controllers/' . PATH_SEPARATOR . 
-    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/middleware/' . PATH_SEPARATOR .
-    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/vendor/' . PATH_SEPARATOR .
-    TESTS_MADEAM_PROJECT_DIRECTORY . 'app/' . PATH_SEPARATOR .
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'application/models/' . PATH_SEPARATOR . 
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'application/controllers/' . PATH_SEPARATOR . 
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'application/middleware/' . PATH_SEPARATOR .
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'application/vendor/' . PATH_SEPARATOR .
+    TESTS_MADEAM_PROJECT_DIRECTORY . 'application/' . PATH_SEPARATOR .
     get_include_path() . PATH_SEPARATOR . 
     __DIR__ . '/' 
   );

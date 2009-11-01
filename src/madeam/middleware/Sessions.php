@@ -13,9 +13,6 @@ class Sessions extends \madeam\Middleware {
       setcookie('_sessionid', $request['_sessionid']);
     }
     
-    // configure sessions
-    session_save_path(\madeam\Framework::$pathToProject . 'etc/session');
-    
     // initiate session
     \madeam\Session::start($request['_sessionid']);
     

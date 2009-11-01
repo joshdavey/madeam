@@ -17,11 +17,11 @@ cd /tmp
 echo "- Copying www directory into release directory"
 cp -rv ${BIN_DIR}/../www/ ${RELEASE_NAME}
 
-echo "- Creating git clone in app/vendor/Madeam"
-git clone -v ${BIN_DIR}/../../Madeam/ ${RELEASE_NAME}/app/vendor/Madeam/
+echo "- Creating git clone in application/vendor/Madeam"
+git clone -v ${BIN_DIR}/../../Madeam/ ${RELEASE_NAME}/application/vendor/Madeam/
 
 echo "- Removing .git from clone"
-rm -rf ${RELEASE_NAME}/app/vendor/Madeam/.git
+rm -rf ${RELEASE_NAME}/application/vendor/Madeam/.git
 
 echo "- Creating release zip and tgz archives"
 tar -zcpPf ${RELEASE_NAME}.tgz ${RELEASE_NAME}
