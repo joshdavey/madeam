@@ -71,16 +71,10 @@ class Framework {
       throw new Exception('URLs not being re-written properly');
     }
     
-    // set query string
-    $request['_query'] = $server_query_string;
-    
-    // set layout if it hasn't already been set
-    isset($request['_layout']) ?: $request['_layout'] = 1;
-    
     // set overriding request method -- note: we need to get rid of all the $_SERVER references for testing purposes
     if (isset($_SERVER['X_HTTP_METHOD_OVERRIDE'])) {
       $request['_method'] = strtolower($_SERVER['X_HTTP_METHOD_OVERRIDE']);
-    } elseif (isset($request['_method']) && $server_request_method == 'POST') {
+    } elseif (isset($request['_method']) && strtolower($server_request_method) == 'post') {
       $request['_method'] = strtolower($request['_method']);
     } else {
       $request['_method'] = strtolower($server_request_method);
@@ -92,10 +86,11 @@ class Framework {
       $request['_layout'] = 0;
     } else {
       $request['_ajax'] = 0;
+      isset($request['_layout']) ?: $request['_layout'] = 1;
     }
     
     // parse request with router
-    $request += Router::parse($request['_uri'] . '?' . $request['_query'], self::$uriPathDynamic);
+    $request += Router::parse($request['_uri'] . '?' . $server_query_string, $request['_method'], $request, self::$uriPathDynamic);
     
     // execute beforeRequest middleware
     foreach (self::$middleware as $class) {

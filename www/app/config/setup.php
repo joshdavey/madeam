@@ -1,11 +1,6 @@
 <?php
 // set environment
-$environemnt = apache_getenv('MADEAM_ENV');
-if ($environemnt === false) {
-  madeam\Framework::$environment = require './env.php';
-} else {
-  madeam\Framework::$environment = $environemnt;
-}
+madeam\Framework::$environment = (isset($_SERVER['MADEAM_ENV'])) ? $_SERVER['MADEAM_ENV'] : 'development';
 
 switch (madeam\Framework::$environment) {
   case 'development' :

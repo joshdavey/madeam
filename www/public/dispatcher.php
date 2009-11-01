@@ -24,16 +24,8 @@
 // if Madeam is in our local lib, include it. Otherwise use the one in the PHP include path
 // note: the library in the PHP include path should only be used for Madeam development and never
 // the development of a project based on madeam. Madeam should always be in the vendor directory
-  require 'app/vendor/Madeam/src/Madeam.php';
-  
-// set environment
-  $environemnt = apache_getenv('MADEAM_ENV');
-  if ($environemnt === false) {
-    madeam\Framework::$environment = require './env.php';
-  } else {
-    madeam\Framework::$environment = $environemnt;
-  }
-  
+  require 'app/vendor/madeam/src/Madeam.php';
+
 // include config files
   require './app/config/setup.php';
   require './app/config/routes.php';

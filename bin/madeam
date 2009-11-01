@@ -3,7 +3,7 @@
 require realpath(dirname(__FILE__) . '/..') . '/src/Madeam.php';
 $pwd = $_SERVER['argv'][0];
 unset($_SERVER['argv'][0]);
-array_unshift($_SERVER['argv'], '-name');
+array_unshift($_SERVER['argv'], '--name');
 array_unshift($_SERVER['argv'], 'app');
 array_unshift($_SERVER['argv'], $pwd);
 new madeam\console\Make($_SERVER['argv']);

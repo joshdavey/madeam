@@ -15,7 +15,7 @@ class Make extends \madeam\Console {
     if (!file_exists($path)) { `mkdir -p $path`; }    
     
     $madeam = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/';
-    echo `cp -rpv {$madeam}madeam/www/ {$path}`;
+    echo `cp -rpv {$madeam}madeam/www/. {$path}`;
     
     if ($clone === true) {
       // clone madeam from remote

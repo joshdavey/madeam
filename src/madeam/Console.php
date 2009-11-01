@@ -30,12 +30,12 @@ class Console {
     // -name Posts => array('name' => 'Posts')
     // -scaffold -name Posts => array('scaffold' => true, 'name' => 'Posts')
     foreach ($params as $key => $param) {
-      if (preg_match('/-.*/', $param)) {
-        if (!isset($params[$key+1]) || preg_match('/-.*/', $params[$key+1])) {
-          $params[substr($param, 1)] = true;
+      if (preg_match('/--.*/', $param)) {
+        if (!isset($params[$key+1]) || preg_match('/--.*/', $params[$key+1])) {
+          $params[substr($param, 2)] = true;
           unset($params[$key]);
         } else {
-          $params[substr($param, 1)] = $params[$key+1];
+          $params[substr($param, 2)] = $params[$key+1];
           unset($params[$key]);
           unset($params[$key+1]);
         }
