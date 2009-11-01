@@ -212,10 +212,9 @@ class Controller {
       try {
         // render view
         $this->_output = View::render(array(
-          'template'  => $this->_view,
+          'template'  => $this->_view . $request['_format'],
           'layout'    => $this->_layout,
-          'data'      => $this->_data + (array) $this,
-          'format'    => $request['_format']
+          'data'      => $this->_data + (array) $this
         ));
       } catch (controller\exception\MissingView $e) {
         // serialize output

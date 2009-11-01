@@ -35,7 +35,7 @@ class View {
    */
   static public function render($__settings) {
     // set format
-    $__format = isset($__settings['format']) ? '.' . $__settings['format'] : $__settings['format'] =  null;
+    $__format = substr($__settings['template'], strrpos($__settings['template'], '.'));
     
     // set layout
     isset($__settings['layout']) ?: $__settings['layout'] = array();
@@ -74,7 +74,7 @@ class View {
         }
       }
     } else {
-      throw new controller\exception\MissingView('Missing View: <strong>' . $__template . "</strong> and unknown serialization format \"<strong>" . $__settings['format'] . '</strong>"' . "\n Create File: <strong>" . $__template . "</strong>");
+      throw new controller\exception\MissingView('Missing View: <strong>' . $__template . "</strong> and unknown serialization format \"<strong>" . $__format . '</strong>"' . "\n Create File: <strong>" . $__template . "</strong>");
     }
     
     return $_content;
