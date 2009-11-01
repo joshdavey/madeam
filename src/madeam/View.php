@@ -44,7 +44,7 @@ class View {
     isset($__settings['data']) ?: $__settings['data'] = array();
     
     // set template
-    $__template = self::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($__settings['template'])) . $__format;
+    $__template = self::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($__settings['template']));
     
     // check if the view exists
     // if the view doesn't exist we need to serialize it.
