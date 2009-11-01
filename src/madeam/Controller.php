@@ -212,7 +212,7 @@ class Controller {
       try {
         // render view
         $this->_output = View::render(array(
-          'template'  => $this->_view . $request['_format'],
+          'template'  => $this->_view . '.' . $request['_format'],
           'layout'    => $this->_layout,
           'data'      => $this->_data + (array) $this
         ));
