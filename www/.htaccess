@@ -1,13 +1,11 @@
-<IfModule mod_rewrite.c>
-  Options +FollowSymlinks
-  RewriteEngine on
-  
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-f
+Options +FollowSymlinks
+RewriteEngine on
 
-  #To use sub directories uncomment this line and replace "sub" with the name of your directory
-  #RewriteRule sub$ /sub/ [QSA,L]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
 
-  RewriteRule ^$ public/dispatcher.php?_uri=$1 [QSA,L]
-  RewriteRule (.*) public/dispatcher.php?_uri=$1 [QSA,L]
-</IfModule>
+#To use sub directories uncomment this line and replace "sub" with the name of your directory
+#RewriteRule sub$ /sub/ [QSA,L]
+
+RewriteRule ^$ public/dispatcher.php?_uri=$1 [QSA,L]
+RewriteRule (.*) public/dispatcher.php?_uri=$1 [QSA,L]

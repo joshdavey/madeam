@@ -1,32 +1,20 @@
 <?php
+// set environment
+$environemnt = apache_getenv('MADEAM_ENV');
+if ($environemnt === false) {
+  madeam\Framework::$environment = require './env.php';
+} else {
+  madeam\Framework::$environment = $environemnt;
+}
+
 switch (madeam\Framework::$environment) {
   case 'development' :
     madeam\Exception::$inlineErrors  = true;
     madeam\Exception::$debugMode     = true;
-    
-    // activerecord\Configure::$connections = array(
-    //   'default' => array(
-    //     'master' => "mysql://username:password@localhost?name=madeam_development",
-    //     'slaves' => array(
-    //       "mysql://username:password@localhost?name=madeam_development",
-    //       "mysql://username:password@localhost?name=madeam_development"
-    //     )
-    //   )
-    // );
   break;  
   case 'production' :
     madeam\Exception::$inlineErrors  = false;
     madeam\Exception::$debugMode     = false;
-    
-    // activerecord\Configure::$connections = array(
-    //   'default' => array(
-    //     'master' => "mysql://username:password@localhost?name=madeam_production",
-    //     'slaves' => array(
-    //       "mysql://username:password@localhost?name=madeam_production",
-    //       "mysql://username:password@localhost?name=madeam_production"
-    //     )
-    //   )
-    // );
   break;
 }
 
