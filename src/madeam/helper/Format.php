@@ -59,9 +59,9 @@ class Format {
       }
     }
   }
-  
+
   /**
-   * undocumented 
+   * undocumented
    *
    * @author Joshua Davey
    */
@@ -79,9 +79,9 @@ class Format {
     if($val>1) $val .= 's';
     return $val;
   }
-  
+
   /**
-   * undocumented 
+   * undocumented
    *
    * @author Joshua Davey
    */

@@ -39,20 +39,20 @@ class Html {
   public static function js($src, $_params = array()) {
     return '<script src="' . \madeam\Framework::url($src) . '.js" type="text/javascript"></script>';
   }
-  
+
   public static function gjs($library, $version) {
     static $timesCalled = 0;
-    
+
     $html = null;
-    
+
     if ($timesCalled == 0) {
       $html = '<script src="http://www.google.com/jsapi"></script>';
     }
-    
+
     $html .= '<script>google.load("' . $library . '", "' . $version . '");</script>';
-    
+
     $timesCalled++;
-    
+
     return $html;
   }
 

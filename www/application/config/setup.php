@@ -6,7 +6,7 @@ switch (madeam\Framework::$environment) {
   case 'development' :
     madeam\Exception::$inlineErrors  = true;
     madeam\Exception::$debugMode     = true;
-  break;  
+  break;
   case 'production' :
     madeam\Exception::$inlineErrors  = false;
     madeam\Exception::$debugMode     = false;

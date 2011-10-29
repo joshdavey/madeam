@@ -130,7 +130,7 @@ class Inflector {
   public static function backSlashize($string) {
     return self::specialize('\\', $string);
   }
-  
+
   /**
    * This method makes strings more readable to human
    *
@@ -145,14 +145,14 @@ class Inflector {
   }
 
   /**
-   * 
+   *
    */
   public static function specialize($char, $string) {
     $escapedChar = preg_quote($char, '/');
     // pad all capitalized strings with replacement character and make the text lowercase.
     $string = strtolower(preg_replace('/[^a-zA-Z0-9' . $escapedChar . ']*([A-Z]+)/', preg_quote($char)  . '${1}', $string));
     $string = preg_replace('/([^a-z0-9' . $escapedChar . ']+)/', $char, $string);
-    
+
     // return formatted string
     return strtolower($string);
   }
@@ -161,8 +161,8 @@ class Inflector {
    * This method returns a string formatted so that it is appropriate to
    * use in a URL.
    *
-   * @param string $string 
-   * @param string $separator 
+   * @param string $string
+   * @param string $separator
    * @return string
    * @author Joshua Davey
    */
@@ -171,10 +171,10 @@ class Inflector {
     $string = preg_replace('/[^a-z0-9' . preg_quote($separator) . '_]/', '', $string);
     return $string;
   }
-  
+
   public static function map($string, $maps = array()) {
     foreach ($maps as $pattern => $replacement) {
-      $string = preg_replace('/' . $pattern . '/', $replacement, $string); 
+      $string = preg_replace('/' . $pattern . '/', $replacement, $string);
     }
     return $string;
   }

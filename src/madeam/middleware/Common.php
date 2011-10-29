@@ -1,7 +1,7 @@
 <?php
 namespace madeam\middleware;
 class Common extends \madeam\Middleware {
-  
+
   static public function beforeRequest($request) {
     // remove _uri from request
     // _uri is defined in the public/.htaccess file. Many developers may not notice it because of
@@ -15,8 +15,8 @@ class Common extends \madeam\Middleware {
     if (isset($_SERVER['QUERY_STRING'])) {
       $_SERVER['QUERY_STRING'] = preg_replace('/&?_uri=[^&]*&?/', null, $_SERVER['QUERY_STRING']);
     }
-    
+
     return $request;
   }
-  
+
 }

@@ -11,10 +11,10 @@ class Create extends \madeam\Console {
    * @param string $actions
    */
   public function controller($name, $extends = 'AppController', $views = 'index,read,new,edit', $actions = 'index,read,new,create,edit,update,delete') {
-    
+
     // set controller name and class name
     $names = explode('/', $name);
-    
+
     $controllerName           = $names[count($names) - 1];
     $controllerClassName      = ucfirst($controllerName) . 'Controller';
     $controllerNamespace      = implode('\\', $names);
@@ -25,16 +25,16 @@ class Create extends \madeam\Console {
     } else {
       $controllerClassFilePath  = getcwd() . '/application/controllers/' . implode(DIRECTORY_SEPARATOR, $names) . '/';
     }
-    
+
     // Create Class directory
     `mkdir -p $controllerClassFilePath`;
-    
+
     // Create View directory
     `mkdir -p $controllerViewFilePath`;
 
     // define controller class in controller file contents
     $controllerContents = "<?php\nclass $controllerClassName extends " . $extends . " {\n";
-    
+
     // create action
     $actions = preg_split('/[\s\,]/', $actions);
     foreach ($actions as $action) {
@@ -42,7 +42,7 @@ class Create extends \madeam\Console {
       // add action method to class
       $controllerContents .= "\n  public function $action" . "Action(\$request) {\n    \n  }\n";
     }
-    
+
     // create views
     $views = preg_split('/[\s\,]/', $views);
     foreach ($actions as $view) {
@@ -54,7 +54,7 @@ class Create extends \madeam\Console {
     }
 
     // close class definition
-    $controllerContents .= "\n}";    
+    $controllerContents .= "\n}";
 
     // save file contents to file
     $controllerFile = $controllerClassFilePath . $controllerName .  'Controller.php';
@@ -71,19 +71,19 @@ class Create extends \madeam\Console {
   public function view($name, $format = 'html') {
     // set file contents
     $viewContents = $name . ' view';
-    
+
     $nodes = explode('/', $name);
-    
+
     $viewFileName = strtolower(array_pop($nodes)) . '.' . $format;
-    
+
     // create view directory
     $viewPath = getcwd() . '/application/views/' . implode('/', $nodes) . '/';
     `mkdir -p $viewPath`;
-    
+
     $viewFile = $viewPath . $viewFileName;
     `touch $viewFile`;
-    
+
     file_put_contents($viewFile, $viewContents);
   }
-  
+
 }

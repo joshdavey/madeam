@@ -1,17 +1,17 @@
 <?php
 class TestsController extends madeam\Controller {
-  
+
   public $include = 'False';
   public $exclude = 'False';
-  
+
   // public function beforeFilter_Include($include = array('tests/include')) {
   //   $this->include = 'True';
   // }
-  // 
+  //
   // public function beforeFilter_Exclude($exclude = array('tests/exclude')) {
   //   $this->exclude = 'True';
   // }
-  // 
+  //
   // /**
   //  * This action is to test the exclusion feature of the callbacks
   //  * $this->exclude should not be set by the beforeFilter_Exclude
@@ -24,7 +24,7 @@ class TestsController extends madeam\Controller {
   //     return 'False';
   //   }
   // }
-  // 
+  //
   // /**
   //  * This action is to test the inclusion feature of the callbacks
   //  * $this->exclude should be set by the beforeFilter_Exclude
@@ -37,29 +37,29 @@ class TestsController extends madeam\Controller {
   //     return 'False';
   //   }
   // }
-  
+
   public function returnAction() {
     return 'Action';
   }
-  
+
   public function actionAction() {
-    
+
   }
-  
+
   public function dataAction() {
     $this->data = 'True';
   }
-  
+
   public function serializeAction() {
     $this->data = 'True';
   }
-  
+
   public function paramAction($data) {
     return $data;
   }
-  
+
   public function modelAction() {
     $this->Test->findAll();
   }
-  
+
 }

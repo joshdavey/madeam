@@ -16,7 +16,7 @@ namespace madeam;
 class Router {
 
   public static $routes = array(); // regex, values, rules
-  
+
   static public $defaults = array(
     '_controller' => 'index',
     '_action'     => 'index',
@@ -46,9 +46,9 @@ class Router {
         $name = $match[1];
         if (isset($rules[$name])) {
           // named param with a rule
-          $regex .= '(?:\\/(?P<' . $name . '>' . $rules[$name] . '))'; 
+          $regex .= '(?:\\/(?P<' . $name . '>' . $rules[$name] . '))';
           // we don't need the rule anymore if its in the regex
-          unset($rules[$name]); 
+          unset($rules[$name]);
         } else {
           // named param with no rules
           $regex .= '(?:\\/(?P<' . $name . '>' . '[^\/]+))?';
@@ -58,21 +58,21 @@ class Router {
         $regex .= '\\/' . $bit;
       }
     }
-    
+
     // build route's regexp
     $regex = '/^' . $regex . '\/?(?P<_extra>.*)$/';
-    
+
     // add to routes list
     self::$routes[] = array($regex, $values, $rules);
   }
-  
+
   /**
    * Default routes for a RESTful resource.
-   * 
+   *
    * To use a slug instead of an id or to simply change the rule for the id the $id param
    * has a value for the id's name and the id's rule. For example if I wanted to call "id"
    * "slug" and change the rule to one that matches slugs I could do the following:
-   * 
+   *
    * madeam\Router::resource::('posts', array('id' => 'slug', 'pattern' => '[a-z0-9\-]+'));
    *
    * @param string $name
@@ -83,11 +83,11 @@ class Router {
    * @author Joshua Davey
    */
   public static function resource($name, $options = array()) {
-    
+
     $controller = isset($options['controller']) ? $options['controller'] : $name;
     $id         = isset($options['id']) ? $options['id'] : 'id';
     $pattern    = isset($options['pattern']) ? $options['pattern'] : '\d+';
-    
+
     self::connect("$name/:$id[0]",      array('_action' => 'show',    '_controller' => $name),  array('_method' => 'get', $id[0] => $id[1]));
     self::connect("$name/edit/:$id[0]", array('_action' => 'edit',    '_controller' => $name),  array('_method' => 'get', $id[0] => $id[1]));
     self::connect("$name/new",          array('_action' => 'new',     '_controller' => $name),  array('_method' => 'get'));
@@ -114,16 +114,16 @@ class Router {
    * @return array
    * @author Joshua Davey
    */
-  public static function parse($uri = false, $baseUri = '/') {    
+  public static function parse($uri = false, $baseUri = '/') {
     // makes sure the first character is "/"
     // if (substr($uri, 0, 1) != '/') { $uri = '/' . $uri; }
     substr($uri, 0, 1) == '/' ?: $uri = '/' . $uri;
-    
+
     $defaults = self::$defaults;
-    
+
     // parse uri
     $parsedURI = parse_url($uri);
-     
+
     // set uri
     if (isset($parsedURI['path']) && $baseUri == '/') {
       $uri = $parsedURI['path'];
@@ -138,7 +138,7 @@ class Router {
     } else {
       $uri = null;
     }
-        
+
     $format = false;
     // grab format if it exists in the uri and strip it from the uri
     // index.html => format = 'html' && uri = 'index'
@@ -155,13 +155,13 @@ class Router {
       // retrieve $_GET vars manually from uri -- so we can enter the uri as index/index?foo=bar when calling a component from the view
       parse_str($query, $get); // assigns $get array of query params
     }
-    
+
     // set default format
     // !$format ?: $defaults['_format'] = $format; // for some reason this line of code will work for a few requests and then crash... replaced with the code below
     if ($format !== false) {
       $defaults['_format'] = $format;
     }
-    
+
     // add query to params
     !isset($query) ?: $defaults['_query'] = $query;
 
@@ -174,11 +174,11 @@ class Router {
         // set default params
         $params = $route[1]; // default values
         $rules  = $route[2]; // param rules
-        
+
         // set _uri param for websites that don't have mod_rewrite
         // sites with mod_rewrite have _uri assigned automatically in the .htaccess file
         $params['_uri'] = $match[0];
-        
+
         // clean param matchs by removing nulls and preg_match's numbered results
         // every other match is a numbered preg_match result
         $index = 0;
@@ -189,10 +189,10 @@ class Router {
             unset($match[$key]); // remove preg_match's numbered results
           }
         }
-        
+
         // merge default param values with matched params
         $params = array_merge($defaults, $params, $match);
-        
+
         // check each rule against its associated param.
         // if it fails then we break out of this loop and continue to the next route
         $continue = false;
@@ -201,17 +201,17 @@ class Router {
             $continue = true;
             break;
           }
-        }        
+        }
         if ($continue === true) { continue; }
-        
+
         // flag as matched
         $matchs++;
-        
+
         // we've found our match and now we're done here
         break;
       }
     }
-    
+
     if ($matchs == 0) {
       // this is lame and needs to be done better
       //header("HTTP/1.1 404 Not Found");
@@ -220,17 +220,17 @@ class Router {
       // but what about returning the params if we throw an error?
       return $params;
     }
-    
+
     // get params from uri
     $params = array_merge($defaults, $params, $get);
-    
+
     // automagically disable the layout when making an AJAX call
     if (!isset($params['_layout']) && isset($params['_ajax']) && $params['_ajax'] == 1) {
       $params['_layout'] = 0;
     } elseif (!isset($params['_layout'])) {
       $params['_layout'] = 1;
     }
-    
+
     return $params;
   }
 }
