@@ -34,12 +34,12 @@ require $madeamLibrary . 'View.php';
 Framework::$pathToProject = getcwd() . '/';
 
 set_include_path(
-  Framework::$pathToProject . 'application/models' . PATH_SEPARATOR . 
-  Framework::$pathToProject . 'application/controllers' . PATH_SEPARATOR . 
+  Framework::$pathToProject . 'application/models' . PATH_SEPARATOR .
+  Framework::$pathToProject . 'application/controllers' . PATH_SEPARATOR .
   Framework::$pathToProject . 'application/middleware' . PATH_SEPARATOR .
   Framework::$pathToProject . 'application/vendor' . PATH_SEPARATOR .
   Framework::$pathToProject . 'application' . PATH_SEPARATOR .
-  get_include_path() . PATH_SEPARATOR . 
+  get_include_path() . PATH_SEPARATOR .
   dirname(dirname(dirname(__FILE__))) . ''
 );
 
@@ -52,14 +52,14 @@ set_exception_handler('madeam\Exception::handle');
 /**
  * Madeam's class Autoloader. This method should be used for autoloading by loading it with spl.
  * Example: spl_autoload_register('madeam\autoload');
- * 
+ *
  * @param string $class
  * @author Joshua Davey
  */
 function autoload($class) {
   // set class file name)
   $file = str_replace('_', '/', str_replace('\\', '/', $class)) . '.php'; // PHP 5.3
-  
+
   // checks all the include paths to see if the file exist
   $paths = explode(PATH_SEPARATOR, get_include_path());
   foreach ($paths as $path) {
@@ -72,13 +72,13 @@ function autoload($class) {
 
 /**
  * This is the second autoloader (one day it will be primary).
- * This autoloader looks for packages. A package is the first part of a class name. 
- * 
+ * This autoloader looks for packages. A package is the first part of a class name.
+ *
  * The expected directory structure of a package is a modified version of PEAR2's directory structure
- * @see http://wiki.pear.php.net/index.php/PEAR2_Standards#Directory_structure 
+ * @see http://wiki.pear.php.net/index.php/PEAR2_Standards#Directory_structure
  * The difference is that PEAR assumes pacakges are always within the PEAR directory. This version
- * only expects the package to be in its on directory within an include path. 
- * 
+ * only expects the package to be in its on directory within an include path.
+ *
  * packagename/
  *  doc/
  *  src/
@@ -87,12 +87,12 @@ function autoload($class) {
  *  tests/
  *    PackageNameTest.php
  *    packagename/
- * 
+ *
  * Here are some example classes and their location
  *  madeam                => madeam/src/Madeam.php
  *  madeam\Controller     => madeam/src/madeam/Controller.php
  *  madeam\serialize\Json => madeam/src/madeam/serialize/Json.php
- * 
+ *
  * @param string $class
  * @author Joshua Davey
  */
@@ -105,7 +105,7 @@ function autoloadPackage($class) {
   } else {
     $file = substr($class, 0, -$packageNameLength) . '/src/' . str_replace('\\', '/', $class) . '.php';
   }
-  
+
   // checks all the include paths to see if the file exist
   $paths = explode(PATH_SEPARATOR, get_include_path());
   foreach ($paths as $path) {
@@ -125,10 +125,10 @@ function autoloadPackage($class) {
  */
 function autoloadFail($class) {
   $fullClass = preg_replace("/[^A-Za-z0-9_\\\]/", null, $class); // clean the dirt
-  
+
   $namespace = substr($fullClass, 0, strrpos($class, '\\'));
   $class = substr($fullClass, strrpos($class, '\\') + 1, strlen($class));
-  
+
   if ($namespace != null) {
     $namespace = 'namespace ' . $namespace . ';';
   }
@@ -161,7 +161,7 @@ function debug($var = null) {
   for ($i = 0; $i < (6 - strlen($tests)); $i ++) {
     $tests = '0' . $tests;
   }
-  
+
   if (!isset($_SERVER['SHELL'])) {
     $header = '<br /><pre>[T::' . $tests . '] &nbsp;&nbsp;' . "\n";
     $footer = ' &nbsp;&nbsp;</pre>' . "\n";
@@ -169,7 +169,7 @@ function debug($var = null) {
     $header = null;
     $footer = "\n";
   }
-  
+
   if (is_array($var) || is_object($var)) {
     echo $header;
     print_r($var);
@@ -180,7 +180,7 @@ function debug($var = null) {
     } else {
       $var = 'FALSE';
     }
-    
+
     echo $header . (string) $var . $footer;
   } else {
     echo $header . $var . $footer;

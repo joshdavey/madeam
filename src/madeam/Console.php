@@ -17,15 +17,15 @@ namespace madeam;
 class Console {
 
   /**
-   * undocumented 
+   * undocumented
    *
    * @author Joshua Davey
    */
   public function __construct($params = array()) {
     array_shift($params); // remove script path
-    
+
     $action = array_shift($params);
-    
+
     // parse POSIX params
     // -name Posts => array('name' => 'Posts')
     // -scaffold -name Posts => array('scaffold' => true, 'name' => 'Posts')
@@ -48,7 +48,7 @@ class Console {
     // check methods for callbacks
     $method = $reflection->getMethod($action);
 
-    // 
+    //
     $defaults = array();
     $parameters = $method->getParameters();
     foreach ($parameters as $parameter) {
@@ -59,7 +59,7 @@ class Console {
         $defaults[$parameter->getName()] = null;
       }
     }
-    
+
     $args = array();
     foreach ($defaults as $param => $value) {
       if (isset($params[$param])) {
@@ -68,21 +68,21 @@ class Console {
         $args[] = $value;
       }
     }
-    
+
     call_user_func_array(array($this, $action), $args);
   }
 
   /**
-   * undocumented 
+   * undocumented
    *
    * @author Joshua Davey
    */
-  public function initialize2() {      
+  public function initialize2() {
     array_shift($_SERVER['argv']);
     $args         = $_SERVER['argv'];
     $scriptName   = false;
     $commandName  = false;
-    
+
     // get list of available consoles
     $scriptNames = array('create', 'delete', 'test', 'migrate');
 
@@ -163,7 +163,7 @@ class Console {
   }
 
   /**
-   * undocumented 
+   * undocumented
    *
    * @author Joshua Davey
    */
@@ -182,25 +182,25 @@ class Console {
     if (substr($file_path, - 1) !== DS) {
       $file_path = $file_path . DS;
     }
-    
+
     $file = $file_path . $file_name;
     if (file_exists($file)) {
       if (console\CLI::getYN('The file ' . $file_name . ' already exists. Overwrite?') === false) {
         return false;
       }
     }
-    
+
     if (file_put_contents($file, $file_content)) {
       console\CLI::outCreate('file ' . $file);
       return true;
     }
   }
-  
+
   protected function createDir($dir) {
     if (!file_exists($dir)) {
       mkdir($dir, 0777, true);
       console\CLI::outCreate('directory ' . $dir);
     }
   }
-  
+
 }

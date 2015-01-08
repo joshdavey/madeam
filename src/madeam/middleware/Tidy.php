@@ -1,9 +1,9 @@
 <?php
 namespace madeam\middleware;
 class Tidy extends \madeam\Middleware {
-  
+
   static public function beforeResponse($request, $response) {
-    
+
     if ($request['_format'] == 'html') {
       $tidy = new \Tidy;
       $tidy->parseString($response, array(
@@ -14,8 +14,8 @@ class Tidy extends \madeam\Middleware {
       $html = $tidy->html();
       $response = $html->value;
     }
-    
+
     return $response;
   }
-  
+
 }

@@ -29,14 +29,14 @@
 // include config files
   require './application/config/setup.php';
   require './application/config/routes.php';
-  
+
 // setup Madeam
   madeam\Framework::setup(
     dirname($_SERVER['SCRIPT_FILENAME']) . '/', // example: /Users/batman/Sites/myblog/
     $_SERVER['DOCUMENT_ROOT']                   // example: /Users/batman/Sites/
   );
-  
-// dispatch handles the request and returns the output  
+
+// dispatch handles the request and returns the output
   echo madeam\Framework::dispatch(
     $_GET + $_POST + $_COOKIE,  // not always the same as $_REQUEST depending on the php.ini configuration
     $_SERVER['QUERY_STRING'],   // example: _uri=posts/view/32&blah=testing

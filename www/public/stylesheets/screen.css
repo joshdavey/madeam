@@ -40,31 +40,31 @@ em {
   font-style: italic;
 }
 
-h1 { 
-  font-size: 2.2em; 
+h1 {
+  font-size: 2.2em;
 }
 
-h1.debug { 
-  color: #b43838; 
+h1.debug {
+  color: #b43838;
 }
 
-h2 { 
-  font-size: 2.0em; 
+h2 {
+  font-size: 2.0em;
 }
 
-h3 { 
-  font-size: 1.8em; 
+h3 {
+  font-size: 1.8em;
 }
 
-h4 { 
-  font-size: 1.6em; 
+h4 {
+  font-size: 1.6em;
 }
 
-h5 { 
+h5 {
   font-size: 1.4em;
 }
 
-p { 
+p {
   font-size: 1.4em;
 }
 
@@ -83,16 +83,16 @@ li, dd, dt {
 
 
 
-/* Tables 
+/* Tables
 -----------------------------------------------------------------------------*/
-table { 
-  border-spacing: 0; 
-  border-collapse: collapse; 
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
 }
 
-td { 
-  text-align: left; 
-  font-weight: normal; 
+td {
+  text-align: left;
+  font-weight: normal;
 }
 
 
@@ -112,7 +112,7 @@ td {
 /* Code
 -----------------------------------------------------------------------------*/
 code {
-  background: #f1f4fa; 
+  background: #f1f4fa;
   padding: 1em;
   display: block;
   border: 1px solid #ddd;
@@ -124,13 +124,13 @@ code {
 
 /* Error
 -----------------------------------------------------------------------------*/
-.error { 
-  background: #c60e1b; 
-  color: #fff; 
-  padding: 3px; 
-  border: solid 3px #b43838; 
+.error {
+  background: #c60e1b;
+  color: #fff;
+  padding: 3px;
+  border: solid 3px #b43838;
 }
 
-  .error li { 
-    margin-left: 20px; 
+  .error li {
+    margin-left: 20px;
   }

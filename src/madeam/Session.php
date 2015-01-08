@@ -16,13 +16,13 @@ namespace madeam;
  */
 class Session {
 
-  static public $driver   = 'madeam\session\PHP';  
+  static public $driver   = 'madeam\session\PHP';
   static public $flashKey = '_flash';
 
   static public function start($sessionId = false) {
     $driver = self::$driver;
     $driver::start($sessionId);
-    
+
     // flashy
     $flashes = self::get(self::$flashKey);
     if (!empty($flashes)) {
@@ -41,28 +41,28 @@ class Session {
     $driver = self::$driver;
     $driver::destroy();
   }
-  
+
   static public function key() {
     return sha1($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR'] . time());
   }
 
   static public function set($key, $value, $flash = 0) {
     $driver = self::$driver;
-    
+
     if ($flash != 0) {
       $flashes = $driver::get(self::$flashKey);
       $flashes[$key] = $flash + 1;
       $driver::set(self::$flashKey, $flashes);
     }
-    
+
     $driver::set($key, $value);
   }
-  
+
   static public function exists($key) {
     $driver = self::$driver;
     return $driver::exists($key);
   }
-  
+
   static public function delete($key) {
     $driver = self::$driver;
     $driver::delete($key);

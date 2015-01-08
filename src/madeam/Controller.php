@@ -2,49 +2,49 @@
 namespace madeam;
 
 class Controller {
-  
+
   /**
    * Layouts
    * @var string/array
    */
   public $_layout = 'master';
-  
+
   /**
    * Path to view file from View directory including view's name (without file extension)
    * example: posts/index
    * @var string
    */
   public $_view = null;
-  
+
   /**
    * Data to be sent to view
    * @var array
    */
   public $_data = array();
-  
+
   /**
-   * Output of the request 
+   * Output of the request
    * @var string
    */
   public $_output = null;
-  
+
   /**
-   * 
+   *
    */
   public $_callbacks = array();
-  
+
   /**
    * This holds the view's final output's content so that it can be included into a layout
    * for example: <?php echo $this->_content; ?>
    * @var string
    */
   public $_content = null;
-  
+
   /**
    * List the formats that this controller returns
    */
   public $_returns = array('html');
-  
+
   /**
    * A map of all the file formats to their associated serialization method
    * @author Joshua Davey
@@ -56,7 +56,7 @@ class Controller {
   );
 
   /**
-   * 
+   *
    * @param string $name
    * @author Joshua Davey
    */
@@ -72,7 +72,7 @@ class Controller {
 
 
   /**
-   * 
+   *
    * @param string $name
    * @param string $value
    */
@@ -80,9 +80,9 @@ class Controller {
     $this->_data[$name] = $value;
   }
 
-  
+
   /**
-   * 
+   *
    * @param string $name
    * @return boolean
    */
@@ -93,52 +93,52 @@ class Controller {
       return false;
     }
   }
-  
-  
+
+
   /**
-   * 
+   *
    * @param string $name
    */
   public function __unset($name) {
     unset($this->_data[$name]);
   }
-  
+
   /**
-   * 
+   *
    * @return string
    */
   public function process($request) {
-    
+
     // reflection
     $reflection = new \ReflectionObject($this);
-    
+
     $parameters = $reflection->getProperties(\ReflectionProperty::IS_PROTECTED);
-    
+
     foreach ($parameters as $param) {
       $matches = array();
       if (preg_match('/^(beforeAction|beforeRender|afterRender)(?:_([a-zA-Z0-9]*))?/', $param->getName(), $matches)) {
         $this->_callbacks[$matches[1]][$matches[2]] = (array) $this->{$matches[0]};
       }
     }
-    
+
     // we should be done with the reflection at this point so let's kill it to save memory
     unset($reflection);
-    
+
     // check for expected params
     $diff = array_diff(array('_controller', '_action'), array_keys($request));
     if (!empty($diff)) {
       throw new controller\exception\MissingExpectedRequestParameter('Missing expected Request Parameter(s): ' . implode(', ', $diff));
     }
-    
+
     // set format if not set
     isset($request['_format']) ?: $request['_format'] = $this->_returns[0];
-    
+
     // set method if no set
     isset($request['_method']) ?: $request['_method'] = 'get';
-    
+
     // set view
     $this->view($request['_controller'] . '/' . $request['_action']);
-    
+
     // set layout
     // check to see if the layout param is set to true or false. If it's false then don't render the layout
     if (isset($request['_layout']) && $request['_layout'] == '0') {
@@ -146,10 +146,10 @@ class Controller {
     } else {
       $this->layout($this->_layout);
     }
-    
+
     // beforeFilter callbacks
     $this->callback('beforeAction', $request);
-    
+
     // action
     $action = Inflector::camelize($request['_action']) . 'Action';
 
@@ -158,13 +158,13 @@ class Controller {
     if (method_exists($this, $action)) {
       $method = new \ReflectionMethod($this, $action);
       $parameters = $method->getParameters();
-      
-      // no need to map $request here. Its done manually 
+
+      // no need to map $request here. Its done manually
       array_shift($parameters);
-      
+
       // manually map $request as first parameter
       $params = array($request);
-      
+
       foreach ($parameters as $param) {
         if (isset($request[$param->getName()])) {
           $params[] = $request[$param->getName()];
@@ -176,16 +176,16 @@ class Controller {
           }
         }
       }
-      
+
       unset($parameters);
-      
-      // execute action and check for a return value 
+
+      // execute action and check for a return value
       // an _output value of anything other than NULL will skip rendering the view and return the _output as is
       $this->_output = call_user_func_array(array($this, $action), $params);
-      
+
     } else {
       if (!file_exists(View::$path . str_replace('/', DIRECTORY_SEPARATOR, strtolower($this->_view)) . '.' . $request['_format'])) {
-        throw new controller\exception\MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.' 
+        throw new controller\exception\MissingAction('Missing Action <strong>' . substr($action, 0, -6) . '</strong> in <strong>' . get_class($this) . '</strong> controller.'
         . "\n Create the view <strong>application/views/" . $request['_controller'] . '/' . Inflector::dashize(substr($action, 0, -6)) . '.' . $request['_format'] . "</strong> OR Create a method called <strong>" . $action . "</strong> in <strong>" . get_class($this) . "</strong> class."
         . " \n <code>public function " . $action . "() {\n\n}</code>");
       } else {
@@ -193,22 +193,22 @@ class Controller {
         $this->_data += $request;
       }
     }
-    
+
     if (is_array($this->_output) || is_object($this->_output)) {
       $this->_data = $this->_output;
       $this->_output = null;
     }
-    
+
     // render
     if ($this->_output === null) {
       // beforeRender callbacks
       $this->callback('beforeRender', $request);
-      
+
       if (!in_array($request['_format'], $this->_returns)) {
         throw new controller\exception\MissingView('Unaccepted Format "<strong>' . $request['_format'] . '</strong>" in the controller <strong>' . get_class($this) . '</strong>.' . "\n
         Add the following to <strong>" . get_class($this) . "</strong><code>public \$_returns = array('" . implode("', '", array_merge($this->_returns, array($request['_format']))) . "');</code>");
       }
-      
+
       try {
         // render view
         $this->_output = View::render(array(
@@ -225,21 +225,21 @@ class Controller {
         }
       }
     }
-    
+
     // afterRender callbacks
     $this->callback('afterRender', $request);
-    
+
     // return response
     return $this->_output;
   }
-  
-  
+
+
   /**
    * Perform a callback.
    * @param string $name
    */
   public function callback($name, $request) {
-    if (!isset($this->_callbacks[$name])) { return; }    
+    if (!isset($this->_callbacks[$name])) { return; }
     foreach ($this->_callbacks[$name] as $callback => $exceptions) {
       // there has to be a better algorithm for this....
       if (empty($exceptions['only']) || (in_array($request['_controller'] . '/' . $request['_action'], $exceptions['only']) || in_array($request['_controller'], $exceptions['only']))) {
@@ -253,7 +253,7 @@ class Controller {
   /**
    * This is a helper method to help the user accept the formats an action returns.
    *
-   * @param string $formats 
+   * @param string $formats
    * @return array
    */
   public function returns($formats) {
@@ -273,7 +273,7 @@ class Controller {
   }
 
   /**
-   * Set the name of the view file (ignoring the file extension) 
+   * Set the name of the view file (ignoring the file extension)
    *
    * @param string $view
    * @return string
@@ -282,11 +282,11 @@ class Controller {
     $this->_view = $view;
     return $this->_view;
   }
-  
+
   /**
    * Set the format this should be rendered as
    *
-   * @param string $format 
+   * @param string $format
    * @return string
    */
   public function format($format) {

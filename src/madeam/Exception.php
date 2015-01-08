@@ -69,7 +69,7 @@ class Exception extends \Exception {
     //   echo '<br />' . $file . ' on line ' . $line;
     //   return;
     // }
-    
+
 
     // clean output buffer
     if (ob_get_level() > 0) { ob_clean(); }
@@ -77,7 +77,7 @@ class Exception extends \Exception {
     if (self::$debugMode === true) {
       // get random snippet
       $snippet = self::$funSnippets[rand(0, count(self::$funSnippets) - 1)];
-      
+
       // call error controller and pass information
       $message = array(
         'exception'   => get_class($e),
@@ -88,7 +88,7 @@ class Exception extends \Exception {
         'code'        => $code,
         'file'        => $file
       );
-      
+
       if (!isset($_SERVER['SHELL'])) {
         require 'madeam/src/madeam/exception/template.html.php';
       } else {
@@ -98,13 +98,13 @@ class Exception extends \Exception {
     } else {
       // return 404 error page
       $params = array(
-        '_controller' => 'error', 
+        '_controller' => 'error',
         '_action'     => 'http404',
         '_method'     => 'get',
         '_layout'     => 1,
         '_format'     => 'html'
       );
-      
+
       echo Framework::control($params);
     }
   }

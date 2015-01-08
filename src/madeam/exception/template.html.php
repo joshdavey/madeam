@@ -41,33 +41,33 @@ em {
   font-style: italic;
 }
 
-h1 { 
-  font-size: 2.2em; 
+h1 {
+  font-size: 2.2em;
 }
 
-h1.debug { 
-  color: #b43838; 
+h1.debug {
+  color: #b43838;
 }
 
-h2 { 
-  font-size: 2.0em; 
+h2 {
+  font-size: 2.0em;
 }
 
-h3 { 
-  font-size: 1.8em; 
+h3 {
+  font-size: 1.8em;
 }
 
-h4 { 
-  font-size: 1.6em; 
+h4 {
+  font-size: 1.6em;
 }
 
 h4 + p { margin-top: 0; }
 
-h5 { 
+h5 {
   font-size: 1.4em;
 }
 
-p { 
+p {
   font-size: 1.4em;
 }
 
@@ -100,7 +100,7 @@ li, dd, dt {
 /* Code
 -----------------------------------------------------------------------------*/
 code {
-  background: #f1f4fa; 
+  background: #f1f4fa;
   padding: 1em;
   display: block;
   border: 1px solid #bfc9d9;
@@ -110,21 +110,21 @@ code {
 }
 </style>
 
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
 <head>
   <title>Debugging</title>
 </head>
 <body>
-  <div id="content" class="fullspan debug">    
+  <div id="content" class="fullspan debug">
 
     <h1 class="debug">Oops, <?php echo $message['snippet']; ?></h1>
     <h4><?php echo $message['exception']; ?> Exception:</h4>
     <p><?php echo $message['error']; ?></p>
-  
+
     <br />
     <br />
-  
+
     <hr />
     <p><strong><?php echo $message['file']; ?></strong> on line <strong><?php echo $message['line']; ?></strong></p>
 
